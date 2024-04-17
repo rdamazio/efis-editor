@@ -9,15 +9,18 @@
   EFIS Editor
 </mat-toolbar>
 
-<mat-sidenav-container class="sidenav-container">
+<mat-sidenav-container
+    class="sidenav-container"
+    hasBackdrop>
   <mat-sidenav
       #sidenav
-      mode="side"
-      opened
+      mode="over"
       role="navigation"
       class="sidenav">
     <mat-nav-list>
       <a mat-list-item href="/checklists">Checklist Editor</a>
+      <hr />
+      <a mat-list-item href="/">Introduction</a>
       <a mat-list-item href="/about">About</a>
     </mat-nav-list>
   </mat-sidenav>

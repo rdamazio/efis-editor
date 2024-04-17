@@ -1,0 +1,20 @@
+<mat-form-field class="checklist-file-select">
+  <mat-label>Select checklist file</mat-label>
+  <mat-select
+      [(value)]="selectedFile"
+      (selectionChange)="onFileSelected()">
+    <mat-option
+        *ngFor="let file of fileList; let i=index"
+        value="{{i}}">
+      {{file.name}}
+    </mat-option>
+    <mat-option value="new">
+      <mat-icon fontIcon="library_add" />
+      Create new file
+    </mat-option>
+    <mat-option value="upload">
+      <mat-icon fontIcon="upload" />
+      Upload new file
+    </mat-option>
+  </mat-select>
+</mat-form-field>

@@ -1,0 +1,24 @@
+.checklist-tree-node {
+    display: flex;
+}
+
+.checklist-tree-node-buttons {
+    padding-right: 10px;
+}
+
+.checklist-tree-node-buttons-hidden {
+    visibility: hidden;
+}
+
+.checklist-tree-node-title {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.checklist-tree-node-spacer {
+    flex: 1 1 auto;
+}
+
+.checklist-tree-node-add {
+    margin-right: 5px;
+}
