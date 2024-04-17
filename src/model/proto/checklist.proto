@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package efis;
+
+option optimize_for = CODE_SIZE;
+
+message ChecklistFile {
+  string name = 1;
+  repeated ChecklistGroup groups = 2;
+}
+
+message ChecklistGroup {
+  string title = 1;
+  repeated Checklist checklists = 2;
+}
+
+message Checklist {
+  string title = 1;
+
+  repeated ChecklistItem items = 2;
+}
+
+message ChecklistItem {
+  string prompt = 1;
+  string expectation = 2;
+
+  enum Type {
+    UNKNOWN = 0;
+    ITEM_PROMPT = 1;
+    ITEM_TITLE = 2;
+    ITEM_WARNING = 3;
+    ITEM_CAUTION = 4;
+    ITEM_NOTE = 5;
+    ITEM_SPACE = 6;
+  }
+  Type type = 3;
+}
