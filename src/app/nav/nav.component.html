@@ -1,0 +1,28 @@
+<mat-toolbar class="topbar" color="primary">
+  <button
+      type="button"
+      aria-label="Toggle sidenav"
+      mat-icon-button
+      (click)="sidenav.toggle()">
+    <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+  </button>
+  EFIS Editor
+</mat-toolbar>
+
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+      #sidenav
+      mode="side"
+      opened
+      role="navigation"
+      class="sidenav">
+    <mat-nav-list>
+      <a mat-list-item href="/checklists">Checklist Editor</a>
+      <a mat-list-item href="/about">About</a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>
