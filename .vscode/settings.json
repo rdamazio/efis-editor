@@ -6,7 +6,6 @@
         "use_absolute_path": true,
         "options": [
             "--proto_path=${workspaceRoot}/src/model/proto",
-            // "--proto_path=${workspaceRoot}/node_modules/@protobuf-ts/protoc/installed/protoc-26.1-osx-aarch_64/include/google/protobuf",
             "--plugin=protoc-gen-ts=${workspaceRoot}/node_modules/@protobuf-ts/plugin/bin/protoc-gen-ts",
             "--ts_out=${workspaceRoot}/gen/ts"
         ]
