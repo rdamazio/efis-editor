@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:prod": "ng serve --configuration production",
     "build": "ng build",
     "build:prod": "ng build --configuration production --base-href https://rdamazio.github.io/efis-editor/",
     "watch": "ng build --watch --configuration development",
