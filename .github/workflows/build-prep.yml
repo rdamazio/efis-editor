@@ -28,9 +28,11 @@ jobs:
             --ts_out=gen/ts \
             src/model/proto/*.proto
       - name: Archive prepared artifacts
+        run: tar cf prepared-source.tar .
+      - name: Upload prepared artifacts
         uses: actions/upload-artifact@v4
         with:
           name: prepared-source
-          path: .
+          path: prepared-source.tar
           if-no-files-found: error
           retention-days: 1
