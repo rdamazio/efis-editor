@@ -9,8 +9,7 @@
     "build:prod": "ng build --configuration production --base-href https://rdamazio.github.io/efis-editor/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:headless": "ng test --watch=false --browsers=ChromeHeadless",
-    "serve:ssr:efis-editor": "node dist/efis-editor/server/server.mjs"
+    "test:headless": "ng test --watch=false --browsers=ChromeHeadless"
   },
   "private": true,
   "dependencies": {
