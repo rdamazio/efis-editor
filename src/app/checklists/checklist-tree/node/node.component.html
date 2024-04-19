@@ -1,8 +1,8 @@
 <!-- TODO: Parent is taller than this div, make hover work on parent area -->
 <div
     class="checklist-tree-node"
-    (mouseover)="hideElement = false"
-    (mouseleave)="hideElement = true">
+    (mouseover)="hideButtons = false"
+    (mouseleave)="hideButtons = true">
 
   <button
       *ngIf="node.isAddNew"
@@ -19,7 +19,7 @@
 
   <div class="checklist-tree-node-buttons"
       *ngIf="!node.isAddNew"
-      [style.visibility]="hideElement ? 'hidden' : 'visible'">
+      [style.visibility]="hideButtons ? 'hidden' : 'visible'">
     <button
         mat-icon-button
         mat-small-icon-button

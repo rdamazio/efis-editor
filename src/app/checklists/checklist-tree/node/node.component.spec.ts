@@ -14,6 +14,10 @@ describe('NodeComponent', () => {
     
     fixture = TestBed.createComponent(ChecklistTreeNodeComponent);
     component = fixture.componentInstance;
+    component.node = {
+      isAddNew: false,
+      title: "Test",
+    }
     fixture.detectChanges();
   });
 

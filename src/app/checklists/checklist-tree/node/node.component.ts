@@ -19,5 +19,5 @@ import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 })
 export class ChecklistTreeNodeComponent {
   @Input() node!: ChecklistTreeNode;
-  hideElement = true;
+  hideButtons = true;
 }

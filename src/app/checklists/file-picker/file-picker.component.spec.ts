@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ChecklistFilePickerComponent } from './file-picker.component';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('FilePickerComponent', () => {
   let component: ChecklistFilePickerComponent;
@@ -8,7 +9,10 @@ describe('FilePickerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChecklistFilePickerComponent]
+      imports: [
+        ChecklistFilePickerComponent,
+        NoopAnimationsModule,
+      ]
     })
     .compileComponents();
     
