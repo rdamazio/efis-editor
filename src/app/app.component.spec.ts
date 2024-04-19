@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -8,6 +9,7 @@ describe('AppComponent', () => {
       imports: [
         AppComponent,
         NoopAnimationsModule,
+        RouterModule.forRoot([]),
       ],
     }).compileComponents();
   });
