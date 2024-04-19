@@ -1,8 +1,9 @@
 import { NgFor } from '@angular/common';
-import { Component, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { ChecklistFile } from '../../../../gen/ts/checklist';
+import { ChecklistStorage } from '../../../model/storage/checklist-storage';
 
 @Component({
   selector: 'checklist-file-picker',
@@ -16,31 +17,44 @@ import { ChecklistFile } from '../../../../gen/ts/checklist';
   styleUrl: './file-picker.component.scss'
 })
 export class ChecklistFilePickerComponent {
-  @Output() selectedFile = '';
+  @Output() fileSelected = new EventEmitter<ChecklistFile | undefined>();
+  selectedFile = '';
 
-  // TODO: replace with real data.
-  fileList: ChecklistFile[] = [
-    {
-      name: "N425RP",
-      groups: [],
-    },
-  ];
+  constructor(public store: ChecklistStorage) {}
 
   onFileSelected() {
     if (this.selectedFile === 'new') {
-        this.onNewFile();
-        return;
+      this.onNewFile();
     } else if (this.selectedFile === 'upload') {
-        this.onUploadFile();
-        return;
+      this.onUploadFile();
     } else {
-      // TODO
+      this.loadFile();
     }
   }
 
+  private loadFile() {
+    let file: ChecklistFile | undefined;
+    if (this.selectedFile) {
+      file = this.store.getChecklistFile(this.selectedFile);
+    }
+    this.fileSelected.emit(file);
+  }
+
   onNewFile() {
-    // TODO
-    this.selectedFile = '';
+    let name = prompt("Enter a name for the new file:");
+    if (name) {
+      // Save an empty file with that name.
+      let file : ChecklistFile = {
+        name: name,
+        groups: [],
+      };
+      this.store.saveChecklistFile(file);
+      this.selectedFile = name;
+    } else {
+      // TODO: Doesn't unselect the New File item if ESC is pressed (vs cancelling)
+      this.selectedFile = '';
+    }
+    this.loadFile();
   }
 
   onUploadFile() {
