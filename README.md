@@ -1,6 +1,17 @@
+[![Angular CI](https://github.com/rdamazio/efis-editor/actions/workflows/node.js.yml/badge.svg?event=push)](https://github.com/rdamazio/efis-editor/actions/workflows/node.js.yml)
+
 # EFIS file format editor
 
 This is a web-based editor for file formats used by modern EFIS avionics systems on aircraft.
+
+## Using
+
+Head over to https://rdamazio.github.io/efis-editor/.
+
+## Supported file types:
+
+* Checklists:
+  * EFIS file formats coming soon
 
 ## Contributing
 
@@ -9,7 +20,7 @@ don't be shy. Please ask if you want a pointer on something you can help with,
 and hopefully we can all figure something out.
 
 We do have [a few policies and
-suggestions](https://rdamazio.github.io/efis-editor/latest/contributing/)
+suggestions](https://github.com/rdamazio/efis-editor/blob/main/docs/contributing.md)
 for contributors. The broad TL;DR:
 
 - Bug reports are very welcome!
