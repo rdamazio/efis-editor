@@ -4,9 +4,9 @@
       [(value)]="selectedFile"
       (selectionChange)="onFileSelected()">
     <mat-option
-        *ngFor="let file of fileList; let i=index"
-        value="{{i}}">
-      {{file.name}}
+        *ngFor="let file of store.listChecklistFiles()"
+        value="{{file}}">
+      {{file}}
     </mat-option>
     <mat-option value="new">
       <mat-icon fontIcon="library_add" />

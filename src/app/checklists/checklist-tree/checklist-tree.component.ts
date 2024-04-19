@@ -3,34 +3,9 @@ import { Component, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTreeModule, MatTreeNestedDataSource } from '@angular/material/tree';
-import { Observable, of } from 'rxjs';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
 import { ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
-
-// TODO: Replace with real data source
-const TREE_DATA: ChecklistFile = {
-  name: "N425RP",
-  groups: [
-    {
-      title: 'Normal procedures',
-      checklists: [
-        { title: 'Before takeoff', items: [] },
-        { title: 'After takeoff', items: [] },
-        { title: 'Before landing', items: [] },
-      ],
-    },
-    {
-      title: 'Emergency procedures',
-      checklists: [
-        { title: 'Engine out at takeoff', items: [] },
-        { title: 'Engine fire', items: [] },
-        { title: 'Low voltage', items: [] },
-        { title: 'A very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long name', items: [] },
-      ],
-    },
-  ]
-};
 
 @Component({
   selector: 'checklist-tree',
@@ -47,25 +22,26 @@ const TREE_DATA: ChecklistFile = {
 export class ChecklistTreeComponent {
   treeControl = new NestedTreeControl<ChecklistTreeNode>(node => node.children);
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
+  _file?: ChecklistFile;
 
-  @Input() file?: Observable<ChecklistFile> = of(TREE_DATA); 
+  @Input()
+  get file() : ChecklistFile | undefined { return this._file; }
+  set file(file: ChecklistFile | undefined) {
+    this._file = file;
 
-  ngOnInit() {
-    this.file?.subscribe(
-      file => {
-        let data = file.groups.map(ChecklistTreeComponent.groupToNode);
-        data.push({
-          title: "Add new checklist group",
-          isAddNew: true,
-        });
-        this.dataSource.data = data;
-        this.treeControl.dataNodes = data;
-        this.treeControl.expandAll();
-      }
-    )
+    let data : ChecklistTreeNode[] = [];
+    if (file) {
+      data = file.groups.map(ChecklistTreeComponent.groupToNode);
+      data.push({
+        title: "Add new checklist group",
+        isAddNew: true,
+      });
+    }
+
+    this.dataSource.data = data;
+    this.treeControl.dataNodes = data;
+    this.treeControl.expandAll();
   }
-
-  hasChild = (_: number, node: ChecklistTreeNode) => !!node.children && node.children.length > 0;
 
   private static groupToNode(group: ChecklistGroup): ChecklistTreeNode {
     let node: ChecklistTreeNode = {
@@ -87,4 +63,6 @@ export class ChecklistTreeComponent {
     });
     return node;
   }
+
+  hasChild = (_: number, node: ChecklistTreeNode) => !!node.children && node.children.length > 0;
 }

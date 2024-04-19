@@ -1,2 +1,3 @@
-<checklist-file-picker />
-<checklist-tree />
+<checklist-file-picker
+  (fileSelected)="tree.file = $event" />
+<checklist-tree #tree />
