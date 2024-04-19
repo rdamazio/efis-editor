@@ -22,6 +22,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: prepared-source
+      - name: Extract prepared artifacts
+        run: tar xf prepared-source.tar
       - name: Build
         run: npm run build --if-present
       - name: Run tests
