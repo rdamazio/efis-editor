@@ -1,4 +1,4 @@
-[![Angular CI](https://github.com/rdamazio/efis-editor/actions/workflows/node.js.yml/badge.svg?event=push)](https://github.com/rdamazio/efis-editor/actions/workflows/node.js.yml)
+[![Angular CI](https://github.com/rdamazio/efis-editor/actions/workflows/angular-ci.yml/badge.svg)](https://github.com/rdamazio/efis-editor/actions/workflows/angular-ci.yml)
 
 # EFIS file format editor
 
