@@ -1,0 +1,22 @@
+<div class="container">
+  <div
+      cdkDropList
+      class="list"
+      [cdkDropListData]="todo"
+      (cdkDropListDropped)="onDrop($event)">
+    @for (item of todo; track item) {
+      <div
+          class="list-item"
+          cdkDrag
+          cdkDragLockAxis="y">
+        <mat-icon
+            cdkDragHandle
+            class="mat-icon-rtl-mirror drag-icon">
+          drag_handle
+        </mat-icon>
+        {{item}}
+        <div *cdkDragPlaceholder></div>
+      </div>
+    }
+  </div>
+</div>
