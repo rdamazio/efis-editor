@@ -28,6 +28,16 @@
   border: none;
 }
 
+.item-contents {
+  display: inline;
+  vertical-align: middle;
+}
+
+.add-bar {
+  display: flex;
+  justify-content: space-between;
+}
+
 /* Highlight the list item that is being dragged. */
 .cdk-drag-preview {
   color: white;
