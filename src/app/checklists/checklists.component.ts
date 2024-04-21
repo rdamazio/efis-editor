@@ -18,11 +18,17 @@ import { ChecklistStorage } from '../../model/storage/checklist-storage';
 })
 export class ChecklistsComponent {
   private _selectedFile? : ChecklistFile;
+  @ViewChild("tree") tree? : ChecklistTreeComponent;
 
   constructor(public store: ChecklistStorage) {}
 
-  onFileSelected(file?: ChecklistFile) {
+  onFileSelected(id: string) {
+    let file: ChecklistFile | undefined;
+    if (id) {
+      file = this.store.getChecklistFile(id);
+    }
     this._selectedFile = file;
+    this.tree!.file = file;
   }
 
   onStructureChanged(file: ChecklistFile) {
