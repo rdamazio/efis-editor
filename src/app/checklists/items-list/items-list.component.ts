@@ -46,7 +46,7 @@ export class ChecklistItemsComponent {
   }
 
   onNewItem(type: ChecklistItem_Type) {
-    let item : ChecklistItem = {
+    let item: ChecklistItem = {
       prompt: 'New item',
       expectation: '',
       type: type,
