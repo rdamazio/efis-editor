@@ -1,9 +1,9 @@
 import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ChecklistTreeNode } from './node';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
+import { ChecklistTreeNode } from './node';
 
 @Component({
   selector: 'checklist-tree-node',

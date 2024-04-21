@@ -1,9 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
+import { Checklist, ChecklistFile } from '../../../gen/ts/checklist';
+import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
-import { Checklist, ChecklistFile } from '../../../gen/ts/checklist';
-import { ChecklistStorage } from '../../model/storage/checklist-storage';
 
 @Component({
   selector: 'app-checklists',
@@ -17,10 +17,10 @@ import { ChecklistStorage } from '../../model/storage/checklist-storage';
   styleUrl: './checklists.component.scss'
 })
 export class ChecklistsComponent {
-  private _selectedFile? : ChecklistFile;
-  @ViewChild("tree") tree? : ChecklistTreeComponent;
+  private _selectedFile?: ChecklistFile;
+  @ViewChild("tree") tree?: ChecklistTreeComponent;
 
-  constructor(public store: ChecklistStorage) {}
+  constructor(public store: ChecklistStorage) { }
 
   onFileSelected(id: string) {
     let file: ChecklistFile | undefined;

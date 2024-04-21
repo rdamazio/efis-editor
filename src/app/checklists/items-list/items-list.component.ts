@@ -1,9 +1,6 @@
-import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { Checklist, ChecklistItem } from '../../../../gen/ts/checklist';
 import { ChecklistItemComponent } from './item/item.component';
 

@@ -10,8 +10,8 @@ describe('ChecklistItemComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ChecklistItemComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(ChecklistItemComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

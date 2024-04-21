@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChecklistsComponent } from './checklists.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ChecklistsComponent } from './checklists.component';
 
 describe('ChecklistsComponent', () => {
   let component: ChecklistsComponent;
@@ -14,8 +14,8 @@ describe('ChecklistsComponent', () => {
         NoopAnimationsModule,
       ]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(ChecklistsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
