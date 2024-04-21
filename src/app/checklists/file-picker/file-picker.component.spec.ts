@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChecklistFilePickerComponent } from './file-picker.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ChecklistFilePickerComponent } from './file-picker.component';
 
 describe('FilePickerComponent', () => {
   let component: ChecklistFilePickerComponent;
@@ -14,8 +14,8 @@ describe('FilePickerComponent', () => {
         NoopAnimationsModule,
       ]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(ChecklistFilePickerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

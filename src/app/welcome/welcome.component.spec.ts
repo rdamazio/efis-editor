@@ -10,8 +10,8 @@ describe('WelcomeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [WelcomeComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(WelcomeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

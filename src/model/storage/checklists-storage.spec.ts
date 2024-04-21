@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { ChecklistStorage } from './checklist-storage';
 import { ChecklistFile, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import { ChecklistStorage } from './checklist-storage';
 
 describe('ChecklistsService', () => {
-  let store : ChecklistStorage;
+  let store: ChecklistStorage;
 
-  const A_CHECKLIST_FILE : ChecklistFile = {
+  const A_CHECKLIST_FILE: ChecklistFile = {
     name: "N425RP",
     groups: [
       {
@@ -26,7 +26,7 @@ describe('ChecklistsService', () => {
       },
     ],
   };
-  const ANOTHER_CHECKLIST_FILE : ChecklistFile = {
+  const ANOTHER_CHECKLIST_FILE: ChecklistFile = {
     name: "Something with spaces",
     groups: [],
   };
@@ -47,18 +47,18 @@ describe('ChecklistsService', () => {
 
   describe('should save and read each checklist', () => {
     [A_CHECKLIST_FILE, ANOTHER_CHECKLIST_FILE]
-        .forEach((file) => {
-          beforeEach(() => {
-            store.clear();
-          });
+      .forEach((file) => {
+        beforeEach(() => {
+          store.clear();
+        });
 
-          it('should save and read back a checklist', () => {
-            store.saveChecklistFile(file);
+        it('should save and read back a checklist', () => {
+          store.saveChecklistFile(file);
 
-            expect(store.listChecklistFiles()).toEqual([file.name]);
-            expect(store.getChecklistFile(file.name)).toEqual(file);
-          });
-    });
+          expect(store.listChecklistFiles()).toEqual([file.name]);
+          expect(store.getChecklistFile(file.name)).toEqual(file);
+        });
+      });
   });
 
   it('should store and read multiple checklists', () => {

@@ -10,8 +10,8 @@ describe('NodeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ChecklistTreeNodeComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(ChecklistTreeNodeComponent);
     component = fixture.componentInstance;
     component.node = {

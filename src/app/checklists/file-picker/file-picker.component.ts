@@ -20,7 +20,7 @@ export class ChecklistFilePickerComponent {
   @Output() fileSelected = new EventEmitter<string>();
   selectedFile = '';
 
-  constructor(public store: ChecklistStorage) {}
+  constructor(public store: ChecklistStorage) { }
 
   onFileSelected() {
     if (this.selectedFile === 'new') {
@@ -40,7 +40,7 @@ export class ChecklistFilePickerComponent {
     let name = prompt("Enter a name for the new file:");
     if (name) {
       // Save an empty file with that name.
-      let file : ChecklistFile = {
+      let file: ChecklistFile = {
         name: name,
         groups: [],
       };
