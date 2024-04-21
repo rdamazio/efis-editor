@@ -21,6 +21,7 @@ import { ChecklistTreeNodeComponent } from './node/node.component';
 })
 export class ChecklistTreeComponent {
   @Output() checklistSelected = new EventEmitter<Checklist | undefined>();
+  @Output() checklistStructureChanged = new EventEmitter<ChecklistFile>();
 
   treeControl = new NestedTreeControl<ChecklistTreeNode>(node => node.children);
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
@@ -30,10 +31,10 @@ export class ChecklistTreeComponent {
   get file(): ChecklistFile | undefined { return this._file; }
   set file(file: ChecklistFile | undefined) {
     this._file = file;
-    this.reloadFile();
+    this.reloadFile(false);
   }
 
-  private reloadFile() {
+  private reloadFile(modified: boolean) {
     let data: ChecklistTreeNode[] = [];
     if (this._file) {
       data = this._file.groups.map(ChecklistTreeComponent.groupToNode);
@@ -46,6 +47,10 @@ export class ChecklistTreeComponent {
     this.dataSource.data = data;
     this.treeControl.dataNodes = data;
     this.treeControl.expandAll();
+
+    if (modified) {
+      this.checklistStructureChanged.emit(this._file);
+    }
   }
 
   private static groupToNode(group: ChecklistGroup): ChecklistTreeNode {
@@ -92,7 +97,7 @@ export class ChecklistTreeComponent {
         }
         this._file?.groups.push(group);
       }
-      this.reloadFile();
+      this.reloadFile(true);
       // Leave checklist unset
     }
 
@@ -103,7 +108,7 @@ export class ChecklistTreeComponent {
 
   onChecklistRename(node: ChecklistTreeNode) {
     this.fillTitle(node.checklist!, "checklist");
-    this.reloadFile();
+    this.reloadFile(true);
   }
 
   onChecklistDelete(node: ChecklistTreeNode) {
@@ -112,7 +117,7 @@ export class ChecklistTreeComponent {
 
   onGroupRename(node: ChecklistTreeNode) {
     this.fillTitle(node.checklist!, "checklist group");
-    this.reloadFile();
+    this.reloadFile(true);
   }
 
   onGroupDelete(node: ChecklistTreeNode) {

@@ -1,5 +1,5 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 
@@ -17,6 +17,8 @@ import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts
   ]
 })
 export class ChecklistItemsComponent {
+  @Output() checklistChanged = new EventEmitter<Checklist>();
+
   _checklist?: Checklist;
   readonly ChecklistItem_Type = ChecklistItem_Type;
 
@@ -28,5 +30,6 @@ export class ChecklistItemsComponent {
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
     moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    this.checklistChanged.emit(this._checklist);
   }
 }
