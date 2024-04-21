@@ -1,0 +1,32 @@
+@if (!editing) {
+  {{value}}
+} @else {
+  <mat-form-field
+      appearance="outline"
+      class="editable-input">
+    <mat-label>{{label}}</mat-label>
+    <input
+        #promptInput
+        matInput
+        required
+        [value]="value">
+    <button
+        mat-icon-button
+        mat-medium-icon-button
+        matSuffix
+        class="item-icon"
+        [attr.aria-label]="'Save changes to ' + label"
+        (click)="editing = false; value = promptInput.value; onValueChanged();">
+        <mat-icon fontIcon="save" />
+    </button>
+    <button
+        mat-icon-button
+        mat-medium-icon-button
+        matSuffix
+        class="item-icon"
+        [attr.aria-label]="'Cancel changes to ' + label"
+        (click)="editing = false; onCancelled();">
+        <mat-icon fontIcon="cancel" />
+    </button>
+  </mat-form-field>
+}

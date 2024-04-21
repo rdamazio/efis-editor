@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 .container {
   margin: 20px;
   display: block;
@@ -72,10 +70,12 @@
   color: cyan;
 }
 
-.prompt-input {
+// TODO: Make this work without ng-deep
+::ng-deep .prompt-input mat-form-field {
+  width: 400px;
+}
+::ng-deep .prompt-expectation mat-form-field {
   width: 300px;
-  height: 32px;
-  @include mat.all-component-densities(-3);
 }
 
 .item-icon {
