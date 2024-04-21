@@ -2,12 +2,10 @@ import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPlaceholder, CdkDropList, m
 import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
-import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
-import { EditableLabelComponent } from './editable-label/editable-label.component';
+import { Checklist, ChecklistItem } from '../../../../gen/ts/checklist';
+import { ChecklistItemComponent } from './item/item.component';
 
 @Component({
   selector: 'checklist-items',
@@ -16,13 +14,9 @@ import { EditableLabelComponent } from './editable-label/editable-label.componen
   standalone: true,
   imports: [
     CdkDrag,
-    CdkDragHandle,
     CdkDragPlaceholder,
     CdkDropList,
-    EditableLabelComponent,
-    MatButtonModule,
-    MatIconButtonSizesModule,
-    MatIconModule,
+    ChecklistItemComponent,
     NgIf,
   ]
 })
@@ -31,7 +25,6 @@ export class ChecklistItemsComponent {
 
   editing: boolean = false;
   _checklist?: Checklist;
-  readonly ChecklistItem_Type = ChecklistItem_Type;
 
   @Input()
   get checklist(): Checklist | undefined { return this._checklist; }
@@ -39,13 +32,9 @@ export class ChecklistItemsComponent {
     this._checklist = checklist;
   }
 
-  onIndent(item: ChecklistItem, delta: number) {
-    item.indent += delta;
-    this.checklistChanged.emit(this._checklist);
-  }
-
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
     moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    this.onItemUpdated();
   }
 
   onItemUpdated() {

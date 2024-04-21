@@ -24,68 +24,6 @@
   font-size: 16px;
 }
 
-.item {
-  vertical-align: middle;
-}
-
-.item-title {
-  color: white;
-}
-
-.item-caution {
-  color: red;
-}
-
-.item-caution:before {
-  padding: 10px;
-  content: "CAUTION:"
-}
-
-.item-warning {
-  color: yellow;
-}
-
-.item-warning:before {
-  padding: 10px;
-  content: "WARNING:"
-}
-
-.item-note {
-  color: gray;
-}
-
-.item-note:before {
-  padding: 10px;
-  content: "NOTE:"
-}
-
-.prompt-spacer {
-  text-wrap: nowrap;
-  overflow: hidden;
-  letter-spacing: 10px;
-}
-
-.prompt-expectation {
-  float: right;
-  color: cyan;
-}
-
-// TODO: Make this work without ng-deep
-::ng-deep .prompt-input mat-form-field {
-  width: 400px;
-}
-::ng-deep .prompt-expectation mat-form-field {
-  width: 300px;
-}
-
-.item-icon {
-  vertical-align: middle;
-}
-
-.drag-icon {
-  cursor: move;
-}
-
 .list-item:last-child {
   border: none;
 }

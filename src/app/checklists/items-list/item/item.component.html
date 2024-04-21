@@ -1,0 +1,63 @@
+@if (item) {
+  <mat-icon
+      cdkDragHandle
+      class="mat-icon-rtl-mirror item-icon drag-icon"
+      fontIcon="drag_handle" />
+   <button
+       mat-icon-button
+       mat-medium-icon-button
+       class="item-icon"
+       (click)="promptInput.edit(); expectationInput.edit()"
+       [attr.aria-label]="'Edit ' + item.prompt">
+   <mat-icon fontIcon="edit" />
+   </button>
+   <button
+       mat-icon-button
+       mat-medium-icon-button
+       class="item-icon"
+       [attr.aria-label]="'Indent ' + item.prompt + ' left'"
+       [disabled]="item.indent == 0"
+       (click)="onIndent(item, -1)">
+   <mat-icon fontIcon="format_indent_decrease" />
+   </button>
+   <button
+       mat-icon-button
+       mat-medium-icon-button
+       class="item-icon"
+       [attr.aria-label]="'Indent ' + item.prompt + ' right'"
+       [disabled]="item.indent == 4"
+       (click)="onIndent(item, 1)">
+   <mat-icon fontIcon="format_indent_increase" />
+   </button>
+   <span
+       class="item"
+       [class.item-prompt]="item.type == ChecklistItem_Type.ITEM_PROMPT"
+       [class.item-title]="item.type == ChecklistItem_Type.ITEM_TITLE"
+       [class.item-warning]="item.type == ChecklistItem_Type.ITEM_WARNING"
+       [class.item-caution]="item.type == ChecklistItem_Type.ITEM_CAUTION"
+       [class.item-note]="item.type == ChecklistItem_Type.ITEM_NOTE"
+       [class.item-space]="item.type == ChecklistItem_Type.ITEM_SPACE"
+       [style.padding-left]="item.indent*25 + 'px'">
+   <!-- TODO: Find a better solution than to save/cancel independent fields together -->
+   <editable-label
+       #promptInput
+       class="prompt-input"
+       label="Prompt text"
+       [value]="item.prompt"
+       (valueChanged)="item.prompt = promptInput.value; onItemUpdated(item); expectationInput.cancel();"
+       (cancelled)="expectationInput.cancel()" />
+   </span>
+   <span [hidden]="item.type !== ChecklistItem_Type.ITEM_PROMPT">
+    <!-- TODO: Make the dots fill the center space and nothing more -->
+    <span class="prompt-spacer" *ngIf="!expectationInput.editing">........................</span>
+    <span class="prompt-expectation">
+        <editable-label
+            #expectationInput
+            class="expectation-input"
+            label="Expectation text"
+            [value]="item.expectation"
+            (valueChanged)="item.expectation = expectationInput.value; onItemUpdated(item); promptInput.cancel();"
+            (cancelled)="promptInput.cancel()" />
+    </span>
+  </span>
+}
