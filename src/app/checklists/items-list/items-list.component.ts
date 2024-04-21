@@ -1,7 +1,7 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { Checklist, ChecklistItem } from '../../../../gen/ts/checklist';
+import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 
 @Component({
   selector: 'checklist-items',
@@ -18,6 +18,7 @@ import { Checklist, ChecklistItem } from '../../../../gen/ts/checklist';
 })
 export class ChecklistItemsComponent {
   _checklist?: Checklist;
+  readonly ChecklistItem_Type = ChecklistItem_Type;
 
   @Input()
   get checklist() : Checklist | undefined { return this._checklist; }

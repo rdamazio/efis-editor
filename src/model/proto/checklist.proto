@@ -34,4 +34,6 @@ message ChecklistItem {
     ITEM_SPACE = 6;
   }
   Type type = 3;
+
+  int32 indent = 4;
 }
