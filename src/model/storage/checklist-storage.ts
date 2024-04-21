@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { ChecklistFile } from "../../../gen/ts/checklist";
 
-const CHECKLIST_PREFIX = "checklists.";
+const CHECKLIST_PREFIX = "checklists:";
 
 @Injectable({
   providedIn: 'root'
