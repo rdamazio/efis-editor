@@ -15,7 +15,24 @@
               class="mat-icon-rtl-mirror drag-icon">
             drag_handle
           </mat-icon>
-          {{item.prompt}}
+          <span
+              class="item"
+              [class.item-prompt]="item.type == ChecklistItem_Type.ITEM_PROMPT"
+              [class.item-title]="item.type == ChecklistItem_Type.ITEM_TITLE"
+              [class.item-warning]="item.type == ChecklistItem_Type.ITEM_WARNING"
+              [class.item-caution]="item.type == ChecklistItem_Type.ITEM_CAUTION"
+              [class.item-note]="item.type == ChecklistItem_Type.ITEM_NOTE"
+              [class.item-space]="item.type == ChecklistItem_Type.ITEM_SPACE"
+              [style.padding-left]="item.indent*25 + 'px'">
+            {{item.prompt}}
+          </span>
+          @if (item.type === ChecklistItem_Type.ITEM_PROMPT) {
+            <!-- TODO: Make the dots fill the center space and nothing more -->
+            <span class="prompt-spacer">........................</span>
+            <span class="prompt-expectation">
+              {{item.expectation}}
+            </span>
+          }
           <div *cdkDragPlaceholder></div>
         </div>
       }
