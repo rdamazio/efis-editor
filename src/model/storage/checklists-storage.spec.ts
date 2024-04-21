@@ -18,6 +18,7 @@ describe('ChecklistsService', () => {
                 prompt: "Mood",
                 expectation: "Panic",
                 type: ChecklistItem_Type.ITEM_PROMPT,
+                indent: 1,
               },
             ],
           },
