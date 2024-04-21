@@ -25,7 +25,7 @@ export class ChecklistTreeComponent {
 
   treeControl = new NestedTreeControl<ChecklistTreeNode>(node => node.children);
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
-  _file?: ChecklistFile;
+  private _file?: ChecklistFile;
 
   @Input()
   get file(): ChecklistFile | undefined { return this._file; }
@@ -116,7 +116,7 @@ export class ChecklistTreeComponent {
   }
 
   onGroupRename(node: ChecklistTreeNode) {
-    this.fillTitle(node.checklist!, "checklist group");
+    this.fillTitle(node.group!, "checklist group");
     this.reloadFile(true);
   }
 
@@ -125,7 +125,7 @@ export class ChecklistTreeComponent {
   }
 
   private fillTitle(pb: Checklist | ChecklistGroup, promptType: string): boolean {
-    let title = prompt(`Enter {promptType} title:`, pb.title);
+    let title = prompt(`Enter ${promptType} title:`, pb.title);
     if (!title) {
       return false;
     }

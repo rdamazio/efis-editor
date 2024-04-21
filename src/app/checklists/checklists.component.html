@@ -1,7 +1,7 @@
 <div class="container">
   <div class="leftbar">
     <checklist-file-picker
-      (fileSelected)="tree.file = $event; onFileSelected($event)" />
+      (fileSelected)="onFileSelected($event)" />
     <checklist-tree
       #tree
       (checklistSelected)="items.checklist = $event"

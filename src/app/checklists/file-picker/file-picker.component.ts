@@ -17,7 +17,7 @@ import { ChecklistStorage } from '../../../model/storage/checklist-storage';
   styleUrl: './file-picker.component.scss'
 })
 export class ChecklistFilePickerComponent {
-  @Output() fileSelected = new EventEmitter<ChecklistFile | undefined>();
+  @Output() fileSelected = new EventEmitter<string>();
   selectedFile = '';
 
   constructor(public store: ChecklistStorage) {}
@@ -33,11 +33,7 @@ export class ChecklistFilePickerComponent {
   }
 
   private loadFile() {
-    let file: ChecklistFile | undefined;
-    if (this.selectedFile) {
-      file = this.store.getChecklistFile(this.selectedFile);
-    }
-    this.fileSelected.emit(file);
+    this.fileSelected.emit(this.selectedFile);
   }
 
   onNewFile() {
