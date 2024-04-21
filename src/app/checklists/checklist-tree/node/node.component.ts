@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ChecklistTreeNode } from './node';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,5 +19,8 @@ import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 })
 export class ChecklistTreeNodeComponent {
   @Input() node!: ChecklistTreeNode;
+  @Output() nodeRename = new EventEmitter<ChecklistTreeNode>;
+  @Output() nodeDelete = new EventEmitter<ChecklistTreeNode>;
+
   hideButtons = true;
 }

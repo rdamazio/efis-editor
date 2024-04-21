@@ -1,6 +1,7 @@
-import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPlaceholder, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Component } from '@angular/core';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { Checklist, ChecklistItem } from '../../../../gen/ts/checklist';
 
 @Component({
   selector: 'checklist-items',
@@ -16,15 +17,15 @@ import { MatIconModule } from '@angular/material/icon';
   ]
 })
 export class ChecklistItemsComponent {
-  // TODO: Connect to checklist data.
-  todo = [
-    'Get to work',
-    'Pick up groceries',
-    'Go home',
-    'Fall asleep'
-  ];
+  _checklist?: Checklist;
 
-  onDrop(event: CdkDragDrop<string[]>): void {
+  @Input()
+  get checklist() : Checklist | undefined { return this._checklist; }
+  set checklist(checklist: Checklist | undefined) {
+    this._checklist = checklist;
+  }
+
+  onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
     moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
   }
 }

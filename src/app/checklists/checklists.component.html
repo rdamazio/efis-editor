@@ -2,7 +2,12 @@
   <div class="leftbar">
     <checklist-file-picker
       (fileSelected)="tree.file = $event" />
-    <checklist-tree #tree />
+    <checklist-tree
+      #tree
+      (checklistSelected)="items.checklist = $event"
+      />
   </div>
-  <checklist-items />
+  <checklist-items
+    #items
+  />
 </div>
