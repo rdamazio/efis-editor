@@ -1,7 +1,10 @@
 import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Checklist, ChecklistItem } from '../../../../gen/ts/checklist';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
+import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 import { ChecklistItemComponent } from './item/item.component';
 
 @Component({
@@ -14,6 +17,9 @@ import { ChecklistItemComponent } from './item/item.component';
     CdkDragPlaceholder,
     CdkDropList,
     ChecklistItemComponent,
+    MatButtonModule,
+    MatIconButtonSizesModule,
+    MatIconModule,
     NgIf,
   ]
 })
@@ -22,6 +28,7 @@ export class ChecklistItemsComponent {
 
   editing: boolean = false;
   _checklist?: Checklist;
+  readonly ChecklistItem_Type = ChecklistItem_Type;
 
   @Input()
   get checklist(): Checklist | undefined { return this._checklist; }
@@ -36,5 +43,22 @@ export class ChecklistItemsComponent {
 
   onItemUpdated() {
     this.checklistChanged.emit(this._checklist);
+  }
+
+  onNewItem(type: ChecklistItem_Type) {
+    let item : ChecklistItem = {
+      prompt: 'New item',
+      expectation: '',
+      type: type,
+      indent: 0,
+    };
+    if (type === ChecklistItem_Type.ITEM_PROMPT) {
+      item.expectation = 'New expectation';
+    }
+    if (type == ChecklistItem_Type.ITEM_SPACE) {
+      item.prompt = '';
+    }
+    this._checklist!.items.push(item);
+    this.onItemUpdated();
   }
 }
