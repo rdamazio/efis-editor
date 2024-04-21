@@ -1,6 +1,6 @@
 {
     "protoc": {
-        "path": "${workspaceRoot}/node_modules/@protobuf-ts/protoc/installed/protoc-26.1-osx-aarch_64/bin/protoc",
+        "path": "${workspaceRoot}/src/model/proto/protoc.sh",
         "compile_on_save": true,
         "compile_all_path": "${workspaceRoot}/src/model/proto",
         "use_absolute_path": true,
