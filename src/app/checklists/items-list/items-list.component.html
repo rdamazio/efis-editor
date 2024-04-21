@@ -18,7 +18,7 @@
               mat-icon-button
               mat-medium-icon-button
               class="item-icon"
-              (click)="editing = true"
+              (click)="promptInput.edit(); expectationInput.edit()"
               [attr.aria-label]="'Edit ' + item.prompt">
             <mat-icon fontIcon="edit" />
           </button>
@@ -49,46 +49,28 @@
               [class.item-note]="item.type == ChecklistItem_Type.ITEM_NOTE"
               [class.item-space]="item.type == ChecklistItem_Type.ITEM_SPACE"
               [style.padding-left]="item.indent*25 + 'px'">
-            @if (!editing) {
-              {{item.prompt}}
-            } @else {
-              <mat-form-field
-                  appearance="outline"
-                  class="prompt-input">
-                <mat-label>Prompt text</mat-label>
-                <input
-                    #promptInput
-                    matInput
-                    required
-                    [value]="item.prompt">
-                <button
-                    mat-icon-button
-                    mat-medium-icon-button
-                    matSuffix
-                    class="item-icon"
-                    [attr.aria-label]="'Save changes to ' + item.prompt"
-                    (click)="item.prompt = promptInput.value; onItemUpdated(); editing = false">
-                  <mat-icon fontIcon="save" />
-                </button>
-                <button
-                    mat-icon-button
-                    mat-medium-icon-button
-                    matSuffix
-                    class="item-icon"
-                    [attr.aria-label]="'Cancel changes to ' + item.prompt"
-                    (click)="editing = false">
-                  <mat-icon fontIcon="cancel" />
-                </button>
-              </mat-form-field>
-            }
+            <!-- TODO: Find a better solution than to save/cancel independent fields together -->
+            <editable-label
+                #promptInput
+                class="prompt-input"
+                label="Prompt text"
+                [value]="item.prompt"
+                (valueChanged)="item.prompt = promptInput.value; onItemUpdated(); expectationInput.cancel();"
+                (cancelled)="expectationInput.cancel()" />
           </span>
-          @if (item.type === ChecklistItem_Type.ITEM_PROMPT) {
+          <span [hidden]="item.type !== ChecklistItem_Type.ITEM_PROMPT">
             <!-- TODO: Make the dots fill the center space and nothing more -->
-            <span class="prompt-spacer" *ngIf="!editing">........................</span>
+            <span class="prompt-spacer" *ngIf="!expectationInput.editing">........................</span>
             <span class="prompt-expectation">
-              {{item.expectation}}
+              <editable-label
+                  #expectationInput
+                  class="expectation-input"
+                  label="Expectation text"
+                  [value]="item.expectation"
+                  (valueChange)="item.expectation = expectationInput.value; onItemUpdated(); promptInput.cancel();"
+                  (cancelled)="promptInput.cancel()" />
             </span>
-          }
+          </span>
           <div *cdkDragPlaceholder></div>
         </div>
       }

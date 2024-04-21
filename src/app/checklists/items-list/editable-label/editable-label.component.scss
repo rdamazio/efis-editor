@@ -1,0 +1,6 @@
+@use '@angular/material' as mat;
+
+.editable-input {
+  height: 32px;
+  @include mat.all-component-densities(-3);
+}

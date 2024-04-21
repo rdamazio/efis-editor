@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
+import { EditableLabelComponent } from './editable-label/editable-label.component';
 
 @Component({
   selector: 'checklist-items',
@@ -18,13 +19,10 @@ import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts
     CdkDragHandle,
     CdkDragPlaceholder,
     CdkDropList,
+    EditableLabelComponent,
     MatButtonModule,
-    MatFormFieldModule,
-    MatIconModule,
     MatIconButtonSizesModule,
     MatIconModule,
-    MatInputModule,
-    MatLabel,
     NgIf,
   ]
 })
