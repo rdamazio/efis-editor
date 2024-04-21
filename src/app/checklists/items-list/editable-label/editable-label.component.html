@@ -9,14 +9,15 @@
         #promptInput
         matInput
         required
-        [value]="value">
+        [formControl]="control">
     <button
         mat-icon-button
         mat-medium-icon-button
         matSuffix
         class="item-icon"
         [attr.aria-label]="'Save changes to ' + label"
-        (click)="editing = false; value = promptInput.value; onValueChanged();">
+        [disabled]="!this.control.valid"
+        (click)="value = promptInput.value; save();">
         <mat-icon fontIcon="save" />
     </button>
     <button
@@ -25,7 +26,7 @@
         matSuffix
         class="item-icon"
         [attr.aria-label]="'Cancel changes to ' + label"
-        (click)="editing = false; onCancelled();">
+        (click)="cancel()">
         <mat-icon fontIcon="cancel" />
     </button>
   </mat-form-field>
