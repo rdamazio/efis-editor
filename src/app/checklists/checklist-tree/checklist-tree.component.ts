@@ -1,11 +1,11 @@
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTreeModule, MatTreeNestedDataSource } from '@angular/material/tree';
+import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
-import { ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
 
 @Component({
   selector: 'checklist-tree',
@@ -20,18 +20,23 @@ import { ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
   styleUrl: './checklist-tree.component.scss'
 })
 export class ChecklistTreeComponent {
+  @Output() checklistSelected = new EventEmitter<Checklist | undefined>();
+
   treeControl = new NestedTreeControl<ChecklistTreeNode>(node => node.children);
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
   _file?: ChecklistFile;
 
   @Input()
-  get file() : ChecklistFile | undefined { return this._file; }
+  get file(): ChecklistFile | undefined { return this._file; }
   set file(file: ChecklistFile | undefined) {
     this._file = file;
+    this.reloadFile();
+  }
 
-    let data : ChecklistTreeNode[] = [];
-    if (file) {
-      data = file.groups.map(ChecklistTreeComponent.groupToNode);
+  private reloadFile() {
+    let data: ChecklistTreeNode[] = [];
+    if (this._file) {
+      data = this._file.groups.map(ChecklistTreeComponent.groupToNode);
       data.push({
         title: "Add new checklist group",
         isAddNew: true,
@@ -59,10 +64,67 @@ export class ChecklistTreeComponent {
     };
     node.children?.push({
       title: "Add new checklist",
+      group: group,
       isAddNew: true,
     });
     return node;
   }
 
   hasChild = (_: number, node: ChecklistTreeNode) => !!node.children && node.children.length > 0;
+
+  onNodeSelect(node: ChecklistTreeNode) {
+    let checklist: Checklist | undefined;
+    if (!node.isAddNew) {
+      checklist = node.checklist!;
+    } else {
+      if (node.group) {
+        // Adding new checklist to a group.
+        checklist = Checklist.create();
+        if (!this.fillTitle(checklist, "checklist")) {
+          return;
+        }
+        node.group.checklists.push(checklist);
+      } else {
+        // Adding new group to the file.
+        let group = ChecklistGroup.create();
+        if (!this.fillTitle(group, "checklist group")) {
+          return;
+        }
+        this._file?.groups.push(group);
+      }
+      this.reloadFile();
+      // Leave checklist unset
+    }
+
+    if (checklist) {
+      this.checklistSelected.emit(checklist);
+    }
+  }
+
+  onChecklistRename(node: ChecklistTreeNode) {
+    this.fillTitle(node.checklist!, "checklist");
+    this.reloadFile();
+  }
+
+  onChecklistDelete(node: ChecklistTreeNode) {
+    window.alert("TODO");
+  }
+
+  onGroupRename(node: ChecklistTreeNode) {
+    this.fillTitle(node.checklist!, "checklist group");
+    this.reloadFile();
+  }
+
+  onGroupDelete(node: ChecklistTreeNode) {
+    window.alert("TODO");
+  }
+
+  private fillTitle(pb: Checklist | ChecklistGroup, promptType: string): boolean {
+    let title = prompt(`Enter {promptType} title:`, pb.title);
+    if (!title) {
+      return false;
+    }
+    pb.title = title;
+    return true;
+  }
 }

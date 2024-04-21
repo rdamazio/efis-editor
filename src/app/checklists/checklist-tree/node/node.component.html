@@ -23,13 +23,17 @@
     <button
         mat-icon-button
         mat-small-icon-button
-        [attr.aria-label]="'Edit ' + node.title">
+        [attr.aria-label]="'Edit ' + node.title"
+        (click)="nodeRename.emit(node)"
+        >
       <mat-icon fontIcon="edit" />
     </button>
     <button
         mat-icon-button
         mat-small-icon-button
-        [attr.aria-label]="'Delete ' + node.title">
+        [attr.aria-label]="'Delete ' + node.title"
+        (click)="nodeDelete.emit(node)"
+        >
       <mat-icon fontIcon="delete" />
     </button>
   </div>
