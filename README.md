@@ -13,6 +13,12 @@ Head over to https://rdamazio.github.io/efis-editor/.
 * Checklists:
   * EFIS file formats coming soon
 
+## File storage
+
+For now, this is a standalone web app that doesn't talk to any servers. To accomplish this, files are
+stored on your browser's local storage. This does mean that if you lose your device or clear your
+browser's data, they will be lost - so download your files and keep a copy safe.
+
 ## Contributing
 
 We welcome outside contributions, and there's plenty of things to do, so
