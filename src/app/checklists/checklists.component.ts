@@ -25,7 +25,10 @@ export class ChecklistsComponent {
   onFileSelected(id: string) {
     let file: ChecklistFile | undefined;
     if (id) {
-      file = this.store.getChecklistFile(id);
+      let loadedFile = this.store.getChecklistFile(id);
+      if (loadedFile) {
+        file = loadedFile;
+      }
     }
     this._selectedFile = file;
     this.tree!.file = file;

@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { AfterRenderPhase, Injectable, afterNextRender } from "@angular/core";
 import { ChecklistFile } from "../../../gen/ts/checklist";
 
 const CHECKLIST_PREFIX = "checklists:";
@@ -7,10 +7,22 @@ const CHECKLIST_PREFIX = "checklists:";
   providedIn: 'root'
 })
 export class ChecklistStorage {
+  private _browserStorage : any;
+
+  constructor() {
+    afterNextRender(() => {
+      this._browserStorage = localStorage;
+    }, {phase: AfterRenderPhase.Read});
+  }
+
   listChecklistFiles(): string[] {
+    if (!this._browserStorage) {
+      return [];
+    }
+
     let names: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      let k = localStorage.key(i);
+    for (let i = 0; i < this._browserStorage.length; i++) {
+      let k = this._browserStorage.key(i);
       if (k?.startsWith(CHECKLIST_PREFIX)) {
         names.push(k.slice(CHECKLIST_PREFIX.length));
       }
@@ -18,18 +30,27 @@ export class ChecklistStorage {
     return names;
   }
 
-  getChecklistFile(id: string): ChecklistFile {
-    let blob = localStorage.getItem(CHECKLIST_PREFIX + id);
-    return ChecklistFile.fromJsonString(blob!);
+  getChecklistFile(id: string): ChecklistFile | null {
+    if (this._browserStorage) {
+      let blob = this._browserStorage.getItem(CHECKLIST_PREFIX + id);
+      if (blob) {
+        return ChecklistFile.fromJsonString(blob);
+      }
+    }
+    return null;
   }
 
   saveChecklistFile(file: ChecklistFile) {
-    let blob = ChecklistFile.toJsonString(file);
-    localStorage.setItem(CHECKLIST_PREFIX + file.name, blob);
+    if (this._browserStorage) {
+      let blob = ChecklistFile.toJsonString(file);
+      this._browserStorage.setItem(CHECKLIST_PREFIX + file.name, blob);
+    }
   }
 
   deleteChecklistFile(id: string) {
-    localStorage.removeItem(CHECKLIST_PREFIX + id);
+    if (this._browserStorage) {
+      this._browserStorage.removeItem(CHECKLIST_PREFIX + id);
+    }
   }
 
   clear() {
