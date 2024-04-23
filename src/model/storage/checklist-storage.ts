@@ -11,8 +11,12 @@ export class ChecklistStorage {
 
   constructor() {
     afterNextRender(() => {
-      this._browserStorage = localStorage;
-    }, {phase: AfterRenderPhase.Read});
+      this.onAfterRender();
+   }, {phase: AfterRenderPhase.Read});
+  }
+
+  onAfterRender() {
+    this._browserStorage = localStorage;
   }
 
   listChecklistFiles(): string[] {
@@ -36,6 +40,7 @@ export class ChecklistStorage {
       if (blob) {
         return ChecklistFile.fromJsonString(blob);
       }
+
     }
     return null;
   }

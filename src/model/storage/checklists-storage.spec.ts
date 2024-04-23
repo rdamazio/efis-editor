@@ -34,6 +34,7 @@ describe('ChecklistsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
     store = TestBed.inject(ChecklistStorage);
+    store.onAfterRender();
     store.clear();
   });
 
