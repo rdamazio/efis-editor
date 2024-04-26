@@ -5,6 +5,7 @@ import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.componen
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
+import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 
 @Component({
   selector: 'app-checklists',
@@ -12,6 +13,7 @@ import { ChecklistItemsComponent } from './items-list/items-list.component';
   imports: [
     ChecklistCommandBarComponent,
     ChecklistFilePickerComponent,
+    ChecklistFileUploadComponent,
     ChecklistItemsComponent,
     ChecklistTreeComponent
   ],
@@ -24,6 +26,7 @@ export class ChecklistsComponent {
   @ViewChild("filePicker") filePicker?: ChecklistFilePickerComponent;
 
   showFilePicker: boolean = false;
+  showFileUpload: boolean = true;
 
   constructor(public store: ChecklistStorage) { }
 
@@ -54,8 +57,18 @@ export class ChecklistsComponent {
 
   onUploadFile() {
     this.showFilePicker = false;
+    this.showFileUpload = true;
+  }
 
-    window.alert('TODO');
+  onUploadFileCancel() {
+    this.showFileUpload = false;
+  }
+
+  onFileUploaded(file: ChecklistFile) {
+    this.showFileUpload = false;
+    
+    this.store.saveChecklistFile(file);
+    this._displayFile(file);
   }
 
   onDownloadFile() {
@@ -75,8 +88,6 @@ export class ChecklistsComponent {
       }
     }
     this._displayFile(file);
-
-    // TODO: Add filename to topbar, add rename pencil there
   }
 
   private _displayFile(file?: ChecklistFile) {
@@ -86,6 +97,8 @@ export class ChecklistsComponent {
       // Make the file selected the next time the picker gets displayed
       this.filePicker!.selectedFile = file.name;
     }
+
+    // TODO: Add filename to topbar, add rename pencil there
   }
 
   onStructureChanged(file: ChecklistFile) {
