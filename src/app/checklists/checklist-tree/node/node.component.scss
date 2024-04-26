@@ -1,5 +1,7 @@
 .checklist-tree-node {
     display: flex;
+    min-height: 48px;
+    align-items: center;
 }
 
 .checklist-tree-node-buttons {
