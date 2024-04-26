@@ -1,20 +1,15 @@
-<mat-form-field class="container">
-  <mat-label>Select checklist file</mat-label>
-  <mat-select
-      [(value)]="selectedFile"
-      (selectionChange)="onFileSelected()">
-    <mat-option
-        *ngFor="let file of store.listChecklistFiles()"
-        value="{{file}}">
-      {{file}}
-    </mat-option>
-    <mat-option value="new">
-      <mat-icon fontIcon="library_add" />
-      Create new file
-    </mat-option>
-    <mat-option value="upload">
-      <mat-icon fontIcon="upload" />
-      Upload new file
-    </mat-option>
-  </mat-select>
-</mat-form-field>
+<div class="container">
+  <mat-form-field class="dropdown">
+    <mat-label>Select checklist file</mat-label>
+    <mat-select
+        [(value)]="selectedFile"
+        (selectionChange)="fileSelected.emit(selectedFile)">
+      <mat-option
+          *ngFor="let file of fileNames"
+          value="{{file}}">
+        {{file}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <!-- TODO: Cancel button -->
+</div>

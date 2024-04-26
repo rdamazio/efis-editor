@@ -1,0 +1,27 @@
+<div class="command-bar">
+  <button
+      mat-icon-button
+      aria-label="New file"
+      (click)="newFile.emit(true)">
+    <mat-icon fontIcon="note_add" />
+  </button>
+  <button
+      mat-icon-button
+      aria-label="Open file"
+      (click)="openFile.emit(true)">
+    <mat-icon fontIcon="folder_open" />
+  </button>
+  <!-- TODO: Rename, delete file? -->
+  <button
+      mat-icon-button
+      aria-label="Upload file"
+      (click)="uploadFile.emit(true)">
+    <mat-icon fontIcon="upload" />
+  </button>
+  <button
+      mat-icon-button
+      aria-label="Download file"
+      (click)="downloadFile.emit(true)">
+    <mat-icon fontIcon="download" />
+  </button>
+</div>
