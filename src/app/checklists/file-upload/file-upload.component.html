@@ -1,8 +1,10 @@
 <!-- TODO: Prettify, add drop zone -->
-<input
-    type="file"
-    accept=".ace"
-    ng2FileSelect
-    [uploader]="uploader"
-    (onFileSelected)="onFile($event)"
-/>
+<div class="file-upload">
+    <input
+        type="file"
+        accept=".ace"
+        ng2FileSelect
+        [uploader]="uploader"
+        (onFileSelected)="onFile($event)"
+    />
+</div>

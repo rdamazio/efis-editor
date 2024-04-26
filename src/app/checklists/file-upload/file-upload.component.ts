@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FileLikeObject, FileUploadModule, FileUploader } from 'ng2-file-upload';
 import { ChecklistFile } from '../../../../gen/ts/checklist';
+import { AceFormat } from '../../../model/formats/ace-format';
 
 @Component({
   selector: 'checklist-file-upload',
@@ -32,16 +33,9 @@ export class ChecklistFileUploadComponent {
     });
   }
 
-  onFile(files: File[]) {
+  async onFile(files: File[]) {
     if (files) {
-      files[0].arrayBuffer().then((contents) => {
-        // TODO: File conversion
-        let file : ChecklistFile = {
-          name: "Sample upload",
-          groups: [],
-        };
-        this.fileUploaded.emit(file);
-      });
+      this.fileUploaded.emit(await AceFormat.toProto(files[0]));
     }
   }
 

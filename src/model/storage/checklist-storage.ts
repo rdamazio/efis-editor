@@ -21,6 +21,7 @@ export class ChecklistStorage {
 
   listChecklistFiles(): string[] {
     if (!this._browserStorage) {
+      // TODO: NG0100 error caused by this
       return [];
     }
 
