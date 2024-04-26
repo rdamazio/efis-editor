@@ -1,17 +1,28 @@
 <div class="container">
   <div class="leftbar">
+    <checklist-command-bar
+        (newFile)="onNewFile()"
+        (openFile)="onOpenFile()"
+        (uploadFile)="onUploadFile()"
+        (downloadFile)="onDownloadFile()"
+    />
     <checklist-file-picker
-      (fileSelected)="onFileSelected($event)" />
+        #filePicker
+        (fileSelected)="onFileSelected($event)"
+        (cancel)="onOpenFileCancel()"
+        [fileNames]="store.listChecklistFiles()"
+        [style.display]="showFilePicker ? '' : 'none'"
+    />
     <checklist-tree
-      #tree
-      class="checklist-tree"
-      (checklistSelected)="items.checklist = $event"
-      (checklistStructureChanged)="onStructureChanged($event)"
-      />
+        #tree
+        class="checklist-tree"
+        (checklistSelected)="items.checklist = $event"
+        (checklistStructureChanged)="onStructureChanged($event)"
+    />
   </div>
   <checklist-items
-    #items
-    class="checklist-items"
-    (checklistChanged)="onChecklistChanged($event)"
+      #items
+      class="checklist-items"
+      (checklistChanged)="onChecklistChanged($event)"
   />
 </div>
