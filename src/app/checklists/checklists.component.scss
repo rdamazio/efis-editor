@@ -4,5 +4,17 @@
 }
 
 .leftbar {
-  display: inline;
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  margin-bottom: 20px;
+}
+
+.checklist-tree {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.checklist-items {
+  flex-grow: 1;
 }

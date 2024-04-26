@@ -4,6 +4,7 @@
   bottom: 0;
   left: 0;
   right: 0;
+  overflow-y: auto;
 }
 
 .sidenav {
@@ -11,6 +12,10 @@
   align-items: center;
   justify-content: center;
   width: 200px;
+}
+
+.sidenav .mat-sidenav-content {
+  display: flex;
 }
 
 .sidenav .mat-toolbar {
