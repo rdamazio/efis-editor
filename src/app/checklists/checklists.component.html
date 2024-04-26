@@ -13,6 +13,11 @@
         [fileNames]="store.listChecklistFiles()"
         [style.display]="showFilePicker ? '' : 'none'"
     />
+    <checklist-file-upload
+        [style.display]="showFileUpload ? '' : 'none'"
+        (fileUploaded)="onFileUploaded($event)"
+        (cancel)="onUploadFileCancel()"
+    />
     <checklist-tree
         #tree
         class="checklist-tree"

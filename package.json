@@ -30,6 +30,7 @@
     "@types/file-saver": "^2.0.7",
     "express": "^4.18.2",
     "mat-icon-button-sizes": "^1.0.6",
+    "ng2-file-upload": "^5.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
@@ -49,5 +50,11 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.4.2"
+  },
+  "overrides": {
+    "ng2-file-upload": {
+      "@angular/common": "$@angular/common",
+      "@angular/core": "$@angular/core"
+    }
   }
 }
