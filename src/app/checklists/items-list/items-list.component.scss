@@ -1,16 +1,17 @@
 .container {
-  margin: 20px;
   display: block;
-  width: 1000px;
-  height: 100%;
+  border-radius: 8px;
+  margin: 20px;
+  padding: 10px;
+  // TODO: Avoid calc - maybe use box-sizing?
+  height: calc(100% - 60px);
+  overflow-y: auto;
+
   color: #bbb;
   background: black;
-  border-radius: 8px;
-  padding: 10px;
 }
 
 .list {
-  // border: solid 1px #ccc;
   min-height: 60px;
   display: block;
   overflow: hidden;
@@ -18,7 +19,6 @@
 
 .list-item {
   padding: 10px;
-  // border-bottom: solid 1px #ccc;
   box-sizing: border-box;
   font-family: monospace;
   font-size: 16px;

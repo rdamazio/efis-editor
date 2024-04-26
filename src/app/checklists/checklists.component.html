@@ -4,12 +4,14 @@
       (fileSelected)="onFileSelected($event)" />
     <checklist-tree
       #tree
+      class="checklist-tree"
       (checklistSelected)="items.checklist = $event"
       (checklistStructureChanged)="onStructureChanged($event)"
       />
   </div>
   <checklist-items
     #items
+    class="checklist-items"
     (checklistChanged)="onChecklistChanged($event)"
   />
 </div>
