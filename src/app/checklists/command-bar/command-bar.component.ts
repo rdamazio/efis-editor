@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'checklist-command-bar',
@@ -15,6 +15,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
   styleUrl: './command-bar.component.scss'
 })
 export class ChecklistCommandBarComponent {
+  @Input() openDisabled = false;
+  @Input() downloadDisabled = false;
   @Output() newFile = new EventEmitter<boolean>();
   @Output() openFile = new EventEmitter<boolean>();
   @Output() uploadFile = new EventEmitter<boolean>();

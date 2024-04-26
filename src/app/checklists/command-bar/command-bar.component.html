@@ -10,6 +10,7 @@
       mat-icon-button
       matTooltip="Open file"
       aria-label="Open file"
+      [disabled]="openDisabled"
       (click)="openFile.emit(true)">
     <mat-icon fontIcon="folder_open" />
   </button>
@@ -25,6 +26,7 @@
       mat-icon-button
       matTooltip="Download file"
       aria-label="Download file"
+      [disabled]="downloadDisabled"
       (click)="downloadFile.emit(true)">
     <mat-icon fontIcon="download" />
   </button>

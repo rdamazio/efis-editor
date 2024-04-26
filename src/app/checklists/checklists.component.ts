@@ -21,12 +21,12 @@ import { ChecklistFileUploadComponent } from './file-upload/file-upload.componen
   styleUrl: './checklists.component.scss'
 })
 export class ChecklistsComponent {
-  private _selectedFile?: ChecklistFile;
+  selectedFile?: ChecklistFile;
   @ViewChild("tree") tree?: ChecklistTreeComponent;
   @ViewChild("filePicker") filePicker?: ChecklistFilePickerComponent;
 
   showFilePicker: boolean = false;
-  showFileUpload: boolean = true;
+  showFileUpload: boolean = false;
 
   constructor(public store: ChecklistStorage) { }
 
@@ -49,6 +49,7 @@ export class ChecklistsComponent {
 
   onOpenFile() {
     this.showFilePicker = true;
+    this.showFileUpload = false;
   }
 
   onOpenFileCancel() {
@@ -91,7 +92,7 @@ export class ChecklistsComponent {
   }
 
   private _displayFile(file?: ChecklistFile) {
-    this._selectedFile = file;
+    this.selectedFile = file;
     this.tree!.file = file;
     if (file) {
       // Make the file selected the next time the picker gets displayed
@@ -106,8 +107,8 @@ export class ChecklistsComponent {
   }
 
   onChecklistChanged(checklist: Checklist) {
-    if (this._selectedFile) {
-      this.store.saveChecklistFile(this._selectedFile);
+    if (this.selectedFile) {
+      this.store.saveChecklistFile(this.selectedFile);
     }
   }
 }
