@@ -42,6 +42,7 @@ export class ChecklistsComponent {
     let file: ChecklistFile = {
       name: name,
       groups: [],
+      metadata: undefined,
     };
     this.store.saveChecklistFile(file);
     this._displayFile(file);

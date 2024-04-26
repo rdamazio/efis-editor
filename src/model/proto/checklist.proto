@@ -4,9 +4,20 @@ package efis;
 
 option optimize_for = CODE_SIZE;
 
+message ChecklistFileMetadata {
+  int32 default_group_index = 1;
+  int32 default_checklist_index = 2;
+
+  string make_and_model = 3;
+  string aircraft_info = 4;
+  string manufacturer_info = 5;
+  string copyright_info = 6;
+}
+
 message ChecklistFile {
   string name = 1;
   repeated ChecklistGroup groups = 2;
+  ChecklistFileMetadata metadata = 3;
 }
 
 message ChecklistGroup {
@@ -25,15 +36,19 @@ message ChecklistItem {
   string expectation = 2;
 
   enum Type {
-    UNKNOWN = 0;
-    ITEM_PROMPT = 1;
-    ITEM_TITLE = 2;
-    ITEM_WARNING = 3;
-    ITEM_CAUTION = 4;
-    ITEM_NOTE = 5;
-    ITEM_SPACE = 6;
+    ITEM_UNKNOWN = 0;
+    ITEM_CHALLENGE = 1;
+    ITEM_CHALLENGE_RESPONSE = 2;
+    ITEM_TITLE = 3;
+    ITEM_PLAINTEXT = 4;
+    ITEM_WARNING = 5;
+    ITEM_CAUTION = 6;
+    ITEM_NOTE = 7;
+    ITEM_SPACE = 8;
   }
   Type type = 3;
 
   int32 indent = 4;
+  // If centered, indent is ignored.
+  bool centered = 5;
 }

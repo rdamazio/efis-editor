@@ -31,7 +31,8 @@
   </button>
   <span
       class="item"
-      [class.item-prompt]="item.type == ChecklistItem_Type.ITEM_PROMPT"
+      [class.item-challenge]="item.type == ChecklistItem_Type.ITEM_CHALLENGE"
+      [class.item-challenge-response]="item.type == ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
       [class.item-title]="item.type == ChecklistItem_Type.ITEM_TITLE"
       [class.item-warning]="item.type == ChecklistItem_Type.ITEM_WARNING"
       [class.item-caution]="item.type == ChecklistItem_Type.ITEM_CAUTION"
@@ -47,7 +48,7 @@
         (valueChanged)="item.prompt = promptInput.value; onItemUpdated(item); expectationInput.cancel();"
         (cancelled)="expectationInput.cancel()" />
   </span>
-  <span [hidden]="item.type !== ChecklistItem_Type.ITEM_PROMPT">
+  <span [hidden]="item.type !== ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE">
     <!-- TODO: Make the dots fill the center space and nothing more -->
     <span class="prompt-spacer" *ngIf="!expectationInput.editing">........................</span>
     <span class="prompt-expectation">

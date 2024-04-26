@@ -51,8 +51,9 @@ export class ChecklistItemsComponent {
       expectation: '',
       type: type,
       indent: 0,
+      centered: false,
     };
-    if (type === ChecklistItem_Type.ITEM_PROMPT) {
+    if (type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
       item.expectation = 'New expectation';
     }
     if (type == ChecklistItem_Type.ITEM_SPACE) {
