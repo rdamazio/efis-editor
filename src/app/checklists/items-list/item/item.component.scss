@@ -1,6 +1,16 @@
 .item {
   vertical-align: middle;
+  color: #eee;
+}
+
+.item-title {
+  font-size: 18px;
+  font-weight: bold;
   color: white;
+}
+
+.item-prompt:before {
+  content: " □";
 }
 
 .item-caution:before {
