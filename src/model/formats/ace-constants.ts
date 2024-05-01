@@ -8,6 +8,7 @@ export namespace AceConstants {
     export const CHECKLIST_HEADER = Uint8Array.from([0x28, 0x30]); // '(0'
     export const CHECKLIST_END_HEADER = ')';
     export const FILE_END = "END";
+    export const CRLF = Uint8Array.from([0xd, 0xa]);
 
     export function itemTypeForCode(code: number) : ChecklistItem_Type {
         switch (code) {
@@ -30,4 +31,24 @@ export namespace AceConstants {
         }
     }
 
+    export function codeForItemType(type: ChecklistItem_Type): number {
+        switch (type) {
+            case ChecklistItem_Type.ITEM_WARNING:
+                return 0x77;  // 'w'
+            case ChecklistItem_Type.ITEM_CAUTION:
+                return 0x61;  // 'a'
+            case ChecklistItem_Type.ITEM_NOTE:
+                return 0x6e;  // 'n'
+            case ChecklistItem_Type.ITEM_PLAINTEXT:
+                return 0x70;  // 'p'
+            case ChecklistItem_Type.ITEM_CHALLENGE:
+                return 0x63;  // 'c'
+            case ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE:
+                return 0x72;  // 'r'
+            case ChecklistItem_Type.ITEM_TITLE:
+                return 0x74;  // 't'
+            default:
+                throw new FormatError(`Unexpected item type code ${type}`);
+        }
+    }
 }
