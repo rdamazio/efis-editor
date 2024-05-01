@@ -85,6 +85,19 @@ export class ChecklistsComponent {
     saveAs(contents, this.selectedFile.name + '.ace');
   }
 
+  onDeleteFile() {
+    this.showFilePicker = false;
+    this.showFileUpload = false;
+
+    if (!this.selectedFile) return;
+
+    // TODO: Look into using a framework that makes nicer dialogs, like ng-bootstrap, sweetalert, sweetalert2 or ng-vibe
+    if (!confirm(`Are you sure you'd like to delete checklist file "${this.selectedFile.name}??`)) return;
+
+    this.store.deleteChecklistFile(this.selectedFile.name);
+    this._displayFile(undefined);
+  }
+
   onFileSelected(id: string) {
     this.showFilePicker = false;
 

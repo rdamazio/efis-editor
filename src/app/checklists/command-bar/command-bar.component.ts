@@ -15,10 +15,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   styleUrl: './command-bar.component.scss'
 })
 export class ChecklistCommandBarComponent {
-  @Input() openDisabled = false;
-  @Input() downloadDisabled = false;
+  @Input() hasFiles = false;
+  @Input() fileIsOpen = false;
   @Output() newFile = new EventEmitter<boolean>();
   @Output() openFile = new EventEmitter<boolean>();
   @Output() uploadFile = new EventEmitter<boolean>();
   @Output() downloadFile = new EventEmitter<boolean>();
+  @Output() deleteFile = new EventEmitter<boolean>();
 }
