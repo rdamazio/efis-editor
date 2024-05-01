@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { saveAs } from 'file-saver';
-import { Checklist, ChecklistFile } from '../../../gen/ts/checklist';
+import { Checklist, ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
 import { AceWriter } from '../../model/formats/ace-writer';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
@@ -42,9 +42,10 @@ export class ChecklistsComponent {
 
     // Save an empty file with that name.
     const file: ChecklistFile = {
-      name: name,
       groups: [],
-      metadata: undefined,
+      metadata: ChecklistFileMetadata.create({
+        name: name,
+      }),
     };
     this.store.saveChecklistFile(file);
     this._displayFile(file);
@@ -82,7 +83,7 @@ export class ChecklistsComponent {
     if (!this.selectedFile) return;
 
     const contents = await new AceWriter().write(this.selectedFile);
-    saveAs(contents, this.selectedFile.name + '.ace');
+    saveAs(contents, this.selectedFile.metadata!.name + '.ace');
   }
 
   onDeleteFile() {
@@ -92,9 +93,9 @@ export class ChecklistsComponent {
     if (!this.selectedFile) return;
 
     // TODO: Look into using a framework that makes nicer dialogs, like ng-bootstrap, sweetalert, sweetalert2 or ng-vibe
-    if (!confirm(`Are you sure you'd like to delete checklist file "${this.selectedFile.name}??`)) return;
+    if (!confirm(`Are you sure you'd like to delete checklist file "${this.selectedFile.metadata!.name}??`)) return;
 
-    this.store.deleteChecklistFile(this.selectedFile.name);
+    this.store.deleteChecklistFile(this.selectedFile.metadata!.name);
     this._displayFile(undefined);
   }
 
@@ -114,9 +115,9 @@ export class ChecklistsComponent {
   private _displayFile(file?: ChecklistFile) {
     this.selectedFile = file;
     this.tree!.file = file;
-    if (file) {
+    if (file?.metadata) {
       // Make the file selected the next time the picker gets displayed
-      this.filePicker!.selectedFile = file.name;
+      this.filePicker!.selectedFile = file.metadata.name;
     }
 
     // TODO: Add filename to topbar, add rename pencil there

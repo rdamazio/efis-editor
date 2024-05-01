@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import { ChecklistFile, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import { ChecklistFile, ChecklistFileMetadata, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { ChecklistStorage } from './checklist-storage';
 
 describe('ChecklistsService', () => {
   let store: ChecklistStorage;
 
   const A_CHECKLIST_FILE: ChecklistFile = {
-    name: "N425RP",
+    metadata: ChecklistFileMetadata.create({
+      name: "N425RP",
+    }),
     groups: [
       {
         title: "Normal procedures",
@@ -28,12 +30,16 @@ describe('ChecklistsService', () => {
     ],
   };
   const ANOTHER_CHECKLIST_FILE: ChecklistFile = {
-    name: "Something with spaces",
+    metadata: ChecklistFileMetadata.create({
+      name: "Something with spaces",
+    }),
     groups: [],
   };
 
   const YET_ANOTHER_CHECKLIST_FILE: ChecklistFile = {
-    name: "Somethingwithoutspaces",
+    metadata: ChecklistFileMetadata.create({
+      name: "Somethingwithoutspaces",
+    }),
     groups: [],
   };
 
@@ -61,12 +67,12 @@ describe('ChecklistsService', () => {
 
         it('should save and read back a checklist', () => {
           store.saveChecklistFile(file);
-          expect(store.listChecklistFiles()).toEqual([file.name]);
-          expect(store.getChecklistFile(file.name)).toEqual(file);
+          expect(store.listChecklistFiles()).toEqual([file.metadata!.name]);
+          expect(store.getChecklistFile(file.metadata!.name)).toEqual(file);
 
-          store.deleteChecklistFile(file.name);
+          store.deleteChecklistFile(file.metadata!.name);
           expect(store.listChecklistFiles()).toEqual([]);
-          expect(store.getChecklistFile(file.name)).toBeNull();
+          expect(store.getChecklistFile(file.metadata!.name)).toBeNull();
         });
       });
   });
@@ -76,19 +82,22 @@ describe('ChecklistsService', () => {
     store.saveChecklistFile(ANOTHER_CHECKLIST_FILE);
     store.saveChecklistFile(YET_ANOTHER_CHECKLIST_FILE);
     expect(store.listChecklistFiles()).toEqual(
-      jasmine.arrayWithExactContents(
-        [A_CHECKLIST_FILE.name, ANOTHER_CHECKLIST_FILE.name, YET_ANOTHER_CHECKLIST_FILE.name]));
-    expect(store.getChecklistFile(A_CHECKLIST_FILE.name)).toEqual(
+      jasmine.arrayWithExactContents([
+        A_CHECKLIST_FILE.metadata!.name,
+        ANOTHER_CHECKLIST_FILE.metadata!.name,
+        YET_ANOTHER_CHECKLIST_FILE.metadata!.name,
+      ]));
+    expect(store.getChecklistFile(A_CHECKLIST_FILE.metadata!.name)).toEqual(
       A_CHECKLIST_FILE);
-    expect(store.getChecklistFile(ANOTHER_CHECKLIST_FILE.name)).toEqual(
+    expect(store.getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(
       ANOTHER_CHECKLIST_FILE);
-    expect(store.getChecklistFile(YET_ANOTHER_CHECKLIST_FILE.name)).toEqual(
+    expect(store.getChecklistFile(YET_ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(
       YET_ANOTHER_CHECKLIST_FILE);
 
-    store.deleteChecklistFile(ANOTHER_CHECKLIST_FILE.name);
+    store.deleteChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name);
     expect(store.listChecklistFiles()).toEqual(
       jasmine.arrayWithExactContents(
-        [A_CHECKLIST_FILE.name, YET_ANOTHER_CHECKLIST_FILE.name]));
-    expect(store.getChecklistFile(ANOTHER_CHECKLIST_FILE.name)).toBeNull();
+        [A_CHECKLIST_FILE.metadata!.name, YET_ANOTHER_CHECKLIST_FILE.metadata!.name]));
+    expect(store.getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).toBeNull();
   });
 });

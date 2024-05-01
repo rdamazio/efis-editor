@@ -1,19 +1,23 @@
 import crc32 from "buffer-crc32";
-import { ChecklistFile, ChecklistFileMetadata, ChecklistItem_Type } from "../../../gen/ts/checklist";
+import { ChecklistFile, ChecklistItem_Type } from "../../../gen/ts/checklist";
 import { AceConstants } from "./ace-constants";
+import { FormatError } from "./error";
 
 export class AceWriter {
     private _parts: BlobPart[] = [];
 
     public async write(file: ChecklistFile): Promise<Blob> {
+        if (!file.metadata?.name) {
+            throw new FormatError('File name must be specified in metadata');
+        }
 
         this.addPart(AceConstants.HEADER);
 
-        const metadata = file.metadata || <ChecklistFileMetadata>{};
+        const metadata = file.metadata;
         this.addBytes(metadata.defaultGroupIndex, metadata.defaultChecklistIndex);
         this.addLine();
 
-        this.addLine(file.name);
+        this.addLine(file.metadata.name);
         this.addLine(metadata.makeAndModel);
         this.addLine(metadata.aircraftInfo);
         this.addLine(metadata.manufacturerInfo);

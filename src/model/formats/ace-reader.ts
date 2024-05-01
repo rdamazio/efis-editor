@@ -32,16 +32,26 @@ export class AceReader {
             throw new FormatError(`Unexpected header ending in ${this._file.name}`);
         }
 
-        const name = this.readLine();
+        let name = this.readLine();
+        if (!name) {
+            name = this._file.name;
+            if (name.toLowerCase().endsWith('.ace') && name.length > 4) {
+                name = name.slice(0, -4);
+            }
+        }
+        if (!name) {
+            // Oh well, we tried.
+            throw new FormatError('No file name in file\'s metadata or uploaded file');
+        }
         const makeAndModel = this.readLine();
         const aircraftInfo = this.readLine();
         const manufacturerInfo = this.readLine();
         const copyrightInfo = this.readLine();
 
         const outFile: ChecklistFile = {
-            name: name,
             groups: [],
             metadata: {
+                name: name,
                 defaultGroupIndex: defaultGroup,
                 defaultChecklistIndex: defaultChecklist,
                 makeAndModel: makeAndModel,
@@ -96,13 +106,7 @@ export class AceReader {
 
     private readItem(): ChecklistItem {
         if (this.consumeLine('')) {
-            return {
-                type: ChecklistItem_Type.ITEM_SPACE,
-                prompt: '',
-                expectation: '',
-                indent: 0,
-                centered: false,
-            };
+            return ChecklistItem.create({ type: ChecklistItem_Type.ITEM_SPACE });
         }
 
         const typeCode = this.readBytes(1)[0];

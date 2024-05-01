@@ -48,8 +48,11 @@ export class ChecklistStorage {
 
   saveChecklistFile(file: ChecklistFile) {
     if (this._browserStorage) {
+      if (!file.metadata?.name) {
+        throw new Error('Must specify checklist file name in metadata.');
+      }
       const blob = ChecklistFile.toJsonString(file);
-      this._browserStorage.setItem(CHECKLIST_PREFIX + file.name, blob);
+      this._browserStorage.setItem(CHECKLIST_PREFIX + file.metadata.name, blob);
     }
   }
 

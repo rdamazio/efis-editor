@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
 import { AceReader } from './ace-reader';
 import { AceWriter } from './ace-writer';
+import { FormatError } from './error';
 
 describe('AceWriter', () => {
     beforeEach(() => {
@@ -27,4 +29,26 @@ describe('AceWriter', () => {
         const blob = await response.blob();
         return new File([blob], 'test.ace');
     }
+
+    describe('try writing files without a name', async () => {
+        [
+            ChecklistFile.create({
+                metadata: undefined,
+            }),
+            ChecklistFile.create({
+                metadata: ChecklistFileMetadata.create({
+                    name: undefined,
+                }),
+            }),
+            ChecklistFile.create({
+                metadata: ChecklistFileMetadata.create({
+                    name: '',
+                }),
+            }),
+        ].forEach((file) => {
+            it('write nameless file', async () => {
+                await expectAsync(new AceWriter().write(file)).toBeRejectedWithError(FormatError);
+            });
+        });
+    });
 });
