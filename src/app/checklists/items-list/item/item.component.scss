@@ -9,7 +9,11 @@
   color: white;
 }
 
-.item-prompt:before {
+.item-challenge:before {
+  content: " □";
+}
+
+.item-challenge-response:before {
   content: " □";
 }
 
