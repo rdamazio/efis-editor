@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Checklist file metadata</h2>
+<mat-dialog-content>
+  <mat-form-field>
+      <mat-label>File name</mat-label>
+      <input
+          #filename
+          matInput
+          cdkFocusInitial
+          required
+          placeholder="e.g. Cessna 172 checklists"
+          [(ngModel)]="data.name">
+  </mat-form-field>
+  <mat-form-field>
+      <mat-label>Aircraft make and model</mat-label>
+      <input matInput placeholder="e.g. Cessna 172" [(ngModel)]="data.makeAndModel">
+  </mat-form-field>
+  <mat-form-field>
+      <mat-label>Aircraft information</mat-label>
+      <input matInput placeholder="e.g. N123AB" [(ngModel)]="data.aircraftInfo">
+  </mat-form-field>
+  <mat-form-field>
+      <mat-label>Manufacturer information</mat-label>
+      <input matInput placeholder="e.g. Cessna" [(ngModel)]="data.manufacturerInfo">
+  </mat-form-field>
+  <mat-form-field>
+      <mat-label>Copyright information</mat-label>
+      <input matInput placeholder="e.g. ©2002 My company, Inc." [(ngModel)]="data.copyrightInfo">
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="data" [disabled]="!filename.validity.valid">Ok</button>
+  <button mat-button (click)="dialogRef.close()">Cancel</button>
+</mat-dialog-actions>

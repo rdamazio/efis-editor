@@ -1,10 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
 import { Checklist, ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
 import { AceWriter } from '../../model/formats/ace-writer';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
+import { ChecklistFileInfoComponent } from './file-info/file-info.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
@@ -15,6 +17,7 @@ import { ChecklistItemsComponent } from './items-list/items-list.component';
   imports: [
     ChecklistCommandBarComponent,
     ChecklistFilePickerComponent,
+    ChecklistFileInfoComponent,
     ChecklistFileUploadComponent,
     ChecklistItemsComponent,
     ChecklistTreeComponent
@@ -30,7 +33,7 @@ export class ChecklistsComponent {
   showFilePicker: boolean = false;
   showFileUpload: boolean = false;
 
-  constructor(public store: ChecklistStorage) { }
+  constructor(public store: ChecklistStorage, private _dialog: MatDialog) { }
 
   onNewFile() {
     this.showFilePicker = false;
@@ -97,6 +100,37 @@ export class ChecklistsComponent {
 
     this.store.deleteChecklistFile(this.selectedFile.metadata!.name);
     this._displayFile(undefined);
+  }
+
+  onFileInfo() {
+    this.showFilePicker = false;
+    this.showFileUpload = false;
+
+    if (!this.selectedFile) return;
+
+    const dialogRef = this._dialog.open(ChecklistFileInfoComponent, {
+      data: ChecklistFileMetadata.clone(this.selectedFile.metadata!),
+      hasBackdrop: true,
+      closeOnNavigation: true,
+      enterAnimationDuration: 200,
+      exitAnimationDuration: 200,
+      role: 'dialog',
+      ariaModal: true,
+    });
+
+    dialogRef.afterClosed().subscribe((updatedData: ChecklistFileMetadata) => {
+      if (!updatedData || !this.selectedFile) return;
+
+      const oldName = this.selectedFile.metadata!.name;
+      const newName = updatedData.name;
+      this.selectedFile.metadata = updatedData;
+      this.store.saveChecklistFile(this.selectedFile);
+      if (oldName !== newName) {
+        // File was renamed, delete old one from storage.
+        this.store.deleteChecklistFile(oldName);
+        this.filePicker!.selectedFile = newName;
+      }
+    });
   }
 
   onFileSelected(id: string) {

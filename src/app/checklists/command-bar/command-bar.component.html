@@ -38,4 +38,12 @@
       (click)="deleteFile.emit(true)">
     <mat-icon fontIcon="delete" />
   </button>
+  <button
+      mat-icon-button
+      matTooltip="File information"
+      aria-label="Open file information dialog"
+      [disabled]="fileIsOpen"
+      (click)="fileInfo.emit(true)">
+    <mat-icon fontIcon="info" />
+  </button>
 </div>

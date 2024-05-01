@@ -22,4 +22,5 @@ export class ChecklistCommandBarComponent {
   @Output() uploadFile = new EventEmitter<boolean>();
   @Output() downloadFile = new EventEmitter<boolean>();
   @Output() deleteFile = new EventEmitter<boolean>();
+  @Output() fileInfo = new EventEmitter<boolean>();
 }
