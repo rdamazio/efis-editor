@@ -1,11 +1,13 @@
 import { Component, ViewChild } from '@angular/core';
+import { saveAs } from 'file-saver';
 import { Checklist, ChecklistFile } from '../../../gen/ts/checklist';
+import { AceWriter } from '../../model/formats/ace-writer';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
-import { ChecklistItemsComponent } from './items-list/items-list.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
+import { ChecklistItemsComponent } from './items-list/items-list.component';
 
 @Component({
   selector: 'app-checklists',
@@ -68,15 +70,19 @@ export class ChecklistsComponent {
 
   onFileUploaded(file: ChecklistFile) {
     this.showFileUpload = false;
-    
+
     this.store.saveChecklistFile(file);
     this._displayFile(file);
   }
 
-  onDownloadFile() {
+  async onDownloadFile() {
     this.showFilePicker = false;
+    this.showFileUpload = false;
 
-    window.alert('TODO');
+    if (!this.selectedFile) return;
+
+    let contents = await new AceWriter().write(this.selectedFile);
+    saveAs(contents, this.selectedFile.name + '.ace');
   }
 
   onFileSelected(id: string) {
