@@ -20,25 +20,25 @@ export class AceReader {
         this._buf = await this._file.arrayBuffer();
         this._arr = new Uint8Array(this._buf);
 
-        let expectedCrc = crc32.signed(Buffer.from(this._buf, 0, this._buf.byteLength - 4));
+        const expectedCrc = crc32.signed(Buffer.from(this._buf, 0, this._buf.byteLength - 4));
 
-        let header = this.readBytes(AceConstants.HEADER.byteLength);
+        const header = this.readBytes(AceConstants.HEADER.byteLength);
         if (!equal(header, AceConstants.HEADER)) {
             throw new FormatError(`Unexpected file header in ${this._file.name}: ${header}`);
         }
-        let defaultGroup = this.readBytes(1)[0];
-        let defaultChecklist = this.readBytes(1)[0];
+        const defaultGroup = this.readBytes(1)[0];
+        const defaultChecklist = this.readBytes(1)[0];
         if (!this.consumeLine('')) {
             throw new FormatError(`Unexpected header ending in ${this._file.name}`);
         }
 
-        let name = this.readLine();
-        let makeAndModel = this.readLine();
-        let aircraftInfo = this.readLine();
-        let manufacturerInfo = this.readLine();
-        let copyrightInfo = this.readLine();
+        const name = this.readLine();
+        const makeAndModel = this.readLine();
+        const aircraftInfo = this.readLine();
+        const manufacturerInfo = this.readLine();
+        const copyrightInfo = this.readLine();
 
-        let outFile: ChecklistFile = {
+        const outFile: ChecklistFile = {
             name: name,
             groups: [],
             metadata: {
@@ -55,7 +55,7 @@ export class AceReader {
             outFile.groups.push(this.readGroup());
         }
 
-        let fileCrc = ~new DataView(this._buf, this._offset, 4).getUint32(0, true);
+        const fileCrc = ~new DataView(this._buf, this._offset, 4).getUint32(0, true);
         if (fileCrc != expectedCrc) {
             throw new FormatError('File failed checksum! Expected ' + expectedCrc.toString(16) + ', file has ' + fileCrc.toString(16));
         }
@@ -67,7 +67,7 @@ export class AceReader {
             throw new FormatError('Bad checklist group header: ' + this.peekLine());
         }
 
-        let group: ChecklistGroup = {
+        const group: ChecklistGroup = {
             title: this.readLine(),
             checklists: [],
         };
@@ -83,7 +83,7 @@ export class AceReader {
             throw new FormatError('Bad checklist header: ' + this.peekLine());
         }
 
-        let checklist: Checklist = {
+        const checklist: Checklist = {
             title: this.readLine(),
             items: [],
         };
@@ -105,9 +105,9 @@ export class AceReader {
             };
         }
 
-        let typeCode = this.readBytes(1)[0];
-        let type = AceConstants.itemTypeForCode(typeCode);
-        let indentCode = this.readBytes(1)[0];
+        const typeCode = this.readBytes(1)[0];
+        const type = AceConstants.itemTypeForCode(typeCode);
+        const indentCode = this.readBytes(1)[0];
         let indent = 0;
         let centered = false;
         if (indentCode === 0x63) { // 'c'
@@ -118,7 +118,7 @@ export class AceReader {
         let prompt = this.readLine();
         let expectation = '';
         if (type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
-            let splits = prompt.split('~');
+            const splits = prompt.split('~');
             prompt = splits[0];
             if (splits.length == 2) {
                 expectation = splits[1]
@@ -137,7 +137,7 @@ export class AceReader {
     }
 
     private consumeBytes(expected: Uint8Array): boolean {
-        let bytes = this.peekBytes(expected.byteLength);
+        const bytes = this.peekBytes(expected.byteLength);
         if (equal(bytes, expected)) {
             this._offset += expected.byteLength;
             return true;
@@ -145,12 +145,12 @@ export class AceReader {
         return false;
     }
     private readBytes(len: number): Uint8Array {
-        let ret = this.peekBytes(len);
+        const ret = this.peekBytes(len);
         this._offset += len;
         return ret;
     }
     private peekBytes(len: number): Uint8Array {
-        let slice = this._arr!.slice(this._offset, this._offset + len);
+        const slice = this._arr!.slice(this._offset, this._offset + len);
         if (slice.byteLength != len) {
             throw new FormatError(`Truncated file: expected to read ${len} bytes, only got ${slice.byteLength}`);
         }
@@ -158,13 +158,13 @@ export class AceReader {
     }
 
     private readLine(): string {
-        let line = this.peekLine();
+        const line = this.peekLine();
         this._offset += line.length + 2;
         return line;
     }
 
     private consumeLine(expected: string): boolean {
-        let line = this.peekLine();
+        const line = this.peekLine();
         if (line === expected) {
             this._offset += line.length + 2;
             return true;
@@ -180,7 +180,7 @@ export class AceReader {
                 break;
             }
         }
-        let line = this.DECODER.decode(this._arr!.slice(this._offset, idx));
+        const line = this.DECODER.decode(this._arr!.slice(this._offset, idx));
         if (idx === this._arr!.byteLength) {
             throw new FormatError(`Truncated file: reached EOF reading line: ${line}`);
         }

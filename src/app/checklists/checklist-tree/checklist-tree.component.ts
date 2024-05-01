@@ -54,7 +54,7 @@ export class ChecklistTreeComponent {
   }
 
   private static groupToNode(group: ChecklistGroup): ChecklistTreeNode {
-    let node: ChecklistTreeNode = {
+    const node: ChecklistTreeNode = {
       title: group.title,
       group: group,
       children: group.checklists.map(
@@ -91,7 +91,7 @@ export class ChecklistTreeComponent {
         node.group.checklists.push(checklist);
       } else {
         // Adding new group to the file.
-        let group = ChecklistGroup.create();
+        const group = ChecklistGroup.create();
         if (!this.fillTitle(group, "checklist group")) {
           return;
         }
@@ -125,7 +125,7 @@ export class ChecklistTreeComponent {
   }
 
   private fillTitle(pb: Checklist | ChecklistGroup, promptType: string): boolean {
-    let title = prompt(`Enter ${promptType} title:`, pb.title);
+    const title = prompt(`Enter ${promptType} title:`, pb.title);
     if (!title) {
       return false;
     }

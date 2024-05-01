@@ -35,13 +35,13 @@ export class ChecklistsComponent {
   onNewFile() {
     this.showFilePicker = false;
 
-    let name = prompt("Enter a name for the new file:");
+    const name = prompt("Enter a name for the new file:");
     if (!name) {
       return;
     }
 
     // Save an empty file with that name.
-    let file: ChecklistFile = {
+    const file: ChecklistFile = {
       name: name,
       groups: [],
       metadata: undefined,
@@ -81,7 +81,7 @@ export class ChecklistsComponent {
 
     if (!this.selectedFile) return;
 
-    let contents = await new AceWriter().write(this.selectedFile);
+    const contents = await new AceWriter().write(this.selectedFile);
     saveAs(contents, this.selectedFile.name + '.ace');
   }
 
@@ -103,7 +103,7 @@ export class ChecklistsComponent {
 
     let file: ChecklistFile | undefined;
     if (id) {
-      let loadedFile = this.store.getChecklistFile(id);
+      const loadedFile = this.store.getChecklistFile(id);
       if (loadedFile) {
         file = loadedFile;
       }

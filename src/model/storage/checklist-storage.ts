@@ -25,9 +25,9 @@ export class ChecklistStorage {
       return [];
     }
 
-    let names: string[] = [];
+    const names: string[] = [];
     for (let i = 0; i < this._browserStorage.length; i++) {
-      let k = this._browserStorage.key(i);
+      const k = this._browserStorage.key(i);
       if (k?.startsWith(CHECKLIST_PREFIX)) {
         names.push(k.slice(CHECKLIST_PREFIX.length));
       }
@@ -37,7 +37,7 @@ export class ChecklistStorage {
 
   getChecklistFile(id: string): ChecklistFile | null {
     if (this._browserStorage) {
-      let blob = this._browserStorage.getItem(CHECKLIST_PREFIX + id);
+      const blob = this._browserStorage.getItem(CHECKLIST_PREFIX + id);
       if (blob) {
         return ChecklistFile.fromJsonString(blob);
       }
@@ -48,7 +48,7 @@ export class ChecklistStorage {
 
   saveChecklistFile(file: ChecklistFile) {
     if (this._browserStorage) {
-      let blob = ChecklistFile.toJsonString(file);
+      const blob = ChecklistFile.toJsonString(file);
       this._browserStorage.setItem(CHECKLIST_PREFIX + file.name, blob);
     }
   }
@@ -61,7 +61,7 @@ export class ChecklistStorage {
 
   clear() {
     // Clear only checklist items.
-    let ids = this.listChecklistFiles();
+    const ids = this.listChecklistFiles();
     for (const id of ids) {
       this.deleteChecklistFile(id);
     }

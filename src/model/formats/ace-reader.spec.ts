@@ -64,8 +64,8 @@ describe('AceReader', () => {
             },
         };
 
-        let f = await loadFile("/model/formats/test.ace");
-        let readFile = await new AceReader(f).read();
+        const f = await loadFile("/model/formats/test.ace");
+        const readFile = await new AceReader(f).read();
         expect(readFile).toEqual(EXPECTED_CONTENTS);
     });
 

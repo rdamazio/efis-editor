@@ -10,13 +10,13 @@ describe('AceWriter', () => {
     it('read then write back test file', async () => {
         // Read the test file.
         // The correctness of the reading is already checked in ace-reader.spec.ts
-        let f = await loadFile("/model/formats/test.ace");
-        let readFile = await new AceReader(f).read();
+        const f = await loadFile("/model/formats/test.ace");
+        const readFile = await new AceReader(f).read();
 
         // Now write the file back.
-        let writtenFile = await new AceWriter().write(readFile);
-        let writtenData = new Uint8Array(await writtenFile.arrayBuffer());
-        let readData = new Uint8Array(await f.arrayBuffer());
+        const writtenFile = await new AceWriter().write(readFile);
+        const writtenData = new Uint8Array(await writtenFile.arrayBuffer());
+        const readData = new Uint8Array(await f.arrayBuffer());
         expect(writtenData.byteLength).toBeGreaterThan(1000);
         expect(writtenData).toEqual(readData);
     });

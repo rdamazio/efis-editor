@@ -8,7 +8,7 @@ export class AceFormat {
     }
 
     public static async fromProto(file: ChecklistFile): Promise<File> {
-        let blob = await new AceWriter().write(file);
+        const blob = await new AceWriter().write(file);
         return new File([blob], file.name + '.ace');
     }
 }

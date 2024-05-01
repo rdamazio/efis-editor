@@ -9,7 +9,7 @@ export class AceWriter {
 
         this.addPart(AceConstants.HEADER);
 
-        let metadata = file.metadata || <ChecklistFileMetadata>{};
+        const metadata = file.metadata || <ChecklistFileMetadata>{};
         this.addBytes(metadata.defaultGroupIndex, metadata.defaultChecklistIndex);
         this.addLine();
 
@@ -31,7 +31,7 @@ export class AceWriter {
                         continue;
                     }
 
-                    let typeCode = AceConstants.codeForItemType(item.type);
+                    const typeCode = AceConstants.codeForItemType(item.type);
                     let indentCode = item.indent + 0x30;
                     if (item.centered) {
                         indentCode = 0x63;  // 'c'
@@ -51,8 +51,8 @@ export class AceWriter {
         this.addLine(AceConstants.FILE_END);
 
         // Add CRC for the existing parts.
-        let crc = crc32.signed(Buffer.from(await new Blob(this._parts).arrayBuffer()));
-        let crcBytes = new Uint8Array(4);
+        const crc = crc32.signed(Buffer.from(await new Blob(this._parts).arrayBuffer()));
+        const crcBytes = new Uint8Array(4);
         new DataView(crcBytes.buffer).setUint32(0, ~crc, true);
         this.addPart(crcBytes);
 
