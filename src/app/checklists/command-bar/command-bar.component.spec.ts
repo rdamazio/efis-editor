@@ -10,8 +10,8 @@ describe('ChecklistCommandBarComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ChecklistCommandBarComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(ChecklistCommandBarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

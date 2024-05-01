@@ -1,8 +1,8 @@
 import crc32 from "buffer-crc32";
 import equal from "fast-deep-equal";
+import { Checklist, ChecklistFile, ChecklistGroup, ChecklistItem, ChecklistItem_Type } from "../../../gen/ts/checklist";
 import { AceConstants } from "./ace-constants";
 import { FormatError } from "./error";
-import { Checklist, ChecklistFile, ChecklistGroup, ChecklistItem, ChecklistItem_Type } from "../../../gen/ts/checklist";
 
 
 export class AceReader {

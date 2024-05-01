@@ -10,7 +10,7 @@ export namespace AceConstants {
     export const FILE_END = "END";
     export const CRLF = Uint8Array.from([0xd, 0xa]);
 
-    export function itemTypeForCode(code: number) : ChecklistItem_Type {
+    export function itemTypeForCode(code: number): ChecklistItem_Type {
         switch (code) {
             case 0x77: // 'w'
                 return ChecklistItem_Type.ITEM_WARNING;

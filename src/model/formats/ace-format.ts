@@ -1,6 +1,4 @@
-import { Checklist, ChecklistFile, ChecklistGroup, ChecklistItem, ChecklistItem_Type } from "../../../gen/ts/checklist";
-import equal from "fast-deep-equal";
-import crc32 from "buffer-crc32";
+import { ChecklistFile } from "../../../gen/ts/checklist";
 import { AceReader } from "./ace-reader";
 import { AceWriter } from "./ace-writer";
 

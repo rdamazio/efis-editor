@@ -7,12 +7,12 @@ const CHECKLIST_PREFIX = "checklists:";
   providedIn: 'root'
 })
 export class ChecklistStorage {
-  private _browserStorage : any;
+  private _browserStorage: any;
 
   constructor() {
     afterNextRender(() => {
       this.onAfterRender();
-   }, {phase: AfterRenderPhase.Read});
+    }, { phase: AfterRenderPhase.Read });
   }
 
   onAfterRender() {

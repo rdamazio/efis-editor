@@ -39,7 +39,7 @@ export class ChecklistFileUploadComponent {
     }
   }
 
-  private _fileExtensionFilter(item: FileLikeObject) : boolean {
+  private _fileExtensionFilter(item: FileLikeObject): boolean {
     return !!item.name?.endsWith(".ace");
   }
 
