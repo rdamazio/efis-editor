@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
@@ -22,8 +22,11 @@ import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
   styleUrl: './editable-label.component.scss'
 })
 export class EditableLabelComponent {
+  private readonly RESTRICTED_CHARS = ['~'];
+
   control = new FormControl('');
   private _savedValue = '';
+  @ViewChild("promptInput") input!: ElementRef;
 
   @Output() valueChanged = new EventEmitter<string>();
   @Output() cancelled = new EventEmitter<boolean>();
@@ -55,6 +58,13 @@ export class EditableLabelComponent {
       this.editing = false;
       this.control.setValue(this._savedValue);
       this.cancelled.emit(true);
+    }
+  }
+
+  onBeforeInput(event: InputEvent) {
+    // Prevent challenge/response separator (ACE format) from text input.
+    if (event.data?.includes('~')) {
+      event.preventDefault();
     }
   }
 }

@@ -9,7 +9,9 @@
         #promptInput
         matInput
         required
-        [formControl]="control">
+        type="text"
+        [formControl]="control"
+        (beforeinput)="onBeforeInput($event)" >
     <button
         mat-icon-button
         mat-medium-icon-button
