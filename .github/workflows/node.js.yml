@@ -21,14 +21,15 @@ jobs:
           node-version: "21.7.3"
           cache: 'npm'
       - run: npm ci
-      - run: find node_modules
       - name: Install ProtoC
         uses: arduino/setup-protoc@v3
-      - run: |
+      - name: Generate protos
+        run: |
           mkdir -p gen/ts
           protoc \
             --proto_path=src/model/proto \
             --plugin=protoc-gen-ts=node_modules/@protobuf-ts/plugin/bin/protoc-gen-ts \
-            --ts_out=gen/ts
+            --ts_out=gen/ts \
+            src/model/proto/*.proto
       - run: npm run build --if-present
       - run: npm test
