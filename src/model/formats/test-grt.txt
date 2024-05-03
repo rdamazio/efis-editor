@@ -1,0 +1,44 @@
+# CHECKLIST EXPORTED FROM https://rdamazio.github.io/efis-editor/checklists/
+
+LIST Test group 1 checklist 1
+ITEM Challenge item
+ITEM Challenge item 2 - Item response
+ITEM Plain text item
+ITEM NOTE: Note item
+ITEM ** Subtitle item **
+ITEM WARNING: Warning item
+ITEM CAUTION: Caution item
+ITEM Item with 1 blank line
+ITEM
+ITEM Item with 2 blank lines
+ITEM
+ITEM
+ITEM Item with a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long text - Response with a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long text
+ITEM   Item with indent 1
+ITEM     NOTE: Item with indent 2
+ITEM       CAUTION: Item with indent 3
+ITEM         WARNING: Item with indent 4
+ITEM          ** Centered item **        
+
+LIST Test group 2 (default): Test group 2 checklist 1
+ITEM Test group 2 checklist 1 item 1
+
+LIST Test group 2 (default): Test group 2 checklist 2
+ITEM ** Test group 2 checklist 2 item 1 **
+
+LIST Test group 2 (default): Test group 2 checklist 3 (default)
+ITEM NOTE: Test group 2 checklist 3 item 1
+
+LIST Checklist Info
+ITEM Checklist file:
+ITEM   Test checklist name
+ITEM Make and model:
+ITEM   Test make and model
+ITEM Aircraft:
+ITEM   Test aircraft
+ITEM Manufacturer:
+ITEM   Test manufacturer
+ITEM Copyright:
+ITEM   Test copyright
+ITEM 
+ITEM Last updated 2024-05-03

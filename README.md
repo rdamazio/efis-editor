@@ -12,6 +12,10 @@ This is a web-based editor for file formats used by modern EFIS avionics systems
 
 * Checklists:
   * Garmin G3X / G3X Touch / GTN (.ace file format)
+  * Grand Rapids (GRT)
+
+Internally, files are stored in our own format, so it is possible to import a
+file in one format and then export it in another.
 
 ## File storage
 

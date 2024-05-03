@@ -13,6 +13,7 @@ import { ChecklistItemsComponent } from './items-list/items-list.component';
 import { JsonFormat } from '../../model/formats/json-format';
 import { FormatError } from '../../model/formats/error';
 import { AceFormat } from '../../model/formats/ace-format';
+import { GrtFormat } from '../../model/formats/grt-format';
 
 @Component({
   selector: 'app-checklists',
@@ -93,6 +94,8 @@ export class ChecklistsComponent {
       file = await AceFormat.fromProto(this.selectedFile);
     } else if (formatId === 'json') {
       file = await JsonFormat.fromProto(this.selectedFile);
+    } else if (formatId === 'grt') {
+      file = await GrtFormat.fromProto(this.selectedFile);
     } else {
       throw new FormatError(`Unknown format "${formatId}"`);
     }
