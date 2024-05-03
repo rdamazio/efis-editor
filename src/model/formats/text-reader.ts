@@ -8,6 +8,8 @@ export class TextReader {
     private readonly _titleSuffix: string;
     private readonly _checklistPrefixMatch: RegExp;
     private readonly _itemPrefixMatch: RegExp;
+    private readonly _checklistNumOffset: number;
+    private readonly _itemNumOffset: number;
 
     constructor(
         private _file: File,
@@ -18,6 +20,8 @@ export class TextReader {
             new RegExp('^' + escapeStringRegexp(this._options.checklistPrefix) + '$');
         this._itemPrefixMatch = this._options.itemPrefixMatcher ||
             new RegExp('^' + escapeStringRegexp(this._options.itemPrefix) + '$');
+        this._checklistNumOffset = this._options.checklistZeroIndexed ? 0 : 1;
+        this._itemNumOffset = this._options.checklistItemZeroIndexed ? 0 : 1;
     }
 
     public async read(): Promise<ChecklistFile> {
@@ -44,6 +48,8 @@ export class TextReader {
         let currentItemSeen = false;
         let currentItemContents = '';
         let currentItemIndent = 0;
+        let currentChecklistNum = 0;
+        let currentItemLineNum = 0;
         const processItem = () => {
             if (currentItemSeen && currentChecklist) {
                 let item = this._itemForContents(currentItemContents, currentItemIndent);
@@ -59,7 +65,6 @@ export class TextReader {
         };
         for (let line of lines) {
             if (this._options.commentPrefix && line.startsWith(this._options.commentPrefix)) {
-                console.log(`Skipped as a comment`);
                 continue;
             }
             if (!line.trim()) {
@@ -76,7 +81,8 @@ export class TextReader {
                 lineContents = line.slice(firstSpaceIdx + 1);
             }
 
-            if (this._checklistPrefixMatch.test(prefix)) {
+            const checklistMatch = this._checklistPrefixMatch.exec(prefix);
+            if (checklistMatch) {
                 // If we had an item we were accumulating contents for, process it now.
                 processItem();
 
@@ -103,12 +109,23 @@ export class TextReader {
                     items: [],
                 };
                 currentGroup.checklists.push(currentChecklist);
+                currentItemLineNum = 0;
+                currentChecklistNum++;
+
+                if (checklistMatch.groups && 'checklistNum' in checklistMatch.groups) {
+                    const checklistNum = parseInt(checklistMatch.groups['checklistNum'] as string);
+                    const expectedNum = currentChecklistNum - 1 + this._checklistNumOffset;
+                    if (checklistNum !== expectedNum) {
+                        throw new FormatError(`Unexpected checklist number ${checklistNum} in "${prefix}" (expected ${expectedNum})`);
+                    }
+                }
+
                 continue;
             }
 
-            // TODO: Match/extract numbers from template.
-            if (this._itemPrefixMatch.test(prefix)) {
-                if (!currentChecklist) {
+            const itemMatch = this._itemPrefixMatch.exec(prefix);
+            if (itemMatch) {
+                if (!currentChecklist || !currentGroup) {
                     throw new FormatError('Checklist item found before start of checklist');
                 }
 
@@ -132,6 +149,23 @@ export class TextReader {
                     currentItemSeen = true;
                 }
 
+                if (itemMatch.groups) {
+                    if ('checklistNum' in itemMatch.groups) {
+                        const checklistNum = parseInt(itemMatch.groups['checklistNum'] as string);
+                        const expectedNum = currentChecklistNum - 1 + this._checklistNumOffset;
+                        if (checklistNum !== expectedNum) {
+                            throw new FormatError(`Unexpected checklist number ${checklistNum} in "${prefix}" (expected ${expectedNum})`);
+                        }
+                    }
+                    if ('itemNum' in itemMatch.groups) {
+                        const itemNum = parseInt(itemMatch.groups['itemNum'] as string);
+                        const expectedNum = currentItemLineNum + this._itemNumOffset;
+                        if (itemNum !== expectedNum) {
+                            throw new FormatError(`Unexpected item number ${itemNum} in "${prefix}" (expected ${expectedNum})`);
+                        }
+                    }
+                }
+                currentItemLineNum++;
                 continue;
             }
 

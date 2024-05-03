@@ -11,10 +11,10 @@ export const DYNON_FORMAT_OPTIONS: TextFormatOptions = {
     checklistTopBlankLine: true,
     outputMetadata: true,
 
-    checklistPrefix: 'CHKLST{{checklistNum}}.TITLE, ',
-    checklistPrefixMatcher: /^CHKLST\d+\.TITLE/,
-    itemPrefix: 'CHKLST{{checklistNum}}.LINE{{itemNum}}, ',
-    itemPrefixMatcher: /^CHKLST\d+\.LINE\d+/,
+    checklistPrefix: 'CHKLST{{checklistNum}}.TITLE,',
+    checklistPrefixMatcher: /^CHKLST(?<checklistNum>\d+)\.TITLE/,
+    itemPrefix: 'CHKLST{{checklistNum}}.LINE{{itemNum}},',
+    itemPrefixMatcher: /^CHKLST(?<checklistNum>\d+)\.LINE(?<itemNum>\d+)/,
     checklistZeroIndexed: true,
     checklistItemZeroIndexed: false,
 
