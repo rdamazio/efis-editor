@@ -55,7 +55,7 @@ export class ChecklistsComponent {
   }
 
   onOpenFile() {
-    this.showFilePicker = true;
+    this.showFilePicker = !this.showFilePicker;
     this.showFileUpload = false;
   }
 
@@ -65,7 +65,7 @@ export class ChecklistsComponent {
 
   onUploadFile() {
     this.showFilePicker = false;
-    this.showFileUpload = true;
+    this.showFileUpload = !this.showFileUpload;
   }
 
   onUploadFileCancel() {
