@@ -13,6 +13,7 @@ import { ChecklistItemsComponent } from './items-list/items-list.component';
 import { JsonFormat } from '../../model/formats/json-format';
 import { FormatError } from '../../model/formats/error';
 import { AceFormat } from '../../model/formats/ace-format';
+import { DynonFormat } from '../../model/formats/dynon-format';
 import { GrtFormat } from '../../model/formats/grt-format';
 
 @Component({
@@ -94,6 +95,8 @@ export class ChecklistsComponent {
       file = await AceFormat.fromProto(this.selectedFile);
     } else if (formatId === 'json') {
       file = await JsonFormat.fromProto(this.selectedFile);
+    } else if (formatId === 'dynon') {
+      file = await DynonFormat.fromProto(this.selectedFile);
     } else if (formatId === 'grt') {
       file = await GrtFormat.fromProto(this.selectedFile);
     } else {

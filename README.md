@@ -11,6 +11,8 @@ This is a web-based editor for file formats used by modern EFIS avionics systems
 ## Supported file types:
 
 * Checklists:
+  * Advanced Flight systems (AFS)
+  * Dynon Skyview
   * Garmin G3X / G3X Touch / GTN (.ace file format)
   * Grand Rapids (GRT)
 

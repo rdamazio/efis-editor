@@ -34,6 +34,10 @@ export interface TextFormatOptions {
     // For these, {{checklistNum}} and {{itemNum}} will be replaced by sequential counters.
     checklistPrefix: string;
     itemPrefix: string;
+    // These default to an exact match of the string version above.
+    checklistPrefixMatcher?: RegExp;
+    itemPrefixMatcher?: RegExp;
+
     // Whether checklistNum and/or itemNum start being counted at 0 (vs 1 if false).
     checklistZeroIndexed?: boolean;
     checklistItemZeroIndexed?: boolean;

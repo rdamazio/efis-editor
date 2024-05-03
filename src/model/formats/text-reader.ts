@@ -1,15 +1,23 @@
+import escapeStringRegexp from 'escape-string-regexp';
+
 import { Checklist, ChecklistFile, ChecklistFileMetadata, ChecklistGroup, ChecklistItem, ChecklistItem_Type } from "../../../gen/ts/checklist";
 import { FormatError } from "./error";
 import { DEFAULT_FIRST_GROUP, METADATA_AIRCRAFT_TITLE, METADATA_CHECKLIST_TITLE, METADATA_COPYRIGHT_TITLE, METADATA_FILE_TITLE, METADATA_MAKE_MODEL_TITLE, METADATA_MANUFACTURER_TITLE, TextFormatOptions, WRAP_PREFIX } from "./text-format-options";
 
 export class TextReader {
     private readonly _titleSuffix: string;
+    private readonly _checklistPrefixMatch: RegExp;
+    private readonly _itemPrefixMatch: RegExp;
 
     constructor(
         private _file: File,
         private _options: TextFormatOptions,
     ) {
         this._titleSuffix = this._options.titlePrefixSuffix.split('').reverse().join('');
+        this._checklistPrefixMatch = this._options.checklistPrefixMatcher ||
+            new RegExp('^' + escapeStringRegexp(this._options.checklistPrefix) + '$');
+        this._itemPrefixMatch = this._options.itemPrefixMatcher ||
+            new RegExp('^' + escapeStringRegexp(this._options.itemPrefix) + '$');
     }
 
     public async read(): Promise<ChecklistFile> {
@@ -58,12 +66,21 @@ export class TextReader {
                 continue;
             }
 
-            if (line.startsWith(this._options.checklistPrefix)) {
+            const firstSpaceIdx = line.indexOf(' ');
+            let prefix, lineContents: string;
+            if (firstSpaceIdx == -1 ) {
+                prefix = line;
+                lineContents = '';
+            } else {
+                prefix = line.slice(0, firstSpaceIdx == -1 ? line.length : firstSpaceIdx);
+                lineContents = line.slice(firstSpaceIdx + 1);
+            }
+
+            if (this._checklistPrefixMatch.test(prefix)) {
                 // If we had an item we were accumulating contents for, process it now.
                 processItem();
 
-                const lineContents = line.slice(this._options.checklistPrefix.length).trim();
-                let groupTitle = DEFAULT_FIRST_GROUP;
+                let groupTitle = this._properCase(DEFAULT_FIRST_GROUP);
                 let checklistTitle = lineContents;
 
                 if (groupSep && (outFile.groups.length > 0 || !this._options.skipFirstGroup)) {
@@ -90,14 +107,9 @@ export class TextReader {
             }
 
             // TODO: Match/extract numbers from template.
-            if (line.startsWith(this._options.itemPrefix)) {
+            if (this._itemPrefixMatch.test(prefix)) {
                 if (!currentChecklist) {
                     throw new FormatError('Checklist item found before start of checklist');
-                }
-
-                let lineContents = line.slice(this._options.itemPrefix.length);
-                if (lineContents && lineContents[0] === ' ') {
-                    lineContents = lineContents.slice(1);
                 }
 
                 const newIndent = Math.floor((lineContents.length - lineContents.trimStart().length) / this._options.indentWidth);
@@ -119,7 +131,11 @@ export class TextReader {
                     currentItemIndent = newIndent;
                     currentItemSeen = true;
                 }
+
+                continue;
             }
+
+            throw new FormatError(`Unexpected line format: prefix="${prefix}"; contents="${line}"`);
         }
         // Process the last item.
         processItem();
@@ -232,7 +248,7 @@ export class TextReader {
         let firstGroup = true;
         for (let group of out.groups) {
             if (firstGroup && this._options.skipFirstGroup) {
-                group.title = DEFAULT_FIRST_GROUP;
+                group.title = this._properCase(DEFAULT_FIRST_GROUP);
             }
             firstGroup = false;
             group.title = this._properCase(group.title);
