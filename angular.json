@@ -97,7 +97,7 @@
               "src/favicon.ico",
               "src/assets",
               "src/model/formats/test.ace",
-              "src/model/formats/*.json"
+              "src/model/formats/test.json"
             ],
             "styles": [
               "@angular/material/prebuilt-themes/purple-green.css",

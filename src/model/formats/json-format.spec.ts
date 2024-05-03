@@ -1,15 +1,15 @@
 import { TestBed } from '@angular/core/testing';
-import { AceReader } from './ace-reader';
+import { JsonFormat } from './json-format';
 import { EXPECTED_CONTENTS } from './test-data';
 
-describe('AceReader', () => {
+describe('JsonFormat', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({});
     });
 
     it('read test file', async () => {
-        const f = await loadFile("/model/formats/test.ace");
-        const readFile = await new AceReader(f).read();
+        const f = await loadFile("/model/formats/test.json");
+        const readFile = await JsonFormat.toProto(f);
         expect(readFile).toEqual(EXPECTED_CONTENTS);
     });
 
@@ -17,6 +17,6 @@ describe('AceReader', () => {
         const response = await fetch(url);
         expect(response.ok).toBeTrue();
         const blob = await response.blob();
-        return new File([blob], 'test.ace');
+        return new File([blob], 'test.json');
     }
 });

@@ -1,0 +1,131 @@
+{
+  "metadata": {
+    "name": "Test checklist name",
+    "defaultGroupIndex": 1,
+    "defaultChecklistIndex": 2,
+    "makeAndModel": "Test make and model",
+    "aircraftInfo": "Test aircraft",
+    "manufacturerInfo": "Test manufacturer",
+    "copyrightInfo": "Test copyright"
+  },
+  "groups": [
+    {
+      "title": "Test group 1",
+      "checklists": [
+        {
+          "title": "Test group 1 checklist 1",
+          "items": [
+            {
+              "prompt": "Challenge item",
+              "type": "ITEM_CHALLENGE"
+            },
+            {
+              "prompt": "Challenge item 2",
+              "expectation": "Item response",
+              "type": "ITEM_CHALLENGE_RESPONSE"
+            },
+            {
+              "prompt": "Plain text item",
+              "type": "ITEM_PLAINTEXT"
+            },
+            {
+              "prompt": "Note item",
+              "type": "ITEM_NOTE"
+            },
+            {
+              "prompt": "Subtitle item",
+              "type": "ITEM_TITLE"
+            },
+            {
+              "prompt": "Warning item",
+              "type": "ITEM_WARNING"
+            },
+            {
+              "prompt": "Caution item",
+              "type": "ITEM_CAUTION"
+            },
+            {
+              "prompt": "Item with 1 blank line",
+              "type": "ITEM_PLAINTEXT"
+            },
+            {
+              "type": "ITEM_SPACE"
+            },
+            {
+              "prompt": "Item with 2 blank lines",
+              "type": "ITEM_CHALLENGE"
+            },
+            {
+              "type": "ITEM_SPACE"
+            },
+            {
+              "type": "ITEM_SPACE"
+            },
+            {
+              "prompt": "Item with a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long text",
+              "expectation": "Response with a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long text",
+              "type": "ITEM_CHALLENGE_RESPONSE"
+            },
+            {
+              "prompt": "Item with indent 1",
+              "type": "ITEM_PLAINTEXT",
+              "indent": 1
+            },
+            {
+              "prompt": "Item with indent 2",
+              "type": "ITEM_NOTE",
+              "indent": 2
+            },
+            {
+              "prompt": "Item with indent 3",
+              "type": "ITEM_CAUTION",
+              "indent": 3
+            },
+            {
+              "prompt": "Item with indent 4",
+              "type": "ITEM_WARNING",
+              "indent": 4
+            },
+            {
+              "prompt": "Centered item",
+              "type": "ITEM_TITLE",
+              "centered": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Test group 2 (default)",
+      "checklists": [
+        {
+          "title": "Test group 2 checklist 1",
+          "items": [
+            {
+              "prompt": "Test group 2 checklist 1 item 1",
+              "type": "ITEM_PLAINTEXT"
+            }
+          ]
+        },
+        {
+          "title": "Test group 2 checklist 2",
+          "items": [
+            {
+              "prompt": "Test group 2 checklist 2 item 1",
+              "type": "ITEM_TITLE"
+            }
+          ]
+        },
+        {
+          "title": "Test group 2 checklist 3 (default)",
+          "items": [
+            {
+              "prompt": "Test group 2 checklist 3 item 1",
+              "type": "ITEM_NOTE"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
