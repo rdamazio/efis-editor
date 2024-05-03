@@ -10,6 +10,9 @@ import { ChecklistFileInfoComponent } from './file-info/file-info.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
+import { JsonFormat } from '../../model/formats/json-format';
+import { FormatError } from '../../model/formats/error';
+import { AceFormat } from '../../model/formats/ace-format';
 
 @Component({
   selector: 'app-checklists',
@@ -79,14 +82,21 @@ export class ChecklistsComponent {
     this._displayFile(file);
   }
 
-  async onDownloadFile() {
+  async onDownloadFile(formatId: string) {
     this.showFilePicker = false;
     this.showFileUpload = false;
 
     if (!this.selectedFile) return;
 
-    const contents = await new AceWriter().write(this.selectedFile);
-    saveAs(contents, this.selectedFile.metadata!.name + '.ace');
+    let file: File;
+    if (formatId === 'ace') {
+      file = await AceFormat.fromProto(this.selectedFile);
+    } else if (formatId === 'json') {
+      file = await JsonFormat.fromProto(this.selectedFile);
+    } else {
+      throw new FormatError(`Unknown format "${formatId}"`);
+    }
+    saveAs(file, file.name);
   }
 
   onDeleteFile() {

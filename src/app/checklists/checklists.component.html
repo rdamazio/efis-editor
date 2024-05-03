@@ -6,9 +6,13 @@
         (newFile)="onNewFile()"
         (openFile)="onOpenFile()"
         (uploadFile)="onUploadFile()"
-        (downloadFile)="onDownloadFile()"
+        (downloadFile)="onDownloadFile($event)"
         (deleteFile)="onDeleteFile()"
         (fileInfo)="onFileInfo()"
+        [downloadFormats]="[
+            { id: 'ace', name: 'ACE format (G3X/GTN)' },
+            { id: 'json', name: 'Raw data (JSON)' },
+        ]"
     />
     <checklist-file-picker
         #filePicker

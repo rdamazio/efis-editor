@@ -27,9 +27,17 @@
       matTooltip="Download file"
       aria-label="Download file"
       [disabled]="fileIsOpen"
-      (click)="downloadFile.emit(true)">
+      [matMenuTriggerFor]="downloadMenu">
     <mat-icon fontIcon="download" />
   </button>
+  <mat-menu #downloadMenu>
+    <button
+        mat-menu-item
+        *ngFor="let format of downloadFormats"
+        (click)="downloadFile.emit(format.id)">
+      {{format.name}}
+    </button>
+  </mat-menu>
   <button
       mat-icon-button
       matTooltip="Delete file"
