@@ -70,3 +70,18 @@ for contributors. The broad TL;DR:
 - There **is** a mandatory CLA you must agree to. Importantly, it **does not**
   transfer copyright ownership to Google or anyone else; it simply gives us the
   right to safely redistribute and use your changes.
+
+## Development setup
+
+The following steps can be followed to set up a development environment:
+
+* If you haven't already, [install Node](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs)
+* Clone this project (we recommend using [jj](http://github.com/martinvonz/jj) for that!)
+* `npm install` (will install all dependencies into `node_modules/`)
+* `npm run genproto` (will generate protocol buffer files into `gen/ts/`)
+
+You can then develop as you normally would any Angular app (e.g. `ng serve`).
+
+If you make changes to `.proto` files, you'll need to run the genproto step again
+(or you can use an IDE extension such as [vscode-proto3](https://github.com/zxh0/vscode-proto3) to
+do that automatically when the file is saved).
