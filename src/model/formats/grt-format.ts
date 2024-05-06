@@ -1,6 +1,7 @@
 import { ChecklistFile } from "../../../gen/ts/checklist";
 import { TextFormatOptions } from "./text-format-options";
 import { TextReader } from "./text-reader";
+import { TextWriter } from "./text-writer";
 
 export const GRT_FORMAT_OPTIONS: TextFormatOptions = {
     fileExtensions: ['.txt'],
@@ -12,7 +13,7 @@ export const GRT_FORMAT_OPTIONS: TextFormatOptions = {
 
     groupNameSeparator: ': ',
     skipFirstGroup: true,
-    expectationSeparator: '-',
+    expectationSeparator: ' - ',
     notePrefix: 'NOTE: ',
     titlePrefixSuffix: '** ',
     warningPrefix: 'WARNING: ',
@@ -28,8 +29,7 @@ export class GrtFormat {
     }
 
     public static async fromProto(file: ChecklistFile): Promise<File> {
-        // TODO
-        const blob = new Blob();
-        return new File([blob], file.metadata!.name + '.ace');
+        const blob = await new TextWriter(GRT_FORMAT_OPTIONS).write(file);
+        return new File([blob], file.metadata!.name + '.txt');
     }
 }

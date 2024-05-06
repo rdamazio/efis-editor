@@ -7,6 +7,8 @@ export const METADATA_AIRCRAFT_TITLE = 'Aircraft:';
 export const METADATA_MANUFACTURER_TITLE = 'Manufacturer:';
 export const METADATA_COPYRIGHT_TITLE = 'Copyright:';
 export const DEFAULT_FIRST_GROUP = 'Main group';
+export const HEADER_COMMENT = '# CHECKLIST EXPORTED FROM https://rdamazio.github.io/efis-editor/checklists/';
+export const LAST_UPDATED_FOOTER = 'Last updated ';
 
 export interface TextFormatOptions {
     // Extensions that this format can parse.

@@ -46,13 +46,10 @@ export class ChecklistItemsComponent {
   }
 
   onNewItem(type: ChecklistItem_Type) {
-    const item: ChecklistItem = {
+    const item = ChecklistItem.create({
       prompt: 'New item',
-      expectation: '',
       type: type,
-      indent: 0,
-      centered: false,
-    };
+    });
     if (type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
       item.expectation = 'New expectation';
     }

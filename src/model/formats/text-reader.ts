@@ -48,11 +48,12 @@ export class TextReader {
         let currentItemSeen = false;
         let currentItemContents = '';
         let currentItemIndent = 0;
+        let currentItemStartSpaces = 0;
         let currentChecklistNum = 0;
         let currentItemLineNum = 0;
         const processItem = () => {
             if (currentItemSeen && currentChecklist) {
-                let item = this._itemForContents(currentItemContents, currentItemIndent);
+                let item = this._itemForContents(currentItemContents, currentItemIndent, currentItemStartSpaces);
                 if (!this._options.checklistTopBlankLine || item.type !== ChecklistItem_Type.ITEM_SPACE ||
                     currentChecklist.items.length > 0) {
                     currentChecklist.items.push(item);
@@ -73,7 +74,7 @@ export class TextReader {
 
             const firstSpaceIdx = line.indexOf(' ');
             let prefix, lineContents: string;
-            if (firstSpaceIdx == -1 ) {
+            if (firstSpaceIdx == -1) {
                 prefix = line;
                 lineContents = '';
             } else {
@@ -129,7 +130,8 @@ export class TextReader {
                     throw new FormatError('Checklist item found before start of checklist');
                 }
 
-                const newIndent = Math.floor((lineContents.length - lineContents.trimStart().length) / this._options.indentWidth);
+                currentItemStartSpaces = lineContents.length - lineContents.trimStart().length;
+                const newIndent = Math.floor(currentItemStartSpaces / this._options.indentWidth);
                 lineContents = lineContents.slice(newIndent * this._options.indentWidth);
 
                 let item: ChecklistItem;
@@ -189,11 +191,11 @@ export class TextReader {
         return outFile;
     }
 
-    private _itemForContents(contents: string, indent: number): ChecklistItem {
+    private _itemForContents(contents: string, indent: number, startSpaces: number): ChecklistItem {
         const endTrimmedContents = contents.trimEnd();
         let endSpaces = (contents.length - endTrimmedContents.length)
         // If it was indented on both sides, meaning it was centered
-        const centered = (endSpaces > 0 && endSpaces === this._options.indentWidth * indent);
+        const centered = (endSpaces > 0 && endSpaces === startSpaces);
         if (centered) {
             indent = 0;
         }
@@ -220,8 +222,8 @@ export class TextReader {
             const responseSepIdx = prompt.indexOf(this._options.expectationSeparator);
             if (responseSepIdx !== -1) {
                 itemType = ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE;
-                expectation = prompt.slice(responseSepIdx + this._options.expectationSeparator.length + 1);
-                prompt = prompt.slice(0, responseSepIdx - 1);
+                expectation = prompt.slice(responseSepIdx + this._options.expectationSeparator.length);
+                prompt = prompt.slice(0, responseSepIdx);
             }
         }
 

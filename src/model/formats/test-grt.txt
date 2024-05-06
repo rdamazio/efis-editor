@@ -18,7 +18,7 @@ ITEM   Item with indent 1
 ITEM     NOTE: Item with indent 2
 ITEM       CAUTION: Item with indent 3
 ITEM         WARNING: Item with indent 4
-ITEM          ** Centered item **        
+ITEM        ** Centered item **       
 
 LIST Test group 2 (default): Test group 2 checklist 1
 ITEM Test group 2 checklist 1 item 1
@@ -40,5 +40,5 @@ ITEM Manufacturer:
 ITEM   Test manufacturer
 ITEM Copyright:
 ITEM   Test copyright
-ITEM 
+ITEM
 ITEM Last updated 2024-05-03
