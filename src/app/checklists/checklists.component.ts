@@ -42,6 +42,7 @@ export class ChecklistsComponent {
 
   onNewFile() {
     this.showFilePicker = false;
+    this.showFileUpload = false;
 
     const name = prompt("Enter a name for the new file:");
     if (!name) {
@@ -64,17 +65,9 @@ export class ChecklistsComponent {
     this.showFileUpload = false;
   }
 
-  onOpenFileCancel() {
-    this.showFilePicker = false;
-  }
-
   onUploadFile() {
     this.showFilePicker = false;
     this.showFileUpload = !this.showFileUpload;
-  }
-
-  onUploadFileCancel() {
-    this.showFileUpload = false;
   }
 
   onFileUploaded(file: ChecklistFile) {

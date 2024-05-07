@@ -32,6 +32,7 @@ export class ChecklistTreeComponent {
   set file(file: ChecklistFile | undefined) {
     this._file = file;
     this.reloadFile(false);
+    this.checklistSelected.emit();
   }
 
   private reloadFile(modified: boolean) {

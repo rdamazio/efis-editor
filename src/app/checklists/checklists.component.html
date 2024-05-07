@@ -19,14 +19,12 @@
     <checklist-file-picker
         #filePicker
         (fileSelected)="onFileSelected($event)"
-        (cancel)="onOpenFileCancel()"
         [fileNames]="store.listChecklistFiles()"
         [style.display]="showFilePicker ? '' : 'none'"
     />
     <checklist-file-upload
         [style.display]="showFileUpload ? '' : 'none'"
         (fileUploaded)="onFileUploaded($event)"
-        (cancel)="onUploadFileCancel()"
     />
     <checklist-tree
         #tree
