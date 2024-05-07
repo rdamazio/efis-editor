@@ -1,3 +1,18 @@
 .file-upload {
     min-height: 40px;
+    padding-bottom: 20px;
+}
+
+:host ::ng-deep {
+    ngx-file-drop {
+        div.ngx-file-drop__drop-zone {
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    }
+}
+
+.file-drop-content {
+    text-align: center;
+    color: white;
 }

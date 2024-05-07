@@ -1,10 +1,18 @@
 <!-- TODO: Prettify, add drop zone -->
 <div class="file-upload">
-    <input
-        type="file"
+    <ngx-file-drop
+        #drop
         accept=".ace, .txt, .afd"
-        ng2FileSelect
-        [uploader]="uploader"
-        (onFileSelected)="onFile($event)"
-    />
+        [directory]="false"
+        [multiple]="false"
+        [showBrowseBtn]="false"
+        required
+        (click)="drop.openFileSelector()"
+        (onFileDrop)="onDropped($event)">
+        <ng-template ngx-file-drop-content-tmp>
+            <div class="file-drop-content">
+                Drop files here<br>(click to browse)
+            </div>
+        </ng-template>
+    </ngx-file-drop>
 </div>
