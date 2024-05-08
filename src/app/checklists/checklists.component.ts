@@ -107,7 +107,7 @@ export class ChecklistsComponent {
     if (!this.selectedFile) return;
 
     // TODO: Look into using a framework that makes nicer dialogs, like ng-bootstrap, sweetalert, sweetalert2 or ng-vibe
-    if (!confirm(`Are you sure you'd like to delete checklist file "${this.selectedFile.metadata!.name}??`)) return;
+    if (!confirm(`Are you sure you'd like to delete checklist file "${this.selectedFile.metadata!.name}"??`)) return;
 
     this.store.deleteChecklistFile(this.selectedFile.metadata!.name);
     this._displayFile(undefined);

@@ -20,6 +20,8 @@ import { ChecklistTreeNodeComponent } from './node/node.component';
   styleUrl: './checklist-tree.component.scss'
 })
 export class ChecklistTreeComponent {
+  @Output() selectedChecklist: Checklist | undefined;
+  @Output() selectedChecklistGroup: ChecklistGroup | undefined;
   @Output() checklistSelected = new EventEmitter<Checklist | undefined>();
   @Output() checklistStructureChanged = new EventEmitter<ChecklistFile>();
 
@@ -32,6 +34,8 @@ export class ChecklistTreeComponent {
   set file(file: ChecklistFile | undefined) {
     this._file = file;
     this.reloadFile(false);
+    this.selectedChecklistGroup = undefined;
+    this.selectedChecklist = undefined;
     this.checklistSelected.emit();
   }
 
@@ -54,15 +58,18 @@ export class ChecklistTreeComponent {
     }
   }
 
-  private static groupToNode(group: ChecklistGroup): ChecklistTreeNode {
+  private static groupToNode(group: ChecklistGroup, groupIdx: number): ChecklistTreeNode {
     const node: ChecklistTreeNode = {
       title: group.title,
       group: group,
+      groupIdx: groupIdx,
       children: group.checklists.map(
-        checklist => ({
+        (checklist, checklistIdx) => ({
           title: checklist.title,
           group: group,
+          groupIdx: groupIdx,
           checklist: checklist,
+          checklistIdx: checklistIdx,
           isAddNew: false,
         })
       ),
@@ -80,8 +87,10 @@ export class ChecklistTreeComponent {
 
   onNodeSelect(node: ChecklistTreeNode) {
     let checklist: Checklist | undefined;
+    let checklistGroup: ChecklistGroup | undefined;
     if (!node.isAddNew) {
       checklist = node.checklist!;
+      checklistGroup = node.group!;
     } else {
       if (node.group) {
         // Adding new checklist to a group.
@@ -89,22 +98,23 @@ export class ChecklistTreeComponent {
         if (!this.fillTitle(checklist, "checklist")) {
           return;
         }
+        checklistGroup = node.group;
         node.group.checklists.push(checklist);
       } else {
         // Adding new group to the file.
-        const group = ChecklistGroup.create();
-        if (!this.fillTitle(group, "checklist group")) {
+        checklistGroup = ChecklistGroup.create();
+        if (!this.fillTitle(checklistGroup, "checklist group")) {
           return;
         }
-        this._file?.groups.push(group);
+        this._file!.groups.push(checklistGroup);
       }
       this.reloadFile(true);
       // Leave checklist unset
     }
 
-    if (checklist) {
-      this.checklistSelected.emit(checklist);
-    }
+    this.selectedChecklist = checklist;
+    this.selectedChecklistGroup = checklistGroup;
+    this.checklistSelected.emit(checklist);
   }
 
   onChecklistRename(node: ChecklistTreeNode) {
@@ -113,7 +123,14 @@ export class ChecklistTreeComponent {
   }
 
   onChecklistDelete(node: ChecklistTreeNode) {
-    window.alert("TODO");
+    if (!confirm(`Are you sure you'd like to delete checklist "${node.checklist!.title}"??`)) return;
+
+    node.group!.checklists.splice(node.checklistIdx!, 1)
+    if (this.selectedChecklist === node.checklist!) {
+      this.selectedChecklist = undefined;
+      this.checklistSelected.emit(undefined);
+    }
+    this.reloadFile(true);
   }
 
   onGroupRename(node: ChecklistTreeNode) {
@@ -122,7 +139,15 @@ export class ChecklistTreeComponent {
   }
 
   onGroupDelete(node: ChecklistTreeNode) {
-    window.alert("TODO");
+    if (!confirm(`Are you sure you'd like to delete checklist group "${node.group!.title}" and all checklists within??`)) return;
+
+    this._file!.groups.splice(node.groupIdx!, 1);
+    if (this.selectedChecklistGroup === node.group!) {
+      this.selectedChecklist = undefined;
+      this.selectedChecklistGroup = undefined;
+      this.checklistSelected.emit(undefined);
+    }
+    this.reloadFile(true);
   }
 
   private fillTitle(pb: Checklist | ChecklistGroup, promptType: string): boolean {

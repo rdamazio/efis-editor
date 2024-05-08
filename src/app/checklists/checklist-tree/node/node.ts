@@ -8,4 +8,7 @@ export interface ChecklistTreeNode {
 
   group?: ChecklistGroup;
   checklist?: Checklist;
+
+  groupIdx?: number;
+  checklistIdx?: number;
 }
