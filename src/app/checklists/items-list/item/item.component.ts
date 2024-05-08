@@ -27,8 +27,13 @@ export class ChecklistItemComponent {
   readonly ChecklistItem_Type = ChecklistItem_Type;
 
   onIndent(item: ChecklistItem, delta: number) {
-    // TODO: Handle centered items
     item.indent += delta;
+    this.onItemUpdated(item);
+  }
+
+  onCenterToggle(item: ChecklistItem) {
+    item.indent = 0;
+    item.centered = !item.centered;
     this.onItemUpdated(item);
   }
 
