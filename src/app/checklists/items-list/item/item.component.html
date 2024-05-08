@@ -56,7 +56,7 @@
       <span
           [class.expectation-container]="item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
           [hidden]="item.type !== ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE">
-        <span class="expectation-spacer" *ngIf="!expectationInput.editing">........................</span>
+        <span class="expectation-spacer"></span>
         <span class="expectation">
           <editable-label
               #expectationInput
