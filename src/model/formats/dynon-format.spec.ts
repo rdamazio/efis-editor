@@ -22,7 +22,7 @@ describe('DynonFormat', () => {
 
         // Now write the file back.
         const decoder = new TextDecoder('UTF-8');
-        const writtenFile = await DynonFormat.fromProto(readFile);
+        const writtenFile = await DynonFormat.fromProto(readFile, 'foo.txt');
         const writtenData = decoder.decode(await writtenFile.arrayBuffer());
         const writtenLines = writtenData.split('\r\n');
         const readData = decoder.decode(await f.arrayBuffer());

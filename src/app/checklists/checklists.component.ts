@@ -88,8 +88,10 @@ export class ChecklistsComponent {
       file = await AceFormat.fromProto(this.selectedFile);
     } else if (formatId === 'json') {
       file = await JsonFormat.fromProto(this.selectedFile);
+    } else if (formatId === 'afs') {
+      file = await DynonFormat.fromProto(this.selectedFile, 'CHKLST.AFD');
     } else if (formatId === 'dynon') {
-      file = await DynonFormat.fromProto(this.selectedFile);
+      file = await DynonFormat.fromProto(this.selectedFile, 'checklist.txt');
     } else if (formatId === 'grt') {
       file = await GrtFormat.fromProto(this.selectedFile);
     } else {

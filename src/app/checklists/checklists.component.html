@@ -10,10 +10,11 @@
         (deleteFile)="onDeleteFile()"
         (fileInfo)="onFileInfo()"
         [downloadFormats]="[
-            { id: 'ace', name: 'ACE format (G3X/GTN)' },
-            { id: 'dynon', name: 'Dynon / AFS' },
-            { id: 'grt', name: 'GRT' },
-            { id: 'json', name: 'Raw data (JSON)' },
+            { id: 'ace', name: 'Garmin G3X/GTN [.ace]' },
+            { id: 'dynon', name: 'Dynon [.txt]' },
+            { id: 'afs', name: 'Advanced Flight Systems [.afd]' },
+            { id: 'grt', name: 'GRT [.txt]' },
+            { id: 'json', name: 'Raw data [.json]' },
         ]"
     />
     <checklist-file-picker

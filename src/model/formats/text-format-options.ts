@@ -13,8 +13,6 @@ export const LAST_UPDATED_FOOTER = 'Last updated ';
 export interface TextFormatOptions {
     // Extensions that this format can parse.
     fileExtensions: string[];
-    // For this, {{checklistName}} will be replaced.
-    fileNameFormat: string;
     // If a line would be wider than this, it will be wrapped.
     maxLineLength?: number;
 
