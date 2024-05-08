@@ -27,7 +27,7 @@ export class TextReader {
     public async read(): Promise<ChecklistFile> {
         let name = this._file.name;
         for (let ext of this._options.fileExtensions) {
-            if (name.endsWith(ext)) {
+            if (name.toLowerCase().endsWith(ext.toLowerCase())) {
                 name = name.slice(0, -ext.length);
                 break;
             }
