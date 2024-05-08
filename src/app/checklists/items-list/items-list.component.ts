@@ -45,6 +45,11 @@ export class ChecklistItemsComponent {
     this.checklistChanged.emit(this._checklist);
   }
 
+  onItemDeleted(idx: number) {
+    this._checklist!.items.splice(idx, 1);
+    this.checklistChanged.emit(this._checklist);
+  }
+
   onNewItem(type: ChecklistItem_Type) {
     const item = ChecklistItem.create({
       prompt: 'New item',

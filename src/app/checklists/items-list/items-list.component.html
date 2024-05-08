@@ -5,14 +5,15 @@
         class="list"
         [cdkDropListData]="_checklist.items"
         (cdkDropListDropped)="onDrop($event)">
-      @for (item of _checklist.items; track item) {
+      @for (item of _checklist.items; track item; let i = $index) {
         <div
             class="list-item"
             cdkDrag
             cdkDragLockAxis="y">
           <checklist-item
               [item]="item"
-              (itemChanged)="onItemUpdated()" />
+              (itemChanged)="onItemUpdated()"
+              (itemDeleted)="onItemDeleted(i)" />
           <div *cdkDragPlaceholder></div>
         </div>
       }

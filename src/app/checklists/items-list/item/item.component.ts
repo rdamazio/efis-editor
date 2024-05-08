@@ -24,6 +24,7 @@ import { EditableLabelComponent } from '../editable-label/editable-label.compone
 export class ChecklistItemComponent {
   @Input() item!: ChecklistItem;
   @Output() itemChanged = new EventEmitter<ChecklistItem>();
+  @Output() itemDeleted = new EventEmitter<boolean>();
   readonly ChecklistItem_Type = ChecklistItem_Type;
 
   onIndent(item: ChecklistItem, delta: number) {
@@ -39,5 +40,9 @@ export class ChecklistItemComponent {
 
   onItemUpdated(item: ChecklistItem) {
     this.itemChanged.emit(this.item);
+  }
+
+  onDelete() {
+    this.itemDeleted.emit(true);
   }
 }

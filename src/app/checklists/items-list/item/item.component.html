@@ -14,7 +14,14 @@
           (click)="promptInput.edit(); expectationInput.edit()">
         <mat-icon fontIcon="edit" />
       </button>
-      <!-- TODO: Action to delete item -->
+      <button
+          mat-icon-button
+          mat-medium-icon-button
+          class="action-icon"
+          [attr.aria-label]="'Delete ' + item.prompt"
+          (click)="onDelete()">
+        <mat-icon fontIcon="delete" />
+      </button>
       <button
           mat-icon-button
           mat-medium-icon-button
