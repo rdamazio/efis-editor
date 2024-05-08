@@ -1,52 +1,70 @@
-.item {
-  vertical-align: middle;
-  color: #eee;
+.item-container {
+  display: flex;
 }
 
-.item-title {
+.actions {
+  float: left;
+  flex: none;
+}
+
+.item {
+  padding-top: 5px;
+  color: #eee;
+  display: flex;
+  width: 100%;
+}
+
+.prompt {
+  box-decoration-break: clone;
+}
+
+.prompt-title {
   font-size: 18px;
   font-weight: bold;
   color: white;
 }
 
-.item-challenge:before {
+.prompt-challenge:before {
   content: " □";
 }
 
-.item-challenge-response:before {
-  content: " □";
+.prompt-challenge-response:before {
+  content: " □ ";
 }
 
-.item-caution:before {
-  padding: 10px;
+.prompt-caution:before {
   content: "CAUTION:";
 }
 
-.item-warning {
+.prompt-warning {
   color: yellow;
 }
 
-.item-warning:before {
-  padding: 10px;
+.prompt-warning:before {
   content: "WARNING:";
 }
 
-.item-note {
+.prompt-note {
   color: gray;
 }
 
-.item-note:before {
-  padding: 10px;
+.prompt-note:before {
   content: "NOTE:";
 }
 
-.prompt-spacer {
+.expectation-container {
+  flex-grow: 1;
+  display: flex;
+}
+
+.expectation-spacer {
+  flex-grow: 1;
   text-wrap: nowrap;
   overflow: hidden;
   letter-spacing: 10px;
 }
 
-.prompt-expectation {
+.expectation {
   float: right;
   color: cyan;
 }
