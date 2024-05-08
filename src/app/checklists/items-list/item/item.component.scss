@@ -7,6 +7,14 @@
   flex: none;
 }
 
+.action-icon {
+  vertical-align: middle;
+}
+
+.drag-icon {
+  cursor: move;
+}
+
 .item {
   padding-top: 5px;
   color: #eee;
@@ -56,6 +64,11 @@
   content: "NOTE:";
 }
 
+// TODO: Make this work without ng-deep
+::ng-deep .prompt-input mat-form-field {
+  width: 400px;
+}
+
 .expectation-container {
   flex-grow: 1;
   display: flex;
@@ -63,32 +76,16 @@
 
 .expectation-spacer {
   flex-grow: 1;
-  text-wrap: nowrap;
-  overflow: hidden;
-  letter-spacing: 10px;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='20' height='100' viewBox='0 0 20 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3ctext x='10' y='15' fill='white' font-size='2em'%3e.%3c/text%3e%3c/svg%3e ");
   background-repeat: repeat-x;
-
 }
 
 .expectation {
   float: right;
   color: cyan;
+  padding-left: 5px;
 }
 
-// TODO: Make this work without ng-deep
-::ng-deep .prompt-input mat-form-field {
-  width: 400px;
-}
-
-::ng-deep .prompt-expectation mat-form-field {
+::ng-deep .expectation mat-form-field {
   width: 300px;
-}
-
-.item-icon {
-  vertical-align: middle;
-}
-
-.drag-icon {
-  cursor: move;
 }

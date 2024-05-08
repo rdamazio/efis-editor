@@ -3,12 +3,12 @@
     <div class="actions">
       <mat-icon
           cdkDragHandle
-          class="mat-icon-rtl-mirror item-icon drag-icon"
+          class="mat-icon-rtl-mirror action-icon drag-icon"
           fontIcon="drag_handle" />
       <button
           mat-icon-button
           mat-medium-icon-button
-          class="item-icon"
+          class="action-icon"
           (click)="promptInput.edit(); expectationInput.edit()"
           [attr.aria-label]="'Edit ' + item.prompt">
         <mat-icon fontIcon="edit" />
@@ -16,7 +16,7 @@
       <button
           mat-icon-button
           mat-medium-icon-button
-          class="item-icon"
+          class="action-icon"
           [attr.aria-label]="'Indent ' + item.prompt + ' left'"
           [disabled]="item.indent == 0 || item.centered"
           (click)="onIndent(item, -1)">
@@ -25,7 +25,7 @@
       <button
           mat-icon-button
           mat-medium-icon-button
-          class="item-icon"
+          class="action-icon"
           [attr.aria-label]="'Indent ' + item.prompt + ' right'"
           [disabled]="item.indent == 4 || item.centered"
           (click)="onIndent(item, 1)">
@@ -34,7 +34,7 @@
       <button
           mat-icon-button
           mat-medium-icon-button
-          class="item-icon"
+          class="action-icon"
           [attr.aria-label]="'Center ' + item.prompt"
           (click)="onCenterToggle(item)">
         <mat-icon [fontIcon]="item.centered ? 'format_align_left' : 'format_align_center'" />
