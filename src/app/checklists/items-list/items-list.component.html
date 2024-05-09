@@ -12,7 +12,7 @@
             cdkDragLockAxis="y">
           <checklist-item
               [item]="item"
-              (itemChanged)="onItemUpdated()"
+              (itemChange)="onItemUpdated()"
               (itemDeleted)="onItemDeleted(i)" />
           <div *cdkDragPlaceholder></div>
         </div>

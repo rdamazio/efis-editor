@@ -19,7 +19,7 @@
     />
     <checklist-file-picker
         #filePicker
-        (fileSelected)="onFileSelected($event)"
+        (selectedFileChange)="onFileSelected($event)"
         [fileNames]="store.listChecklistFiles()"
         [style.display]="showFilePicker ? '' : 'none'"
     />
@@ -30,13 +30,13 @@
     <checklist-tree
         #tree
         class="checklist-tree"
-        (checklistSelected)="items.checklist = $event"
-        (checklistStructureChanged)="onStructureChanged($event)"
+        (fileChange)="onFileChanged($event)"
     />
   </div>
   <checklist-items
       #items
       class="checklist-items"
-      (checklistChanged)="onChecklistChanged($event)"
+      [(checklist)]="tree.selectedChecklist"
+      (checklistChange)="onChecklistChanged($event)"
   />
 </div>

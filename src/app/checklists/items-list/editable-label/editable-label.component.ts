@@ -28,12 +28,12 @@ export class EditableLabelComponent {
   private _savedValue = '';
   @ViewChild("promptInput") input!: ElementRef;
 
-  @Output() valueChanged = new EventEmitter<string>();
   @Output() cancelled = new EventEmitter<boolean>();
   @Output() editing = false;
   @Input() label: string = '';
   @Input() disallowEmpty = false;
 
+  @Output() valueChange = new EventEmitter<string>();
   @Input()
   get value(): string { return this._savedValue; }
   set value(v: string) {
@@ -45,7 +45,7 @@ export class EditableLabelComponent {
     if (this.editing) {
       this.editing = false;
       this._savedValue = this.control.value!;
-      this.valueChanged.emit(this._savedValue);
+      this.valueChange.emit(this._savedValue);
     }
   }
 

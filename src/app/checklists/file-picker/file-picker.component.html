@@ -3,7 +3,7 @@
     <mat-label>Select checklist file</mat-label>
     <mat-select
         [(value)]="selectedFile"
-        (selectionChange)="fileSelected.emit(selectedFile)">
+        (selectionChange)="selectedFileChange.emit(selectedFile)">
       <mat-option
           *ngFor="let file of fileNames"
           value="{{file}}">

@@ -168,7 +168,7 @@ export class ChecklistsComponent {
     // TODO: Add filename to topbar, add rename pencil there
   }
 
-  onStructureChanged(file: ChecklistFile) {
+  onFileChanged(file: ChecklistFile) {
     this.store.saveChecklistFile(file);
   }
 

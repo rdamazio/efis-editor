@@ -23,7 +23,7 @@ import { EditableLabelComponent } from '../editable-label/editable-label.compone
 })
 export class ChecklistItemComponent {
   @Input() item!: ChecklistItem;
-  @Output() itemChanged = new EventEmitter<ChecklistItem>();
+  @Output() itemChange = new EventEmitter<ChecklistItem>();
   @Output() itemDeleted = new EventEmitter<boolean>();
   readonly ChecklistItem_Type = ChecklistItem_Type;
 
@@ -39,7 +39,7 @@ export class ChecklistItemComponent {
   }
 
   onItemUpdated(item: ChecklistItem) {
-    this.itemChanged.emit(this.item);
+    this.itemChange.emit(this.item);
   }
 
   onDelete() {

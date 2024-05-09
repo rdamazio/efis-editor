@@ -21,14 +21,14 @@ import { ChecklistTreeNodeComponent } from './node/node.component';
 })
 export class ChecklistTreeComponent {
   @Output() selectedChecklist: Checklist | undefined;
+  @Output() selectedChecklistChange = new EventEmitter<Checklist | undefined>();
   @Output() selectedChecklistGroup: ChecklistGroup | undefined;
-  @Output() checklistSelected = new EventEmitter<Checklist | undefined>();
-  @Output() checklistStructureChanged = new EventEmitter<ChecklistFile>();
 
   treeControl = new NestedTreeControl<ChecklistTreeNode>(node => node.children);
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
   private _file?: ChecklistFile;
 
+  @Output() fileChange = new EventEmitter<ChecklistFile>();
   @Input()
   get file(): ChecklistFile | undefined { return this._file; }
   set file(file: ChecklistFile | undefined) {
@@ -36,7 +36,7 @@ export class ChecklistTreeComponent {
     this.reloadFile(false);
     this.selectedChecklistGroup = undefined;
     this.selectedChecklist = undefined;
-    this.checklistSelected.emit();
+    this.selectedChecklistChange.emit();
   }
 
   private reloadFile(modified: boolean) {
@@ -54,7 +54,7 @@ export class ChecklistTreeComponent {
     this.treeControl.expandAll();
 
     if (modified) {
-      this.checklistStructureChanged.emit(this._file);
+      this.fileChange.emit(this._file);
     }
   }
 
@@ -114,7 +114,7 @@ export class ChecklistTreeComponent {
 
     this.selectedChecklist = checklist;
     this.selectedChecklistGroup = checklistGroup;
-    this.checklistSelected.emit(checklist);
+    this.selectedChecklistChange.emit(checklist);
   }
 
   onChecklistRename(node: ChecklistTreeNode) {
@@ -128,7 +128,7 @@ export class ChecklistTreeComponent {
     node.group!.checklists.splice(node.checklistIdx!, 1)
     if (this.selectedChecklist === node.checklist!) {
       this.selectedChecklist = undefined;
-      this.checklistSelected.emit(undefined);
+      this.selectedChecklistChange.emit(undefined);
     }
     this.reloadFile(true);
   }
@@ -145,7 +145,7 @@ export class ChecklistTreeComponent {
     if (this.selectedChecklistGroup === node.group!) {
       this.selectedChecklist = undefined;
       this.selectedChecklistGroup = undefined;
-      this.checklistSelected.emit(undefined);
+      this.selectedChecklistChange.emit(undefined);
     }
     this.reloadFile(true);
   }

@@ -18,7 +18,6 @@ import { GrtFormat } from '../../../model/formats/grt-format';
 })
 export class ChecklistFileUploadComponent {
   @Output() fileUploaded = new EventEmitter<ChecklistFile>();
-  fileName: string = '';
 
   onDropped(files: NgxFileDropEntry[]) {
     for (const f of files) {

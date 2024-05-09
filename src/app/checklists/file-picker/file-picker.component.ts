@@ -17,5 +17,5 @@ import { MatSelectModule } from '@angular/material/select';
 export class ChecklistFilePickerComponent {
   @Input() fileNames?: string[];
   @Input() selectedFile = '';
-  @Output() fileSelected = new EventEmitter<string>();
+  @Output() selectedFileChange = new EventEmitter<string>();
 }

@@ -24,12 +24,11 @@ import { ChecklistItemComponent } from './item/item.component';
   ]
 })
 export class ChecklistItemsComponent {
-  @Output() checklistChanged = new EventEmitter<Checklist>();
-
   editing: boolean = false;
   _checklist?: Checklist;
   readonly ChecklistItem_Type = ChecklistItem_Type;
 
+  @Output() checklistChange = new EventEmitter<Checklist>();
   @Input()
   get checklist(): Checklist | undefined { return this._checklist; }
   set checklist(checklist: Checklist | undefined) {
@@ -42,12 +41,12 @@ export class ChecklistItemsComponent {
   }
 
   onItemUpdated() {
-    this.checklistChanged.emit(this._checklist);
+    this.checklistChange.emit(this._checklist);
   }
 
   onItemDeleted(idx: number) {
     this._checklist!.items.splice(idx, 1);
-    this.checklistChanged.emit(this._checklist);
+    this.checklistChange.emit(this._checklist);
   }
 
   onNewItem(type: ChecklistItem_Type) {
