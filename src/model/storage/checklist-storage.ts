@@ -12,9 +12,13 @@ export class ChecklistStorage {
   constructor() {
     afterNextRender(() => {
       setTimeout(() => {
-        this._browserStorage = localStorage;
+        this.browserInit();
       });
     }, { phase: AfterRenderPhase.Read });
+  }
+
+  browserInit() {
+    this._browserStorage = localStorage;
   }
 
   listChecklistFiles(): string[] {
