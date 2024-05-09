@@ -6,7 +6,7 @@
 .leftbar {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  min-width: 300px;
   margin-bottom: 20px;
   margin-left: 20px;
 }
