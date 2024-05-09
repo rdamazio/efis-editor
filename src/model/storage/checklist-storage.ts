@@ -1,4 +1,4 @@
-import { AfterRenderPhase, Injectable, afterNextRender } from "@angular/core";
+import { AfterRenderPhase, ApplicationRef, ChangeDetectorRef, Injectable, afterNextRender } from "@angular/core";
 import { ChecklistFile } from "../../../gen/ts/checklist";
 
 const CHECKLIST_PREFIX = "checklists:";
@@ -11,17 +11,14 @@ export class ChecklistStorage {
 
   constructor() {
     afterNextRender(() => {
-      this.onAfterRender();
+      setTimeout(() => {
+        this._browserStorage = localStorage;
+      });
     }, { phase: AfterRenderPhase.Read });
-  }
-
-  onAfterRender() {
-    this._browserStorage = localStorage;
   }
 
   listChecklistFiles(): string[] {
     if (!this._browserStorage) {
-      // TODO: NG0100 error caused by this
       return [];
     }
 
