@@ -8,6 +8,7 @@
   <mat-tree-node
       *matTreeNodeDef="let node"
       matTreeNodePadding
+      [class.checklist-selected]="selectedChecklist === node.checklist"
       (click)="onNodeSelect(node)">
     <checklist-tree-node
         [node]="node"
