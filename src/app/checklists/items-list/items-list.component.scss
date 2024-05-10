@@ -28,14 +28,25 @@
   border: none;
 }
 
-.item-contents {
+.add-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.action-button {
   display: inline;
+  white-space: nowrap;
+  margin-top: 10px;
+  // TODO: Softer color for these?
+}
+
+.action-icon {
   vertical-align: middle;
 }
 
-.add-bar {
-  display: flex;
-  justify-content: space-between;
+.action-label {
+  vertical-align: middle;
 }
 
 /* Highlight the list item that is being dragged. */

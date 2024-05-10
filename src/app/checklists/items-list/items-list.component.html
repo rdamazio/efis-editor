@@ -18,84 +18,19 @@
         </div>
       }
       <div class="list-item add-bar">
-        <!-- TODO: Make the label clickable too -->
-        <div class="item-contents">
-          <button
-              mat-icon-button
-              mat-medium-icon-button
-              class="item-contents"
-              [attr.aria-label]="'Add a new checklist challenge/response'"
-              (click)="onNewItem(ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE)">
-            <mat-icon fontIcon="add" />
-          </button>
-          <span class="item-contents">Add challenge/response</span>
-        </div>
-        <div class="item-contents">
-          <button
-              mat-icon-button
-              mat-medium-icon-button
-              class="item-contents"
-              [attr.aria-label]="'Add a new checklist challenge'"
-              (click)="onNewItem(ChecklistItem_Type.ITEM_CHALLENGE)">
-            <mat-icon fontIcon="add" />
-          </button>
-          <span class="item-contents">Add challenge</span>
-        </div>
-        <div class="item-contents">
-          <button
-              mat-icon-button
-              mat-medium-icon-button
-              class="item-contents"
-              [attr.aria-label]="'Add a new checklist title'"
-              (click)="onNewItem(ChecklistItem_Type.ITEM_TITLE)">
-            <mat-icon fontIcon="add" />
-          </button>
-          <span class="item-contents">Add title</span>
-        </div>
-        <div class="item-contents">
-          <button
-              mat-icon-button
-              mat-medium-icon-button
-              class="item-contents"
-              [attr.aria-label]="'Add a new checklist warning'"
-              (click)="onNewItem(ChecklistItem_Type.ITEM_WARNING)">
-            <mat-icon fontIcon="add" />
-          </button>
-          <span class="item-contents">Add warning</span>
-        </div>
-        <div class="item-contents">
-          <button
-              mat-icon-button
-              mat-medium-icon-button
-              class="item-contents"
-              [attr.aria-label]="'Add a new checklist caution'"
-              (click)="onNewItem(ChecklistItem_Type.ITEM_CAUTION)">
-            <mat-icon fontIcon="add" />
-          </button>
-          <span class="item-contents">Add caution</span>
-        </div>
-        <div class="item-contents">
-          <button
-              mat-icon-button
-              mat-medium-icon-button
-              class="item-contents"
-              [attr.aria-label]="'Add a new checklist note'"
-              (click)="onNewItem(ChecklistItem_Type.ITEM_NOTE)">
-            <mat-icon fontIcon="add" />
-          </button>
-          <span class="item-contents">Add note</span>
-        </div>
-        <div class="item-contents">
-          <button
-              mat-icon-button
-              mat-medium-icon-button
-              class="item-contents"
-              [attr.aria-label]="'Add a new checklist blank row'"
-              (click)="onNewItem(ChecklistItem_Type.ITEM_SPACE)">
-            <mat-icon fontIcon="add" />
-          </button>
-          <span class="item-contents">Add blank</span>
-        </div>
+        @for(item_type of ITEM_TYPES; track item_type.type) {
+          <div class="action-button">
+            <button
+                mat-fab
+                extended
+                class="action-button"
+                [attr.aria-label]="'Add a new checklist ' + item_type.label"
+                (click)="onNewItem(item_type.type)">
+              <mat-icon class="action-icon" fontIcon="add" />
+              <span class="action-label">Add {{item_type.label}}</span>
+            </button>
+          </div>
+        }
       </div> 
     </div>
   } @else {

@@ -3,7 +3,6 @@ import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 import { ChecklistItemComponent } from './item/item.component';
 
@@ -18,15 +17,22 @@ import { ChecklistItemComponent } from './item/item.component';
     CdkDropList,
     ChecklistItemComponent,
     MatButtonModule,
-    MatIconButtonSizesModule,
     MatIconModule,
     NgIf,
   ]
 })
 export class ChecklistItemsComponent {
-  editing: boolean = false;
   _checklist?: Checklist;
-  readonly ChecklistItem_Type = ChecklistItem_Type;
+  readonly ITEM_TYPES: { label: string, type: ChecklistItem_Type }[] = [
+    { label: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
+    { label: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
+    { label: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
+    { label: 'title', type: ChecklistItem_Type.ITEM_TITLE },
+    { label: 'warning', type: ChecklistItem_Type.ITEM_WARNING },
+    { label: 'caution', type: ChecklistItem_Type.ITEM_CAUTION },
+    { label: 'note', type: ChecklistItem_Type.ITEM_NOTE },
+    { label: 'blank row', type: ChecklistItem_Type.ITEM_SPACE },
+  ];
 
   @Output() checklistChange = new EventEmitter<Checklist>();
   @Input()
