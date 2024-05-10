@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 
 @Component({
@@ -16,6 +17,7 @@ import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
     MatIconModule,
     MatInputModule,
     MatLabel,
+    MatTooltipModule,
     ReactiveFormsModule,
   ],
   templateUrl: './editable-label.component.html',

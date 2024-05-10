@@ -17,6 +17,7 @@
         mat-medium-icon-button
         matSuffix
         class="item-icon"
+        matTooltip="Save"
         [attr.aria-label]="'Save changes to ' + label"
         [disabled]="!this.control.valid"
         (click)="value = promptInput.value; save();">
@@ -27,6 +28,7 @@
         mat-medium-icon-button
         matSuffix
         class="item-icon"
+        matTooltip="Cancel"
         [attr.aria-label]="'Cancel changes to ' + label"
         (click)="cancel()">
         <mat-icon fontIcon="cancel" />

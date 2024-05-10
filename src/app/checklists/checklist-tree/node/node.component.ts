@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { ChecklistTreeNode } from './node';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'checklist-tree-node',
@@ -12,6 +13,7 @@ import { ChecklistTreeNode } from './node';
     MatButtonModule,
     MatIconButtonSizesModule,
     MatIconModule,
+    MatTooltipModule,
     NgIf,
   ],
   templateUrl: './node.component.html',

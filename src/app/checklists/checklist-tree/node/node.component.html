@@ -23,7 +23,8 @@
     <button
         mat-icon-button
         mat-small-icon-button
-        [attr.aria-label]="'Edit ' + node.title"
+        [attr.aria-label]="'Rename ' + node.title"
+        [matTooltip]="'Rename ' + node.title"
         (click)="nodeRename.emit(node)"
         >
       <mat-icon fontIcon="edit" />
@@ -32,6 +33,7 @@
         mat-icon-button
         mat-small-icon-button
         [attr.aria-label]="'Delete ' + node.title"
+        [matTooltip]="'Delete ' + node.title + ' and all its items'"
         (click)="nodeDelete.emit(node)"
         >
       <mat-icon fontIcon="delete" />

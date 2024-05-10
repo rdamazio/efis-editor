@@ -4,11 +4,13 @@
       <mat-icon
           cdkDragHandle
           class="mat-icon-rtl-mirror action-icon drag-icon"
+          matTooltip="Drag to reorder"
           fontIcon="drag_handle" />
       <button
           mat-icon-button
           mat-medium-icon-button
           class="action-icon"
+          matTooltip="Edit this line"
           [attr.aria-label]="'Edit ' + item.prompt"
           [disabled]="item.type == ChecklistItem_Type.ITEM_SPACE"
           (click)="promptInput.edit(); expectationInput.edit()">
@@ -18,6 +20,7 @@
           mat-icon-button
           mat-medium-icon-button
           class="action-icon"
+          matTooltip="Delete this line"
           [attr.aria-label]="'Delete ' + item.prompt"
           (click)="onDelete()">
         <mat-icon fontIcon="delete" />
@@ -26,6 +29,7 @@
           mat-icon-button
           mat-medium-icon-button
           class="action-icon"
+          matTooltip="Indent left"
           [attr.aria-label]="'Indent ' + item.prompt + ' left'"
           [disabled]="item.indent == 0 || item.centered || item.type == ChecklistItem_Type.ITEM_SPACE"
           (click)="onIndent(item, -1)">
@@ -35,6 +39,7 @@
           mat-icon-button
           mat-medium-icon-button
           class="action-icon"
+          matTooltip="Indent right"
           [attr.aria-label]="'Indent ' + item.prompt + ' right'"
           [disabled]="item.indent == 4 || item.centered || item.type == ChecklistItem_Type.ITEM_SPACE"
           (click)="onIndent(item, 1)">
@@ -44,6 +49,7 @@
           mat-icon-button
           mat-medium-icon-button
           class="action-icon"
+          [matTooltip]="(item.centered ? 'Left-justify' : 'Center') + ' this line'"
           [attr.aria-label]="'Center ' + item.prompt"
           [disabled]="item.type == ChecklistItem_Type.ITEM_SPACE"
           (click)="onCenterToggle(item)">
