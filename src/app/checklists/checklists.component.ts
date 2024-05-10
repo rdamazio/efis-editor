@@ -1,6 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { saveAs } from 'file-saver';
 import { Checklist, ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
 import { AceFormat } from '../../model/formats/ace-format';
@@ -39,7 +40,73 @@ export class ChecklistsComponent {
   showFilePicker: boolean = false;
   showFileUpload: boolean = false;
 
-  constructor(public store: ChecklistStorage, private _dialog: MatDialog) {
+  constructor(public store: ChecklistStorage, private _dialog: MatDialog, private _route: ActivatedRoute) { }
+
+  ngOnInit() {
+    this._route.fragment.subscribe(async (fragment) => {
+      // We use fragment-based navigation because of the routing limitations associated with GH Pages.
+      // (yes, I could make 404.html point to index.html, but that's just horrible)
+      await this._onFragmentChange(fragment);
+    });
+  }
+
+  private async _onFragmentChange(fragment: string | null) {
+    const parsed = this._parseFragment(fragment);
+    const fileName = parsed.fileName;
+
+    await this.onFileSelected(fileName);
+
+    if (fileName) {
+      if (!this.selectedFile) {
+        console.log(`Failed to load file ${fileName}`);
+        return;
+      }
+
+      let checklist: Checklist | undefined;
+      if (parsed.checklistIdx !== undefined && parsed.groupIdx !== undefined) {
+        if (this.selectedFile.groups.length <= parsed.groupIdx) {
+          console.log(`File ${fileName} does not have group ${parsed.groupIdx}`);
+          return;
+        }
+
+        const group = this.selectedFile.groups[parsed.groupIdx];
+        if (group.checklists.length <= parsed.checklistIdx) {
+          console.log(`Group ${parsed.groupIdx} in file ${fileName} has no checklist ${parsed.checklistIdx}`);
+          return;
+        }
+
+        checklist = group.checklists[parsed.checklistIdx];
+      }
+      this.tree!.selectedChecklist = checklist;
+    }
+  }
+
+  private _parseFragment(fragment: string | null): { fileName?: string, groupIdx?: number, checklistIdx?: number } {
+    if (!fragment) return {};
+
+    // Two possible fragment formats:
+    // #checklistname
+    // #checklistname/groupIdx/checklistIdx
+
+    const checklistSepIdx = fragment.lastIndexOf('/');
+    if (checklistSepIdx === -1) {
+      return { fileName: fragment };
+    }
+
+    const checklistIdxStr = fragment.substring(checklistSepIdx + 1);
+    const checklistIdx = parseInt(checklistIdxStr);
+    if (isNaN(checklistIdx)) {
+      return { fileName: fragment };
+    }
+    const groupSepIdx = fragment.lastIndexOf('/', checklistSepIdx - 1);
+    const groupIdxStr = fragment.substring(groupSepIdx + 1, checklistSepIdx);
+    const groupIdx = parseInt(groupIdxStr);
+    if (isNaN(groupIdx)) {
+      return { fileName: fragment };
+    }
+
+    const fileName = fragment.slice(0, groupSepIdx);
+    return { fileName, groupIdx, checklistIdx };
   }
 
   onNewFile() {
@@ -146,7 +213,7 @@ export class ChecklistsComponent {
     });
   }
 
-  async onFileSelected(id: string) {
+  async onFileSelected(id?: string) {
     this.showFilePicker = false;
 
     let file: ChecklistFile | undefined;
@@ -161,7 +228,9 @@ export class ChecklistsComponent {
 
   private _displayFile(file?: ChecklistFile) {
     this.selectedFile = file;
-    this.tree!.file = file;
+    if (this.tree) {
+      this.tree.file = file;
+    }
     if (file?.metadata) {
       // Make the file selected the next time the picker gets displayed
       this.filePicker!.selectedFile = file.metadata.name;

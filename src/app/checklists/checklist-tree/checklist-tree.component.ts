@@ -20,7 +20,7 @@ import { ChecklistTreeNodeComponent } from './node/node.component';
   styleUrl: './checklist-tree.component.scss'
 })
 export class ChecklistTreeComponent {
-  @Output() selectedChecklist: Checklist | undefined;
+  @Input() selectedChecklist: Checklist | undefined;
   @Output() selectedChecklistChange = new EventEmitter<Checklist | undefined>();
   @Output() selectedChecklistGroup: ChecklistGroup | undefined;
 

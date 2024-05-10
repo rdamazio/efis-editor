@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ChecklistsComponent } from './checklists.component';
+import { provideRouter } from '@angular/router';
 
 describe('ChecklistsComponent', () => {
   let component: ChecklistsComponent;
@@ -12,7 +13,11 @@ describe('ChecklistsComponent', () => {
       imports: [
         ChecklistsComponent,
         NoopAnimationsModule,
-      ]
+      ],
+      providers: [
+        provideRouter([{ path: 'checklists', component: ChecklistsComponent }]),
+      ],
+
     })
       .compileComponents();
 
