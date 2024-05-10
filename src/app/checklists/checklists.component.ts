@@ -1,7 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { saveAs } from 'file-saver';
 import { Checklist, ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
 import { AceFormat } from '../../model/formats/ace-format';
@@ -16,6 +16,12 @@ import { ChecklistFileInfoComponent } from './file-info/file-info.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
+
+interface ParsedFragment {
+  fileName?: string;
+  groupIdx?: number;
+  checklistIdx?: number;
+};
 
 @Component({
   selector: 'app-checklists',
@@ -40,7 +46,7 @@ export class ChecklistsComponent {
   showFilePicker: boolean = false;
   showFileUpload: boolean = false;
 
-  constructor(public store: ChecklistStorage, private _dialog: MatDialog, private _route: ActivatedRoute) { }
+  constructor(public store: ChecklistStorage, private _dialog: MatDialog, private _route: ActivatedRoute, private _router: Router) { }
 
   ngOnInit() {
     this._route.fragment.subscribe(async (fragment) => {
@@ -50,38 +56,52 @@ export class ChecklistsComponent {
     });
   }
 
+  private loadingFragment = false;
   private async _onFragmentChange(fragment: string | null) {
+    if (this.loadingFragment) {
+      // We're the ones setting the fragment, changes are being made directly.
+      return;
+    }
+    this.loadingFragment = true;
+
     const parsed = this._parseFragment(fragment);
     const fileName = parsed.fileName;
 
-    await this.onFileSelected(fileName);
+    if (fileName !== this.selectedFile?.metadata?.name) {
+      await this.onFileSelected(fileName);
+    }
 
     if (fileName) {
-      if (!this.selectedFile) {
-        console.log(`Failed to load file ${fileName}`);
+      this._loadFragmentChecklist(parsed);
+    }
+    this.loadingFragment = false;
+  }
+
+  _loadFragmentChecklist(parsed: ParsedFragment) {
+    if (!this.selectedFile) {
+      console.log(`Failed to load file ${parsed.fileName}`);
+      return;
+    }
+
+    let checklist: Checklist | undefined;
+    if (parsed.checklistIdx !== undefined && parsed.groupIdx !== undefined) {
+      if (this.selectedFile.groups.length <= parsed.groupIdx) {
+        console.log(`File ${parsed.fileName} does not have group ${parsed.groupIdx}`);
         return;
       }
 
-      let checklist: Checklist | undefined;
-      if (parsed.checklistIdx !== undefined && parsed.groupIdx !== undefined) {
-        if (this.selectedFile.groups.length <= parsed.groupIdx) {
-          console.log(`File ${fileName} does not have group ${parsed.groupIdx}`);
-          return;
-        }
-
-        const group = this.selectedFile.groups[parsed.groupIdx];
-        if (group.checklists.length <= parsed.checklistIdx) {
-          console.log(`Group ${parsed.groupIdx} in file ${fileName} has no checklist ${parsed.checklistIdx}`);
-          return;
-        }
-
-        checklist = group.checklists[parsed.checklistIdx];
+      const group = this.selectedFile.groups[parsed.groupIdx];
+      if (group.checklists.length <= parsed.checklistIdx) {
+        console.log(`Group ${parsed.groupIdx} in file ${parsed.fileName} has no checklist ${parsed.checklistIdx}`);
+        return;
       }
-      this.tree!.selectedChecklist = checklist;
+
+      checklist = group.checklists[parsed.checklistIdx];
     }
+    this.tree!.selectedChecklist = checklist;
   }
 
-  private _parseFragment(fragment: string | null): { fileName?: string, groupIdx?: number, checklistIdx?: number } {
+  private _parseFragment(fragment: string | null): ParsedFragment {
     if (!fragment) return {};
 
     // Two possible fragment formats:
@@ -107,6 +127,44 @@ export class ChecklistsComponent {
 
     const fileName = fragment.slice(0, groupSepIdx);
     return { fileName, groupIdx, checklistIdx };
+  }
+
+  private _buildFragment(): string {
+    if (!this.selectedFile || !this.selectedFile.metadata?.name) {
+      return '';
+    }
+
+    if (!this.tree || !this.tree.selectedChecklist) {
+      return this.selectedFile.metadata.name;
+    }
+
+    // TODO: Can probably use the tree node indices directly instead.
+    for (const [groupIdx, group] of this.selectedFile.groups.entries()) {
+      if (group === this.tree.selectedChecklistGroup) {
+        for (const [checklistIdx, checklist] of group.checklists.entries()) {
+          if (checklist === this.tree.selectedChecklist) {
+            return `${this.selectedFile.metadata.name}/${groupIdx}/${checklistIdx}`;
+          }
+        }
+      }
+    }
+
+    return this.selectedFile.metadata.name;
+  }
+
+  private async _updateFragment() {
+    if (this.loadingFragment) {
+      // We're in the middle of setting a fragment - that triggers loading
+      // the file, which then triggers an _updateFragment call (and even
+      // worse, before a checklist is selected, which would result in a
+      // different fragment) - avoid the loop.
+      return;
+    }
+
+    await this._router.navigate([], {
+      fragment: this._buildFragment(),
+      onSameUrlNavigation: 'ignore',
+    });
   }
 
   onNewFile() {
@@ -226,7 +284,11 @@ export class ChecklistsComponent {
     this._displayFile(file);
   }
 
-  private _displayFile(file?: ChecklistFile) {
+  async onChecklistSelected(checklist?: Checklist) {
+    await this._updateFragment();
+  }
+
+  private async _displayFile(file?: ChecklistFile) {
     this.selectedFile = file;
     if (this.tree) {
       this.tree.file = file;
@@ -235,6 +297,8 @@ export class ChecklistsComponent {
       // Make the file selected the next time the picker gets displayed
       this.filePicker!.selectedFile = file.metadata.name;
     }
+
+    await this._updateFragment();
 
     // TODO: Add filename to topbar, add rename pencil there
   }

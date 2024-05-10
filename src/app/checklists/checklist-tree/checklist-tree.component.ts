@@ -34,9 +34,11 @@ export class ChecklistTreeComponent {
   set file(file: ChecklistFile | undefined) {
     this._file = file;
     this.reloadFile(false);
-    this.selectedChecklistGroup = undefined;
-    this.selectedChecklist = undefined;
-    this.selectedChecklistChange.emit();
+    if (this.selectedChecklist || this.selectedChecklistGroup) {
+      this.selectedChecklistGroup = undefined;
+      this.selectedChecklist = undefined;
+      this.selectedChecklistChange.emit();
+    }
   }
 
   private reloadFile(modified: boolean) {
