@@ -5,7 +5,6 @@ import { TextWriter } from './text-writer';
 
 export const DYNON_FORMAT_OPTIONS: TextFormatOptions = {
     fileExtensions: ['.txt', '.afd'],
-    maxLineLength: 31,
     indentWidth: 2,
     allUppercase: true,
     checklistTopBlankLine: true,
@@ -33,8 +32,10 @@ export class DynonFormat {
         return new TextReader(file, DYNON_FORMAT_OPTIONS).read();
     }
 
-    public static async fromProto(file: ChecklistFile, fileName: string): Promise<File> {
-        const blob = await new TextWriter(DYNON_FORMAT_OPTIONS).write(file);
+    public static async fromProto(file: ChecklistFile, fileName: string, maxLineLength?: number): Promise<File> {
+        const options = Object.assign({}, DYNON_FORMAT_OPTIONS);
+        options.maxLineLength = maxLineLength;
+        const blob = await new TextWriter(options).write(file);
         return new File([blob], fileName);
     }
 }

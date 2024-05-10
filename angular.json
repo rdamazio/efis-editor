@@ -99,6 +99,8 @@
               "src/model/formats/test.ace",
               "src/model/formats/test.json",
               "src/model/formats/test-dynon.txt",
+              "src/model/formats/test-dynon31.txt",
+              "src/model/formats/test-dynon40.txt",
               "src/model/formats/test-grt.txt"
             ],
             "styles": [

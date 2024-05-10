@@ -135,7 +135,7 @@ export class TextReader {
                 lineContents = lineContents.slice(newIndent * this._options.indentWidth);
 
                 let item: ChecklistItem;
-                if (this._options.maxLineLength && lineContents.startsWith(WRAP_PREFIX)) {
+                if (lineContents.startsWith(WRAP_PREFIX)) {
                     // Wrapped line found - add to previous item.
                     const wrappedContents = lineContents.slice(WRAP_PREFIX.length);
                     currentItemContents += ' ' + wrappedContents;

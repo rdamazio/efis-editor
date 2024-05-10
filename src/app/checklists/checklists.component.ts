@@ -219,6 +219,10 @@ export class ChecklistsComponent {
       file = await DynonFormat.fromProto(this.selectedFile, 'CHKLST.AFD');
     } else if (formatId === 'dynon') {
       file = await DynonFormat.fromProto(this.selectedFile, 'checklist.txt');
+    } else if (formatId === 'dynon31') {
+      file = await DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 31);
+    } else if (formatId === 'dynon40') {
+      file = await DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 40);
     } else if (formatId === 'grt') {
       file = await GrtFormat.fromProto(this.selectedFile);
     } else {
