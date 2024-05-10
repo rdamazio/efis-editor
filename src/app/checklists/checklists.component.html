@@ -1,7 +1,7 @@
 <div class="container">
   <div class="leftbar">
     <checklist-command-bar
-        [hasFiles]="store.listChecklistFiles().length === 0"
+        [hasFiles]="(store.listChecklistFiles() | async)?.length === 0"
         [fileIsOpen]="!!!selectedFile"
         (newFile)="onNewFile()"
         (openFile)="onOpenFile()"
@@ -20,7 +20,7 @@
     <checklist-file-picker
         #filePicker
         (selectedFileChange)="onFileSelected($event)"
-        [fileNames]="store.listChecklistFiles()"
+        [fileNames]="(store.listChecklistFiles() | async) || []"
         [style.display]="showFilePicker ? '' : 'none'"
     />
     <checklist-file-upload

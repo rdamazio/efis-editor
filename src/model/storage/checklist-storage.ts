@@ -1,4 +1,5 @@
-import { AfterRenderPhase, ApplicationRef, ChangeDetectorRef, Injectable, afterNextRender } from "@angular/core";
+import { AfterRenderPhase, Injectable, afterNextRender } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
 import { ChecklistFile } from "../../../gen/ts/checklist";
 
 const CHECKLIST_PREFIX = "checklists:";
@@ -7,67 +8,89 @@ const CHECKLIST_PREFIX = "checklists:";
   providedIn: 'root'
 })
 export class ChecklistStorage {
-  private _browserStorage: any;
+  private _browserStorage: Promise<any>;
+  private _storageResolveFunc: any;
 
   constructor() {
-    afterNextRender(() => {
-      setTimeout(() => {
-        this.browserInit();
-      });
-    }, { phase: AfterRenderPhase.Read });
+    this._browserStorage = new Promise<any>((resolve, reject) => {
+      this._storageResolveFunc = () => {
+        if (global.hasOwnProperty('localStorage')) {
+          console.log('Initialized local storage');
+          resolve(localStorage);
+        } else {
+          console.log('No local storage!!');
+          reject('No local storage found');
+        }
+      };
+
+      afterNextRender(() => {
+        setTimeout(() => {
+          this._storageResolveFunc();
+        });
+        
+      }, { phase: AfterRenderPhase.Read });
+    });
+
+    this._browserStorage.then(store => {
+      this._publishList(store);
+    });
   }
 
-  browserInit() {
-    this._browserStorage = localStorage;
+  // For testing only.
+  forceBrowserStorage() {
+    this._storageResolveFunc();
   }
 
-  listChecklistFiles(): string[] {
-    if (!this._browserStorage) {
-      return [];
-    }
+  private _filesSubject = new BehaviorSubject<string[]>([]);
+  private _file$ = this._filesSubject.asObservable();
+  listChecklistFiles(): Observable<string[]> {
+    return this._file$;
+  }
 
+  private _publishList(store: any) {
     const names: string[] = [];
-    for (let i = 0; i < this._browserStorage.length; i++) {
-      const k = this._browserStorage.key(i);
+    for (let i = 0; i < store.length; i++) {
+      const k = store.key(i);
       if (k?.startsWith(CHECKLIST_PREFIX)) {
         names.push(k.slice(CHECKLIST_PREFIX.length));
       }
     }
-    return names;
+    this._filesSubject.next(names);
   }
 
-  getChecklistFile(id: string): ChecklistFile | null {
-    if (this._browserStorage) {
-      const blob = this._browserStorage.getItem(CHECKLIST_PREFIX + id);
-      if (blob) {
-        return ChecklistFile.fromJsonString(blob);
-      }
-
+  async getChecklistFile(id: string): Promise<ChecklistFile | null> {
+    const store = await this._browserStorage;
+    const blob = store.getItem(CHECKLIST_PREFIX + id);
+    if (blob) {
+      return ChecklistFile.fromJsonString(blob);
     }
     return null;
   }
 
-  saveChecklistFile(file: ChecklistFile) {
-    if (this._browserStorage) {
-      if (!file.metadata?.name) {
-        throw new Error('Must specify checklist file name in metadata.');
-      }
-      const blob = ChecklistFile.toJsonString(file);
-      this._browserStorage.setItem(CHECKLIST_PREFIX + file.metadata.name, blob);
+  async saveChecklistFile(file: ChecklistFile) {
+    const store = await this._browserStorage;
+    if (!file.metadata?.name) {
+      throw new Error('Must specify checklist file name in metadata.');
     }
+    const blob = ChecklistFile.toJsonString(file);
+    store.setItem(CHECKLIST_PREFIX + file.metadata.name, blob);
+    this._publishList(store);
   }
 
-  deleteChecklistFile(id: string) {
-    if (this._browserStorage) {
-      this._browserStorage.removeItem(CHECKLIST_PREFIX + id);
-    }
+  async deleteChecklistFile(id: string) {
+    const store = await this._browserStorage;
+    store.removeItem(CHECKLIST_PREFIX + id);
+    this._publishList(store);
   }
 
-  clear() {
+  async clear() {
     // Clear only checklist items.
-    const ids = this.listChecklistFiles();
+    const ids = this._filesSubject.value;
     for (const id of ids) {
-      this.deleteChecklistFile(id);
+      await this.deleteChecklistFile(id);
     }
+
+    const store = await this._browserStorage;
+    this._publishList(store);
   }
 }

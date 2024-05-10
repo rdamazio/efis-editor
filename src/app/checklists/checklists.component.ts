@@ -1,8 +1,13 @@
+import { AsyncPipe } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
 import { Checklist, ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
-import { AceWriter } from '../../model/formats/ace-writer';
+import { AceFormat } from '../../model/formats/ace-format';
+import { DynonFormat } from '../../model/formats/dynon-format';
+import { FormatError } from '../../model/formats/error';
+import { GrtFormat } from '../../model/formats/grt-format';
+import { JsonFormat } from '../../model/formats/json-format';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
@@ -10,16 +15,12 @@ import { ChecklistFileInfoComponent } from './file-info/file-info.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
-import { JsonFormat } from '../../model/formats/json-format';
-import { FormatError } from '../../model/formats/error';
-import { AceFormat } from '../../model/formats/ace-format';
-import { DynonFormat } from '../../model/formats/dynon-format';
-import { GrtFormat } from '../../model/formats/grt-format';
 
 @Component({
   selector: 'app-checklists',
   standalone: true,
   imports: [
+    AsyncPipe,
     ChecklistCommandBarComponent,
     ChecklistFilePickerComponent,
     ChecklistFileInfoComponent,
@@ -28,7 +29,7 @@ import { GrtFormat } from '../../model/formats/grt-format';
     ChecklistTreeComponent
   ],
   templateUrl: './checklists.component.html',
-  styleUrl: './checklists.component.scss'
+  styleUrl: './checklists.component.scss',
 })
 export class ChecklistsComponent {
   selectedFile?: ChecklistFile;
@@ -38,7 +39,8 @@ export class ChecklistsComponent {
   showFilePicker: boolean = false;
   showFileUpload: boolean = false;
 
-  constructor(public store: ChecklistStorage, private _dialog: MatDialog) { }
+  constructor(public store: ChecklistStorage, private _dialog: MatDialog) {
+  }
 
   onNewFile() {
     this.showFilePicker = false;
@@ -144,12 +146,12 @@ export class ChecklistsComponent {
     });
   }
 
-  onFileSelected(id: string) {
+  async onFileSelected(id: string) {
     this.showFilePicker = false;
 
     let file: ChecklistFile | undefined;
     if (id) {
-      const loadedFile = this.store.getChecklistFile(id);
+      const loadedFile = await this.store.getChecklistFile(id);
       if (loadedFile) {
         file = loadedFile;
       }
