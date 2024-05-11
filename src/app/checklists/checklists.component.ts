@@ -1,6 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { saveAs } from 'file-saver';
 import { Checklist, ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
@@ -33,7 +34,7 @@ interface ParsedFragment {
     ChecklistFileInfoComponent,
     ChecklistFileUploadComponent,
     ChecklistItemsComponent,
-    ChecklistTreeComponent
+    ChecklistTreeComponent,
   ],
   templateUrl: './checklists.component.html',
   styleUrl: './checklists.component.scss',
@@ -46,7 +47,13 @@ export class ChecklistsComponent {
   showFilePicker: boolean = false;
   showFileUpload: boolean = false;
 
-  constructor(public store: ChecklistStorage, private _dialog: MatDialog, private _route: ActivatedRoute, private _router: Router) { }
+  constructor(
+    public store: ChecklistStorage,
+    private _dialog: MatDialog,
+    private _snackBar: MatSnackBar,
+    private _route: ActivatedRoute,
+    private _router: Router,
+  ) { }
 
   ngOnInit() {
     this._route.fragment.subscribe(async (fragment) => {
@@ -79,20 +86,20 @@ export class ChecklistsComponent {
 
   _loadFragmentChecklist(parsed: ParsedFragment) {
     if (!this.selectedFile) {
-      console.log(`Failed to load file ${parsed.fileName}`);
+      this._snackBar.open(`Failed to load file "${parsed.fileName}".`, '', { duration: 5000 });
       return;
     }
 
     let checklist: Checklist | undefined;
     if (parsed.checklistIdx !== undefined && parsed.groupIdx !== undefined) {
       if (this.selectedFile.groups.length <= parsed.groupIdx) {
-        console.log(`File ${parsed.fileName} does not have group ${parsed.groupIdx}`);
+        this._snackBar.open(`File ${parsed.fileName} does not have group ${parsed.groupIdx} - check your URL.`, '', { duration: 5000 });
         return;
       }
 
       const group = this.selectedFile.groups[parsed.groupIdx];
       if (group.checklists.length <= parsed.checklistIdx) {
-        console.log(`Group ${parsed.groupIdx} in file ${parsed.fileName} has no checklist ${parsed.checklistIdx}`);
+        this._snackBar.open(`Group ${parsed.groupIdx} in file ${parsed.fileName} has no checklist ${parsed.checklistIdx} - check your URL.`, '', { duration: 5000 });
         return;
       }
 
@@ -237,11 +244,13 @@ export class ChecklistsComponent {
 
     if (!this.selectedFile) return;
 
+    const name = this.selectedFile.metadata!.name;
     // TODO: Look into using a framework that makes nicer dialogs, like ng-bootstrap, sweetalert, sweetalert2 or ng-vibe
-    if (!confirm(`Are you sure you'd like to delete checklist file "${this.selectedFile.metadata!.name}"??`)) return;
+    if (!confirm(`Are you sure you'd like to delete checklist file "${name}"??`)) return;
 
-    this.store.deleteChecklistFile(this.selectedFile.metadata!.name);
+    this.store.deleteChecklistFile(name);
     this._displayFile(undefined);
+    this._snackBar.open(`Deleted checklist "${name}".`, '', { duration: 2000 });
   }
 
   onFileInfo() {
@@ -300,6 +309,7 @@ export class ChecklistsComponent {
     if (file?.metadata) {
       // Make the file selected the next time the picker gets displayed
       this.filePicker!.selectedFile = file.metadata.name;
+      this._snackBar.open(`Loaded checklist "${file.metadata?.name}".`, '', { duration: 2000 });
     }
 
     await this._updateFragment();
