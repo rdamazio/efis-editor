@@ -73,7 +73,7 @@
             class="prompt-input"
             label="Prompt text"
             [value]="item.prompt"
-            (valueChange)="item.prompt = promptInput.value; onItemUpdated(item); expectationInput.cancel();"
+            (valueChange)="onSavePrompt()"
             (cancelled)="expectationInput.cancel()" />
       </span>
       <!-- hidden doesn't work if display is set -->
@@ -87,7 +87,7 @@
               class="expectation-input"
               label="Expectation text"
               [value]="item.expectation"
-              (valueChange)="item.expectation = expectationInput.value; onItemUpdated(item); promptInput.cancel();"
+              (valueChange)="onSaveExpectation()"
               (cancelled)="promptInput.cancel()" />
         </span>
       </span>
