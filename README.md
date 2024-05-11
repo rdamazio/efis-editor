@@ -93,6 +93,9 @@ This is a short list of known areas where contributions would be helpful:
 - **GRT live data**: GRT supports showing live data on the checklist, which is pretty
   cool. Building that into the app (both to easily select a field to insert, and
   to render it with some fake data) would be nice.
+- **Printing**: It'd be really nice to generate a printable version of a checklist to serve as
+  a backup to the electronic one.
+- **Configuration files**: I'd like to support more than just checklists.
 - Your favorite missing feature goes here.
 
 ## Development setup
