@@ -79,6 +79,19 @@ for contributors. The broad TL;DR:
   transfer copyright ownership to Google or anyone else; it simply gives us the
   right to safely redistribute and use your changes.
 
+### Contributions wanted
+
+This is a short list of known areas where contributions would be helpful:
+
+- **UI refinement**: As a backend developer (heck, nowadays I'm not even that, just a manager),
+  my CSS-foo is quite limited. If  you see something that looks odd, please send a PR!
+- **Format testing**: I have not tested these files on anything but Garmin avionics. Please
+  test and send improvements.
+- **GRT live data**: GRT supports showing live data on the checklist, which is pretty
+  cool. Building that into the app (both to easily select a field to insert, and
+  to render it with some fake data) would be nice.
+- Your favorite missing feature goes here.
+
 ## Development setup
 
 The following steps can be followed to set up a development environment:
