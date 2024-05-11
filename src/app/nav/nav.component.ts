@@ -2,6 +2,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -9,6 +10,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
+import { AboutComponent } from '../about/about.component';
 
 @Component({
   selector: 'app-nav',
@@ -17,11 +19,12 @@ import { map, shareReplay } from 'rxjs/operators';
   standalone: true,
   imports: [
     AsyncPipe,
-    MatToolbarModule,
     MatButtonModule,
-    MatSidenavModule,
-    MatListModule,
+    MatDialogModule,
     MatIconModule,
+    MatListModule,
+    MatSidenavModule,
+    MatToolbarModule,
     RouterLink,
     RouterOutlet,
   ]
@@ -34,4 +37,14 @@ export class NavComponent {
       map(result => result.matches),
       shareReplay()
     );
+
+  constructor(private _dialog: MatDialog) {}
+
+  onAboutClicked() {
+    this._dialog.open(AboutComponent, {
+      hasBackdrop: true,
+      enterAnimationDuration: 200,
+      exitAnimationDuration: 200,
+    });
+  }
 }

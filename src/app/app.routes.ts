@@ -6,5 +6,4 @@ import { WelcomeComponent } from './welcome/welcome.component';
 export const routes: Routes = [
     { path: '', component: WelcomeComponent },
     { path: 'checklists', component: ChecklistsComponent },
-    { path: 'about', component: AboutComponent },
 ];
