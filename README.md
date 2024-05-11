@@ -6,6 +6,9 @@ This is a web-based editor for file formats used by modern EFIS avionics systems
 
 ## Using
 
+> [!IMPORTANT]
+> First, read the disclaimer below carefully. Then:
+
 :point_right:	 Head over to https://rdamazio.github.io/efis-editor/. :point_left:
 
 ## Supported file types:
