@@ -1,0 +1,40 @@
+.container {
+    padding: 20px;
+}
+
+.filetypes {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.filetype-card {
+    max-width: 400px;
+    border-radius: 8px;
+}
+
+.callout {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-flex;
+}
+
+.danger {
+    background-color: #faa; // Pun intended.
+    color: #222;
+}
+
+.important {
+    background-color: #ffa;
+    color: #222;
+}
+
+.callout-title {
+    padding-right: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.skull-icon {
+    font-size: 80px;
+}

@@ -47,6 +47,8 @@ these files. We obviously also take no responsibility for the actual contents of
 checklists, or even guarantee that the contents you enter in this app will
 be accurately reflected in your EFIS.
 
+Experimental aircraft use only - use for certificated aircraft is not authorized.
+
 The authors of this app have no association or relationship with the manufacturers
 of the avionics with which these files may be used, and its use is not supported by
 or endorsed by any of those companies.
