@@ -11,6 +11,12 @@ This is a web-based editor for file formats used by modern EFIS avionics systems
 
 :point_right:	 Head over to https://rdamazio.github.io/efis-editor/. :point_left:
 
+## Preview
+
+You can try it out directly in the link above, but here's what it currently looks like:
+
+![Screenshot of the checklist editor with a sample checklist displayed](docs/screenshot.png)
+
 ## Supported file types:
 
 * Checklists:
