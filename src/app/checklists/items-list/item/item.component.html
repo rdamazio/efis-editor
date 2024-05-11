@@ -51,7 +51,7 @@
           class="action-icon"
           [matTooltip]="(item.centered ? 'Left-justify' : 'Center') + ' this line'"
           [attr.aria-label]="'Center ' + item.prompt"
-          [disabled]="item.type == ChecklistItem_Type.ITEM_SPACE"
+          [disabled]="item.type === ChecklistItem_Type.ITEM_SPACE || item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
           (click)="onCenterToggle(item)">
         <mat-icon [fontIcon]="item.centered ? 'format_align_left' : 'format_align_center'" />
       </button>
