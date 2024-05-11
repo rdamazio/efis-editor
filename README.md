@@ -97,6 +97,9 @@ This is a short list of known areas where contributions would be helpful:
   a backup to the electronic one.
 - **Moving items between checklists**
 - **Reordering/moving checklists or groups**
+- **Default checklist selection**: Garmin supports setting a default checklist, which initially
+  gets displayed when you go into the checklists page. The file format reader/writer supports
+  that, but the UI is not in place to select it.
 - **Configuration files**: I'd like to support more than just checklists.
 - Your favorite missing feature goes here.
 
