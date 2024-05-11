@@ -124,7 +124,7 @@ export class AceReader {
         if (type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
             const splits = prompt.split('~');
             prompt = splits[0];
-            if (splits.length == 2) {
+            if (splits.length === 2) {
                 expectation = splits[1]
             } else if (splits.length > 2) {
                 expectation = splits.slice(1).join('~');
@@ -180,7 +180,7 @@ export class AceReader {
         // Find the CRLF
         let idx: number;
         for (idx = this._offset; idx < this._arr!.byteLength - 1; idx++) {
-            if (this._arr![idx] == 0xd && this._arr![idx + 1] == 0xa) {
+            if (this._arr![idx] === 0xd && this._arr![idx + 1] === 0xa) {
                 break;
             }
         }

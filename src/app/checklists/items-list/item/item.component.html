@@ -12,7 +12,7 @@
           class="action-icon"
           matTooltip="Edit this line"
           [attr.aria-label]="'Edit ' + item.prompt"
-          [disabled]="item.type == ChecklistItem_Type.ITEM_SPACE"
+          [disabled]="item.type === ChecklistItem_Type.ITEM_SPACE"
           (click)="promptInput.edit(); expectationInput.edit()">
         <mat-icon fontIcon="edit" />
       </button>
@@ -31,7 +31,7 @@
           class="action-icon"
           matTooltip="Indent left"
           [attr.aria-label]="'Indent ' + item.prompt + ' left'"
-          [disabled]="item.indent == 0 || item.centered || item.type == ChecklistItem_Type.ITEM_SPACE"
+          [disabled]="item.indent === 0 || item.centered || item.type === ChecklistItem_Type.ITEM_SPACE"
           (click)="onIndent(item, -1)">
         <mat-icon fontIcon="format_indent_decrease" />
       </button>
@@ -41,7 +41,7 @@
           class="action-icon"
           matTooltip="Indent right"
           [attr.aria-label]="'Indent ' + item.prompt + ' right'"
-          [disabled]="item.indent == 4 || item.centered || item.type == ChecklistItem_Type.ITEM_SPACE"
+          [disabled]="item.indent === 4 || item.centered || item.type === ChecklistItem_Type.ITEM_SPACE"
           (click)="onIndent(item, 1)">
         <mat-icon fontIcon="format_indent_increase" />
       </button>
@@ -59,13 +59,13 @@
     <div class="item" [class.item-centered]="item.centered">
       <span
           class="prompt"
-          [class.prompt-challenge]="item.type == ChecklistItem_Type.ITEM_CHALLENGE"
-          [class.prompt-challenge-response]="item.type == ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
-          [class.prompt-title]="item.type == ChecklistItem_Type.ITEM_TITLE"
-          [class.prompt-warning]="item.type == ChecklistItem_Type.ITEM_WARNING"
-          [class.prompt-caution]="item.type == ChecklistItem_Type.ITEM_CAUTION"
-          [class.prompt-note]="item.type == ChecklistItem_Type.ITEM_NOTE"
-          [class.prompt-space]="item.type == ChecklistItem_Type.ITEM_SPACE"
+          [class.prompt-challenge]="item.type === ChecklistItem_Type.ITEM_CHALLENGE"
+          [class.prompt-challenge-response]="item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
+          [class.prompt-title]="item.type === ChecklistItem_Type.ITEM_TITLE"
+          [class.prompt-warning]="item.type === ChecklistItem_Type.ITEM_WARNING"
+          [class.prompt-caution]="item.type === ChecklistItem_Type.ITEM_CAUTION"
+          [class.prompt-note]="item.type === ChecklistItem_Type.ITEM_NOTE"
+          [class.prompt-space]="item.type === ChecklistItem_Type.ITEM_SPACE"
           [style.padding-left]="item.centered ? '' : 10+item.indent*25 + 'px'">
         <!-- TODO: Find a better solution than to save/cancel independent fields together -->
         <editable-label

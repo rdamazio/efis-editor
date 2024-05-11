@@ -63,7 +63,7 @@ export class ChecklistItemsComponent {
     if (type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
       item.expectation = 'New expectation';
     }
-    if (type == ChecklistItem_Type.ITEM_SPACE) {
+    if (type === ChecklistItem_Type.ITEM_SPACE) {
       item.prompt = '';
     }
     this._checklist!.items.push(item);

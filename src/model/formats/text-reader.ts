@@ -74,11 +74,11 @@ export class TextReader {
 
             const firstSpaceIdx = line.indexOf(' ');
             let prefix, lineContents: string;
-            if (firstSpaceIdx == -1) {
+            if (firstSpaceIdx === -1) {
                 prefix = line;
                 lineContents = '';
             } else {
-                prefix = line.slice(0, firstSpaceIdx == -1 ? line.length : firstSpaceIdx);
+                prefix = line.slice(0, firstSpaceIdx === -1 ? line.length : firstSpaceIdx);
                 lineContents = line.slice(firstSpaceIdx + 1);
             }
 
