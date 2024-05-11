@@ -95,6 +95,8 @@ This is a short list of known areas where contributions would be helpful:
   to render it with some fake data) would be nice.
 - **Printing**: It'd be really nice to generate a printable version of a checklist to serve as
   a backup to the electronic one.
+- **Moving items between checklists**
+- **Reordering/moving checklists or groups**
 - **Configuration files**: I'd like to support more than just checklists.
 - Your favorite missing feature goes here.
 
