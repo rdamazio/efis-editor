@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { saveAs } from 'file-saver';
-import { Checklist, ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
+import { Checklist, ChecklistFile, ChecklistFileMetadata, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { AceFormat } from '../../model/formats/ace-format';
 import { DynonFormat } from '../../model/formats/dynon-format';
 import { FormatError } from '../../model/formats/error';
@@ -185,7 +185,25 @@ export class ChecklistsComponent {
 
     // Save an empty file with that name.
     const file: ChecklistFile = {
-      groups: [],
+      groups: [
+        {
+          title: 'First checklist group',
+          checklists: [
+            {
+              title: "First checklist",
+              items: [
+                {
+                  type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+                  prompt: "Checklist created",
+                  expectation: "CHECK",
+                  centered: false,
+                  indent: 0,
+                },
+              ],
+            },
+          ],
+        },
+      ],
       metadata: ChecklistFileMetadata.create({
         name: name,
       }),
