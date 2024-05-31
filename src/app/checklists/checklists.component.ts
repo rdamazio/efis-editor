@@ -13,7 +13,7 @@ import { JsonFormat } from '../../model/formats/json-format';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
-import { ChecklistFileInfoComponent } from './file-info/file-info.component';
+import { ChecklistFileInfoComponent, FileInfoDialogData } from './file-info/file-info.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
@@ -277,8 +277,12 @@ export class ChecklistsComponent {
 
     if (!this.selectedFile) return;
 
+    let dialogData = {
+      metadata: ChecklistFileMetadata.clone(this.selectedFile.metadata!),
+      allGroups: this.selectedFile.groups,
+    };
     const dialogRef = this._dialog.open(ChecklistFileInfoComponent, {
-      data: ChecklistFileMetadata.clone(this.selectedFile.metadata!),
+      data: dialogData,
       hasBackdrop: true,
       closeOnNavigation: true,
       enterAnimationDuration: 200,
@@ -287,12 +291,12 @@ export class ChecklistsComponent {
       ariaModal: true,
     });
 
-    dialogRef.afterClosed().subscribe((updatedData: ChecklistFileMetadata) => {
+    dialogRef.afterClosed().subscribe((updatedData: FileInfoDialogData) => {
       if (!updatedData || !this.selectedFile) return;
 
       const oldName = this.selectedFile.metadata!.name;
-      const newName = updatedData.name;
-      this.selectedFile.metadata = updatedData;
+      const newName = updatedData.metadata.name;
+      this.selectedFile.metadata = updatedData.metadata;
       this.store.saveChecklistFile(this.selectedFile);
       if (oldName !== newName) {
         // File was renamed, delete old one from storage.

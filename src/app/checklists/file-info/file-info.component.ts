@@ -11,7 +11,13 @@ import {
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { ChecklistFileMetadata } from '../../../../gen/ts/checklist';
+import { MatSelectModule } from '@angular/material/select';
+import { ChecklistFileMetadata, ChecklistGroup } from '../../../../gen/ts/checklist';
+
+export interface FileInfoDialogData {
+  metadata: ChecklistFileMetadata;
+  allGroups: ChecklistGroup[];
+}
 
 @Component({
   standalone: true,
@@ -24,6 +30,7 @@ import { ChecklistFileMetadata } from '../../../../gen/ts/checklist';
     MatDialogClose,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     ReactiveFormsModule,
   ],
   templateUrl: './file-info.component.html',
@@ -32,6 +39,19 @@ import { ChecklistFileMetadata } from '../../../../gen/ts/checklist';
 export class ChecklistFileInfoComponent {
   constructor(
     public dialogRef: MatDialogRef<ChecklistFileInfoComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ChecklistFileMetadata,
+    @Inject(MAT_DIALOG_DATA) public data: FileInfoDialogData,
   ) { }
+
+  get defaultChecklist(): string {
+    return `${this.data.metadata.defaultGroupIndex}.${this.data.metadata.defaultChecklistIndex}`;
+  }
+  set defaultChecklist(val: string) {
+    const dotIdx = val.indexOf('.');
+    if (dotIdx == -1) {
+      throw new Error(`Invalid checklist value "${val}"`);
+    }
+
+    this.data.metadata.defaultGroupIndex = parseInt(val.slice(0, dotIdx));
+    this.data.metadata.defaultChecklistIndex = parseInt(val.slice(dotIdx + 1));
+  }
 }
