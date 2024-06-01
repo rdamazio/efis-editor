@@ -127,6 +127,13 @@ export class ChecklistTreeComponent {
   onChecklistDelete(node: ChecklistTreeNode) {
     if (!confirm(`Are you sure you'd like to delete checklist "${node.checklist!.title}"??`)) return;
 
+    // Update the default checklist index if needed.
+    if (this.file && this.file.metadata &&
+        this.file.metadata.defaultGroupIndex === node.groupIdx &&
+        this.file.metadata.defaultChecklistIndex! >= node.checklistIdx!) {
+      this.file.metadata.defaultChecklistIndex--;
+    }
+
     node.group!.checklists.splice(node.checklistIdx!, 1)
     if (this.selectedChecklist === node.checklist!) {
       this.selectedChecklist = undefined;
@@ -142,6 +149,18 @@ export class ChecklistTreeComponent {
 
   onGroupDelete(node: ChecklistTreeNode) {
     if (!confirm(`Are you sure you'd like to delete checklist group "${node.group!.title}" and all checklists within??`)) return;
+
+    // Update the default group index if needed.
+    if (this.file && this.file.metadata) {
+      if (this.file.metadata.defaultGroupIndex === node.groupIdx) {
+        // The group containing the current default was deleted, reset.
+        this.file.metadata.defaultGroupIndex = 0;
+        this.file.metadata.defaultChecklistIndex = 0;
+      } else if (this.file.metadata.defaultGroupIndex > node.groupIdx!) {
+        // The default comes after the deleted group, just shift it.
+        this.file.metadata.defaultGroupIndex--;
+      }
+    }
 
     this._file!.groups.splice(node.groupIdx!, 1);
     if (this.selectedChecklistGroup === node.group!) {
