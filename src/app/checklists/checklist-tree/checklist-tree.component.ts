@@ -130,7 +130,8 @@ export class ChecklistTreeComponent {
     // Update the default checklist index if needed.
     if (this.file && this.file.metadata &&
         this.file.metadata.defaultGroupIndex === node.groupIdx &&
-        this.file.metadata.defaultChecklistIndex! >= node.checklistIdx!) {
+        this.file.metadata.defaultChecklistIndex! >= node.checklistIdx! &&
+        this.file.metadata.defaultChecklistIndex > 0) {
       this.file.metadata.defaultChecklistIndex--;
     }
 
