@@ -1,6 +1,6 @@
 import crc32 from "buffer-crc32";
 import { ChecklistFile, ChecklistItem_Type } from "../../../gen/ts/checklist";
-import { AceConstants } from "./ace-constants";
+import * as AceConstants from "./ace-constants";
 import { FormatError } from "./error";
 
 export class AceWriter {
@@ -23,13 +23,13 @@ export class AceWriter {
         this.addLine(metadata.manufacturerInfo);
         this.addLine(metadata.copyrightInfo);
 
-        for (let group of file.groups) {
+        for (const group of file.groups) {
             this.addPart(AceConstants.GROUP_HEADER);
             this.addLine(group.title);
-            for (let checklist of group.checklists) {
+            for (const checklist of group.checklists) {
                 this.addPart(AceConstants.CHECKLIST_HEADER);
                 this.addLine(checklist.title);
-                for (let item of checklist.items) {
+                for (const item of checklist.items) {
                     if (item.type === ChecklistItem_Type.ITEM_SPACE) {
                         this.addLine();
                         continue;

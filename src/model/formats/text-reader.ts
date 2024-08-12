@@ -26,7 +26,7 @@ export class TextReader {
 
     public async read(): Promise<ChecklistFile> {
         let name = this._file.name;
-        for (let ext of this._options.fileExtensions) {
+        for (const ext of this._options.fileExtensions) {
             if (name.toLowerCase().endsWith(ext.toLowerCase())) {
                 name = name.slice(0, -ext.length);
                 break;
@@ -53,18 +53,16 @@ export class TextReader {
         let currentItemLineNum = 0;
         const processItem = () => {
             if (currentItemSeen && currentChecklist) {
-                let item = this._itemForContents(currentItemContents, currentItemIndent, currentItemStartSpaces);
+                const item = this._itemForContents(currentItemContents, currentItemIndent, currentItemStartSpaces);
                 if (!this._options.checklistTopBlankLine || item.type !== ChecklistItem_Type.ITEM_SPACE ||
                     currentChecklist.items.length > 0) {
                     currentChecklist.items.push(item);
-
-                    const debugstr = ChecklistItem.toJsonString(item);
                 }
                 currentItemContents = '';
                 currentItemSeen = false;
             }
         };
-        for (let line of lines) {
+        for (const line of lines) {
             if (this._options.commentPrefix && line.startsWith(this._options.commentPrefix)) {
                 continue;
             }
@@ -134,7 +132,6 @@ export class TextReader {
                 const newIndent = Math.floor(currentItemStartSpaces / this._options.indentWidth);
                 lineContents = lineContents.slice(newIndent * this._options.indentWidth);
 
-                let item: ChecklistItem;
                 if (lineContents.startsWith(WRAP_PREFIX)) {
                     // Wrapped line found - add to previous item.
                     const wrappedContents = lineContents.slice(WRAP_PREFIX.length);
@@ -193,7 +190,7 @@ export class TextReader {
 
     private _itemForContents(contents: string, indent: number, startSpaces: number): ChecklistItem {
         const endTrimmedContents = contents.trimEnd();
-        let endSpaces = (contents.length - endTrimmedContents.length)
+        const endSpaces = (contents.length - endTrimmedContents.length)
         // If it was indented on both sides, meaning it was centered
         const centered = (endSpaces > 0 && endSpaces === startSpaces);
         if (centered) {
@@ -282,15 +279,15 @@ export class TextReader {
         }
 
         let firstGroup = true;
-        for (let group of out.groups) {
+        for (const group of out.groups) {
             if (firstGroup && this._options.skipFirstGroup) {
                 group.title = this._properCase(DEFAULT_FIRST_GROUP);
             }
             firstGroup = false;
             group.title = this._properCase(group.title);
-            for (let list of group.checklists) {
+            for (const list of group.checklists) {
                 list.title = this._properCase(list.title);
-                for (let item of list.items) {
+                for (const item of list.items) {
                     item.prompt = this._properCase(item.prompt);
                     item.expectation = this._properCase(item.expectation);
 

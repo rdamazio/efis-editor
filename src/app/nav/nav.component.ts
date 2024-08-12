@@ -40,11 +40,13 @@ export class NavComponent {
 
   constructor(private _dialog: MatDialog) {}
 
-  onAboutClicked() {
+  showAbout() {
     this._dialog.open(AboutComponent, {
       hasBackdrop: true,
       enterAnimationDuration: 200,
       exitAnimationDuration: 200,
     });
   }
+
+
 }

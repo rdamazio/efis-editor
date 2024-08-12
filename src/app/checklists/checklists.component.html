@@ -33,13 +33,13 @@
         #tree
         class="checklist-tree"
         (fileChange)="onFileChanged($event)"
-        (selectedChecklistChange)="onChecklistSelected($event)"
+        (selectedChecklistChange)="onChecklistSelected()"
     />
   </div>
   <checklist-items
       #items
       class="checklist-items"
       [(checklist)]="tree.selectedChecklist"
-      (checklistChange)="onChecklistChanged($event)"
+      (checklistChange)="onChecklistChanged()"
   />
 </div>

@@ -18,9 +18,8 @@ export class TextWriter {
 
         let firstGroup = true;
         let checklistIdx = 0;
-        for (let group of file.groups) {
-            let groupTitle = group.title + ': ';
-            for (let checklist of group.checklists) {
+        for (const group of file.groups) {
+            for (const checklist of group.checklists) {
                 this._addLine();
                 this._addPart(this._replaceNumbers(this._options.checklistPrefix, checklistIdx, 0));
                 this._addPart(' ');
@@ -104,7 +103,7 @@ export class TextWriter {
             this._addLine(this._replaceNumbers(this._options.itemPrefix, checklistIdx, itemIdx++));
         }
 
-        for (let item of items) {
+        for (const item of items) {
             let prefix = '';
             let suffix = '';
             switch (item.type) {

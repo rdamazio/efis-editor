@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -39,13 +39,13 @@ interface ParsedFragment {
   templateUrl: './checklists.component.html',
   styleUrl: './checklists.component.scss',
 })
-export class ChecklistsComponent {
+export class ChecklistsComponent implements OnInit {
   selectedFile?: ChecklistFile;
   @ViewChild("tree") tree?: ChecklistTreeComponent;
   @ViewChild("filePicker") filePicker?: ChecklistFilePickerComponent;
 
-  showFilePicker: boolean = false;
-  showFileUpload: boolean = false;
+  showFilePicker = false;
+  showFileUpload = false;
 
   constructor(
     public store: ChecklistStorage,
@@ -277,7 +277,7 @@ export class ChecklistsComponent {
 
     if (!this.selectedFile) return;
 
-    let dialogData = {
+    const dialogData = {
       metadata: ChecklistFileMetadata.clone(this.selectedFile.metadata!),
       allGroups: this.selectedFile.groups,
     };
@@ -319,7 +319,7 @@ export class ChecklistsComponent {
     this._displayFile(file);
   }
 
-  async onChecklistSelected(checklist?: Checklist) {
+  async onChecklistSelected() {
     await this._updateFragment();
   }
 
@@ -343,7 +343,7 @@ export class ChecklistsComponent {
     this.store.saveChecklistFile(file);
   }
 
-  onChecklistChanged(checklist: Checklist) {
+  onChecklistChanged() {
     if (this.selectedFile) {
       this.store.saveChecklistFile(this.selectedFile);
     }
