@@ -8,13 +8,15 @@ const CHECKLIST_PREFIX = "checklists:";
   providedIn: 'root'
 })
 export class ChecklistStorage {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   private _browserStorage: Promise<any>;
   private _storageResolveFunc: any;
 
   constructor() {
     this._browserStorage = new Promise<any>((resolve, reject) => {
+      /* eslint-enable @typescript-eslint/no-explicit-any */
       this._storageResolveFunc = () => {
-        if (global.hasOwnProperty('localStorage')) {
+        if (Object.prototype.hasOwnProperty.call(global, 'localStorage')) {
           console.log('Initialized local storage');
           resolve(localStorage);
         } else {
@@ -47,6 +49,7 @@ export class ChecklistStorage {
     return this._file$;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _publishList(store: any) {
     const names: string[] = [];
     for (let i = 0; i < store.length; i++) {

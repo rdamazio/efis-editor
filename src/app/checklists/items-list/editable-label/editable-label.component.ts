@@ -32,7 +32,7 @@ export class EditableLabelComponent {
 
   @Output() cancelled = new EventEmitter<boolean>();
   @Output() editing = false;
-  @Input() label: string = '';
+  @Input() label = '';
   @Input() disallowEmpty = false;
 
   @Output() valueChange = new EventEmitter<string>();

@@ -31,19 +31,19 @@ export class ChecklistFileUploadComponent {
           this.fileUploaded.emit(await AceFormat.toProto(file));
           return;
         } catch (e) {
-          console.log('Failed to parse as ACE.');
+          console.log('Failed to parse as ACE: ', e);
         }
         try {
           this.fileUploaded.emit(await GrtFormat.toProto(file));
           return;
         } catch (e) {
-          console.log('Failed to parse as GRT.');
+          console.log('Failed to parse as GRT: ', e);
         }
         try {
           this.fileUploaded.emit(await DynonFormat.toProto(file));
           return;
         } catch (e) {
-          console.log('Failed to parse as Dynon.');
+          console.log('Failed to parse as Dynon: ', e);
         }
 
         this._snackBar.open(`Failed to parse uploaded file.`, '', { duration: 5000 });
