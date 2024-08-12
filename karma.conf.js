@@ -33,7 +33,13 @@ module.exports = function (config) {
       ]
     },
     reporters: ['progress', 'kjhtml'],
-    browsers: ['Chrome'],
+    browsers: ['ChromeWithoutNagScreen'],
+    customLaunchers: {
+      ChromeWithoutNagScreen: {
+        base: 'Chrome',
+        flags: ['--disable-search-engine-choice-screen']
+      }
+    },
     restartOnFileChange: true
   });
 };
