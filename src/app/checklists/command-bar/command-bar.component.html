@@ -1,6 +1,6 @@
 <div class="command-bar">
   <button mat-icon-button matTooltip="New file" aria-label="New file" (click)="newFile.emit(true)">
-    <mat-icon fontIcon="note_add" />
+    <mat-icon>note_add</mat-icon>
   </button>
   <button
     mat-icon-button
@@ -9,10 +9,10 @@
     [disabled]="hasFiles"
     (click)="openFile.emit(true)"
   >
-    <mat-icon fontIcon="folder_open" />
+    <mat-icon>folder_open</mat-icon>
   </button>
   <button mat-icon-button matTooltip="Upload file" aria-label="Upload file" (click)="uploadFile.emit(true)">
-    <mat-icon fontIcon="upload" />
+    <mat-icon>upload</mat-icon>
   </button>
   <button
     mat-icon-button
@@ -21,7 +21,7 @@
     [disabled]="fileIsOpen"
     [matMenuTriggerFor]="downloadMenu"
   >
-    <mat-icon fontIcon="download" />
+    <mat-icon>download</mat-icon>
   </button>
   <mat-menu #downloadMenu>
     <button mat-menu-item *ngFor="let format of downloadFormats" (click)="downloadFile.emit(format.id)">
@@ -35,7 +35,7 @@
     [disabled]="fileIsOpen"
     (click)="deleteFile.emit(true)"
   >
-    <mat-icon fontIcon="delete" />
+    <mat-icon>delete</mat-icon>
   </button>
   <button
     mat-icon-button
@@ -44,6 +44,6 @@
     [disabled]="fileIsOpen"
     (click)="fileInfo.emit(true)"
   >
-    <mat-icon fontIcon="info" />
+    <mat-icon>info</mat-icon>
   </button>
 </div>

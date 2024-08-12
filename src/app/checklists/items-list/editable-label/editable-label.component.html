@@ -23,7 +23,7 @@
       [disabled]="!this.control.valid"
       (click)="value = promptInput.value; save()"
     >
-      <mat-icon fontIcon="save" />
+      <mat-icon>save</mat-icon>
     </button>
     <button
       mat-icon-button
@@ -34,7 +34,7 @@
       [attr.aria-label]="'Cancel changes to ' + label"
       (click)="cancel()"
     >
-      <mat-icon fontIcon="cancel" />
+      <mat-icon>cancel</mat-icon>
     </button>
   </mat-form-field>
 }

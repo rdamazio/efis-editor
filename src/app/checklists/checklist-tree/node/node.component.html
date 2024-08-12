@@ -12,7 +12,7 @@
     class="checklist-tree-node-add"
     [attr.aria-label]="node.title"
   >
-    <mat-icon fontIcon="add" />
+    <mat-icon>add</mat-icon>
   </button>
 
   <div class="checklist-tree-node-title">{{ node.title }}</div>
@@ -31,7 +31,7 @@
       [matTooltip]="'Rename ' + node.title"
       (click)="nodeRename.emit(node)"
     >
-      <mat-icon fontIcon="edit" />
+      <mat-icon>edit</mat-icon>
     </button>
     <button
       mat-icon-button
@@ -40,7 +40,7 @@
       [matTooltip]="'Delete ' + node.title + ' and all its items'"
       (click)="nodeDelete.emit(node)"
     >
-      <mat-icon fontIcon="delete" />
+      <mat-icon>delete</mat-icon>
     </button>
   </div>
 </div>
