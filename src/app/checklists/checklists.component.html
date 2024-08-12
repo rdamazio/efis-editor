@@ -27,6 +27,7 @@
       [style.display]="showFilePicker ? '' : 'none'"
     />
     <checklist-file-upload [style.display]="showFileUpload ? '' : 'none'" (fileUploaded)="onFileUploaded($event)" />
+    <checklist-tree-bar [tree]="tree" />
     <checklist-tree
       #tree
       class="checklist-tree"

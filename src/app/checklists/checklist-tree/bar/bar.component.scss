@@ -1,0 +1,16 @@
+.checklist-tree-bar {
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 5px;
+}
+
+.title {
+  flex-grow: 1;
+  font-size: large;
+  align-content: center;
+  padding-left: 0.2em;
+}
+
+.buttons {
+  align-content: center;
+}

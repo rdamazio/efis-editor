@@ -6,11 +6,12 @@ import { MatTreeModule, MatTreeNestedDataSource } from '@angular/material/tree';
 import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
+import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 
 @Component({
   selector: 'checklist-tree',
   standalone: true,
-  imports: [ChecklistTreeNodeComponent, MatButtonModule, MatIconModule, MatTreeModule],
+  imports: [ChecklistTreeNodeComponent, MatButtonModule, MatIconButtonSizesModule, MatIconModule, MatTreeModule],
   templateUrl: './checklist-tree.component.html',
   styleUrl: './checklist-tree.component.scss',
 })
@@ -253,6 +254,22 @@ export class ChecklistTreeComponent {
       this._selectChecklist(undefined, undefined);
     }
     this.reloadFile(true);
+  }
+
+  isAllExpanded(): boolean {
+    return this.dataSource.data.every((node) => this.treeControl.isExpanded(node));
+  }
+
+  isAllCollapsed(): boolean {
+    return this.treeControl.expansionModel.isEmpty();
+  }
+
+  expandAll() {
+    this.treeControl.expandAll();
+  }
+
+  collapseAll() {
+    this.treeControl.collapseAll();
   }
 
   private fillTitle(pb: Checklist | ChecklistGroup, promptType: string): boolean {

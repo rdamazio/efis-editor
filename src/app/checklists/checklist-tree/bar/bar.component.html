@@ -1,0 +1,25 @@
+<div class="checklist-tree-bar">
+  <div class="title">Checklist groups:</div>
+  <div class="buttons">
+    <button
+      mat-icon-button
+      mat-medium-icon-button
+      matTooltip="Expand all checklist groups"
+      aria-label="Expand all checklist groups"
+      [disabled]="tree?.isAllExpanded()"
+      (click)="tree?.expandAll()"
+    >
+      <mat-icon>expand_all</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      mat-medium-icon-button
+      matTooltip="Collapse all checklist groups"
+      aria-label="Collapse all checklist groups"
+      [disabled]="tree?.isAllCollapsed()"
+      (click)="tree?.collapseAll()"
+    >
+      <mat-icon>collapse_all</mat-icon>
+    </button>
+  </div>
+</div>

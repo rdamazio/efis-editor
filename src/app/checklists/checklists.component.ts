@@ -15,9 +15,12 @@ import {
 import { AceFormat } from '../../model/formats/ace-format';
 import { DynonFormat } from '../../model/formats/dynon-format';
 import { FormatError } from '../../model/formats/error';
+import { ForeFlightFormat } from '../../model/formats/foreflight-format';
+import { ForeFlightUtils } from '../../model/formats/foreflight-utils';
 import { GrtFormat } from '../../model/formats/grt-format';
 import { JsonFormat } from '../../model/formats/json-format';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
+import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
 import { ChecklistFileInfoComponent, FileInfoDialogData } from './file-info/file-info.component';
@@ -25,8 +28,6 @@ import { ChecklistFilePickerComponent } from './file-picker/file-picker.componen
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { HelpComponent } from './hotkeys/help/help.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
-import { ForeFlightFormat } from '../../model/formats/foreflight-format';
-import { ForeFlightUtils } from '../../model/formats/foreflight-utils';
 
 interface ParsedFragment {
   fileName?: string;
@@ -44,6 +45,7 @@ interface ParsedFragment {
     ChecklistFileInfoComponent,
     ChecklistFileUploadComponent,
     ChecklistItemsComponent,
+    ChecklistTreeBarComponent,
     ChecklistTreeComponent,
     HotkeysDirective,
     MatDialogModule,
