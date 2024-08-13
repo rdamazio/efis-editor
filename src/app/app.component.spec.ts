@@ -6,11 +6,7 @@ import { AppComponent } from './app.component';
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        AppComponent,
-        NoopAnimationsModule,
-        RouterModule.forRoot([]),
-      ],
+      imports: [AppComponent, NoopAnimationsModule, RouterModule.forRoot([])],
     }).compileComponents();
   });
 

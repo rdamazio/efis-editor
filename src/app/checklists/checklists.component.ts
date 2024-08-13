@@ -22,7 +22,7 @@ interface ParsedFragment {
   fileName?: string;
   groupIdx?: number;
   checklistIdx?: number;
-};
+}
 
 @Component({
   selector: 'app-checklists',
@@ -41,8 +41,8 @@ interface ParsedFragment {
 })
 export class ChecklistsComponent implements OnInit {
   selectedFile?: ChecklistFile;
-  @ViewChild("tree") tree?: ChecklistTreeComponent;
-  @ViewChild("filePicker") filePicker?: ChecklistFilePickerComponent;
+  @ViewChild('tree') tree?: ChecklistTreeComponent;
+  @ViewChild('filePicker') filePicker?: ChecklistFilePickerComponent;
 
   showFilePicker = false;
   showFileUpload = false;
@@ -53,7 +53,7 @@ export class ChecklistsComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private _route: ActivatedRoute,
     private _router: Router,
-  ) { }
+  ) {}
 
   ngOnInit() {
     this._route.fragment.subscribe(async (fragment) => {
@@ -93,13 +93,19 @@ export class ChecklistsComponent implements OnInit {
     let checklist: Checklist | undefined;
     if (parsed.checklistIdx !== undefined && parsed.groupIdx !== undefined) {
       if (this.selectedFile.groups.length <= parsed.groupIdx) {
-        this._snackBar.open(`File ${parsed.fileName} does not have group ${parsed.groupIdx} - check your URL.`, '', { duration: 5000 });
+        this._snackBar.open(`File ${parsed.fileName} does not have group ${parsed.groupIdx} - check your URL.`, '', {
+          duration: 5000,
+        });
         return;
       }
 
       const group = this.selectedFile.groups[parsed.groupIdx];
       if (group.checklists.length <= parsed.checklistIdx) {
-        this._snackBar.open(`Group ${parsed.groupIdx} in file ${parsed.fileName} has no checklist ${parsed.checklistIdx} - check your URL.`, '', { duration: 5000 });
+        this._snackBar.open(
+          `Group ${parsed.groupIdx} in file ${parsed.fileName} has no checklist ${parsed.checklistIdx} - check your URL.`,
+          '',
+          { duration: 5000 },
+        );
         return;
       }
 
@@ -178,7 +184,7 @@ export class ChecklistsComponent implements OnInit {
     this.showFilePicker = false;
     this.showFileUpload = false;
 
-    const name = prompt("Enter a name for the new file:");
+    const name = prompt('Enter a name for the new file:');
     if (!name) {
       return;
     }
@@ -190,12 +196,12 @@ export class ChecklistsComponent implements OnInit {
           title: 'First checklist group',
           checklists: [
             {
-              title: "First checklist",
+              title: 'First checklist',
               items: [
                 {
                   type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
-                  prompt: "Checklist created",
-                  expectation: "CHECK",
+                  prompt: 'Checklist created',
+                  expectation: 'CHECK',
                   centered: false,
                   indent: 0,
                 },

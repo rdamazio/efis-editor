@@ -2,93 +2,105 @@
   @if (item) {
     <div class="actions">
       <mat-icon
-          cdkDragHandle
-          class="mat-icon-rtl-mirror action-icon drag-icon"
-          matTooltip="Drag to reorder"
-          fontIcon="drag_handle" />
+        cdkDragHandle
+        class="mat-icon-rtl-mirror action-icon drag-icon"
+        matTooltip="Drag to reorder"
+        fontIcon="drag_handle"
+      />
       <button
-          mat-icon-button
-          mat-medium-icon-button
-          class="action-icon"
-          matTooltip="Edit this line"
-          [attr.aria-label]="'Edit ' + item.prompt"
-          [disabled]="item.type === ChecklistItem_Type.ITEM_SPACE"
-          (click)="promptInput.edit(); expectationInput.edit()">
+        mat-icon-button
+        mat-medium-icon-button
+        class="action-icon"
+        matTooltip="Edit this line"
+        [attr.aria-label]="'Edit ' + item.prompt"
+        [disabled]="item.type === ChecklistItem_Type.ITEM_SPACE"
+        (click)="promptInput.edit(); expectationInput.edit()"
+      >
         <mat-icon fontIcon="edit" />
       </button>
       <button
-          mat-icon-button
-          mat-medium-icon-button
-          class="action-icon"
-          matTooltip="Delete this line"
-          [attr.aria-label]="'Delete ' + item.prompt"
-          (click)="onDelete()">
+        mat-icon-button
+        mat-medium-icon-button
+        class="action-icon"
+        matTooltip="Delete this line"
+        [attr.aria-label]="'Delete ' + item.prompt"
+        (click)="onDelete()"
+      >
         <mat-icon fontIcon="delete" />
       </button>
       <button
-          mat-icon-button
-          mat-medium-icon-button
-          class="action-icon"
-          matTooltip="Indent left"
-          [attr.aria-label]="'Indent ' + item.prompt + ' left'"
-          [disabled]="item.indent === 0 || item.centered || item.type === ChecklistItem_Type.ITEM_SPACE"
-          (click)="onIndent(item, -1)">
+        mat-icon-button
+        mat-medium-icon-button
+        class="action-icon"
+        matTooltip="Indent left"
+        [attr.aria-label]="'Indent ' + item.prompt + ' left'"
+        [disabled]="item.indent === 0 || item.centered || item.type === ChecklistItem_Type.ITEM_SPACE"
+        (click)="onIndent(item, -1)"
+      >
         <mat-icon fontIcon="format_indent_decrease" />
       </button>
       <button
-          mat-icon-button
-          mat-medium-icon-button
-          class="action-icon"
-          matTooltip="Indent right"
-          [attr.aria-label]="'Indent ' + item.prompt + ' right'"
-          [disabled]="item.indent === 4 || item.centered || item.type === ChecklistItem_Type.ITEM_SPACE"
-          (click)="onIndent(item, 1)">
+        mat-icon-button
+        mat-medium-icon-button
+        class="action-icon"
+        matTooltip="Indent right"
+        [attr.aria-label]="'Indent ' + item.prompt + ' right'"
+        [disabled]="item.indent === 4 || item.centered || item.type === ChecklistItem_Type.ITEM_SPACE"
+        (click)="onIndent(item, 1)"
+      >
         <mat-icon fontIcon="format_indent_increase" />
       </button>
       <button
-          mat-icon-button
-          mat-medium-icon-button
-          class="action-icon"
-          [matTooltip]="(item.centered ? 'Left-justify' : 'Center') + ' this line'"
-          [attr.aria-label]="'Center ' + item.prompt"
-          [disabled]="item.type === ChecklistItem_Type.ITEM_SPACE || item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
-          (click)="onCenterToggle(item)">
+        mat-icon-button
+        mat-medium-icon-button
+        class="action-icon"
+        [matTooltip]="(item.centered ? 'Left-justify' : 'Center') + ' this line'"
+        [attr.aria-label]="'Center ' + item.prompt"
+        [disabled]="
+          item.type === ChecklistItem_Type.ITEM_SPACE || item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE
+        "
+        (click)="onCenterToggle(item)"
+      >
         <mat-icon [fontIcon]="item.centered ? 'format_align_left' : 'format_align_center'" />
       </button>
     </div>
     <div class="item" [class.item-centered]="item.centered">
       <span
-          class="prompt"
-          [class.prompt-challenge]="item.type === ChecklistItem_Type.ITEM_CHALLENGE"
-          [class.prompt-challenge-response]="item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
-          [class.prompt-title]="item.type === ChecklistItem_Type.ITEM_TITLE"
-          [class.prompt-warning]="item.type === ChecklistItem_Type.ITEM_WARNING"
-          [class.prompt-caution]="item.type === ChecklistItem_Type.ITEM_CAUTION"
-          [class.prompt-note]="item.type === ChecklistItem_Type.ITEM_NOTE"
-          [class.prompt-space]="item.type === ChecklistItem_Type.ITEM_SPACE"
-          [style.padding-left]="item.centered ? '' : 10+item.indent*25 + 'px'">
+        class="prompt"
+        [class.prompt-challenge]="item.type === ChecklistItem_Type.ITEM_CHALLENGE"
+        [class.prompt-challenge-response]="item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
+        [class.prompt-title]="item.type === ChecklistItem_Type.ITEM_TITLE"
+        [class.prompt-warning]="item.type === ChecklistItem_Type.ITEM_WARNING"
+        [class.prompt-caution]="item.type === ChecklistItem_Type.ITEM_CAUTION"
+        [class.prompt-note]="item.type === ChecklistItem_Type.ITEM_NOTE"
+        [class.prompt-space]="item.type === ChecklistItem_Type.ITEM_SPACE"
+        [style.padding-left]="item.centered ? '' : 10 + item.indent * 25 + 'px'"
+      >
         <!-- TODO: Find a better solution than to save/cancel independent fields together -->
         <editable-label
-            #promptInput
-            class="prompt-input"
-            label="Prompt text"
-            [value]="item.prompt"
-            (valueChange)="onSavePrompt()"
-            (cancelled)="expectationInput.cancel()" />
+          #promptInput
+          class="prompt-input"
+          label="Prompt text"
+          [value]="item.prompt"
+          (valueChange)="onSavePrompt()"
+          (cancelled)="expectationInput.cancel()"
+        />
       </span>
       <!-- hidden doesn't work if display is set -->
       <span
-          [class.expectation-container]="item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
-          [hidden]="item.type !== ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE">
+        [class.expectation-container]="item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
+        [hidden]="item.type !== ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
+      >
         <span class="expectation-spacer"></span>
         <span class="expectation">
           <editable-label
-              #expectationInput
-              class="expectation-input"
-              label="Expectation text"
-              [value]="item.expectation"
-              (valueChange)="onSaveExpectation()"
-              (cancelled)="promptInput.cancel()" />
+            #expectationInput
+            class="expectation-input"
+            label="Expectation text"
+            [value]="item.expectation"
+            (valueChange)="onSaveExpectation()"
+            (cancelled)="promptInput.cancel()"
+          />
         </span>
       </span>
     </div>

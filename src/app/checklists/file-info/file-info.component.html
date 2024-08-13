@@ -1,42 +1,43 @@
 <h2 mat-dialog-title>Checklist file metadata</h2>
 <mat-dialog-content>
   <mat-form-field>
-      <mat-label>File name</mat-label>
-      <input
-          #filename
-          matInput
-          cdkFocusInitial
-          required
-          placeholder="e.g. Cessna 172 checklists"
-          [(ngModel)]="data.metadata.name">
+    <mat-label>File name</mat-label>
+    <input
+      #filename
+      matInput
+      cdkFocusInitial
+      required
+      placeholder="e.g. Cessna 172 checklists"
+      [(ngModel)]="data.metadata.name"
+    />
   </mat-form-field>
   <mat-form-field>
-      <mat-label>Aircraft make and model</mat-label>
-      <input matInput placeholder="e.g. Cessna 172" [(ngModel)]="data.metadata.makeAndModel">
+    <mat-label>Aircraft make and model</mat-label>
+    <input matInput placeholder="e.g. Cessna 172" [(ngModel)]="data.metadata.makeAndModel" />
   </mat-form-field>
   <mat-form-field>
-      <mat-label>Aircraft information</mat-label>
-      <input matInput placeholder="e.g. N123AB" [(ngModel)]="data.metadata.aircraftInfo">
+    <mat-label>Aircraft information</mat-label>
+    <input matInput placeholder="e.g. N123AB" [(ngModel)]="data.metadata.aircraftInfo" />
   </mat-form-field>
   <mat-form-field>
-      <mat-label>Manufacturer information</mat-label>
-      <input matInput placeholder="e.g. Cessna" [(ngModel)]="data.metadata.manufacturerInfo">
+    <mat-label>Manufacturer information</mat-label>
+    <input matInput placeholder="e.g. Cessna" [(ngModel)]="data.metadata.manufacturerInfo" />
   </mat-form-field>
   <mat-form-field>
-      <mat-label>Copyright information</mat-label>
-      <input matInput placeholder="e.g. ©2002 My company, Inc." [(ngModel)]="data.metadata.copyrightInfo">
+    <mat-label>Copyright information</mat-label>
+    <input matInput placeholder="e.g. ©2002 My company, Inc." [(ngModel)]="data.metadata.copyrightInfo" />
   </mat-form-field>
   <mat-form-field>
-      <mat-label>Default checklist</mat-label>
-      <mat-select [(value)]="defaultChecklist">
-        @for (group of data.allGroups; track $index; let groupIdx = $index) {
-            <mat-optgroup [label]="group.title">
-                @for (checklist of group.checklists; track $index; let checklistIdx = $index) {
-                    <mat-option [value]="groupIdx + '.' + checklistIdx">{{checklist.title}}</mat-option>
-                }
-            </mat-optgroup>
-        }
-      </mat-select>
+    <mat-label>Default checklist</mat-label>
+    <mat-select [(value)]="defaultChecklist">
+      @for (group of data.allGroups; track $index; let groupIdx = $index) {
+        <mat-optgroup [label]="group.title">
+          @for (checklist of group.checklists; track $index; let checklistIdx = $index) {
+            <mat-option [value]="groupIdx + '.' + checklistIdx">{{ checklist.title }}</mat-option>
+          }
+        </mat-optgroup>
+      }
+    </mat-select>
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>

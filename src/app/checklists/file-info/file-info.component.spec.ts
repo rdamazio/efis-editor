@@ -19,10 +19,7 @@ describe('ChecklistFileInfoComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        MatDialogModule,
-        NoopAnimationsModule,
-      ],
+      imports: [MatDialogModule, NoopAnimationsModule],
       providers: [
         { provide: MatDialogRef, useValue: {} },
         { provide: MAT_DIALOG_DATA, useValue: DATA },

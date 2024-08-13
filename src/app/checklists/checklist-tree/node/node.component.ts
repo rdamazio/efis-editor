@@ -9,20 +9,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
   selector: 'checklist-tree-node',
   standalone: true,
-  imports: [
-    MatButtonModule,
-    MatIconButtonSizesModule,
-    MatIconModule,
-    MatTooltipModule,
-    NgIf,
-  ],
+  imports: [MatButtonModule, MatIconButtonSizesModule, MatIconModule, MatTooltipModule, NgIf],
   templateUrl: './node.component.html',
-  styleUrl: './node.component.scss'
+  styleUrl: './node.component.scss',
 })
 export class ChecklistTreeNodeComponent {
   @Input() node!: ChecklistTreeNode;
-  @Output() nodeRename = new EventEmitter<ChecklistTreeNode>;
-  @Output() nodeDelete = new EventEmitter<ChecklistTreeNode>;
+  @Output() nodeRename = new EventEmitter<ChecklistTreeNode>();
+  @Output() nodeDelete = new EventEmitter<ChecklistTreeNode>();
 
   hideButtons = true;
 }

@@ -27,16 +27,15 @@ import { AboutComponent } from '../about/about.component';
     MatToolbarModule,
     RouterLink,
     RouterOutlet,
-  ]
+  ],
 })
 export class NavComponent {
   private breakpointObserver = inject(BreakpointObserver);
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(
-      map(result => result.matches),
-      shareReplay()
-    );
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
+    map((result) => result.matches),
+    shareReplay(),
+  );
 
   constructor(private _dialog: MatDialog) {}
 
@@ -47,6 +46,4 @@ export class NavComponent {
       exitAnimationDuration: 200,
     });
   }
-
-
 }

@@ -21,14 +21,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     NgIf,
   ],
   templateUrl: './item.component.html',
-  styleUrl: './item.component.scss'
+  styleUrl: './item.component.scss',
 })
 export class ChecklistItemComponent {
   @Input() item!: ChecklistItem;
   @Output() itemChange = new EventEmitter<ChecklistItem>();
   @Output() itemDeleted = new EventEmitter<boolean>();
-  @ViewChild("promptInput") promptInput?: EditableLabelComponent;
-  @ViewChild("expectationInput") expectationInput?: EditableLabelComponent;
+  @ViewChild('promptInput') promptInput?: EditableLabelComponent;
+  @ViewChild('expectationInput') expectationInput?: EditableLabelComponent;
 
   readonly ChecklistItem_Type = ChecklistItem_Type;
 

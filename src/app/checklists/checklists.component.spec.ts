@@ -10,16 +10,9 @@ describe('ChecklistsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        ChecklistsComponent,
-        NoopAnimationsModule,
-      ],
-      providers: [
-        provideRouter([{ path: 'checklists', component: ChecklistsComponent }]),
-      ],
-
-    })
-      .compileComponents();
+      imports: [ChecklistsComponent, NoopAnimationsModule],
+      providers: [provideRouter([{ path: 'checklists', component: ChecklistsComponent }])],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistsComponent);
     component = fixture.componentInstance;

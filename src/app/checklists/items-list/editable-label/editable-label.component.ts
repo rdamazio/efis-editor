@@ -21,14 +21,14 @@ import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
     ReactiveFormsModule,
   ],
   templateUrl: './editable-label.component.html',
-  styleUrl: './editable-label.component.scss'
+  styleUrl: './editable-label.component.scss',
 })
 export class EditableLabelComponent {
   private readonly RESTRICTED_CHARS = ['~'];
 
   control = new FormControl('');
   private _savedValue = '';
-  @ViewChild("promptInput") input!: ElementRef;
+  @ViewChild('promptInput') input!: ElementRef;
 
   @Output() cancelled = new EventEmitter<boolean>();
   @Output() editing = false;
@@ -37,7 +37,9 @@ export class EditableLabelComponent {
 
   @Output() valueChange = new EventEmitter<string>();
   @Input()
-  get value(): string { return this._savedValue; }
+  get value(): string {
+    return this._savedValue;
+  }
   set value(v: string) {
     this._savedValue = v;
     this.control.setValue(v);

@@ -1,56 +1,49 @@
 <div class="command-bar">
-  <button
-      mat-icon-button
-      matTooltip="New file"
-      aria-label="New file"
-      (click)="newFile.emit(true)">
+  <button mat-icon-button matTooltip="New file" aria-label="New file" (click)="newFile.emit(true)">
     <mat-icon fontIcon="note_add" />
   </button>
   <button
-      mat-icon-button
-      matTooltip="Open file"
-      aria-label="Open file"
-      [disabled]="hasFiles"
-      (click)="openFile.emit(true)">
+    mat-icon-button
+    matTooltip="Open file"
+    aria-label="Open file"
+    [disabled]="hasFiles"
+    (click)="openFile.emit(true)"
+  >
     <mat-icon fontIcon="folder_open" />
   </button>
-  <button
-      mat-icon-button
-      matTooltip="Upload file"
-      aria-label="Upload file"
-      (click)="uploadFile.emit(true)">
+  <button mat-icon-button matTooltip="Upload file" aria-label="Upload file" (click)="uploadFile.emit(true)">
     <mat-icon fontIcon="upload" />
   </button>
   <button
-      mat-icon-button
-      matTooltip="Download file"
-      aria-label="Download file"
-      [disabled]="fileIsOpen"
-      [matMenuTriggerFor]="downloadMenu">
+    mat-icon-button
+    matTooltip="Download file"
+    aria-label="Download file"
+    [disabled]="fileIsOpen"
+    [matMenuTriggerFor]="downloadMenu"
+  >
     <mat-icon fontIcon="download" />
   </button>
   <mat-menu #downloadMenu>
-    <button
-        mat-menu-item
-        *ngFor="let format of downloadFormats"
-        (click)="downloadFile.emit(format.id)">
-      {{format.name}}
+    <button mat-menu-item *ngFor="let format of downloadFormats" (click)="downloadFile.emit(format.id)">
+      {{ format.name }}
     </button>
   </mat-menu>
   <button
-      mat-icon-button
-      matTooltip="Delete file"
-      aria-label="Delete file"
-      [disabled]="fileIsOpen"
-      (click)="deleteFile.emit(true)">
+    mat-icon-button
+    matTooltip="Delete file"
+    aria-label="Delete file"
+    [disabled]="fileIsOpen"
+    (click)="deleteFile.emit(true)"
+  >
     <mat-icon fontIcon="delete" />
   </button>
   <button
-      mat-icon-button
-      matTooltip="File information"
-      aria-label="Open file information dialog"
-      [disabled]="fileIsOpen"
-      (click)="fileInfo.emit(true)">
+    mat-icon-button
+    matTooltip="File information"
+    aria-label="Open file information dialog"
+    [disabled]="fileIsOpen"
+    (click)="fileInfo.emit(true)"
+  >
     <mat-icon fontIcon="info" />
   </button>
 </div>

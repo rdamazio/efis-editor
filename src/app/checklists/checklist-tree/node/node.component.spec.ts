@@ -8,16 +8,15 @@ describe('NodeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChecklistTreeNodeComponent]
-    })
-      .compileComponents();
+      imports: [ChecklistTreeNodeComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistTreeNodeComponent);
     component = fixture.componentInstance;
     component.node = {
       isAddNew: false,
-      title: "Test",
-    }
+      title: 'Test',
+    };
     fixture.detectChanges();
   });
 

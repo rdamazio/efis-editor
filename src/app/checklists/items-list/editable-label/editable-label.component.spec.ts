@@ -8,9 +8,8 @@ describe('EditableLabelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditableLabelComponent]
-    })
-      .compileComponents();
+      imports: [EditableLabelComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(EditableLabelComponent);
     component = fixture.componentInstance;
