@@ -6,13 +6,9 @@ import { MatSelectModule } from '@angular/material/select';
 @Component({
   selector: 'checklist-file-picker',
   standalone: true,
-  imports: [
-    MatIconModule,
-    MatSelectModule,
-    NgFor,
-  ],
+  imports: [MatIconModule, MatSelectModule, NgFor],
   templateUrl: './file-picker.component.html',
-  styleUrl: './file-picker.component.scss'
+  styleUrl: './file-picker.component.scss',
 })
 export class ChecklistFilePickerComponent {
   @Input() fileNames?: string[];

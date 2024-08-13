@@ -11,19 +11,11 @@ import { ChecklistItemComponent } from './item/item.component';
   templateUrl: './items-list.component.html',
   styleUrl: './items-list.component.scss',
   standalone: true,
-  imports: [
-    CdkDrag,
-    CdkDragPlaceholder,
-    CdkDropList,
-    ChecklistItemComponent,
-    MatButtonModule,
-    MatIconModule,
-    NgIf,
-  ]
+  imports: [CdkDrag, CdkDragPlaceholder, CdkDropList, ChecklistItemComponent, MatButtonModule, MatIconModule, NgIf],
 })
 export class ChecklistItemsComponent {
   _checklist?: Checklist;
-  readonly ITEM_TYPES: { label: string, type: ChecklistItem_Type }[] = [
+  readonly ITEM_TYPES: { label: string; type: ChecklistItem_Type }[] = [
     { label: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
     { label: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
     { label: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
@@ -36,7 +28,9 @@ export class ChecklistItemsComponent {
 
   @Output() checklistChange = new EventEmitter<Checklist>();
   @Input()
-  get checklist(): Checklist | undefined { return this._checklist; }
+  get checklist(): Checklist | undefined {
+    return this._checklist;
+  }
   set checklist(checklist: Checklist | undefined) {
     this._checklist = checklist;
   }

@@ -9,12 +9,8 @@ describe('FilePickerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        ChecklistFilePickerComponent,
-        NoopAnimationsModule,
-      ]
-    })
-      .compileComponents();
+      imports: [ChecklistFilePickerComponent, NoopAnimationsModule],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistFilePickerComponent);
     component = fixture.componentInstance;

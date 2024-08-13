@@ -10,17 +10,14 @@ import { GrtFormat } from '../../../model/formats/grt-format';
 @Component({
   selector: 'checklist-file-upload',
   standalone: true,
-  imports: [
-    MatIconModule,
-    NgxFileDropModule,
-  ],
+  imports: [MatIconModule, NgxFileDropModule],
   templateUrl: './file-upload.component.html',
-  styleUrl: './file-upload.component.scss'
+  styleUrl: './file-upload.component.scss',
 })
 export class ChecklistFileUploadComponent {
   @Output() fileUploaded = new EventEmitter<ChecklistFile>();
 
-  constructor(private _snackBar: MatSnackBar) { }
+  constructor(private _snackBar: MatSnackBar) {}
 
   onDropped(files: NgxFileDropEntry[]) {
     for (const f of files) {

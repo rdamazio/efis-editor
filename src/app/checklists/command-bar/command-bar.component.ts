@@ -13,15 +13,9 @@ export interface DownloadFormat {
 @Component({
   selector: 'checklist-command-bar',
   standalone: true,
-  imports: [
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatTooltipModule,
-    NgFor,
-  ],
+  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatTooltipModule, NgFor],
   templateUrl: './command-bar.component.html',
-  styleUrl: './command-bar.component.scss'
+  styleUrl: './command-bar.component.scss',
 })
 export class ChecklistCommandBarComponent {
   @Input() hasFiles = false;

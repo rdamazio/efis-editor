@@ -1,11 +1,11 @@
-import { AfterRenderPhase, Injectable, afterNextRender } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
-import { ChecklistFile } from "../../../gen/ts/checklist";
+import { AfterRenderPhase, Injectable, afterNextRender } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { ChecklistFile } from '../../../gen/ts/checklist';
 
-const CHECKLIST_PREFIX = "checklists:";
+const CHECKLIST_PREFIX = 'checklists:';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ChecklistStorage {
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -25,15 +25,17 @@ export class ChecklistStorage {
         }
       };
 
-      afterNextRender(() => {
-        setTimeout(() => {
-          this._storageResolveFunc();
-        });
-        
-      }, { phase: AfterRenderPhase.Read });
+      afterNextRender(
+        () => {
+          setTimeout(() => {
+            this._storageResolveFunc();
+          });
+        },
+        { phase: AfterRenderPhase.Read },
+      );
     });
 
-    this._browserStorage.then(store => {
+    this._browserStorage.then((store) => {
       this._publishList(store);
     });
   }

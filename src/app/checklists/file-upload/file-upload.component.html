@@ -1,17 +1,16 @@
 <div class="file-upload">
-    <ngx-file-drop
-        #drop
-        accept=".ace, .txt, .afd"
-        [directory]="false"
-        [multiple]="false"
-        [showBrowseBtn]="false"
-        required
-        (click)="drop.openFileSelector()"
-        (onFileDrop)="onDropped($event)">
-        <ng-template ngx-file-drop-content-tmp>
-            <div class="file-drop-content">
-                Drop files here<br>(click to browse)
-            </div>
-        </ng-template>
-    </ngx-file-drop>
+  <ngx-file-drop
+    #drop
+    accept=".ace, .txt, .afd"
+    [directory]="false"
+    [multiple]="false"
+    [showBrowseBtn]="false"
+    required
+    (click)="drop.openFileSelector()"
+    (onFileDrop)="onDropped($event)"
+  >
+    <ng-template ngx-file-drop-content-tmp>
+      <div class="file-drop-content">Drop files here<br />(click to browse)</div>
+    </ng-template>
+  </ngx-file-drop>
 </div>

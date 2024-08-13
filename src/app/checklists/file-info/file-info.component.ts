@@ -7,7 +7,7 @@ import {
   MatDialogClose,
   MatDialogContent,
   MatDialogRef,
-  MatDialogTitle
+  MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -34,13 +34,13 @@ export interface FileInfoDialogData {
     ReactiveFormsModule,
   ],
   templateUrl: './file-info.component.html',
-  styleUrl: './file-info.component.scss'
+  styleUrl: './file-info.component.scss',
 })
 export class ChecklistFileInfoComponent {
   constructor(
     public dialogRef: MatDialogRef<ChecklistFileInfoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: FileInfoDialogData,
-  ) { }
+  ) {}
 
   get defaultChecklist(): string {
     return `${this.data.metadata.defaultGroupIndex}.${this.data.metadata.defaultChecklistIndex}`;

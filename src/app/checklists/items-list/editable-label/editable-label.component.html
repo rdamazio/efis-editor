@@ -1,37 +1,31 @@
 @if (!editing) {
-  {{value}}
+  {{ value }}
 } @else {
-  <mat-form-field
-      appearance="outline"
-      class="editable-input">
-    <mat-label>{{label}}</mat-label>
-    <input
-        #promptInput
-        matInput
-        required
-        type="text"
-        [formControl]="control"
-        (beforeinput)="onBeforeInput($event)" >
+  <mat-form-field appearance="outline" class="editable-input">
+    <mat-label>{{ label }}</mat-label>
+    <input #promptInput matInput required type="text" [formControl]="control" (beforeinput)="onBeforeInput($event)" />
     <button
-        mat-icon-button
-        mat-medium-icon-button
-        matSuffix
-        class="item-icon"
-        matTooltip="Save"
-        [attr.aria-label]="'Save changes to ' + label"
-        [disabled]="!this.control.valid"
-        (click)="value = promptInput.value; save();">
-        <mat-icon fontIcon="save" />
+      mat-icon-button
+      mat-medium-icon-button
+      matSuffix
+      class="item-icon"
+      matTooltip="Save"
+      [attr.aria-label]="'Save changes to ' + label"
+      [disabled]="!this.control.valid"
+      (click)="value = promptInput.value; save()"
+    >
+      <mat-icon fontIcon="save" />
     </button>
     <button
-        mat-icon-button
-        mat-medium-icon-button
-        matSuffix
-        class="item-icon"
-        matTooltip="Cancel"
-        [attr.aria-label]="'Cancel changes to ' + label"
-        (click)="cancel()">
-        <mat-icon fontIcon="cancel" />
+      mat-icon-button
+      mat-medium-icon-button
+      matSuffix
+      class="item-icon"
+      matTooltip="Cancel"
+      [attr.aria-label]="'Cancel changes to ' + label"
+      (click)="cancel()"
+    >
+      <mat-icon fontIcon="cancel" />
     </button>
   </mat-form-field>
 }

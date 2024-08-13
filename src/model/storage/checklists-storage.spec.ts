@@ -8,18 +8,18 @@ describe('ChecklistsService', () => {
 
   const A_CHECKLIST_FILE: ChecklistFile = {
     metadata: ChecklistFileMetadata.create({
-      name: "N425RP",
+      name: 'N425RP',
     }),
     groups: [
       {
-        title: "Normal procedures",
+        title: 'Normal procedures',
         checklists: [
           {
-            title: "Engine out on takeoff",
+            title: 'Engine out on takeoff',
             items: [
               {
-                prompt: "Mood",
-                expectation: "Panic",
+                prompt: 'Mood',
+                expectation: 'Panic',
                 type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
                 indent: 1,
                 centered: false,
@@ -32,14 +32,14 @@ describe('ChecklistsService', () => {
   };
   const ANOTHER_CHECKLIST_FILE: ChecklistFile = {
     metadata: ChecklistFileMetadata.create({
-      name: "Something with spaces",
+      name: 'Something with spaces',
     }),
     groups: [],
   };
 
   const YET_ANOTHER_CHECKLIST_FILE: ChecklistFile = {
     metadata: ChecklistFileMetadata.create({
-      name: "Somethingwithoutspaces",
+      name: 'Somethingwithoutspaces',
     }),
     groups: [],
   };
@@ -56,27 +56,26 @@ describe('ChecklistsService', () => {
   });
 
   it('should be empty at the start', async () => {
-    expect(await firstValueFrom(store.listChecklistFiles())).toEqual((jasmine.empty()));
+    expect(await firstValueFrom(store.listChecklistFiles())).toEqual(jasmine.empty());
   });
 
   describe('should save and read each checklist', () => {
-    [A_CHECKLIST_FILE, ANOTHER_CHECKLIST_FILE, YET_ANOTHER_CHECKLIST_FILE]
-      .forEach((file) => {
-        beforeEach(async () => {
-          localStorage.clear();
-        });
-
-        it('should save and read back a checklist', async () => {
-          await store.saveChecklistFile(file);
-          const files = store.listChecklistFiles();
-          expect(await firstValueFrom(files)).toEqual([file.metadata!.name]);
-          expect(await store.getChecklistFile(file.metadata!.name)).toEqual(file);
-
-          await store.deleteChecklistFile(file.metadata!.name);
-          expect(await firstValueFrom(files)).toEqual([]);
-          expect(await store.getChecklistFile(file.metadata!.name)).toBeNull();
-        });
+    [A_CHECKLIST_FILE, ANOTHER_CHECKLIST_FILE, YET_ANOTHER_CHECKLIST_FILE].forEach((file) => {
+      beforeEach(async () => {
+        localStorage.clear();
       });
+
+      it('should save and read back a checklist', async () => {
+        await store.saveChecklistFile(file);
+        const files = store.listChecklistFiles();
+        expect(await firstValueFrom(files)).toEqual([file.metadata!.name]);
+        expect(await store.getChecklistFile(file.metadata!.name)).toEqual(file);
+
+        await store.deleteChecklistFile(file.metadata!.name);
+        expect(await firstValueFrom(files)).toEqual([]);
+        expect(await store.getChecklistFile(file.metadata!.name)).toBeNull();
+      });
+    });
   });
 
   it('should store and read multiple checklists', async () => {
@@ -88,18 +87,16 @@ describe('ChecklistsService', () => {
         A_CHECKLIST_FILE.metadata!.name,
         ANOTHER_CHECKLIST_FILE.metadata!.name,
         YET_ANOTHER_CHECKLIST_FILE.metadata!.name,
-      ]));
-    expect(await store.getChecklistFile(A_CHECKLIST_FILE.metadata!.name)).toEqual(
-      A_CHECKLIST_FILE);
-    expect(await store.getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(
-      ANOTHER_CHECKLIST_FILE);
-    expect(await store.getChecklistFile(YET_ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(
-      YET_ANOTHER_CHECKLIST_FILE);
+      ]),
+    );
+    expect(await store.getChecklistFile(A_CHECKLIST_FILE.metadata!.name)).toEqual(A_CHECKLIST_FILE);
+    expect(await store.getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(ANOTHER_CHECKLIST_FILE);
+    expect(await store.getChecklistFile(YET_ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(YET_ANOTHER_CHECKLIST_FILE);
 
     await store.deleteChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name);
     expect(await firstValueFrom(store.listChecklistFiles())).toEqual(
-      jasmine.arrayWithExactContents(
-        [A_CHECKLIST_FILE.metadata!.name, YET_ANOTHER_CHECKLIST_FILE.metadata!.name]));
+      jasmine.arrayWithExactContents([A_CHECKLIST_FILE.metadata!.name, YET_ANOTHER_CHECKLIST_FILE.metadata!.name]),
+    );
     expect(await store.getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).toBeNull();
 
     await store.clear();

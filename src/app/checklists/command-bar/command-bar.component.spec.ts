@@ -8,9 +8,8 @@ describe('ChecklistCommandBarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChecklistCommandBarComponent]
-    })
-      .compileComponents();
+      imports: [ChecklistCommandBarComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistCommandBarComponent);
     component = fixture.componentInstance;

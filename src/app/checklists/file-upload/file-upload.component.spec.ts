@@ -8,9 +8,8 @@ describe('ChecklistFileUploadComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChecklistFileUploadComponent]
-    })
-      .compileComponents();
+      imports: [ChecklistFileUploadComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistFileUploadComponent);
     component = fixture.componentInstance;

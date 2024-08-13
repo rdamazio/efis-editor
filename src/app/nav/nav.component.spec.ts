@@ -10,10 +10,7 @@ describe('NavComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        NoopAnimationsModule,
-        RouterModule.forRoot([]),
-      ]
+      imports: [NoopAnimationsModule, RouterModule.forRoot([])],
     }).compileComponents();
   }));
 
