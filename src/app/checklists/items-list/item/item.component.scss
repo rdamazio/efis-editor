@@ -38,15 +38,15 @@
 }
 
 .prompt-challenge:before {
-  content: " □";
+  content: ' □';
 }
 
 .prompt-challenge-response:before {
-  content: " □ ";
+  content: ' □ ';
 }
 
 .prompt-caution:before {
-  content: "CAUTION:";
+  content: 'CAUTION:';
 }
 
 .prompt-warning {
@@ -54,7 +54,7 @@
 }
 
 .prompt-warning:before {
-  content: "WARNING:";
+  content: 'WARNING:';
 }
 
 .prompt-note {
@@ -62,7 +62,7 @@
 }
 
 .prompt-note:before {
-  content: "NOTE:";
+  content: 'NOTE:';
 }
 
 // TODO: Make this work without ng-deep
