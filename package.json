@@ -13,7 +13,8 @@
     "test": "ng test",
     "test:headless": "ng test --watch=false --browsers=ChromeHeadless",
     "lint": "ng lint",
-    "format": "prettier --write \"**/*.{js,ts,html}\""
+    "format": "prettier --check \"**/*.{js,ts,html,css,scss}\"",
+    "format:fix": "npm run format -- --write"
   },
   "private": true,
   "dependencies": {
