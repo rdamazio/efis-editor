@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
+import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node';
 
 @Component({
@@ -19,4 +20,5 @@ export class ChecklistTreeNodeComponent {
   @Output() nodeDelete = new EventEmitter<ChecklistTreeNode>();
 
   hideButtons = true;
+  protected readonly ChecklistGroup_Category = ChecklistGroup_Category;
 }

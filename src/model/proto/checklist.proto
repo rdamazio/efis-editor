@@ -23,6 +23,15 @@ message ChecklistFile {
 message ChecklistGroup {
   string title = 1;
   repeated Checklist checklists = 2;
+
+  enum Category {
+    UNKNOWN = 0;
+    NORMAL = 1;
+    ABNORMAL = 2;
+    EMERGENCY = 3;
+  }
+
+  Category category = 3;
 }
 
 message Checklist {

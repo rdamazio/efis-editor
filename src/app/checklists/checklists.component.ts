@@ -5,7 +5,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HotkeysDirective, HotkeysService } from '@ngneat/hotkeys';
 import { saveAs } from 'file-saver';
-import { Checklist, ChecklistFile, ChecklistFileMetadata, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import {
+  Checklist,
+  ChecklistFile,
+  ChecklistFileMetadata,
+  ChecklistGroup_Category,
+  ChecklistItem_Type,
+} from '../../../gen/ts/checklist';
 import { AceFormat } from '../../model/formats/ace-format';
 import { DynonFormat } from '../../model/formats/dynon-format';
 import { FormatError } from '../../model/formats/error';
@@ -356,6 +362,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
               ],
             },
           ],
+          category: ChecklistGroup_Category.UNKNOWN,
         },
       ],
       metadata: ChecklistFileMetadata.create({
