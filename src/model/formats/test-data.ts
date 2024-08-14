@@ -84,3 +84,86 @@ export const EXPECTED_CONTENTS: ChecklistFile = {
     copyrightInfo: 'Test copyright',
   },
 };
+
+export const EXPECTED_FOREFLIGHT_CONTENTS = {
+  groups: [
+    { category: ChecklistGroup_Category.NORMAL, title: 'Empty subgroup', checklists: [] },
+    {
+      category: ChecklistGroup_Category.NORMAL,
+      title: 'Subgroup with empty checklist',
+      checklists: [{ title: 'Empty checklist', items: [] }],
+    },
+    {
+      category: ChecklistGroup_Category.NORMAL,
+      title: 'Subgroup',
+      checklists: [
+        {
+          title: 'Checklist',
+          items: [
+            {
+              prompt: 'Challenge',
+              expectation: 'RESPONSE',
+              type: 2,
+              indent: 0,
+              centered: false,
+            },
+            {
+              prompt: 'Detail1',
+              expectation: '',
+              type: 3,
+              indent: 0,
+              centered: false,
+            },
+            {
+              prompt: 'Another challenge',
+              expectation: 'CHECK',
+              type: 2,
+              indent: 0,
+              centered: false,
+            },
+            {
+              prompt: 'Challenge with note',
+              expectation: 'RESPONSE',
+              type: 2,
+              indent: 0,
+              centered: false,
+            },
+            {
+              prompt: 'Notes',
+              expectation: '',
+              type: 7,
+              indent: 1,
+              centered: false,
+            },
+            {
+              prompt: 'Challenge without note',
+              expectation: 'CHECK',
+              type: 2,
+              indent: 0,
+              centered: false,
+            },
+            { prompt: 'Detail2', expectation: '', type: 3, indent: 0, centered: false },
+            {
+              prompt: 'Detail3',
+              expectation: '',
+              type: 3,
+              indent: 0,
+              centered: false,
+            },
+          ],
+        },
+      ],
+    },
+    { category: ChecklistGroup_Category.ABNORMAL, title: 'Test empty abnormal subgroup', checklists: [] },
+  ],
+  metadata: {
+    name: 'Checklist name',
+    description: 'Checklist description',
+    defaultGroupIndex: 0,
+    defaultChecklistIndex: 0,
+    makeAndModel: '',
+    aircraftInfo: 'TAIL NUMBER',
+    manufacturerInfo: '',
+    copyrightInfo: '',
+  },
+};
