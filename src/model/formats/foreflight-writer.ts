@@ -71,6 +71,12 @@ export class ForeFlightWriter {
             title: itemEFIS.prompt,
           });
           break;
+        case ChecklistItem_Type.ITEM_CHALLENGE:
+          itemsFF.push({
+            objectId: await ForeFlightUtils.getObjectId(),
+            title: itemEFIS.prompt,
+          });
+          break;
         case ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE:
           itemsFF.push({
             objectId: await ForeFlightUtils.getObjectId(),
