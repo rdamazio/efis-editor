@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { RouterLink } from '@angular/router';
+import { ForeFlightUtils } from '../../model/formats/foreflight-utils';
 
 @Component({
   selector: 'app-welcome',
@@ -10,4 +11,6 @@ import { RouterLink } from '@angular/router';
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.scss',
 })
-export class WelcomeComponent {}
+export class WelcomeComponent {
+  protected readonly FOREFLIGHT_FILE_EXTENSION = ForeFlightUtils.FILE_EXTENSION;
+}

@@ -13,7 +13,7 @@
     <mat-card class="filetype-card">
       <mat-card-header>
         <mat-card-title>Checklists</mat-card-title>
-        <mat-card-subtitle>(e.g .ace, .txt, .afd)</mat-card-subtitle>
+        <mat-card-subtitle>(e.g .ace, .txt, .afd, .{{ FOREFLIGHT_FILE_EXTENSION }})</mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
@@ -30,6 +30,7 @@
           <li>Dynon SkyView&trade; - multiple width options (.txt))</li>
           <li>Advanced Flight Systems (.afd)</li>
           <li>Grand Rapids Technology (.txt)</li>
+          <li>Boeing ForeFlight (.{{ FOREFLIGHT_FILE_EXTENSION }})</li>
         </ul>
         <p>Not all avionics systems support all the features of this editor.</p>
       </mat-card-content>
@@ -64,6 +65,23 @@
       This app does not save your files on any server - they're only stored on your browser's local storage.<br />
       If you clear your browser's storage, or lose your computer, they'll be gone. Forever.<br />
       Be sure to download a copy of your data and keep it somewhere safe.
+    </div>
+  </div>
+
+  <div class="callout important">
+    <div class="callout-title">IMPORTANT:</div>
+    <div>
+      Not all formats can represent entered items in the same way! Do check that the checklists are complete and appear
+      as you expected when converting between formats.<br />
+      Specifically, the ForeFlight format supports:
+      <ul>
+        <li>Only 3 pre-set group category types (Normal, Abnormal, Emergency)</li>
+        <li>
+          Title, Challenge, Challenge/Response and Note to Challenge/Response (exactly 1 level indent) checklist item
+          types
+        </li>
+      </ul>
+      Other items will be silently ignored when exporting the checklist file!
     </div>
   </div>
 </div>

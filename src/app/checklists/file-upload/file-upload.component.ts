@@ -6,6 +6,8 @@ import { ChecklistFile } from '../../../../gen/ts/checklist';
 import { AceFormat } from '../../../model/formats/ace-format';
 import { DynonFormat } from '../../../model/formats/dynon-format';
 import { GrtFormat } from '../../../model/formats/grt-format';
+import { ForeFlightFormat } from '../../../model/formats/foreflight-format';
+import { ForeFlightUtils } from '../../../model/formats/foreflight-utils';
 import { JsonFormat } from '../../../model/formats/json-format';
 
 @Component({
@@ -20,11 +22,19 @@ export class ChecklistFileUploadComponent {
 
   constructor(private _snackBar: MatSnackBar) {}
 
+  protected readonly FOREFLIGHT_EXTENSION = ForeFlightUtils.FILE_EXTENSION;
+
   onDropped(files: NgxFileDropEntry[]) {
     for (const f of files) {
       const fileEntry = f.fileEntry as FileSystemFileEntry;
       fileEntry.file(async (file: File) => {
         // TODO: Come up with a nicer way to see which should match.
+        try {
+          this.fileUploaded.emit(await ForeFlightFormat.toProto(file));
+          return;
+        } catch (e) {
+          console.log('Failed to parse as ForeFlight: ', e);
+        }
         try {
           this.fileUploaded.emit(await AceFormat.toProto(file));
           return;
