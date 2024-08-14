@@ -1,6 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
-import { ChecklistFile, ChecklistFileMetadata, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import {
+  ChecklistFile,
+  ChecklistFileMetadata,
+  ChecklistGroup_Category,
+  ChecklistItem_Type,
+} from '../../../gen/ts/checklist';
 import { ChecklistStorage } from './checklist-storage';
 
 describe('ChecklistsService', () => {
@@ -12,6 +17,7 @@ describe('ChecklistsService', () => {
     }),
     groups: [
       {
+        category: ChecklistGroup_Category.UNKNOWN,
         title: 'Normal procedures',
         checklists: [
           {

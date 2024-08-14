@@ -5,6 +5,7 @@ import {
   ChecklistFile,
   ChecklistFileMetadata,
   ChecklistGroup,
+  ChecklistGroup_Category,
   ChecklistItem,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
@@ -119,6 +120,7 @@ export class TextReader {
           currentGroup = {
             title: groupTitle,
             checklists: [],
+            category: ChecklistGroup_Category.UNKNOWN,
           };
           outFile.groups.push(currentGroup);
         }
