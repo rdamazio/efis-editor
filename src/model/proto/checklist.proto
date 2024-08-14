@@ -13,6 +13,8 @@ message ChecklistFileMetadata {
   string aircraft_info = 5;
   string manufacturer_info = 6;
   string copyright_info = 7;
+
+  optional string description = 8;
 }
 
 message ChecklistFile {
