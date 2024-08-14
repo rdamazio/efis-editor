@@ -1,18 +1,14 @@
-import { TestBed } from '@angular/core/testing';
 import { ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
 import { AceReader } from './ace-reader';
 import { AceWriter } from './ace-writer';
 import { FormatError } from './error';
+import { loadFile } from './test-utils';
 
 describe('AceWriter', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-  });
-
   it('read then write back test file', async () => {
     // Read the test file.
     // The correctness of the reading is already checked in ace-reader.spec.ts
-    const f = await loadFile('/model/formats/test.ace');
+    const f = await loadFile('/model/formats/test.ace', 'test.ace');
     const readFile = await new AceReader(f).read();
 
     // Now write the file back.
@@ -22,13 +18,6 @@ describe('AceWriter', () => {
     expect(writtenData.byteLength).toBeGreaterThan(1000);
     expect(writtenData).toEqual(readData);
   });
-
-  async function loadFile(url: string): Promise<File> {
-    const response = await fetch(url);
-    expect(response.ok).toBeTrue();
-    const blob = await response.blob();
-    return new File([blob], 'test.ace');
-  }
 
   describe('try writing files without a name', async () => {
     [
