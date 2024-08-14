@@ -1,8 +1,8 @@
-import { TestBed } from '@angular/core/testing';
 import { DYNON_FORMAT_OPTIONS, DynonFormat } from './dynon-format';
 import { EXPECTED_CONTENTS } from './test-data';
 import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
+import { loadFile } from './test-utils';
 
 const DYNON_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), DYNON_FORMAT_OPTIONS).testCaseify(
   EXPECTED_CONTENTS,
@@ -11,10 +11,6 @@ const DYNON_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), DYNON_FORMA
 describe('DynonFormat', () => {
   beforeAll(() => {
     TextWriter.testingTime = new Date(2024, 4, 3);
-  });
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
   });
 
   describe('read then write back test file', () => {
@@ -30,7 +26,7 @@ describe('DynonFormat', () => {
   });
 
   async function testWriteRead(fileName: string, maxLineLength?: number) {
-    const f = await loadFile('/model/formats/' + fileName);
+    const f = await loadFile('/model/formats/' + fileName, 'test.txt');
     const readFile = await DynonFormat.toProto(f);
     expect(readFile).toEqual(DYNON_EXPECTED_CONTENTS);
 
@@ -42,12 +38,5 @@ describe('DynonFormat', () => {
     const readData = decoder.decode(await f.arrayBuffer());
     const readLines = readData.split('\r\n');
     expect(writtenLines).toEqual(readLines);
-  }
-
-  async function loadFile(url: string): Promise<File> {
-    const response = await fetch(url);
-    expect(response.ok).toBeTrue();
-    const blob = await response.blob();
-    return new File([blob], 'test.txt');
   }
 });
