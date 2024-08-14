@@ -25,6 +25,8 @@ import { ChecklistFilePickerComponent } from './file-picker/file-picker.componen
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { HelpComponent } from './hotkeys/help/help.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
+import { ForeFlightFormat } from '../../model/formats/foreflight-format';
+import { ForeFlightUtils } from '../../model/formats/foreflight-utils';
 
 interface ParsedFragment {
   fileName?: string;
@@ -58,6 +60,9 @@ export class ChecklistsComponent implements OnInit {
   showFilePicker = false;
   showFileUpload = false;
   helpRef?: MatDialogRef<HelpComponent>;
+
+  protected readonly FOREFLIGHT_EXTENSION = ForeFlightUtils.FILE_EXTENSION;
+  protected readonly FOREFLIGHT_EXTENSION_DESCRIPTION = `ForeFlight [.${ForeFlightUtils.FILE_EXTENSION}]`;
 
   constructor(
     public store: ChecklistStorage,
@@ -418,6 +423,8 @@ export class ChecklistsComponent implements OnInit {
       file = await DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 40);
     } else if (formatId === 'grt') {
       file = await GrtFormat.fromProto(this.selectedFile);
+    } else if (formatId === this.FOREFLIGHT_EXTENSION) {
+      file = await ForeFlightFormat.fromProto(this.selectedFile);
     } else {
       throw new FormatError(`Unknown format "${formatId}"`);
     }
