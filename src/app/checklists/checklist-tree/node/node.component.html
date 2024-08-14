@@ -15,7 +15,22 @@
     <mat-icon fontIcon="add" />
   </button>
 
-  <div class="checklist-tree-node-title">{{ node.title }}</div>
+  <div class="checklist-tree-node-title">
+    @if (!node.checklist && !node.isAddNew) {
+      @switch (node.group?.category) {
+        @case (ChecklistGroup_Category.NORMAL) {
+          <span>🄽</span>
+        }
+        @case (ChecklistGroup_Category.ABNORMAL) {
+          <span class="important">🄰</span>
+        }
+        @case (ChecklistGroup_Category.EMERGENCY) {
+          <span class="danger">🄴</span>
+        }
+      }
+    }
+    {{ node.title }}
+  </div>
 
   <span class="checklist-tree-node-spacer"></span>
 

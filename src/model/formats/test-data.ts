@@ -1,8 +1,9 @@
-import { ChecklistFile, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import { ChecklistFile, ChecklistGroup_Category, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
 
 export const EXPECTED_CONTENTS: ChecklistFile = {
   groups: [
     {
+      category: ChecklistGroup_Category.UNKNOWN,
       title: 'Test group 1',
       checklists: [
         {
@@ -46,6 +47,7 @@ export const EXPECTED_CONTENTS: ChecklistFile = {
       ],
     },
     {
+      category: ChecklistGroup_Category.UNKNOWN,
       title: 'Test group 2 (default)',
       checklists: [
         {

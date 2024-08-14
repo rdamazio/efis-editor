@@ -1,6 +1,13 @@
 import crc32 from 'buffer-crc32';
 import equal from 'fast-deep-equal';
-import { Checklist, ChecklistFile, ChecklistGroup, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import {
+  Checklist,
+  ChecklistFile,
+  ChecklistGroup,
+  ChecklistGroup_Category,
+  ChecklistItem,
+  ChecklistItem_Type,
+} from '../../../gen/ts/checklist';
 import * as AceConstants from './ace-constants';
 import { FormatError } from './error';
 
@@ -81,6 +88,7 @@ export class AceReader {
     const group: ChecklistGroup = {
       title: this.readLine(),
       checklists: [],
+      category: ChecklistGroup_Category.UNKNOWN,
     };
 
     while (!this.consumeLine(AceConstants.GROUP_END_HEADER)) {
