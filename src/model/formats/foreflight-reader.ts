@@ -99,11 +99,16 @@ export class ForeFlightReader {
           }),
         ]
       : [
-          ChecklistItem.create({
-            type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
-            prompt: checklistItem.title,
-            expectation: checklistItem.detail,
-          }),
+          checklistItem.detail
+            ? ChecklistItem.create({
+                type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+                prompt: checklistItem.title,
+                expectation: checklistItem.detail,
+              })
+            : ChecklistItem.create({
+                type: ChecklistItem_Type.ITEM_CHALLENGE,
+                prompt: checklistItem.title,
+              }),
           ...(checklistItem.note
             ? [
                 ChecklistItem.create({
