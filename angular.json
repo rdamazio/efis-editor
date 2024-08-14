@@ -101,7 +101,8 @@
               "src/model/formats/test-dynon.txt",
               "src/model/formats/test-dynon31.txt",
               "src/model/formats/test-dynon40.txt",
-              "src/model/formats/test-grt.txt"
+              "src/model/formats/test-grt.txt",
+              "src/model/formats/test-foreflight.fmd"
             ],
             "styles": [
               "@angular/material/prebuilt-themes/purple-green.css",
