@@ -23,7 +23,7 @@ export class ForeFlightWriter {
         metadata: {
           name: file.metadata?.name,
           detail: file.metadata?.description,
-          tailNumber: file.metadata?.aircraftInfo,
+          tailNumber: file.metadata?.aircraftInfo.toUpperCase(),
         },
         groups: await ForeFlightWriter.checklistGroupsToFF(file.groups),
       },
