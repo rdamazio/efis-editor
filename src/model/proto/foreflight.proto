@@ -47,6 +47,6 @@ message ForeFlightChecklistItem {
   string objectId = 1;
   optional string type = 2; // Not present for items, "comment" for section headings
   string title = 3;
-  optional string detail = 4; // Not present for section headings
+  optional string detail = 4; // Might be present both for section headings and normal items
   optional string note = 5; // Not present for section headings, optional for normal items
 }
