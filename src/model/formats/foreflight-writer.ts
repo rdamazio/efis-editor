@@ -81,7 +81,7 @@ export class ForeFlightWriter {
           itemsFF.push({
             objectId: await ForeFlightUtils.getObjectId(),
             title: itemEFIS.prompt,
-            detail: itemEFIS.expectation,
+            detail: itemEFIS.expectation.toUpperCase(),
           });
           break;
         case ChecklistItem_Type.ITEM_NOTE: {
