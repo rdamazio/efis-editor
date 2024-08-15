@@ -87,12 +87,12 @@ export class ForeFlightWriter {
         case ChecklistItem_Type.ITEM_NOTE: {
           // JavaScript, why not [-1] or .last() !? :-(
           const lastItemFF = itemsFF[itemsFF.length - 1];
-          if (
-            lastItemFF &&
-            lastItemFF.type !== ForeFlightUtils.ITEM_HEADER &&
-            itemEFIS.indent === ForeFlightUtils.NOTE_INDENT
-          ) {
-            lastItemFF.note = itemEFIS.prompt;
+          if (lastItemFF && itemEFIS.indent === ForeFlightUtils.NOTE_INDENT) {
+            if (lastItemFF.type === ForeFlightUtils.ITEM_HEADER) {
+              lastItemFF.detail = itemEFIS.prompt;
+            } else {
+              lastItemFF.note = itemEFIS.prompt;
+            }
           }
         }
       }
