@@ -150,6 +150,7 @@ export const EXPECTED_FOREFLIGHT_CONTENTS = {
               centered: false,
             },
             { prompt: 'Detail2', expectation: '', type: ChecklistItem_Type.ITEM_TITLE, indent: 0, centered: false },
+            { prompt: 'With note', expectation: '', type: ChecklistItem_Type.ITEM_NOTE, indent: 1, centered: false },
             {
               prompt: 'Detail3',
               expectation: '',

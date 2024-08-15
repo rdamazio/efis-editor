@@ -91,33 +91,31 @@ export class ForeFlightReader {
   }
 
   private static checklistItemToEFIS(checklistItem: ForeFlightChecklistItem): ChecklistItem[] {
-    return checklistItem.type === ForeFlightUtils.ITEM_HEADER
-      ? [
-          ChecklistItem.create({
+    return [
+      checklistItem.type === ForeFlightUtils.ITEM_HEADER
+        ? ChecklistItem.create({
             type: ChecklistItem_Type.ITEM_TITLE,
             prompt: checklistItem.title,
-          }),
-        ]
-      : [
-          checklistItem.detail
-            ? ChecklistItem.create({
-                type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
-                prompt: checklistItem.title,
-                expectation: checklistItem.detail,
-              })
-            : ChecklistItem.create({
-                type: ChecklistItem_Type.ITEM_CHALLENGE,
-                prompt: checklistItem.title,
-              }),
-          ...(checklistItem.note
-            ? [
-                ChecklistItem.create({
-                  type: ChecklistItem_Type.ITEM_NOTE,
-                  prompt: checklistItem.note,
-                  indent: ForeFlightUtils.NOTE_INDENT,
-                }),
-              ]
-            : []),
-        ];
+          })
+        : checklistItem.detail
+          ? ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: checklistItem.title,
+              expectation: checklistItem.detail.toUpperCase(),
+            })
+          : ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE,
+              prompt: checklistItem.title,
+            }),
+      ...((checklistItem.type === ForeFlightUtils.ITEM_HEADER && checklistItem.detail) || checklistItem.note
+        ? [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_NOTE,
+              prompt: checklistItem.type === ForeFlightUtils.ITEM_HEADER ? checklistItem.detail : checklistItem.note,
+              indent: ForeFlightUtils.NOTE_INDENT,
+            }),
+          ]
+        : []),
+    ];
   }
 }
