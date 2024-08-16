@@ -3,7 +3,6 @@ import {
   ForeFlightChecklistContainer,
   ForeFlightChecklistGroup,
   ForeFlightChecklistItem,
-  ForeFlightChecklistMetadata,
   ForeFlightChecklistSubgroup,
 } from '../../../gen/ts/foreflight';
 import {
@@ -39,7 +38,7 @@ export class ForeFlightReader {
     return {
       groups: ForeFlightReader.checklistGroupsToEFIS(container.payload.groups),
       metadata: {
-        name: ForeFlightReader.getChecklistName(container.payload.metadata),
+        name: ForeFlightUtils.getChecklistFileName(file, container),
         description: container.payload.metadata.detail || '',
         defaultGroupIndex: 0,
         defaultChecklistIndex: 0,
@@ -49,15 +48,6 @@ export class ForeFlightReader {
         copyrightInfo: '',
       },
     };
-  }
-
-  /**
-   * Unfortunately, all fields in ForeFlight are optional, so take first one filled out or default
-   */
-  private static getChecklistName(metadata: ForeFlightChecklistMetadata): string {
-    return [metadata.name, metadata.tailNumber, metadata.detail, 'ForeFlight Checklist']
-      .filter((item) => !!item)
-      .shift() as string;
   }
 
   private static checklistGroupsToEFIS(groups: ForeFlightChecklistGroup[]): ChecklistGroup[] {
