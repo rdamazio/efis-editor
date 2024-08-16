@@ -10,8 +10,8 @@ message ForeFlightChecklistContainer {
 }
 
 message ForeFlightChecklistPayload {
-  string objectId = 1;
-  string schemaVersion = 2; // Always "1.0"
+  string object_id = 1;
+  string schema_version = 2; // Always "1.0"
   ForeFlightChecklistMetadata metadata = 3;
   repeated ForeFlightChecklistGroup groups = 4; // Luckily always present and has 3 elements
 }
@@ -20,23 +20,23 @@ message ForeFlightChecklistPayload {
 message ForeFlightChecklistMetadata {
   optional string name = 1;
   optional string detail = 2;
-  optional string tailNumber = 3;
+  optional string tail_number = 3;
 }
 
 message ForeFlightChecklistGroup {
-  string objectId = 1;
-  string groupType = 2;
+  string object_id = 1;
+  string group_type = 2;
   repeated ForeFlightChecklistSubgroup items = 3; // This key might be missing altogether
 }
 
 message ForeFlightChecklistSubgroup {
-  string objectId = 1;
+  string object_id = 1;
   string title = 2;
   repeated ForeFlightChecklist items = 3; // This key might be missing altogether
 }
 
 message ForeFlightChecklist {
-  string objectId = 1;
+  string object_id = 1;
   string title = 2;
   repeated ForeFlightChecklistItem items = 3; // This key might be missing altogether
 }
@@ -44,7 +44,7 @@ message ForeFlightChecklist {
 // This would have been better modelled by inheritance, or better still using oneOf.
 // Unfortunately, inheritance is not supported and oneOf cannot be used with repeated fields.
 message ForeFlightChecklistItem {
-  string objectId = 1;
+  string object_id = 1;
   optional string type = 2; // Not present for items, "comment" for section headings
   string title = 3;
   optional string detail = 4; // Might be present both for section headings and normal items
