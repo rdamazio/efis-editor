@@ -4,6 +4,7 @@ import { EXPECTED_FOREFLIGHT_CONTENTS } from './test-data';
 import { ForeFlightReader } from './foreflight-reader';
 import { loadFile } from './test-utils';
 import { ForeFlightWriter } from './foreflight-writer';
+import { ForeFlightChecklistContainer } from '../../../gen/ts/foreflight';
 
 describe('ForeFlightFormat', () => {
   describe('ForeFlightUtils', () => {
@@ -26,6 +27,13 @@ describe('ForeFlightFormat', () => {
       expect(() => {
         ForeFlightUtils.categoryToEFIS('undefined');
       }).toThrowError("ForeFlight: unknown category 'undefined'");
+    });
+
+    it('should determine correct checklist file name', async () => {
+      const mockFile = new File([], `bar.${ForeFlightUtils.FILE_EXTENSION}`);
+      const mockContainer = ForeFlightChecklistContainer.create({ payload: { metadata: { name: 'foo' } } });
+      expect(ForeFlightUtils.getChecklistFileName(mockFile, ForeFlightChecklistContainer.create())).toMatch('bar');
+      expect(ForeFlightUtils.getChecklistFileName(mockFile, mockContainer)).toMatch('foo');
     });
   });
 
