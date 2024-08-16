@@ -1,6 +1,7 @@
 import { ChecklistGroup_Category } from '../../../gen/ts/checklist';
 import { v4 as uuid } from 'uuid';
 import { ForeFlightFormatError } from './foreflight-format';
+import { ForeFlightChecklistContainer } from '../../../gen/ts/foreflight';
 
 export enum ForeFlightCategory {
   Normal = 'normal',
@@ -89,5 +90,9 @@ export class ForeFlightUtils {
       .map((byte) => byte.toString(16).padStart(2, '0'))
       .join('')
       .slice(0, ForeFlightUtils.OBJECT_ID_LENGTH);
+  }
+
+  public static getChecklistFileName(file: File, container: ForeFlightChecklistContainer): string {
+    return container.payload?.metadata?.name || file.name.replace(`\\.${ForeFlightUtils.FILE_EXTENSION}$`, '');
   }
 }
