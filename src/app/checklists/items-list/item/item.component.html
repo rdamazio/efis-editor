@@ -14,7 +14,7 @@
         matTooltip="Edit this line"
         [attr.aria-label]="'Edit ' + item.prompt"
         [disabled]="item.type === ChecklistItem_Type.ITEM_SPACE"
-        (click)="promptInput.edit(); expectationInput.edit()"
+        (click)="onEdit($event)"
       >
         <mat-icon fontIcon="edit" />
       </button>
@@ -64,7 +64,7 @@
         <mat-icon [fontIcon]="item.centered ? 'format_align_left' : 'format_align_center'" />
       </button>
     </div>
-    <div class="item" [class.item-centered]="item.centered">
+    <div class="item" [class.item-centered]="item.centered" tabindex="10" (keyup.enter)="onEdit($event)">
       <span
         class="prompt"
         [class.prompt-challenge]="item.type === ChecklistItem_Type.ITEM_CHALLENGE"

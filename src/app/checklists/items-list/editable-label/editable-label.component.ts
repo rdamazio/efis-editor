@@ -57,6 +57,16 @@ export class EditableLabelComponent {
     this.editing = true;
   }
 
+  focus() {
+    // setTimeout is needed to remove focusing from the execution stack and allow the input element to be created first
+    // See https://v17.angular.io/api/core/ViewChild for the details.
+    setTimeout(() => {
+      if (this.editing) {
+        this.input.nativeElement.focus();
+      }
+    });
+  }
+
   cancel() {
     if (this.editing) {
       this.editing = false;

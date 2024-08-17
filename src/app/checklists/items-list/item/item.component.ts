@@ -32,6 +32,13 @@ export class ChecklistItemComponent {
 
   readonly ChecklistItem_Type = ChecklistItem_Type;
 
+  onEdit(e: Event) {
+    e.stopPropagation();
+    this.promptInput!.edit();
+    this.expectationInput!.edit();
+    this.promptInput!.focus();
+  }
+
   onIndent(item: ChecklistItem, delta: number) {
     item.indent += delta;
     this.onItemUpdated();
