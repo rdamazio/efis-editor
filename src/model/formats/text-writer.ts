@@ -154,7 +154,7 @@ export class TextWriter {
           indentWidth = Math.floor((this._options.maxLineLength - fullLine.length) / 2);
         } else {
           // Either we don't have a length to center within, or the line already
-          // exceeds that length and will beed to be wrapped - in either case,
+          // exceeds that length and will need to be wrapped - in either case,
           // fall back to arbitrarily using 7 spaces.
           // TODO: There's probably a better solution here.
           indentWidth = 7;
@@ -180,7 +180,7 @@ export class TextWriter {
           if (fullLine.length > maxContentLength) {
             let wrapIdx = fullLine.slice(0, maxContentLength).lastIndexOf(' ');
             if (wrapIdx === -1) {
-              // Oh welp, no spaces - gotta break a word arbitrarily.
+              // Oh well, no spaces - gotta break a word arbitrarily.
               wrapIdx = this._options.maxLineLength;
             }
             this._addLine(fullLine.slice(0, wrapIdx));

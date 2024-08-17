@@ -14,7 +14,9 @@
     "test:headless": "ng test --watch=false --browsers=ChromeHeadless",
     "lint": "ng lint",
     "format": "prettier --check \"**/*.{js,ts,html,css,scss}\"",
-    "format:fix": "npm run format -- --write"
+    "format:fix": "npm run format -- --write",
+    "spell": "codespell src/",
+    "spell:fix": "codespell -w -i 3 src/"
   },
   "private": true,
   "dependencies": {

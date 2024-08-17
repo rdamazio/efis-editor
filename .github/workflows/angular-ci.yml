@@ -38,3 +38,6 @@ jobs:
       - run: npm ci
       - run: npm run format
       - run: npm run lint
+      - uses: codespell-project/actions-codespell@v2
+        with:
+          path: src
