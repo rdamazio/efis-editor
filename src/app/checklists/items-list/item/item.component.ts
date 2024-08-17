@@ -34,9 +34,9 @@ export class ChecklistItemComponent {
 
   onEdit(e: Event) {
     e.stopPropagation();
-    this.promptInput?.edit();
-    this.expectationInput?.edit();
-    this.promptInput?.focus();
+    this.promptInput!.edit();
+    this.expectationInput!.edit();
+    this.promptInput!.focus();
   }
 
   onIndent(item: ChecklistItem, delta: number) {
