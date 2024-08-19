@@ -27,6 +27,10 @@
   place-content: center;
 }
 
+.item-selected {
+  border: solid 1px blue;
+}
+
 .prompt {
   box-decoration-break: clone;
 }

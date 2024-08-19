@@ -3,7 +3,13 @@
     <div cdkDropList class="list" [cdkDropListData]="_checklist.items" (cdkDropListDropped)="onDrop($event)">
       @for (item of _checklist.items; track item; let i = $index) {
         <div class="list-item" cdkDrag cdkDragLockAxis="y">
-          <checklist-item [item]="item" (itemChange)="onItemUpdated()" (itemDeleted)="onItemDeleted(i)" />
+          <checklist-item
+            #item
+            [item]="item"
+            [selected]="_selectedIdx === i"
+            (itemChange)="onItemUpdated()"
+            (itemDeleted)="onItemDeleted(i)"
+          />
           <div *cdkDragPlaceholder></div>
         </div>
       }

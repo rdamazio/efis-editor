@@ -1,6 +1,6 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { afterNextRender, Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { saveAs } from 'file-saver';
@@ -17,6 +17,7 @@ import { ChecklistFileInfoComponent, FileInfoDialogData } from './file-info/file
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
+import { HotkeysDirective, HotkeysHelpComponent, HotkeysService } from '@ngneat/hotkeys';
 
 interface ParsedFragment {
   fileName?: string;
@@ -35,6 +36,8 @@ interface ParsedFragment {
     ChecklistFileUploadComponent,
     ChecklistItemsComponent,
     ChecklistTreeComponent,
+    HotkeysDirective,
+    MatDialogModule,
   ],
   templateUrl: './checklists.component.html',
   styleUrl: './checklists.component.scss',
@@ -42,6 +45,7 @@ interface ParsedFragment {
 export class ChecklistsComponent implements OnInit {
   selectedFile?: ChecklistFile;
   @ViewChild('tree') tree?: ChecklistTreeComponent;
+  @ViewChild('items') items?: ChecklistItemsComponent;
   @ViewChild('filePicker') filePicker?: ChecklistFilePickerComponent;
 
   showFilePicker = false;
@@ -53,7 +57,106 @@ export class ChecklistsComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private _route: ActivatedRoute,
     private _router: Router,
-  ) {}
+    private _hotkeys: HotkeysService,
+  ) {
+    afterNextRender(() => {
+      this._hotkeys.setSequenceDebounce(10);
+
+      // TODO: Make the help dialog look nicer.
+      const helpFcn: () => void = () => {
+        const ref = this._dialog.open(HotkeysHelpComponent);
+        ref.componentInstance.dismiss.subscribe(() => ref.close());
+      };
+
+      this._hotkeys.registerHelpModal(helpFcn);
+
+      this._hotkeys
+        .addShortcut({
+          keys: 'down',
+          description: 'Select next checklist item',
+          preventDefault: true,
+          group: 'Navigation',
+        })
+        .subscribe(() => {
+          this.items!.selectNextItem();
+        });
+      this._hotkeys
+        .addShortcut({
+          keys: 'up',
+          description: 'Select previous checklist item',
+          preventDefault: true,
+          group: 'Navigation',
+        })
+        .subscribe(() => {
+          this.items!.selectPreviousItem();
+        });
+      // TODO: Hot keys to navigate between checklists
+
+      this._hotkeys
+        .addShortcut({
+          // TODO: Make this enter without also letting the EditableInput get it.
+          keys: 'e',
+          description: 'Edit checklist item',
+          preventDefault: true,
+          group: 'Editing',
+        })
+        .subscribe(() => {
+          this.items!.editCurrentItem();
+        });
+      this._hotkeys
+        .addShortcut({
+          keys: 'shift.right',
+          description: 'Indent checklist item',
+          preventDefault: true,
+          group: 'Editing',
+        })
+        .subscribe(() => {
+          this.items!.indentCurrentItem(1);
+        });
+      this._hotkeys
+        .addShortcut({
+          keys: 'shift.left',
+          description: 'Unident checklist item',
+          preventDefault: true,
+          group: 'Editing',
+        })
+        .subscribe(() => {
+          this.items!.indentCurrentItem(-1);
+        });
+      this._hotkeys
+        .addShortcut({
+          keys: 'shift.C',
+          description: 'Toggle checklist item centering',
+          preventDefault: true,
+          group: 'Editing',
+        })
+        .subscribe(() => {
+          this.items!.toggleCurrentItemCenter();
+        });
+      this._hotkeys
+        .addShortcut({
+          keys: 'shift.up',
+          description: 'Move checklist item up',
+          preventDefault: true,
+          group: 'Editing',
+        })
+        .subscribe(() => {
+          this.items!.moveCurrentItemUp();
+        });
+      this._hotkeys
+        .addShortcut({
+          keys: 'shift.down',
+          description: 'Move checklist item down',
+          preventDefault: true,
+          group: 'Editing',
+        })
+        .subscribe(() => {
+          this.items!.moveCurrentItemDown();
+        });
+
+      // TODO: Hot keys to add new items
+    });
+  }
 
   ngOnInit() {
     this._route.fragment.subscribe(async (fragment) => {

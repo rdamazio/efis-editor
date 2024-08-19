@@ -1,6 +1,6 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { NgIf } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
@@ -25,6 +25,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class ChecklistItemComponent {
   @Input() item!: ChecklistItem;
+  @Input() selected = false;
   @Output() itemChange = new EventEmitter<ChecklistItem>();
   @Output() itemDeleted = new EventEmitter<boolean>();
   @ViewChild('promptInput') promptInput?: EditableLabelComponent;
@@ -32,8 +33,10 @@ export class ChecklistItemComponent {
 
   readonly ChecklistItem_Type = ChecklistItem_Type;
 
-  onEdit(e: Event) {
-    e.stopPropagation();
+  constructor(public elRef: ElementRef) {}
+
+  onEdit(e?: Event) {
+    e?.stopPropagation();
     this.promptInput!.edit();
     this.expectationInput!.edit();
     this.promptInput!.focus();

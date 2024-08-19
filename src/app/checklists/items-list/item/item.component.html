@@ -64,7 +64,13 @@
         <mat-icon [fontIcon]="item.centered ? 'format_align_left' : 'format_align_center'" />
       </button>
     </div>
-    <div class="item" [class.item-centered]="item.centered" tabindex="10" (keyup.enter)="onEdit($event)">
+    <div
+      class="item"
+      [class.item-centered]="item.centered"
+      [class.item-selected]="selected"
+      tabindex="10"
+      (keyup.enter)="onEdit($event)"
+    >
       <span
         class="prompt"
         [class.prompt-challenge]="item.type === ChecklistItem_Type.ITEM_CHALLENGE"
