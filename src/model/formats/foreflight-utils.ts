@@ -1,5 +1,5 @@
 import { ChecklistGroup_Category } from '../../../gen/ts/checklist';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 import { ForeFlightFormatError } from './foreflight-format';
 import { ForeFlightChecklistContainer } from '../../../gen/ts/foreflight';
 
@@ -22,8 +22,6 @@ export class ForeFlightUtils {
 
   public static readonly ITEM_HEADER = 'comment';
   public static readonly NOTE_INDENT = 1;
-
-  public static readonly OBJECT_ID_LENGTH = 32;
 
   static readonly CIPHER_TYPE = 'AES-CBC';
   static readonly CIPHER_BLOCK_SIZE = 16;
@@ -82,14 +80,11 @@ export class ForeFlightUtils {
     }
   }
 
-  public static async getObjectId(): Promise<string> {
-    const hash = Array.from(
-      new Uint8Array(await window.crypto.subtle.digest('SHA-256', ForeFlightUtils.encoder.encode(uuid()))),
-    );
-    return hash
-      .map((byte) => byte.toString(16).padStart(2, '0'))
-      .join('')
-      .slice(0, ForeFlightUtils.OBJECT_ID_LENGTH);
+  /**
+   * Object IDs appear to be UUID V4 without dashes, and are presumably used for checklist synchronization
+   */
+  public static getObjectId(): string {
+    return uuidV4().replaceAll('-', '');
   }
 
   public static getChecklistFileName(file: File, container: ForeFlightChecklistContainer): string {
