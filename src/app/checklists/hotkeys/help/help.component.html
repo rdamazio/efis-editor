@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Available shortcuts</h2>
+<mat-dialog-content>
+  @for (hotkeyGroup of hotkeys; track $index) {
+    <h1>{{ hotkeyGroup.group }}</h1>
+    <table mat-table class="hotkeys-table" [dataSource]="hotkeyGroup.hotkeys">
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Action</th>
+        <td mat-cell *matCellDef="let hotkey">{{ hotkey.description }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="key">
+        <th mat-header-cell *matHeaderCellDef>Shortcut</th>
+        <td mat-cell *matCellDef="let hotkey" [innerHTML]="hotkey.keys | shortcut"></td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="DISPLAYED_COLUMNS"></tr>
+      <tr mat-row *matRowDef="let row; columns: DISPLAYED_COLUMNS"></tr>
+    </table>
+  }
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="dialogRef.close()">Ok</button>
+</mat-dialog-actions>

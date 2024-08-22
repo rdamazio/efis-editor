@@ -3,6 +3,7 @@ import { afterNextRender, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HotkeysDirective, HotkeysService } from '@ngneat/hotkeys';
 import { saveAs } from 'file-saver';
 import { Checklist, ChecklistFile, ChecklistFileMetadata, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { AceFormat } from '../../model/formats/ace-format';
@@ -16,8 +17,8 @@ import { ChecklistCommandBarComponent } from './command-bar/command-bar.componen
 import { ChecklistFileInfoComponent, FileInfoDialogData } from './file-info/file-info.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
+import { HelpComponent } from './hotkeys/help/help.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
-import { HotkeysDirective, HotkeysHelpComponent, HotkeysService } from '@ngneat/hotkeys';
 
 interface ParsedFragment {
   fileName?: string;
@@ -50,6 +51,7 @@ export class ChecklistsComponent implements OnInit {
 
   showFilePicker = false;
   showFileUpload = false;
+  helpDisplayed = false;
 
   constructor(
     public store: ChecklistStorage,
@@ -62,13 +64,19 @@ export class ChecklistsComponent implements OnInit {
     afterNextRender(() => {
       this._hotkeys.setSequenceDebounce(10);
 
-      // TODO: Make the help dialog look nicer.
-      const helpFcn: () => void = () => {
-        const ref = this._dialog.open(HotkeysHelpComponent);
-        ref.componentInstance.dismiss.subscribe(() => ref.close());
-      };
+      this._hotkeys.registerHelpModal(() => {
+        if (this.helpDisplayed) return;
+        this.helpDisplayed = true;
 
-      this._hotkeys.registerHelpModal(helpFcn);
+        const ref = this._dialog.open(HelpComponent, {
+          hasBackdrop: true,
+          width: '500px',
+        });
+
+        ref.afterClosed().subscribe(() => {
+          this.helpDisplayed = false;
+        });
+      });
 
       this._hotkeys
         .addShortcut({
