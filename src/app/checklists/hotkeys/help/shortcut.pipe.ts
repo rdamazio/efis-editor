@@ -6,7 +6,7 @@ import { HotkeysShortcutPipe } from '@ngneat/hotkeys';
   standalone: true,
 })
 export class ShortcutPipe implements PipeTransform {
-  transform(value: string): unknown {
+  transform(value: string): string {
     // Work around a bug in the built-in pipe for arrow keys
     const noArrowValue = value.replaceAll('Arrow', '');
     const builtinPipe = new HotkeysShortcutPipe();
