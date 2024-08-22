@@ -9,6 +9,10 @@ message ForeFlightChecklistContainer {
   ForeFlightChecklistPayload payload = 2;
 }
 
+/*
+All objects in the checklist payload have object_id's that are UUID V4 lowercase and without dashes. Presumably these
+are used for checklist synchronization between devices.
+*/
 message ForeFlightChecklistPayload {
   string object_id = 1;
   string schema_version = 2; // Always "1.0"
@@ -16,7 +20,21 @@ message ForeFlightChecklistPayload {
   repeated ForeFlightChecklistGroup groups = 4; // Luckily always present and has 3 elements
 }
 
-// All metadata fields are optional!
+/*
+ForeFlight has 3 metadata fields for checklists:
+
+  1. Tail number
+  2. Name (not file name!)
+  3. Description
+
+All 3 fields can be empty. If so, the checklist will be displayed as `No name` and exported as `No name.fmd`.
+
+If **only one** of these fields (tail number or name or description) is present, it will be used as identifier **and**
+as filename.
+
+If **multiple** fields are present, then the filename can be either "tail number, name" or "tail number" or "name".
+The description always appears below the identifier and is never part of the filename.
+*/
 message ForeFlightChecklistMetadata {
   optional string name = 1;
   optional string detail = 2;
