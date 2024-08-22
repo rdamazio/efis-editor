@@ -18,7 +18,7 @@ export class ForeFlightWriter {
     return {
       type: ForeFlightUtils.CONTAINER_TYPE,
       payload: {
-        objectId: await ForeFlightUtils.getObjectId(),
+        objectId: ForeFlightUtils.getObjectId(),
         schemaVersion: ForeFlightUtils.SCHEMA_VERSION,
         metadata: {
           name: file.metadata?.name,
@@ -34,7 +34,7 @@ export class ForeFlightWriter {
     return Promise.all(
       Object.values(ForeFlightCategory).map(
         async (categoryFF): Promise<ForeFlightChecklistGroup> => ({
-          objectId: await ForeFlightUtils.getObjectId(),
+          objectId: ForeFlightUtils.getObjectId(),
           groupType: categoryFF,
           items: await Promise.all(
             groupsEFIS
@@ -42,11 +42,11 @@ export class ForeFlightWriter {
                 (checklistGroupEFIS) => checklistGroupEFIS.category === ForeFlightUtils.categoryToEFIS(categoryFF),
               )
               .map(async (checklistGroupEFIS) => ({
-                objectId: await ForeFlightUtils.getObjectId(),
+                objectId: ForeFlightUtils.getObjectId(),
                 title: checklistGroupEFIS.title,
                 items: await Promise.all(
                   checklistGroupEFIS.checklists.map(async (checklistEFIS) => ({
-                    objectId: await ForeFlightUtils.getObjectId(),
+                    objectId: ForeFlightUtils.getObjectId(),
                     title: checklistEFIS.title,
                     items: await ForeFlightWriter.checklistItemsToFF(checklistEFIS.items),
                   })),
@@ -66,20 +66,20 @@ export class ForeFlightWriter {
       switch (itemEFIS.type) {
         case ChecklistItem_Type.ITEM_TITLE:
           itemsFF.push({
-            objectId: await ForeFlightUtils.getObjectId(),
+            objectId: ForeFlightUtils.getObjectId(),
             type: ForeFlightUtils.ITEM_HEADER,
             title: itemEFIS.prompt,
           });
           break;
         case ChecklistItem_Type.ITEM_CHALLENGE:
           itemsFF.push({
-            objectId: await ForeFlightUtils.getObjectId(),
+            objectId: ForeFlightUtils.getObjectId(),
             title: itemEFIS.prompt,
           });
           break;
         case ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE:
           itemsFF.push({
-            objectId: await ForeFlightUtils.getObjectId(),
+            objectId: ForeFlightUtils.getObjectId(),
             title: itemEFIS.prompt,
             detail: itemEFIS.expectation.toUpperCase(),
           });
