@@ -62,7 +62,7 @@ export class ChecklistsComponent implements OnInit {
     private _hotkeys: HotkeysService,
   ) {
     afterNextRender(() => {
-      this._hotkeys.setSequenceDebounce(10);
+      this._hotkeys.setSequenceDebounce(500);
 
       this._hotkeys.registerHelpModal(() => {
         if (this.helpRef) {
@@ -164,7 +164,28 @@ export class ChecklistsComponent implements OnInit {
           this.items!.moveCurrentItemDown();
         });
 
-      // TODO: Hot keys to add new items
+      const NEW_ITEM_SHORTCUTS = [
+        { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
+        { secondKey: 'c', typeDescription: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
+        { secondKey: 'x', typeDescription: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
+        { secondKey: 't', typeDescription: 'title', type: ChecklistItem_Type.ITEM_TITLE },
+        { secondKey: 'w', typeDescription: 'warning', type: ChecklistItem_Type.ITEM_WARNING },
+        { secondKey: 'a', typeDescription: 'caution', type: ChecklistItem_Type.ITEM_CAUTION },
+        { secondKey: 'n', typeDescription: 'note', type: ChecklistItem_Type.ITEM_NOTE },
+        { secondKey: 'b', typeDescription: 'blank', type: ChecklistItem_Type.ITEM_SPACE },
+      ];
+      for (const shortcut of NEW_ITEM_SHORTCUTS) {
+        this._hotkeys
+          .addSequenceShortcut({
+            keys: `n>${shortcut.secondKey}`,
+            description: `Add new ${shortcut.typeDescription} item`,
+            preventDefault: true,
+            group: 'Adding',
+          })
+          .subscribe(() => {
+            this.items!.onNewItem(shortcut.type);
+          });
+      }
     });
   }
 

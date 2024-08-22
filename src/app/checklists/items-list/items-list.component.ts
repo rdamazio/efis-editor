@@ -83,7 +83,15 @@ export class ChecklistItemsComponent {
     const items = this._checklist!.items;
     items.push(item);
     this.onItemUpdated();
-    // TODO: Make newly added item gain focus
+
+    // Set focus to the newly added item.
+    afterNextRender(
+      () => {
+        this._selectedIdx = this._checklist!.items.length - 1;
+        this._focusSelectedItem();
+      },
+      { injector: this._injector },
+    );
   }
 
   selectNextItem() {
