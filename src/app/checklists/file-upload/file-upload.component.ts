@@ -22,7 +22,7 @@ export class ChecklistFileUploadComponent {
 
   constructor(private _snackBar: MatSnackBar) {}
 
-  protected readonly FOREFLIGHT_EXTENSION = ForeFlightUtils.FILE_EXTENSION;
+  protected readonly ForeFlightUtils = ForeFlightUtils;
 
   onDropped(files: NgxFileDropEntry[]) {
     for (const f of files) {
