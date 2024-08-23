@@ -120,7 +120,7 @@ export class TextReader {
           currentGroup = {
             title: groupTitle,
             checklists: [],
-            category: ChecklistGroup_Category.UNKNOWN,
+            category: ChecklistGroup_Category.normal,
           };
           outFile.groups.push(currentGroup);
         }

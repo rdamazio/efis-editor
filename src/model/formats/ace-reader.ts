@@ -88,7 +88,7 @@ export class AceReader {
     const group: ChecklistGroup = {
       title: this.readLine(),
       checklists: [],
-      category: ChecklistGroup_Category.UNKNOWN,
+      category: ChecklistGroup_Category.normal,
     };
 
     while (!this.consumeLine(AceConstants.GROUP_END_HEADER)) {

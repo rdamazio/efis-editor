@@ -1,13 +1,5 @@
-import { ChecklistGroup_Category } from '../../../gen/ts/checklist';
 import { v4 as uuidV4 } from 'uuid';
-import { ForeFlightFormatError } from './foreflight-format';
 import { ForeFlightChecklistContainer } from '../../../gen/ts/foreflight';
-
-export enum ForeFlightCategory {
-  Normal = 'normal',
-  Abnormal = 'abnormal',
-  Emergency = 'emergency',
-}
 
 enum KeyUsage {
   Encrypt = 'encrypt',
@@ -65,19 +57,6 @@ export class ForeFlightUtils {
       ],
       { type: 'application/octet-stream' },
     );
-  }
-
-  public static categoryToEFIS(category: string): ChecklistGroup_Category {
-    switch (category) {
-      case ForeFlightCategory.Normal:
-        return ChecklistGroup_Category.NORMAL;
-      case ForeFlightCategory.Abnormal:
-        return ChecklistGroup_Category.ABNORMAL;
-      case ForeFlightCategory.Emergency:
-        return ChecklistGroup_Category.EMERGENCY;
-      default:
-        throw new ForeFlightFormatError(`unknown category '${category}'`);
-    }
   }
 
   /**

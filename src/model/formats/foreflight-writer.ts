@@ -1,16 +1,23 @@
-import { ChecklistFile, ChecklistGroup, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import {
+  ChecklistFile,
+  ChecklistGroup,
+  ChecklistGroup_Category,
+  ChecklistItem,
+  ChecklistItem_Type,
+} from '../../../gen/ts/checklist';
 import {
   ForeFlightChecklistContainer,
   ForeFlightChecklistGroup,
+  ForeFlightChecklistSubgroup,
   ForeFlightChecklistItem,
 } from '../../../gen/ts/foreflight';
 
-import { ForeFlightCategory, ForeFlightUtils } from './foreflight-utils';
+import { ForeFlightUtils } from './foreflight-utils';
 
 export class ForeFlightWriter {
   public static async write(file: ChecklistFile): Promise<Blob> {
     return ForeFlightUtils.encrypt(
-      ForeFlightChecklistContainer.toJsonString(await ForeFlightWriter.checklistFileToFF(file), { prettySpaces: 2 }),
+      ForeFlightChecklistContainer.toJsonString(ForeFlightWriter.checklistFileToFF(file), { prettySpaces: 2 }),
     );
   }
 
@@ -25,27 +32,34 @@ export class ForeFlightWriter {
           detail: file.metadata?.description,
           tailNumber: file.metadata?.aircraftInfo.toUpperCase(),
         },
-        groups: ForeFlightWriter.checklistGroupsToFF(file.groups),
+        groups: ForeFlightWriter.checklistGroupsToFFGroup(file.groups),
       },
     };
   }
 
-  private static checklistGroupsToFF(groupsEFIS: ChecklistGroup[]): ForeFlightChecklistGroup[] {
-    return Object.values(ForeFlightCategory).map((categoryFF) => ({
+  private static checklistGroupsToFFGroup(groupsEFIS: ChecklistGroup[]): ForeFlightChecklistGroup[] {
+    return Object.keys(ChecklistGroup_Category)
+      .filter((categoryKey) => isNaN(Number(categoryKey)))
+      .map((categoryKey) => ChecklistGroup_Category[categoryKey as keyof typeof ChecklistGroup_Category])
+      .map((checklistGroupCategory) => ({
+        objectId: ForeFlightUtils.getObjectId(),
+        groupType: checklistGroupCategory,
+        items: groupsEFIS
+          .filter((checklistGroupEFIS) => checklistGroupEFIS.category === checklistGroupCategory)
+          .map(ForeFlightWriter.checklistGroupToFFSubgroup),
+      }));
+  }
+
+  private static checklistGroupToFFSubgroup(checklistGroupEFIS: ChecklistGroup): ForeFlightChecklistSubgroup {
+    return {
       objectId: ForeFlightUtils.getObjectId(),
-      groupType: categoryFF,
-      items: groupsEFIS
-        .filter((checklistGroupEFIS) => checklistGroupEFIS.category === ForeFlightUtils.categoryToEFIS(categoryFF))
-        .map((checklistGroupEFIS) => ({
-          objectId: ForeFlightUtils.getObjectId(),
-          title: checklistGroupEFIS.title,
-          items: checklistGroupEFIS.checklists.map((checklistEFIS) => ({
-            objectId: ForeFlightUtils.getObjectId(),
-            title: checklistEFIS.title,
-            items: ForeFlightWriter.checklistItemsToFF(checklistEFIS.items),
-          })),
-        })),
-    }));
+      title: checklistGroupEFIS.title,
+      items: checklistGroupEFIS.checklists.map((checklistEFIS) => ({
+        objectId: ForeFlightUtils.getObjectId(),
+        title: checklistEFIS.title,
+        items: ForeFlightWriter.checklistItemsToFF(checklistEFIS.items),
+      })),
+    };
   }
 
   private static checklistItemsToFF(itemsEFIS: ChecklistItem[]): ForeFlightChecklistItem[] {

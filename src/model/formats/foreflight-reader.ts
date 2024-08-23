@@ -19,7 +19,7 @@ import { ForeFlightUtils } from './foreflight-utils';
 export class ForeFlightReader {
   public static async read(file: File): Promise<ChecklistFile> {
     const plaintext = await ForeFlightUtils.decrypt(await file.arrayBuffer());
-    const container: ForeFlightChecklistContainer = JSON.parse(plaintext);
+    const container: ForeFlightChecklistContainer = ForeFlightChecklistContainer.fromJsonString(plaintext);
 
     if (container.type !== ForeFlightUtils.CONTAINER_TYPE) {
       throw new ForeFlightFormatError(`unknown checklist type '${container.type}'`);
@@ -56,9 +56,8 @@ export class ForeFlightReader {
   }
 
   private static checklistGroupToEFIS(checklistGroup: ForeFlightChecklistGroup): ChecklistGroup[] {
-    const category = ForeFlightUtils.categoryToEFIS(checklistGroup.groupType);
     return checklistGroup.items
-      ? checklistGroup.items.map((item) => ForeFlightReader.checklistSubgroupToEFIS(category, item))
+      ? checklistGroup.items.map((item) => ForeFlightReader.checklistSubgroupToEFIS(checklistGroup.groupType, item))
       : []; // if the FF group (not subgroup!) is empty, drop it - we need a subgroup to represent a group
   }
 
