@@ -373,7 +373,7 @@ export class ChecklistsComponent implements OnInit {
               ],
             },
           ],
-          category: ChecklistGroup_Category.UNKNOWN,
+          category: ChecklistGroup_Category.normal,
         },
       ],
       metadata: ChecklistFileMetadata.create({
