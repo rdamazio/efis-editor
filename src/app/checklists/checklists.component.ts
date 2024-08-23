@@ -61,8 +61,7 @@ export class ChecklistsComponent implements OnInit {
   showFileUpload = false;
   helpRef?: MatDialogRef<HelpComponent>;
 
-  protected readonly FOREFLIGHT_EXTENSION = ForeFlightUtils.FILE_EXTENSION;
-  protected readonly FOREFLIGHT_EXTENSION_DESCRIPTION = `ForeFlight [.${ForeFlightUtils.FILE_EXTENSION}]`;
+  protected readonly ForeFlightUtils = ForeFlightUtils;
 
   constructor(
     public store: ChecklistStorage,
@@ -423,7 +422,7 @@ export class ChecklistsComponent implements OnInit {
       file = await DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 40);
     } else if (formatId === 'grt') {
       file = await GrtFormat.fromProto(this.selectedFile);
-    } else if (formatId === this.FOREFLIGHT_EXTENSION) {
+    } else if (formatId === ForeFlightUtils.FILE_EXTENSION) {
       file = await ForeFlightFormat.fromProto(this.selectedFile);
     } else {
       throw new FormatError(`Unknown format "${formatId}"`);

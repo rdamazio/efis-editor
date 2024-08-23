@@ -12,5 +12,5 @@ import { ForeFlightUtils } from '../../model/formats/foreflight-utils';
   styleUrl: './welcome.component.scss',
 })
 export class WelcomeComponent {
-  protected readonly FOREFLIGHT_FILE_EXTENSION = ForeFlightUtils.FILE_EXTENSION;
+  protected readonly ForeFlightUtils = ForeFlightUtils;
 }
