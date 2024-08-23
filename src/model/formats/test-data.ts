@@ -3,7 +3,7 @@ import { ChecklistFile, ChecklistGroup_Category, ChecklistItem, ChecklistItem_Ty
 export const EXPECTED_CONTENTS: ChecklistFile = {
   groups: [
     {
-      category: ChecklistGroup_Category.UNKNOWN,
+      category: ChecklistGroup_Category.normal,
       title: 'Test group 1',
       checklists: [
         {
@@ -47,7 +47,7 @@ export const EXPECTED_CONTENTS: ChecklistFile = {
       ],
     },
     {
-      category: ChecklistGroup_Category.UNKNOWN,
+      category: ChecklistGroup_Category.normal,
       title: 'Test group 2 (default)',
       checklists: [
         {
@@ -87,14 +87,14 @@ export const EXPECTED_CONTENTS: ChecklistFile = {
 
 export const EXPECTED_FOREFLIGHT_CONTENTS = {
   groups: [
-    { category: ChecklistGroup_Category.NORMAL, title: 'Empty subgroup', checklists: [] },
+    { category: ChecklistGroup_Category.normal, title: 'Empty subgroup', checklists: [] },
     {
-      category: ChecklistGroup_Category.NORMAL,
+      category: ChecklistGroup_Category.normal,
       title: 'Subgroup with empty checklist',
       checklists: [{ title: 'Empty checklist', items: [] }],
     },
     {
-      category: ChecklistGroup_Category.NORMAL,
+      category: ChecklistGroup_Category.normal,
       title: 'Subgroup',
       checklists: [
         {
@@ -162,7 +162,7 @@ export const EXPECTED_FOREFLIGHT_CONTENTS = {
         },
       ],
     },
-    { category: ChecklistGroup_Category.ABNORMAL, title: 'Test empty abnormal subgroup', checklists: [] },
+    { category: ChecklistGroup_Category.abnormal, title: 'Test empty abnormal subgroup', checklists: [] },
   ],
   metadata: {
     name: 'Checklist name',

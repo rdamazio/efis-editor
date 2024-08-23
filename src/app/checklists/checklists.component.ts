@@ -366,7 +366,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
               ],
             },
           ],
-          category: ChecklistGroup_Category.UNKNOWN,
+          category: ChecklistGroup_Category.normal,
         },
       ],
       metadata: ChecklistFileMetadata.create({

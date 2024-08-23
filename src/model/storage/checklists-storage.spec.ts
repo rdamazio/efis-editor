@@ -17,7 +17,7 @@ describe('ChecklistsService', () => {
     }),
     groups: [
       {
-        category: ChecklistGroup_Category.UNKNOWN,
+        category: ChecklistGroup_Category.normal,
         title: 'Normal procedures',
         checklists: [
           {

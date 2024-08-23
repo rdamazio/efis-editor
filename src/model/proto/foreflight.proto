@@ -4,6 +4,8 @@ package foreflight;
 
 option optimize_for = CODE_SIZE;
 
+import "checklist.proto";
+
 message ForeFlightChecklistContainer {
   string type = 1; // Always "checklist"
   ForeFlightChecklistPayload payload = 2;
@@ -43,7 +45,7 @@ message ForeFlightChecklistMetadata {
 
 message ForeFlightChecklistGroup {
   string object_id = 1;
-  string group_type = 2;
+  efis.ChecklistGroup.Category group_type = 2;
   repeated ForeFlightChecklistSubgroup items = 3; // This key might be missing altogether
 }
 

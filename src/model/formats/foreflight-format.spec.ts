@@ -1,5 +1,4 @@
-import { ChecklistGroup_Category } from '../../../gen/ts/checklist';
-import { ForeFlightCategory, ForeFlightUtils } from './foreflight-utils';
+import { ForeFlightUtils } from './foreflight-utils';
 import { EXPECTED_FOREFLIGHT_CONTENTS } from './test-data';
 import { ForeFlightReader } from './foreflight-reader';
 import { loadFile } from './test-utils';
@@ -31,13 +30,6 @@ describe('ForeFlightFormat', () => {
       expect(encrypted).not.toBe(new Blob([checklistData]));
       expect(encrypted.type).toBe('application/octet-stream');
       expect(decrypted).toBe(checklistData);
-    });
-
-    it('should map ForeFlight categories to EFIS', async () => {
-      expect(ForeFlightUtils.categoryToEFIS(ForeFlightCategory.Normal)).toBe(ChecklistGroup_Category.NORMAL);
-      expect(() => {
-        ForeFlightUtils.categoryToEFIS('undefined');
-      }).toThrowError("ForeFlight: unknown category 'undefined'");
     });
 
     it('should determine correct checklist file name', () => {

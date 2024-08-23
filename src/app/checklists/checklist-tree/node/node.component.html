@@ -18,13 +18,13 @@
   <div class="checklist-tree-node-title">
     @if (!node.checklist && !node.isAddNew) {
       @switch (node.group?.category) {
-        @case (ChecklistGroup_Category.NORMAL) {
+        @case (ChecklistGroup_Category.normal) {
           <span>🄽</span>
         }
-        @case (ChecklistGroup_Category.ABNORMAL) {
+        @case (ChecklistGroup_Category.abnormal) {
           <span class="important">🄰</span>
         }
-        @case (ChecklistGroup_Category.EMERGENCY) {
+        @case (ChecklistGroup_Category.emergency) {
           <span class="danger">🄴</span>
         }
       }
