@@ -1,6 +1,15 @@
 import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NgIf } from '@angular/common';
-import { Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  EventEmitter,
+  Injector,
+  Input,
+  Output,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
@@ -38,6 +47,8 @@ export class ChecklistItemsComponent {
     this._selectedIdx = null;
   }
 
+  constructor(private _injector: Injector) {}
+
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
     moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     this.onItemUpdated();
@@ -45,6 +56,12 @@ export class ChecklistItemsComponent {
 
   onItemUpdated() {
     this.checklistChange.emit(this._checklist);
+    afterNextRender(
+      () => {
+        this._focusSelectedItem();
+      },
+      { injector: this._injector },
+    );
   }
 
   onItemDeleted(idx: number) {
@@ -63,8 +80,10 @@ export class ChecklistItemsComponent {
     if (type === ChecklistItem_Type.ITEM_SPACE) {
       item.prompt = '';
     }
-    this._checklist!.items.push(item);
+    const items = this._checklist!.items;
+    items.push(item);
     this.onItemUpdated();
+    // TODO: Make newly added item gain focus
   }
 
   selectNextItem() {
@@ -77,7 +96,6 @@ export class ChecklistItemsComponent {
     } else if (this._selectedIdx < this._checklist.items.length - 1) {
       this._selectedIdx++;
     }
-    this._scrollToSelectedItem();
     this.onItemUpdated();
   }
 
@@ -91,7 +109,6 @@ export class ChecklistItemsComponent {
     } else if (this._selectedIdx > 0) {
       this._selectedIdx--;
     }
-    this._scrollToSelectedItem();
     this.onItemUpdated();
   }
 
@@ -129,8 +146,10 @@ export class ChecklistItemsComponent {
 
     moveItemInArray(this._checklist!.items, this._selectedIdx! - 1, this._selectedIdx!);
     this._selectedIdx!--;
-    this._scrollToSelectedItem();
     this.onItemUpdated();
+
+    // HACK: I don't really understand why it works IFF this is done both before and after render on move up (but not down).
+    this._focusSelectedItem();
   }
 
   moveCurrentItemDown() {
@@ -140,7 +159,6 @@ export class ChecklistItemsComponent {
 
     moveItemInArray(this._checklist!.items, this._selectedIdx! + 1, this._selectedIdx!);
     this._selectedIdx!++;
-    this._scrollToSelectedItem();
     this.onItemUpdated();
   }
 
@@ -160,11 +178,23 @@ export class ChecklistItemsComponent {
     return this.items.get(this._selectedIdx);
   }
 
-  private _scrollToSelectedItem() {
-    this._selectedItemComponent()?.elRef.nativeElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'nearest',
-    });
+  onItemFocused(idx: number) {
+    this._selectedIdx = idx;
+  }
+
+  onItemBlurred() {
+    this._selectedIdx = null;
+  }
+
+  private _focusSelectedItem() {
+    const item = this._selectedItemComponent();
+    if (item) {
+      item.focus();
+      item.containerRef?.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
+      });
+    }
   }
 }

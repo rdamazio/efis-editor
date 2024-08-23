@@ -6,9 +6,10 @@
           <checklist-item
             #item
             [item]="item"
-            [selected]="_selectedIdx === i"
             (itemChange)="onItemUpdated()"
             (itemDeleted)="onItemDeleted(i)"
+            (itemFocused)="onItemFocused(i)"
+            (itemBlurred)="onItemBlurred()"
           />
           <div *cdkDragPlaceholder></div>
         </div>

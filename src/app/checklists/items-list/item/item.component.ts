@@ -3,10 +3,10 @@ import { NgIf } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { ChecklistItem, ChecklistItem_Type } from '../../../../../gen/ts/checklist';
 import { EditableLabelComponent } from '../editable-label/editable-label.component';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'checklist-item',
@@ -25,17 +25,19 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class ChecklistItemComponent {
   @Input() item!: ChecklistItem;
-  @Input() selected = false;
   @Output() itemChange = new EventEmitter<ChecklistItem>();
   @Output() itemDeleted = new EventEmitter<boolean>();
+  @Output() itemFocused = new EventEmitter<boolean>();
+  @Output() itemBlurred = new EventEmitter<boolean>();
+  @ViewChild('container') containerRef?: ElementRef;
   @ViewChild('promptInput') promptInput?: EditableLabelComponent;
   @ViewChild('expectationInput') expectationInput?: EditableLabelComponent;
+  private _shouldRestoreFocus = false;
 
   readonly ChecklistItem_Type = ChecklistItem_Type;
 
-  constructor(public elRef: ElementRef) {}
-
   onEdit(e?: Event) {
+    this._shouldRestoreFocus = document.activeElement == this.containerRef!.nativeElement;
     e?.stopPropagation();
     this.promptInput!.edit();
     this.expectationInput!.edit();
@@ -57,12 +59,27 @@ export class ChecklistItemComponent {
     this.item.prompt = this.promptInput!.value;
     this.onItemUpdated();
     this.expectationInput!.save();
+    this._restoreFocus();
   }
 
   onSaveExpectation() {
     this.item.expectation = this.expectationInput!.value;
     this.onItemUpdated();
     this.promptInput!.save();
+    this._restoreFocus();
+  }
+
+  onCancelEdit() {
+    this.promptInput!.cancel();
+    this.expectationInput!.cancel();
+    this._restoreFocus();
+  }
+
+  private _restoreFocus() {
+    if (this._shouldRestoreFocus) {
+      this.focus();
+    }
+    this._shouldRestoreFocus = false;
   }
 
   onItemUpdated() {
@@ -71,5 +88,9 @@ export class ChecklistItemComponent {
 
   onDelete() {
     this.itemDeleted.emit(true);
+  }
+
+  focus() {
+    this.containerRef!.nativeElement.focus();
   }
 }

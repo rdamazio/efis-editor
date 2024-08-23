@@ -1,4 +1,4 @@
-<div class="item-container">
+<div #container class="item-container" tabindex="0" (focus)="itemFocused.emit(true)" (blur)="itemBlurred.emit(true)">
   @if (item) {
     <div class="actions">
       <mat-icon
@@ -64,13 +64,7 @@
         <mat-icon [fontIcon]="item.centered ? 'format_align_left' : 'format_align_center'" />
       </button>
     </div>
-    <div
-      class="item"
-      [class.item-centered]="item.centered"
-      [class.item-selected]="selected"
-      tabindex="10"
-      (keyup.enter)="onEdit($event)"
-    >
+    <div class="item" [class.item-centered]="item.centered" tabindex="0">
       <span
         class="prompt"
         [class.prompt-challenge]="item.type === ChecklistItem_Type.ITEM_CHALLENGE"
@@ -89,7 +83,7 @@
           label="Prompt text"
           [value]="item.prompt"
           (valueChange)="onSavePrompt()"
-          (cancelled)="expectationInput.cancel()"
+          (cancelled)="onCancelEdit()"
         />
       </span>
       <!-- hidden doesn't work if display is set -->
@@ -105,7 +99,7 @@
             label="Expectation text"
             [value]="item.expectation"
             (valueChange)="onSaveExpectation()"
-            (cancelled)="promptInput.cancel()"
+            (cancelled)="onCancelEdit()"
           />
         </span>
       </span>

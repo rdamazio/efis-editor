@@ -104,10 +104,10 @@ export class ChecklistsComponent implements OnInit {
 
       this._hotkeys
         .addShortcut({
-          // TODO: Make this enter without also letting the EditableInput get it.
-          keys: 'e',
+          keys: 'enter',
           description: 'Edit checklist item',
           preventDefault: true,
+          trigger: 'keyup',
           group: 'Editing',
         })
         .subscribe(() => {

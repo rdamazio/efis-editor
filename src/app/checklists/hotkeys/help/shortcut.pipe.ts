@@ -10,6 +10,8 @@ export class ShortcutPipe implements PipeTransform {
     // Work around a bug in the built-in pipe for arrow keys
     const noArrowValue = value.replaceAll('Arrow', '');
     const builtinPipe = new HotkeysShortcutPipe();
-    return builtinPipe.transform(noArrowValue);
+    const transformedValue = builtinPipe.transform(noArrowValue);
+    // Work around another bug where the built-in Pipe uses the wrong symbol for enter.
+    return transformedValue.replaceAll('&#8996;', '&#8629;');
   }
 }
