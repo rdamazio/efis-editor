@@ -17,17 +17,18 @@
 
   <div class="checklist-tree-node-title">
     @if (!node.checklist && !node.isAddNew) {
-      @switch (node.group?.category) {
-        @case (ChecklistGroup_Category.normal) {
-          <span>🄽</span>
+      <mat-select
+        [(value)]="checklistGroupCategory"
+        class="checklist-tree-node-title-category"
+        [style]="this.checklistGroupCategories.get(checklistGroupCategory)!.style"
+        panelWidth="6em"
+      >
+        @for (category of checklistGroupCategories; track category[0]) {
+          <mat-option [value]="category[0]"
+            ><span [style]="category[1].style">{{ category[1].viewValue }}</span></mat-option
+          >
         }
-        @case (ChecklistGroup_Category.abnormal) {
-          <span class="important">🄰</span>
-        }
-        @case (ChecklistGroup_Category.emergency) {
-          <span class="danger">🄴</span>
-        }
-      }
+      </mat-select>
     }
     {{ node.title }}
   </div>
