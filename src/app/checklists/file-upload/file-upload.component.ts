@@ -6,6 +6,7 @@ import { ChecklistFile } from '../../../../gen/ts/checklist';
 import { AceFormat } from '../../../model/formats/ace-format';
 import { DynonFormat } from '../../../model/formats/dynon-format';
 import { GrtFormat } from '../../../model/formats/grt-format';
+import { JsonFormat } from '../../../model/formats/json-format';
 
 @Component({
   selector: 'checklist-file-upload',
@@ -41,6 +42,12 @@ export class ChecklistFileUploadComponent {
           return;
         } catch (e) {
           console.log('Failed to parse as Dynon: ', e);
+        }
+        try {
+          this.fileUploaded.emit(await JsonFormat.toProto(file));
+          return;
+        } catch (e) {
+          console.log('Failed to parse as JSON: ', e);
         }
 
         this._snackBar.open(`Failed to parse uploaded file.`, '', { duration: 5000 });
