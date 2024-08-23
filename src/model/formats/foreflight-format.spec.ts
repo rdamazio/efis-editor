@@ -9,7 +9,7 @@ import { validate } from 'uuid';
 
 describe('ForeFlightFormat', () => {
   describe('ForeFlightUtils', () => {
-    it(`should generate uuid v4 objectIds w/o dashes`, async () => {
+    it(`should generate uuid v4 objectIds w/o dashes`, () => {
       const objectId = ForeFlightUtils.getObjectId();
 
       const groupSizes = [8, 4, 4, 4, 12];
@@ -40,7 +40,7 @@ describe('ForeFlightFormat', () => {
       }).toThrowError("ForeFlight: unknown category 'undefined'");
     });
 
-    it('should determine correct checklist file name', async () => {
+    it('should determine correct checklist file name', () => {
       const mockFile = new File([], `bar.${ForeFlightUtils.FILE_EXTENSION}`);
       const mockContainer = ForeFlightChecklistContainer.create({ payload: { metadata: { name: 'foo' } } });
       expect(ForeFlightUtils.getChecklistFileName(mockFile, ForeFlightChecklistContainer.create())).toMatch('bar');

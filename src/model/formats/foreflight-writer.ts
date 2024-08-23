@@ -14,7 +14,7 @@ export class ForeFlightWriter {
     );
   }
 
-  private static async checklistFileToFF(file: ChecklistFile): Promise<ForeFlightChecklistContainer> {
+  private static checklistFileToFF(file: ChecklistFile): ForeFlightChecklistContainer {
     return {
       type: ForeFlightUtils.CONTAINER_TYPE,
       payload: {
@@ -25,40 +25,30 @@ export class ForeFlightWriter {
           detail: file.metadata?.description,
           tailNumber: file.metadata?.aircraftInfo.toUpperCase(),
         },
-        groups: await ForeFlightWriter.checklistGroupsToFF(file.groups),
+        groups: ForeFlightWriter.checklistGroupsToFF(file.groups),
       },
     };
   }
 
-  private static async checklistGroupsToFF(groupsEFIS: ChecklistGroup[]): Promise<ForeFlightChecklistGroup[]> {
-    return Promise.all(
-      Object.values(ForeFlightCategory).map(
-        async (categoryFF): Promise<ForeFlightChecklistGroup> => ({
+  private static checklistGroupsToFF(groupsEFIS: ChecklistGroup[]): ForeFlightChecklistGroup[] {
+    return Object.values(ForeFlightCategory).map((categoryFF) => ({
+      objectId: ForeFlightUtils.getObjectId(),
+      groupType: categoryFF,
+      items: groupsEFIS
+        .filter((checklistGroupEFIS) => checklistGroupEFIS.category === ForeFlightUtils.categoryToEFIS(categoryFF))
+        .map((checklistGroupEFIS) => ({
           objectId: ForeFlightUtils.getObjectId(),
-          groupType: categoryFF,
-          items: await Promise.all(
-            groupsEFIS
-              .filter(
-                (checklistGroupEFIS) => checklistGroupEFIS.category === ForeFlightUtils.categoryToEFIS(categoryFF),
-              )
-              .map(async (checklistGroupEFIS) => ({
-                objectId: ForeFlightUtils.getObjectId(),
-                title: checklistGroupEFIS.title,
-                items: await Promise.all(
-                  checklistGroupEFIS.checklists.map(async (checklistEFIS) => ({
-                    objectId: ForeFlightUtils.getObjectId(),
-                    title: checklistEFIS.title,
-                    items: await ForeFlightWriter.checklistItemsToFF(checklistEFIS.items),
-                  })),
-                ),
-              })),
-          ),
-        }),
-      ),
-    );
+          title: checklistGroupEFIS.title,
+          items: checklistGroupEFIS.checklists.map((checklistEFIS) => ({
+            objectId: ForeFlightUtils.getObjectId(),
+            title: checklistEFIS.title,
+            items: ForeFlightWriter.checklistItemsToFF(checklistEFIS.items),
+          })),
+        })),
+    }));
   }
 
-  private static async checklistItemsToFF(itemsEFIS: ChecklistItem[]): Promise<ForeFlightChecklistItem[]> {
+  private static checklistItemsToFF(itemsEFIS: ChecklistItem[]): ForeFlightChecklistItem[] {
     const itemsFF: ForeFlightChecklistItem[] = [];
 
     // TypeScript has map, reduce, but no scan :-( WHY??!!!11
