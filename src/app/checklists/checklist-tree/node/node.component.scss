@@ -15,6 +15,15 @@
 .checklist-tree-node-title {
   margin-top: auto;
   margin-bottom: auto;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+}
+
+.checklist-tree-node-title-category {
+  width: 2em;
+  padding-right: 0.5em;
 }
 
 .checklist-tree-node-spacer {
