@@ -80,31 +80,53 @@ export class ForeFlightReader {
   }
 
   private static checklistItemToEFIS(checklistItem: ForeFlightChecklistItem): ChecklistItem[] {
-    return [
+    const result = [
       checklistItem.type === ForeFlightUtils.ITEM_HEADER
-        ? ChecklistItem.create({
-            type: ChecklistItem_Type.ITEM_TITLE,
-            prompt: checklistItem.title,
-          })
-        : checklistItem.detail
-          ? ChecklistItem.create({
+        ? // Detail Item
+          checklistItem.title
+          ? // Title is set - interpret as title
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_TITLE,
+              prompt: checklistItem.title,
+            })
+          : // Title is not set
+            checklistItem.detail
+            ? // Detail is set - interpret as unindented text
+              ChecklistItem.create(ForeFlightUtils.promptToPartialChecklistItem(checklistItem.detail))
+            : // Neither title, nor detail set - interpret as empty space
+              ChecklistItem.create({ type: ChecklistItem_Type.ITEM_SPACE })
+        : // Check Item
+          checklistItem.detail
+          ? // Detail is set - interpret as expectation
+            ChecklistItem.create({
               type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
               prompt: checklistItem.title,
               expectation: checklistItem.detail.toUpperCase(),
             })
-          : ChecklistItem.create({
+          : // Detail not set - interpret as prompt-only
+            ChecklistItem.create({
               type: ChecklistItem_Type.ITEM_CHALLENGE,
               prompt: checklistItem.title,
             }),
-      ...((checklistItem.type === ForeFlightUtils.ITEM_HEADER && checklistItem.detail) || checklistItem.note
-        ? [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_NOTE,
-              prompt: checklistItem.type === ForeFlightUtils.ITEM_HEADER ? checklistItem.detail : checklistItem.note,
-              indent: ForeFlightUtils.NOTE_INDENT,
-            }),
-          ]
-        : []),
     ];
+
+    // Note handling
+    if (
+      // Detail Item, but with both title and detail
+      (checklistItem.type === ForeFlightUtils.ITEM_HEADER && checklistItem.title && checklistItem.detail) ||
+      // Check Item with a note
+      checklistItem.note
+    ) {
+      result.push(
+        ChecklistItem.create({
+          indent: ForeFlightUtils.NOTE_INDENT,
+          ...ForeFlightUtils.promptToPartialChecklistItem(
+            (checklistItem.type === ForeFlightUtils.ITEM_HEADER ? checklistItem.detail : checklistItem.note) || '',
+          ),
+        }),
+      );
+    }
+
+    return result;
   }
 }
