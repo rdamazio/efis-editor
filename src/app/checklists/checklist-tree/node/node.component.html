@@ -16,7 +16,7 @@
   </button>
 
   <div class="checklist-tree-node-title">
-    @if (!node.checklist && !node.isAddNew) {
+    @if (node.group && !node.checklist && !node.isAddNew) {
       <mat-select
         [(value)]="checklistGroupCategory"
         class="checklist-tree-node-title-category"
