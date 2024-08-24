@@ -100,7 +100,28 @@ export class ChecklistsComponent implements OnInit {
         .subscribe(() => {
           this.items!.selectPreviousItem();
         });
-      // TODO: Hot keys to navigate between checklists
+      this._hotkeys
+        .addShortcut({
+          keys: 'meta.down',
+          description: 'Select next checklist',
+          preventDefault: true,
+          group: 'Navigation',
+        })
+        .subscribe(() => {
+          this.tree?.selectNextChecklist();
+        });
+      this._hotkeys
+        .addShortcut({
+          keys: 'meta.up',
+          description: 'Select next checklist',
+          preventDefault: true,
+          group: 'Navigation',
+        })
+        .subscribe(() => {
+          this.tree?.selectPreviousChecklist();
+        });
+      // TODO: meta.shift.up/down to reorder checklists
+      // TODO: Group navigation/reordering shortcuts
 
       this._hotkeys
         .addShortcut({

@@ -32,9 +32,7 @@ export class ChecklistTreeComponent {
     this._file = file;
     this.reloadFile(false);
     if (this.selectedChecklist || this.selectedChecklistGroup) {
-      this.selectedChecklistGroup = undefined;
-      this.selectedChecklist = undefined;
-      this.selectedChecklistChange.emit();
+      this._selectChecklist(undefined, undefined);
     }
   }
 
@@ -108,10 +106,97 @@ export class ChecklistTreeComponent {
       this.reloadFile(true);
       // Leave checklist unset
     }
+    this._selectChecklist(checklist, checklistGroup);
+  }
 
+  selectNextChecklist() {
+    if (!this._file) return;
+    let { groupIdx, checklistIdx } = this._findSelectedChecklist();
+    if (groupIdx === undefined || checklistIdx === undefined) return;
+
+    // If it's the last checklis on the current group, wrap to next group that has a checklist.
+    const groups = this._file.groups;
+    const numGroups = groups.length;
+    let group = groups[groupIdx];
+    if (checklistIdx === group.checklists.length - 1) {
+      checklistIdx = 0;
+      groupIdx++;
+      while (groupIdx < numGroups) {
+        group = groups[groupIdx];
+        if (group.checklists.length > 0) {
+          break;
+        }
+        groupIdx++;
+      }
+      if (groupIdx === numGroups) {
+        // This was the last checklist of the last group (that has checklists) already.
+        return;
+      }
+    } else {
+      checklistIdx++;
+    }
+
+    this._selectChecklist(group.checklists[checklistIdx], group);
+  }
+
+  selectPreviousChecklist() {
+    if (!this._file) return;
+    let { groupIdx, checklistIdx } = this._findSelectedChecklist();
+    if (groupIdx === undefined || checklistIdx === undefined) return;
+
+    // If it's the first checklist on the current group, wrap to prior group that has a checklist.
+    const groups = this._file.groups;
+    let group = groups[groupIdx];
+    if (checklistIdx === 0) {
+      groupIdx--;
+      while (groupIdx >= 0) {
+        group = groups[groupIdx];
+        if (group.checklists.length > 0) {
+          break;
+        }
+        groupIdx--;
+      }
+      if (groupIdx === -1) {
+        // This was the first checklist of the first group (that has checklists) already.
+        return;
+      }
+      checklistIdx = group.checklists.length - 1;
+    } else {
+      checklistIdx--;
+    }
+
+    this._selectChecklist(group.checklists[checklistIdx], group);
+  }
+
+  private _selectChecklist(checklist?: Checklist, group?: ChecklistGroup) {
     this.selectedChecklist = checklist;
-    this.selectedChecklistGroup = checklistGroup;
+    this.selectedChecklistGroup = group;
     this.selectedChecklistChange.emit(checklist);
+
+    // TODO: Focus/scroll to selected checklist in the tree.
+  }
+
+  private _findSelectedChecklist(): { groupIdx?: number; checklistIdx?: number } {
+    if (!this._file || !this.selectedChecklist) return { groupIdx: undefined, checklistIdx: undefined };
+
+    // Find the currently selected checklist
+    const groups = this._file.groups;
+    let currentGroupIdx: number | undefined;
+    let currentChecklistIdx: number | undefined;
+    findloop: for (currentGroupIdx = 0; currentGroupIdx < groups.length; currentGroupIdx++) {
+      const checklists = groups[currentGroupIdx].checklists;
+      for (currentChecklistIdx = 0; currentChecklistIdx < checklists.length; currentChecklistIdx++) {
+        const checklist = checklists[currentChecklistIdx];
+        if (checklist === this.selectedChecklist) {
+          break findloop;
+        }
+      }
+    }
+    if (currentGroupIdx === groups.length) {
+      // Current checklist not found.
+      return { groupIdx: undefined, checklistIdx: undefined };
+    }
+    return { groupIdx: currentGroupIdx, checklistIdx: currentChecklistIdx };
   }
 
   onChecklistRename(node: ChecklistTreeNode) {
@@ -135,8 +220,7 @@ export class ChecklistTreeComponent {
 
     node.group!.checklists.splice(node.checklistIdx!, 1);
     if (this.selectedChecklist === node.checklist!) {
-      this.selectedChecklist = undefined;
-      this.selectedChecklistChange.emit(undefined);
+      this._selectChecklist(undefined, node.group!);
     }
     this.reloadFile(true);
   }
@@ -166,9 +250,7 @@ export class ChecklistTreeComponent {
 
     this._file!.groups.splice(node.groupIdx!, 1);
     if (this.selectedChecklistGroup === node.group!) {
-      this.selectedChecklist = undefined;
-      this.selectedChecklistGroup = undefined;
-      this.selectedChecklistChange.emit(undefined);
+      this._selectChecklist(undefined, undefined);
     }
     this.reloadFile(true);
   }
