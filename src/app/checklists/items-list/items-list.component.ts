@@ -81,13 +81,22 @@ export class ChecklistItemsComponent {
       item.prompt = '';
     }
     const items = this._checklist!.items;
-    items.push(item);
+
+    // Add after the selected item, or at the end if none selected.
+    let newIdx: number;
+    if (this._selectedIdx === null) {
+      newIdx = items.length;
+    } else {
+      newIdx = this._selectedIdx + 1;
+    }
+    items.splice(newIdx, 0, item);
+
     this.onItemUpdated();
 
     // Set focus to the newly added item.
     afterNextRender(
       () => {
-        this._selectedIdx = this._checklist!.items.length - 1;
+        this._selectedIdx = newIdx;
         this._focusSelectedItem();
       },
       { injector: this._injector },
