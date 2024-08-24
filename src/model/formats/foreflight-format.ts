@@ -13,6 +13,26 @@ export class ForeFlightFormatError extends FormatError {
   }
 }
 
+/**
+ * Mapping strategy between EFIS and ForeFlight items:
+ *
+ *   - Challenge/response
+ *     * "Check Item" w/ title and detail
+ *   - Challenge
+ *     * "Check Item" w/ title
+ *   - Title
+ *     * "Detail Item" w/ title and w/o detail
+ *   - Blank row
+ *     * "Detail Item" w/o any data
+ *     * Better than "Check Item" because it does not need to be checked
+ *
+ *   - Text
+ *   - Note
+ *   - Warning
+ *   - Caution
+ *     * If unindented, then stand-alone "Detail Item" w/o title and w/ detail
+ *     * If indented, then attached to the previous "Check/Detail Item" (note or detail)
+ */
 export class ForeFlightFormat {
   public static async toProto(file: File): Promise<ChecklistFile> {
     return ForeFlightReader.read(file);

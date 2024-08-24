@@ -38,6 +38,14 @@ describe('ForeFlightFormat', () => {
       expect(ForeFlightUtils.getChecklistFileName(mockFile, ForeFlightChecklistContainer.create())).toMatch('bar');
       expect(ForeFlightUtils.getChecklistFileName(mockFile, mockContainer)).toMatch('foo');
     });
+
+    it('should determine checklist item type by prefix correctly', () => {
+      for (const [expectedType, prefix] of ForeFlightUtils.CHECKLIST_ITEM_PREFIXES) {
+        const { type: actualType, prompt: text } = ForeFlightUtils.promptToPartialChecklistItem(`${prefix}: text`);
+        expect(actualType).toBe(expectedType);
+        expect(text).toBe(': text');
+      }
+    });
   });
 
   it('should read test file', async () => {
