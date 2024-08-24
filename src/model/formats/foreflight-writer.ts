@@ -8,8 +8,8 @@ import {
 import {
   ForeFlightChecklistContainer,
   ForeFlightChecklistGroup,
-  ForeFlightChecklistSubgroup,
   ForeFlightChecklistItem,
+  ForeFlightChecklistSubgroup,
 } from '../../../gen/ts/foreflight';
 
 import { ForeFlightUtils } from './foreflight-utils';
@@ -63,45 +63,74 @@ export class ForeFlightWriter {
   }
 
   private static checklistItemsToFF(itemsEFIS: ChecklistItem[]): ForeFlightChecklistItem[] {
-    const itemsFF: ForeFlightChecklistItem[] = [];
-
-    // TypeScript has map, reduce, but no scan :-( WHY??!!!11
-    for (const itemEFIS of itemsEFIS) {
-      switch (itemEFIS.type) {
-        case ChecklistItem_Type.ITEM_TITLE:
-          itemsFF.push({
-            objectId: ForeFlightUtils.getObjectId(),
-            type: ForeFlightUtils.ITEM_HEADER,
-            title: itemEFIS.prompt,
-          });
-          break;
-        case ChecklistItem_Type.ITEM_CHALLENGE:
-          itemsFF.push({
-            objectId: ForeFlightUtils.getObjectId(),
-            title: itemEFIS.prompt,
-          });
-          break;
-        case ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE:
-          itemsFF.push({
-            objectId: ForeFlightUtils.getObjectId(),
-            title: itemEFIS.prompt,
-            detail: itemEFIS.expectation.toUpperCase(),
-          });
-          break;
-        case ChecklistItem_Type.ITEM_NOTE: {
-          // JavaScript, why not [-1] or .last() !? :-(
-          const lastItemFF = itemsFF[itemsFF.length - 1];
-          if (lastItemFF && itemEFIS.indent === ForeFlightUtils.NOTE_INDENT) {
-            if (lastItemFF.type === ForeFlightUtils.ITEM_HEADER) {
-              lastItemFF.detail = itemEFIS.prompt;
+    return itemsEFIS
+      .reduce<[ForeFlightChecklistItem, ChecklistItem][]>((accumulator, itemEFIS) => {
+        switch (itemEFIS.type) {
+          case ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE:
+            accumulator.push([
+              {
+                objectId: ForeFlightUtils.getObjectId(),
+                title: itemEFIS.prompt,
+                detail: itemEFIS.expectation.toUpperCase(),
+              },
+              itemEFIS,
+            ]);
+            break;
+          case ChecklistItem_Type.ITEM_CHALLENGE:
+            accumulator.push([
+              {
+                objectId: ForeFlightUtils.getObjectId(),
+                title: itemEFIS.prompt,
+              },
+              itemEFIS,
+            ]);
+            break;
+          case ChecklistItem_Type.ITEM_TITLE:
+            accumulator.push([
+              {
+                objectId: ForeFlightUtils.getObjectId(),
+                type: ForeFlightUtils.ITEM_HEADER,
+                title: itemEFIS.prompt,
+              },
+              itemEFIS,
+            ]);
+            break;
+          case ChecklistItem_Type.ITEM_PLAINTEXT:
+          case ChecklistItem_Type.ITEM_NOTE:
+          case ChecklistItem_Type.ITEM_CAUTION:
+          case ChecklistItem_Type.ITEM_WARNING: {
+            const text = ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.get(itemEFIS.type) + itemEFIS.prompt;
+            const [lastItemFF, lastItemEFIS] = accumulator[accumulator.length - 1] || [];
+            if (lastItemFF && lastItemEFIS && lastItemEFIS.indent < itemEFIS.indent) {
+              // If this is an indented text item, then
+              if (lastItemFF.type !== ForeFlightUtils.ITEM_HEADER) {
+                // attach note to the previous Check...
+                lastItemFF.note = text;
+              } else {
+                // ...or Detail Item
+                lastItemFF.detail = text;
+              }
             } else {
-              lastItemFF.note = itemEFIS.prompt;
+              // otherwise, create a Detail Item without title, but with a note
+              accumulator.push([
+                {
+                  objectId: ForeFlightUtils.getObjectId(),
+                  type: ForeFlightUtils.ITEM_HEADER,
+                  detail: text,
+                },
+                itemEFIS,
+              ]);
             }
+            break;
           }
+          case ChecklistItem_Type.ITEM_SPACE:
+            accumulator.push([
+              { objectId: ForeFlightUtils.getObjectId(), type: ForeFlightUtils.ITEM_HEADER },
+              itemEFIS,
+            ]);
         }
-      }
-    }
-
-    return itemsFF;
+        return accumulator;
+      }, [])
+      .map((tuple) => tuple[0]);
   }
 }

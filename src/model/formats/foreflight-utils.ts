@@ -1,9 +1,15 @@
 import { v4 as uuidV4 } from 'uuid';
 import { ForeFlightChecklistContainer } from '../../../gen/ts/foreflight';
+import { ChecklistItem_Type } from '../../../gen/ts/checklist';
 
 enum KeyUsage {
   Encrypt = 'encrypt',
   Decrypt = 'decrypt',
+}
+
+interface PartialChecklistItem {
+  type: ChecklistItem_Type;
+  prompt: string;
 }
 
 export class ForeFlightUtils {
@@ -21,6 +27,34 @@ export class ForeFlightUtils {
 
   static readonly encoder = new TextEncoder();
   static readonly decoder = new TextDecoder();
+
+  public static readonly CHECKLIST_ITEM_PREFIXES = new Map([
+    [ChecklistItem_Type.ITEM_PLAINTEXT, ''],
+    [ChecklistItem_Type.ITEM_NOTE, 'NOTE: '],
+    [ChecklistItem_Type.ITEM_CAUTION, 'CAUTION: '],
+    [ChecklistItem_Type.ITEM_WARNING, 'WARNING: '],
+  ]);
+
+  public static readonly CHECKLIST_ITEM_TYPES = new Map(
+    [...ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.entries()].map(
+      (item) => item.reverse() as [string, ChecklistItem_Type],
+    ),
+  );
+
+  public static promptToPartialChecklistItem(prompt: string): PartialChecklistItem {
+    const matches = /^([^:]+: )?(.*)$/.exec(prompt || '');
+    const [prefix, rest] = matches !== null ? [matches[1], matches[2]] : ['', prompt];
+    const itemType = ForeFlightUtils.CHECKLIST_ITEM_TYPES.get(prefix);
+    return itemType !== undefined
+      ? {
+          type: itemType,
+          prompt: rest,
+        }
+      : {
+          type: ChecklistItem_Type.ITEM_PLAINTEXT,
+          prompt: prompt,
+        };
+  }
 
   private static getKey(keyUsage: KeyUsage): Promise<CryptoKey> {
     return window.crypto.subtle.importKey(
