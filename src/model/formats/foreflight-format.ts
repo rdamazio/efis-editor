@@ -32,6 +32,8 @@ export class ForeFlightFormatError extends FormatError {
  *   - Caution
  *     * If unindented, then stand-alone "Detail Item" w/o title and w/ detail
  *     * If indented, then attached to the previous "Check/Detail Item" (note or detail)
+ *
+ *   Multiline ForeFlight notes are expanded as multiple indented text elements.
  */
 export class ForeFlightFormat {
   public static async toProto(file: File): Promise<ChecklistFile> {
