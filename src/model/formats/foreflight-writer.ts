@@ -17,7 +17,11 @@ import { ForeFlightUtils } from './foreflight-utils';
 export class ForeFlightWriter {
   public static async write(file: ChecklistFile): Promise<Blob> {
     return ForeFlightUtils.encrypt(
-      ForeFlightChecklistContainer.toJsonString(ForeFlightWriter.checklistFileToFF(file), { prettySpaces: 2 }),
+      ForeFlightChecklistContainer.toJsonString(ForeFlightWriter.checklistFileToFF(file), {
+        // Explicit serialization of enum first elements is required for ForeFlight!
+        emitDefaultValues: true,
+        prettySpaces: 2,
+      }),
     );
   }
 
