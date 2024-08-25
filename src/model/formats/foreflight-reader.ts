@@ -110,21 +110,24 @@ export class ForeFlightReader {
             }),
     ];
 
-    // Note handling
+    // Handle notes
     if (
       // Detail Item, but with both title and detail
       (checklistItem.type === ForeFlightUtils.ITEM_HEADER && checklistItem.title && checklistItem.detail) ||
       // Check Item with a note
       checklistItem.note
     ) {
-      result.push(
-        ChecklistItem.create({
-          indent: ForeFlightUtils.NOTE_INDENT,
-          ...ForeFlightUtils.promptToPartialChecklistItem(
-            (checklistItem.type === ForeFlightUtils.ITEM_HEADER ? checklistItem.detail : checklistItem.note) || '',
-          ),
-        }),
-      );
+      const noteLines = (
+        (checklistItem.type === ForeFlightUtils.ITEM_HEADER ? checklistItem.detail : checklistItem.note) || ''
+      ).split(/\r?\n/);
+      for (const noteLine of noteLines) {
+        result.push(
+          ChecklistItem.create({
+            indent: ForeFlightUtils.NOTE_INDENT,
+            ...ForeFlightUtils.promptToPartialChecklistItem(noteLine),
+          }),
+        );
+      }
     }
 
     return result;

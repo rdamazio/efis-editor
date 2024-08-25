@@ -102,16 +102,22 @@ export class ForeFlightWriter {
             const text = ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.get(itemEFIS.type) + itemEFIS.prompt;
             const [lastItemFF, lastItemEFIS] = accumulator[accumulator.length - 1] || [];
             if (lastItemFF && lastItemEFIS && lastItemEFIS.indent < itemEFIS.indent) {
-              // If this is an indented text item, then
-              if (lastItemFF.type !== ForeFlightUtils.ITEM_HEADER) {
-                // attach note to the previous Check...
-                lastItemFF.note = text;
-              } else {
-                // ...or Detail Item
-                lastItemFF.detail = text;
-              }
+              // If this is an indented text item, then...
+              const appendNote = (field: string, text: string) => {
+                type fieldType = keyof typeof lastItemFF;
+                const typedField = field as fieldType;
+                lastItemFF[typedField] = lastItemFF[typedField] ? lastItemFF[typedField] + '\n' + text : text;
+              };
+              appendNote(
+                lastItemFF.type !== ForeFlightUtils.ITEM_HEADER
+                  ? // ...append note to the previous Check...
+                    'note'
+                  : // ...or Detail Item
+                    'detail',
+                text,
+              );
             } else {
-              // otherwise, create a Detail Item without title, but with a note
+              // ...otherwise, create a Detail Item without title, but with a note
               accumulator.push([
                 {
                   objectId: ForeFlightUtils.getObjectId(),
