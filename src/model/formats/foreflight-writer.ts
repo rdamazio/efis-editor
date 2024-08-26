@@ -9,6 +9,7 @@ import {
   ForeFlightChecklistContainer,
   ForeFlightChecklistGroup,
   ForeFlightChecklistItem,
+  ForeFlightChecklistMetadata,
   ForeFlightChecklistSubgroup,
 } from '../../../gen/ts/foreflight';
 
@@ -31,13 +32,17 @@ export class ForeFlightWriter {
       payload: {
         objectId: ForeFlightUtils.getObjectId(),
         schemaVersion: ForeFlightUtils.SCHEMA_VERSION,
-        metadata: {
-          name: file.metadata?.name,
-          detail: file.metadata?.description,
-          tailNumber: file.metadata?.aircraftInfo.toUpperCase(),
-        },
+        metadata: ForeFlightWriter.getChecklistMetadata(file),
         groups: ForeFlightWriter.checklistGroupsToFFGroup(file.groups),
       },
+    };
+  }
+
+  public static getChecklistMetadata(file: ChecklistFile): ForeFlightChecklistMetadata {
+    return {
+      name: file.metadata?.name,
+      detail: file.metadata?.makeAndModel,
+      tailNumber: file.metadata?.aircraftInfo.toUpperCase(),
     };
   }
 

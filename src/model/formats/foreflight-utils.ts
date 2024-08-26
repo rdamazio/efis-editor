@@ -1,5 +1,4 @@
 import { v4 as uuidV4 } from 'uuid';
-import { ForeFlightChecklistContainer } from '../../../gen/ts/foreflight';
 import { ChecklistItem_Type } from '../../../gen/ts/checklist';
 
 enum KeyUsage {
@@ -41,9 +40,16 @@ export class ForeFlightUtils {
     ),
   );
 
+  public static splitLines(text: string): string[] {
+    return text.split(/\r?\n/);
+  }
+  public static splitByColon(text: string): [string, string] {
+    const matches = /^([^:]+: )?(.*)$/.exec(text);
+    return matches !== null ? [matches[1] || '', matches[2]] : ['', text];
+  }
+
   public static promptToPartialChecklistItem(prompt: string): PartialChecklistItem {
-    const matches = /^([^:]+: )?(.*)$/.exec(prompt || '');
-    const [prefix, rest] = matches !== null ? [matches[1], matches[2]] : ['', prompt];
+    const [prefix, rest] = ForeFlightUtils.splitByColon(prompt);
     const itemType = ForeFlightUtils.CHECKLIST_ITEM_TYPES.get(prefix);
     return itemType !== undefined
       ? {
@@ -98,9 +104,5 @@ export class ForeFlightUtils {
    */
   public static getObjectId(): string {
     return uuidV4().replaceAll('-', '');
-  }
-
-  public static getChecklistFileName(file: File, container: ForeFlightChecklistContainer): string {
-    return container.payload?.metadata?.name || file.name.replace(`\\.${ForeFlightUtils.FILE_EXTENSION}$`, '');
   }
 }

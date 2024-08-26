@@ -167,10 +167,9 @@ export const EXPECTED_FOREFLIGHT_CONTENTS = {
   ],
   metadata: {
     name: 'Checklist name',
-    description: 'Checklist description',
     defaultGroupIndex: 0,
     defaultChecklistIndex: 0,
-    makeAndModel: '',
+    makeAndModel: 'Make and model',
     aircraftInfo: 'TAIL NUMBER',
     manufacturerInfo: '',
     copyrightInfo: '',
