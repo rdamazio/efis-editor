@@ -81,47 +81,55 @@ export class ForeFlightReader {
   }
 
   private static checklistItemToEFIS(checklistItem: ForeFlightChecklistItem): ChecklistItem[] {
-    const result = [
-      checklistItem.type === ForeFlightUtils.ITEM_HEADER
-        ? // Detail Item
-          checklistItem.title
-          ? // Title is set - interpret as title
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_TITLE,
-              prompt: checklistItem.title,
-            })
-          : // Title is not set
-            checklistItem.detail
-            ? // Detail is set - interpret as unindented text
-              ChecklistItem.create(ForeFlightUtils.promptToPartialChecklistItem(checklistItem.detail))
-            : // Neither title, nor detail set - interpret as empty space
-              ChecklistItem.create({ type: ChecklistItem_Type.ITEM_SPACE })
-        : // Check Item
-          checklistItem.detail
-          ? // Detail is set - interpret as expectation
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
-              prompt: checklistItem.title,
-              expectation: checklistItem.detail.toUpperCase(),
-            })
-          : // Detail not set - interpret as prompt-only
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_CHALLENGE,
-              prompt: checklistItem.title,
-            }),
-    ];
+    const result = [];
+
+    if (checklistItem.type === ForeFlightUtils.ITEM_HEADER) {
+      // Detail Item
+      if (checklistItem.title) {
+        // Title is set - interpret as title
+        result.push(ChecklistItem.create({ type: ChecklistItem_Type.ITEM_TITLE, prompt: checklistItem.title }));
+      } else {
+        // Title is not set
+        if (checklistItem.detail) {
+          // Detail is set - interpret as unindented text
+          result.push(ChecklistItem.create(ForeFlightUtils.promptToPartialChecklistItem(checklistItem.detail)));
+        } else {
+          // Neither title, nor detail set - interpret as empty space
+          result.push(ChecklistItem.create({ type: ChecklistItem_Type.ITEM_SPACE }));
+        }
+      }
+    } else {
+      // Check Item
+      if (checklistItem.detail) {
+        // Detail is set - interpret as expectation
+        result.push(
+          ChecklistItem.create({
+            type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+            prompt: checklistItem.title,
+            expectation: checklistItem.detail.toUpperCase(),
+          }),
+        );
+      } else {
+        // Detail not set - interpret as prompt-only
+        result.push(
+          ChecklistItem.create({
+            type: ChecklistItem_Type.ITEM_CHALLENGE,
+            prompt: checklistItem.title,
+          }),
+        );
+      }
+    }
 
     // Handle notes
+    const possibleNote = checklistItem.type === ForeFlightUtils.ITEM_HEADER ? checklistItem.detail : checklistItem.note;
+
     if (
       // Detail Item, but with both title and detail
       (checklistItem.type === ForeFlightUtils.ITEM_HEADER && checklistItem.title && checklistItem.detail) ||
       // Check Item with a note
       checklistItem.note
     ) {
-      const noteLines = ForeFlightUtils.splitLines(
-        (checklistItem.type === ForeFlightUtils.ITEM_HEADER ? checklistItem.detail : checklistItem.note) || '',
-      );
-      for (const noteLine of noteLines) {
+      for (const noteLine of ForeFlightUtils.splitLines(possibleNote || '')) {
         result.push(
           ChecklistItem.create({
             indent: ForeFlightUtils.NOTE_INDENT,
