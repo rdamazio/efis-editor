@@ -3,8 +3,9 @@ import { EXPECTED_FOREFLIGHT_CONTENTS } from './test-data';
 import { ForeFlightReader } from './foreflight-reader';
 import { loadFile } from './test-utils';
 import { ForeFlightWriter } from './foreflight-writer';
-import { ForeFlightChecklistContainer } from '../../../gen/ts/foreflight';
+import { ForeFlightChecklistMetadata } from '../../../gen/ts/foreflight';
 import { validate } from 'uuid';
+import { ChecklistFileMetadata } from '../../../gen/ts/checklist';
 
 describe('ForeFlightFormat', () => {
   describe('ForeFlightUtils', () => {
@@ -32,19 +33,35 @@ describe('ForeFlightFormat', () => {
       expect(decrypted).toBe(checklistData);
     });
 
-    it('should determine correct checklist file name', () => {
-      const mockFile = new File([], `bar.${ForeFlightUtils.FILE_EXTENSION}`);
-      const mockContainer = ForeFlightChecklistContainer.create({ payload: { metadata: { name: 'foo' } } });
-      expect(ForeFlightUtils.getChecklistFileName(mockFile, ForeFlightChecklistContainer.create())).toMatch('bar');
-      expect(ForeFlightUtils.getChecklistFileName(mockFile, mockContainer)).toMatch('foo');
-    });
-
     it('should determine checklist item type by prefix correctly', () => {
       for (const [expectedType, prefix] of ForeFlightUtils.CHECKLIST_ITEM_PREFIXES) {
         const { type: actualType, prompt: text } = ForeFlightUtils.promptToPartialChecklistItem(`${prefix}: text`);
         expect(actualType).toBe(expectedType);
         expect(text).toBe(': text');
       }
+    });
+  });
+
+  describe('ForeFlightReader', () => {
+    it('should determine correct checklist metadata', () => {
+      const mockFile = new File([], `bar.${ForeFlightUtils.FILE_EXTENSION}`);
+      expect(ForeFlightReader.getChecklistMetadata(mockFile, ForeFlightChecklistMetadata.create())).toEqual(
+        ChecklistFileMetadata.create({ name: 'bar' }),
+      );
+
+      const mockMetadata = ForeFlightChecklistMetadata.create({
+        name: 'foo',
+        tailNumber: 'TAIL NUMBER',
+        detail: 'Wright Model B',
+      });
+      const actualMetadata = ForeFlightReader.getChecklistMetadata(mockFile, mockMetadata);
+      expect(actualMetadata).toEqual(
+        ChecklistFileMetadata.create({
+          name: 'foo',
+          aircraftInfo: 'TAIL NUMBER',
+          makeAndModel: 'Wright Model B',
+        }),
+      );
     });
   });
 

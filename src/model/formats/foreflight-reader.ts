@@ -3,11 +3,13 @@ import {
   ForeFlightChecklistContainer,
   ForeFlightChecklistGroup,
   ForeFlightChecklistItem,
+  ForeFlightChecklistMetadata,
   ForeFlightChecklistSubgroup,
 } from '../../../gen/ts/foreflight';
 import {
   Checklist,
   ChecklistFile,
+  ChecklistFileMetadata,
   ChecklistGroup,
   ChecklistGroup_Category,
   ChecklistItem,
@@ -37,17 +39,16 @@ export class ForeFlightReader {
 
     return {
       groups: ForeFlightReader.checklistGroupsToEFIS(container.payload.groups),
-      metadata: {
-        name: ForeFlightUtils.getChecklistFileName(file, container),
-        description: container.payload.metadata.detail || '',
-        defaultGroupIndex: 0,
-        defaultChecklistIndex: 0,
-        makeAndModel: '',
-        aircraftInfo: container.payload.metadata.tailNumber || '',
-        manufacturerInfo: '',
-        copyrightInfo: '',
-      },
+      metadata: ForeFlightReader.getChecklistMetadata(file, container.payload.metadata),
     };
+  }
+
+  public static getChecklistMetadata(file: File, metadata: ForeFlightChecklistMetadata): ChecklistFileMetadata {
+    return ChecklistFileMetadata.create({
+      name: metadata.name || file.name.replace(new RegExp(`\\.${ForeFlightUtils.FILE_EXTENSION}$`), ''),
+      aircraftInfo: metadata.tailNumber,
+      makeAndModel: metadata.detail,
+    });
   }
 
   private static checklistGroupsToEFIS(groups: ForeFlightChecklistGroup[]): ChecklistGroup[] {
@@ -117,9 +118,9 @@ export class ForeFlightReader {
       // Check Item with a note
       checklistItem.note
     ) {
-      const noteLines = (
-        (checklistItem.type === ForeFlightUtils.ITEM_HEADER ? checklistItem.detail : checklistItem.note) || ''
-      ).split(/\r?\n/);
+      const noteLines = ForeFlightUtils.splitLines(
+        (checklistItem.type === ForeFlightUtils.ITEM_HEADER ? checklistItem.detail : checklistItem.note) || '',
+      );
       for (const noteLine of noteLines) {
         result.push(
           ChecklistItem.create({

@@ -27,15 +27,15 @@ ForeFlight has 3 metadata fields for checklists:
 
   1. Tail number
   2. Name (not file name!)
-  3. Description
+  3. Detail (make and model)
 
 All 3 fields can be empty. If so, the checklist will be displayed as `No name` and exported as `No name.fmd`.
 
-If **only one** of these fields (tail number or name or description) is present, it will be used as identifier **and**
+If **only one** of these fields (tail number or name or detail) is present, it will be used as identifier **and**
 as filename.
 
 If **multiple** fields are present, then the filename can be either "tail number, name" or "tail number" or "name".
-The description always appears below the identifier and is never part of the filename.
+The detail always appears below the identifier and is never part of the filename.
 */
 message ForeFlightChecklistMetadata {
   optional string name = 1;
