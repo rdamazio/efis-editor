@@ -11,6 +11,10 @@ interface PartialChecklistItem {
   prompt: string;
 }
 
+function swap<T1, T2>([a, b]: [T1, T2]): [T2, T1] {
+  return [b, a];
+}
+
 export class ForeFlightUtils {
   public static readonly FILE_EXTENSION = 'fmd';
 
@@ -35,9 +39,7 @@ export class ForeFlightUtils {
   ]);
 
   public static readonly CHECKLIST_ITEM_TYPES = new Map(
-    [...ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.entries()].map(
-      (item) => item.reverse() as [string, ChecklistItem_Type],
-    ),
+    Array.from(ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.entries()).map((item) => swap(item)),
   );
 
   public static splitLines(text: string): string[] {
