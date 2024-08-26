@@ -1,6 +1,7 @@
 import { AfterRenderPhase, Injectable, afterNextRender } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
+import { JsonFormat } from '../formats/json-format';
 
 const CHECKLIST_PREFIX = 'checklists:';
 
@@ -67,7 +68,7 @@ export class ChecklistStorage {
     const store = await this._browserStorage;
     const blob = store.getItem(CHECKLIST_PREFIX + id);
     if (blob) {
-      return ChecklistFile.fromJsonString(blob);
+      return JsonFormat.toProto(new File([blob], id));
     }
     return null;
   }
@@ -77,8 +78,8 @@ export class ChecklistStorage {
     if (!file.metadata?.name) {
       throw new Error('Must specify checklist file name in metadata.');
     }
-    const blob = ChecklistFile.toJsonString(file);
-    store.setItem(CHECKLIST_PREFIX + file.metadata.name, blob);
+    const blob = await JsonFormat.fromProto(file);
+    store.setItem(CHECKLIST_PREFIX + file.metadata.name, await blob.text());
     this._publishList(store);
   }
 
