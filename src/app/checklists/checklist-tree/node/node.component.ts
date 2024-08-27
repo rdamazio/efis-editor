@@ -28,9 +28,9 @@ export class ChecklistTreeNodeComponent {
   hideButtons = true;
 
   protected readonly checklistGroupCategories = new Map<ChecklistGroup_Category, CategorySelector>([
-    [ChecklistGroup_Category.normal, { viewValue: '🄽', style: 'color: white !important' }],
-    [ChecklistGroup_Category.abnormal, { viewValue: '🄰', style: 'color: yellow !important' }],
-    [ChecklistGroup_Category.emergency, { viewValue: '🄴', style: 'color: red !important' }],
+    [ChecklistGroup_Category.normal, { viewValue: '🄽ormal', style: 'color: white !important' }],
+    [ChecklistGroup_Category.abnormal, { viewValue: '🄰bnormal', style: 'color: yellow !important' }],
+    [ChecklistGroup_Category.emergency, { viewValue: '🄴mergency', style: 'color: red !important' }],
   ]);
 
   get checklistGroupCategory(): ChecklistGroup_Category {
