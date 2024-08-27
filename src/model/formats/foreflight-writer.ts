@@ -112,8 +112,7 @@ export class ForeFlightWriter {
             if (lastItemFF && lastItemEFIS && lastItemEFIS.indent < itemEFIS.indent) {
               // If this is an indented text item, then...
               const appendNote = (field: string, text: string) => {
-                type fieldType = keyof typeof lastItemFF;
-                const typedField = field as fieldType;
+                const typedField = field as keyof typeof lastItemFF;
                 lastItemFF[typedField] = lastItemFF[typedField] ? lastItemFF[typedField] + '\n' + text : text;
               };
               appendNote(
