@@ -47,16 +47,15 @@ export class ForeFlightWriter {
   }
 
   private static checklistGroupsToFFGroup(groupsEFIS: ChecklistGroup[]): ForeFlightChecklistGroup[] {
-    return Object.keys(ChecklistGroup_Category)
-      .filter((categoryKey) => isNaN(Number(categoryKey)))
-      .map((categoryKey) => ChecklistGroup_Category[categoryKey as keyof typeof ChecklistGroup_Category])
-      .map((checklistGroupCategory) => ({
+    return [ChecklistGroup_Category.normal, ChecklistGroup_Category.abnormal, ChecklistGroup_Category.emergency].map(
+      (checklistGroupCategory) => ({
         objectId: ForeFlightUtils.getObjectId(),
         groupType: checklistGroupCategory,
         items: groupsEFIS
           .filter((checklistGroupEFIS) => checklistGroupEFIS.category === checklistGroupCategory)
           .map(ForeFlightWriter.checklistGroupToFFSubgroup),
-      }));
+      }),
+    );
   }
 
   private static checklistGroupToFFSubgroup(checklistGroupEFIS: ChecklistGroup): ForeFlightChecklistSubgroup {
