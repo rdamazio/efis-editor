@@ -22,7 +22,7 @@ You can try it out directly in the link above, but here's what it currently look
 * Checklists:
   * Advanced Flight systems (AFS)
   * Dynon Skyview
-  * Foreflight (.mfd file format) - thanks to [zyv](https://github.com/zyv)!
+  * Foreflight (.fmd file format) - thanks to [zyv](https://github.com/zyv)!
   * Garmin G3X / G3X Touch / GTN (.ace file format)
   * Grand Rapids (GRT)
 
