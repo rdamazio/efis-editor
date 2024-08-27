@@ -21,12 +21,12 @@
         [(value)]="checklistGroupCategory"
         class="checklist-tree-node-title-category"
         [style]="this.checklistGroupCategories.get(checklistGroupCategory)!.style"
-        panelWidth="6em"
+        panelWidth="12em"
       >
         @for (category of checklistGroupCategories; track category[0]) {
           <mat-option [value]="category[0]"
-            ><span [style]="category[1].style">{{ category[1].viewValue }}</span></mat-option
-          >
+            ><span [style]="category[1].style">{{ category[1].viewValue }}</span>
+          </mat-option>
         }
       </mat-select>
     }
