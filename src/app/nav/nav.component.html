@@ -1,8 +1,14 @@
 <mat-toolbar class="topbar" color="primary">
-  <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="sidenav.toggle()">
-    <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+  <button mat-icon-button aria-label="Toggle sidenav" (click)="sidenav.toggle()">
+    <mat-icon>menu</mat-icon>
   </button>
   EFIS Editor
+  <span class="topbar-spacer"></span>
+  @if (_hotkeys.getHotkeys().length > 0) {
+    <button mat-icon-button aria-label="Show keyboard shortcuts" (click)="showKeyboardShortcuts()">
+      <mat-icon>keyboard</mat-icon>
+    </button>
+  }
 </mat-toolbar>
 
 <mat-sidenav-container class="sidenav-container" hasBackdrop>
