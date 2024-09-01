@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { afterNextRender, Component, OnInit, ViewChild } from '@angular/core';
+import { afterNextRender, Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -53,7 +53,7 @@ interface ParsedFragment {
   templateUrl: './checklists.component.html',
   styleUrl: './checklists.component.scss',
 })
-export class ChecklistsComponent implements OnInit {
+export class ChecklistsComponent implements OnInit, OnDestroy {
   selectedFile?: ChecklistFile;
   @ViewChild('tree') tree?: ChecklistTreeComponent;
   @ViewChild('items') items?: ChecklistItemsComponent;
@@ -228,6 +228,10 @@ export class ChecklistsComponent implements OnInit {
       // (yes, I could make 404.html point to index.html, but that's just horrible)
       await this._onFragmentChange(fragment);
     });
+  }
+
+  ngOnDestroy() {
+    this._hotkeys.removeShortcuts(this._hotkeys.getHotkeys().map((hk) => hk.keys));
   }
 
   private loadingFragment = false;
