@@ -1,6 +1,6 @@
 import { AsyncPipe } from '@angular/common';
-import { afterNextRender, Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { afterNextRender, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HotkeysDirective, HotkeysService } from '@ngneat/hotkeys';
@@ -61,7 +61,6 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
 
   showFilePicker = false;
   showFileUpload = false;
-  helpRef?: MatDialogRef<HelpComponent>;
 
   protected readonly ForeFlightUtils = ForeFlightUtils;
 
@@ -77,19 +76,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
       this._hotkeys.setSequenceDebounce(500);
 
       this._hotkeys.registerHelpModal(() => {
-        if (this.helpRef) {
-          this.helpRef.close();
-          return;
-        }
-
-        this.helpRef = this._dialog.open(HelpComponent, {
-          hasBackdrop: true,
-          width: '500px',
-        });
-
-        this.helpRef.afterClosed().subscribe(() => {
-          this.helpRef = undefined;
-        });
+        HelpComponent.toggleHelp(_dialog);
       });
 
       this._hotkeys

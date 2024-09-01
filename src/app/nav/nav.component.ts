@@ -11,6 +11,8 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { AboutComponent } from '../about/about.component';
+import { HotkeysService } from '@ngneat/hotkeys';
+import { HelpComponent } from '../checklists/hotkeys/help/help.component';
 
 @Component({
   selector: 'app-nav',
@@ -37,7 +39,10 @@ export class NavComponent {
     shareReplay(),
   );
 
-  constructor(private _dialog: MatDialog) {}
+  constructor(
+    public _hotkeys: HotkeysService,
+    private _dialog: MatDialog,
+  ) {}
 
   showAbout() {
     this._dialog.open(AboutComponent, {
@@ -45,5 +50,13 @@ export class NavComponent {
       enterAnimationDuration: 200,
       exitAnimationDuration: 200,
     });
+  }
+
+  showKeyboardShortcuts() {
+    if (this._hotkeys.getHotkeys().length === 0) {
+      return;
+    }
+
+    HelpComponent.toggleHelp(this._dialog);
   }
 }
