@@ -21,15 +21,28 @@
   justify-content: left;
 }
 
-.checklist-tree-node-title-category {
-  width: 2em;
-  padding-right: 0.5em;
-}
-
 .checklist-tree-node-spacer {
   flex: 1 1 auto;
 }
 
 .checklist-tree-node-add {
   margin-right: 5px;
+}
+
+.checklist-tree-node-title-category {
+  width: 1.7em;
+  padding-right: 0.5em;
+}
+
+// Category IDs match the ChecklistGroup_Category proto definition
+.checklist-tree-node-title-category-1 {
+  color: white !important;
+}
+
+.checklist-tree-node-title-category-2 {
+  color: yellow !important;
+}
+
+.checklist-tree-node-title-category-3 {
+  color: red !important;
 }
