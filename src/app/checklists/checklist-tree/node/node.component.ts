@@ -8,11 +8,6 @@ import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node';
 
-interface CategorySelector {
-  viewValue: string;
-  style: string;
-}
-
 @Component({
   selector: 'checklist-tree-node',
   standalone: true,
@@ -27,10 +22,10 @@ export class ChecklistTreeNodeComponent {
 
   hideButtons = true;
 
-  protected readonly checklistGroupCategories = new Map<ChecklistGroup_Category, CategorySelector>([
-    [ChecklistGroup_Category.normal, { viewValue: '🄽ormal', style: 'color: white !important' }],
-    [ChecklistGroup_Category.abnormal, { viewValue: '🄰bnormal', style: 'color: yellow !important' }],
-    [ChecklistGroup_Category.emergency, { viewValue: '🄴mergency', style: 'color: red !important' }],
+  protected readonly GROUP_CATEGORIES = new Map<ChecklistGroup_Category, string>([
+    [ChecklistGroup_Category.normal, '🄽ormal'],
+    [ChecklistGroup_Category.abnormal, '🄰bnormal'],
+    [ChecklistGroup_Category.emergency, '🄴mergency'],
   ]);
 
   get checklistGroupCategory(): ChecklistGroup_Category {

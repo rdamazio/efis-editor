@@ -19,14 +19,13 @@
     @if (node.group && !node.checklist && !node.isAddNew) {
       <mat-select
         [(value)]="checklistGroupCategory"
-        class="checklist-tree-node-title-category"
+        [class]="'checklist-tree-node-title-category checklist-tree-node-title-category-' + checklistGroupCategory"
         matTooltip="Checklist group category"
-        [style]="this.checklistGroupCategories.get(checklistGroupCategory)!.style"
         panelWidth="12em"
       >
-        @for (category of checklistGroupCategories; track category[0]) {
+        @for (category of GROUP_CATEGORIES; track category[0]) {
           <mat-option [value]="category[0]"
-            ><span [style]="category[1].style">{{ category[1].viewValue }}</span>
+            ><span [class]="'checklist-tree-node-title-category-' + category[0]">{{ category[1] }}</span>
           </mat-option>
         }
       </mat-select>
