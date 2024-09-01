@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { NavComponent } from './nav/nav.component';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
+import { NavComponent } from './nav/nav.component';
 
 @Component({
   selector: 'app-root',
