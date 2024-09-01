@@ -1,8 +1,8 @@
 import { DYNON_FORMAT_OPTIONS, DynonFormat } from './dynon-format';
 import { EXPECTED_CONTENTS } from './test-data';
+import { loadFile } from './test-utils';
 import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
-import { loadFile } from './test-utils';
 
 const DYNON_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), DYNON_FORMAT_OPTIONS).testCaseify(
   EXPECTED_CONTENTS,

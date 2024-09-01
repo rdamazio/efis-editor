@@ -5,9 +5,9 @@ import { FileSystemFileEntry, NgxFileDropEntry, NgxFileDropModule } from 'ngx-fi
 import { ChecklistFile } from '../../../../gen/ts/checklist';
 import { AceFormat } from '../../../model/formats/ace-format';
 import { DynonFormat } from '../../../model/formats/dynon-format';
-import { GrtFormat } from '../../../model/formats/grt-format';
 import { ForeFlightFormat } from '../../../model/formats/foreflight-format';
 import { ForeFlightUtils } from '../../../model/formats/foreflight-utils';
+import { GrtFormat } from '../../../model/formats/grt-format';
 import { JsonFormat } from '../../../model/formats/json-format';
 
 @Component({

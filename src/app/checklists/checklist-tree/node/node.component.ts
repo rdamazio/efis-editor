@@ -2,11 +2,11 @@ import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
-import { ChecklistTreeNode } from './node';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
 import { MatOption, MatSelect } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
+import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
+import { ChecklistTreeNode } from './node';
 
 interface CategorySelector {
   viewValue: string;

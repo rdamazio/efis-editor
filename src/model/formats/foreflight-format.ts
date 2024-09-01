@@ -2,8 +2,8 @@ import { ChecklistFile } from '../../../gen/ts/checklist';
 
 import { FormatError } from './error';
 import { ForeFlightReader } from './foreflight-reader';
-import { ForeFlightWriter } from './foreflight-writer';
 import { ForeFlightUtils } from './foreflight-utils';
+import { ForeFlightWriter } from './foreflight-writer';
 
 export class ForeFlightFormatError extends FormatError {
   constructor(message: string, cause?: Error) {

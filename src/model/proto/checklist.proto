@@ -25,9 +25,11 @@ message ChecklistGroup {
   repeated Checklist checklists = 2;
 
   /*
-  These categories are currently used for output in the ForeFlight format. The values are in lower case because that is
-  what ForeFlight expects. Also, only these three categories are expected to be present. If you extend or otherwise
-  change this enum, be sure to create an appropriate mapping for the ForeFlight format.
+  These categories are currently used for output in the ForeFlight format. The
+  values are in lower case because that is what ForeFlight expects. Also, only
+  these three categories are expected to be present. If you extend or otherwise
+  change this enum, be sure to create an appropriate mapping for the ForeFlight
+  format.
   */
   enum Category {
     unknown = 0;

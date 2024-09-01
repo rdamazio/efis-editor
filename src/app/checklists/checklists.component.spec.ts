@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { ChecklistsComponent } from './checklists.component';
 import { provideRouter } from '@angular/router';
+import { ChecklistsComponent } from './checklists.component';
 
 describe('ChecklistsComponent', () => {
   let component: ChecklistsComponent;
