@@ -135,6 +135,17 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         });
       this._hotkeys
         .addShortcut({
+          keys: 'delete',
+          description: 'Delete checklist item',
+          preventDefault: true,
+          trigger: 'keyup',
+          group: 'Editing',
+        })
+        .subscribe(() => {
+          this.items!.deleteCurrentItem();
+        });
+      this._hotkeys
+        .addShortcut({
           keys: 'shift.right',
           description: 'Indent checklist item',
           preventDefault: true,

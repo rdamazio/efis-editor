@@ -133,6 +133,16 @@ export class ChecklistItemsComponent {
     this._selectedItemComponent()?.onEdit(undefined);
   }
 
+  deleteCurrentItem() {
+    this._selectedItemComponent()?.onDelete();
+
+    if (this._selectedIdx === this._checklist!.items.length) {
+      this.selectPreviousItem();
+    } else {
+      this.onItemUpdated();
+    }
+  }
+
   indentCurrentItem(delta: number) {
     const item = this._selectedItem();
     if (item && !item.centered) {
