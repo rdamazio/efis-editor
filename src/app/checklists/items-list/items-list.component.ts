@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 import { ChecklistItemComponent } from './item/item.component';
 
@@ -33,9 +34,14 @@ export class ChecklistItemsComponent {
     { label: 'note', type: ChecklistItem_Type.ITEM_NOTE },
     { label: 'blank row', type: ChecklistItem_Type.ITEM_SPACE },
   ];
+  // TODO: Customize snackbar to allow multiple undos.
+  readonly UNDO_LEVELS = 1;
+
   @ViewChildren(ChecklistItemComponent) items!: QueryList<ChecklistItemComponent>;
   _checklist?: Checklist;
   _selectedIdx: number | null = null;
+  private _undoState: Checklist[] = [];
+  private _undoSnackbar?: MatSnackBarRef<TextOnlySnackBar>;
 
   @Output() checklistChange = new EventEmitter<Checklist>();
   @Input()
@@ -45,9 +51,14 @@ export class ChecklistItemsComponent {
   set checklist(checklist: Checklist | undefined) {
     this._checklist = checklist;
     this._selectedIdx = null;
+    this._dismissUndoSnackbar();
+    this._undoState = [];
   }
 
-  constructor(private _injector: Injector) {}
+  constructor(
+    private _injector: Injector,
+    private _snackBar: MatSnackBar,
+  ) {}
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
     moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
@@ -65,6 +76,8 @@ export class ChecklistItemsComponent {
   }
 
   onItemDeleted(idx: number) {
+    this._pushUndoState('Item deleted');
+
     this._checklist!.items.splice(idx, 1);
     this.checklistChange.emit(this._checklist);
   }
@@ -223,5 +236,35 @@ export class ChecklistItemsComponent {
         inline: 'nearest',
       });
     }
+  }
+
+  private _pushUndoState(txt: string) {
+    // Save the full state for undoing, up to the max levels.
+    if (this._undoState.length === this.UNDO_LEVELS) {
+      this._undoState.splice(0, 1);
+    }
+    this._undoState.push(Checklist.clone(this._checklist!));
+
+    // Show snackbar with option to undo.
+    this._undoSnackbar = this._snackBar.open(txt, 'Undo', { duration: 5000 });
+    this._undoSnackbar.onAction().subscribe(() => {
+      this._popUndoState();
+    });
+    this._undoSnackbar.afterDismissed().subscribe(() => {
+      this._undoSnackbar = undefined;
+    });
+  }
+
+  private _dismissUndoSnackbar() {
+    this._undoSnackbar?.dismiss();
+  }
+
+  private _popUndoState() {
+    if (this._undoState.length === 0) {
+      return;
+    }
+
+    this._checklist = this._undoState.pop();
+    this.onItemUpdated();
   }
 }
