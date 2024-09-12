@@ -25,6 +25,7 @@ You can try it out directly in the link above, but here's what it currently look
   * Foreflight (.fmd file format) - thanks to [zyv](https://github.com/zyv)!
   * Garmin G3X / G3X Touch / GTN (.ace file format)
   * Grand Rapids (GRT)
+  * Printable (PDF) - export only
 
 Internally, files are stored in our own format, so it is possible to import a
 file in one format and then export it in another.

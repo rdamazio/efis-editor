@@ -28,6 +28,7 @@ import { HelpComponent } from './hotkeys/help/help.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
 import { ForeFlightFormat } from '../../model/formats/foreflight-format';
 import { ForeFlightUtils } from '../../model/formats/foreflight-utils';
+import { PdfFormat } from '../../model/formats/pdf-format';
 
 interface ParsedFragment {
   fileName?: string;
@@ -428,6 +429,8 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
       file = await GrtFormat.fromProto(this.selectedFile);
     } else if (formatId === ForeFlightUtils.FILE_EXTENSION) {
       file = await ForeFlightFormat.fromProto(this.selectedFile);
+    } else if (formatId === 'pdf') {
+      file = await PdfFormat.fromProto(this.selectedFile);
     } else {
       throw new FormatError(`Unknown format "${formatId}"`);
     }
