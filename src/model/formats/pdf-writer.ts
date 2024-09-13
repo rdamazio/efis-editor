@@ -166,7 +166,7 @@ export class PdfWriter {
       first = false;
 
       autoTable(this._doc, {
-        // Actual columsn are: icon, prompt, spacer, expectation
+        // Actual columns are: icon, prompt, spacer, expectation
         head: [[{ content: checklist.title, colSpan: 4, styles: { halign: 'center', fontSize: 16 } }]],
         body: this._checklistTableBody(checklist),
         showHead: 'firstPage',
