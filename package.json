@@ -16,7 +16,10 @@
     "format": "prettier --check \"**/*.{js,ts,html,css,scss}\"",
     "format:fix": "npm run format -- --write",
     "spell": "codespell src/",
-    "spell:fix": "codespell -w -i 3 src/"
+    "spell:fix": "codespell -w -i 3 src/",
+    "prepush": "npm run lint && npm run format && npm run spell",
+    "prepush:fix": "npm run format:fix && npm run spell:fix",
+    "push": "jj branch set -r @- main && jj git push -b main"
   },
   "private": true,
   "dependencies": {
