@@ -1,13 +1,13 @@
 import { jsPDF, jsPDFOptions } from 'jspdf';
 import autoTable, { CellDef, RowInput } from 'jspdf-autotable';
 import {
-    Checklist,
-    ChecklistFile,
-    ChecklistFileMetadata,
-    ChecklistGroup,
-    ChecklistGroup_Category,
-    ChecklistItem,
-    ChecklistItem_Type,
+  Checklist,
+  ChecklistFile,
+  ChecklistFileMetadata,
+  ChecklistGroup,
+  ChecklistGroup_Category,
+  ChecklistItem,
+  ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
 
 type OrientationType = jsPDFOptions['orientation'];
@@ -31,18 +31,12 @@ export class PdfWriter {
   private static readonly METADATA_HEADER_HEIGHT = 2;
   private static readonly METADATA_VALUE_FONT_SIZE = 20;
   private static readonly METADATA_VALUE_HEIGHT = 3;
-  private static readonly PREFIX_TEMPLATE: CellDef = {
-    styles: {
-      fontStyle: 'bold',
-      halign: 'right',
-      valign: 'top',
-    },
-  };
   private static readonly SPACER_CELL: CellDef = {
-    content: '. '.repeat(50),
+    content: '. '.repeat(100),
     styles: {
       overflow: 'hidden',
       valign: 'top',
+      halign: 'center',
     },
   };
 
@@ -141,6 +135,9 @@ export class PdfWriter {
 
   private _addGroupTitle(group: ChecklistGroup) {
     if (!this._doc) return;
+    if (PdfWriter.DEBUG_LAYOUT) {
+      console.log(`Group ${group.title}`);
+    }
 
     this._setCurrentY(PdfWriter.GROUP_TITLE_SIZE);
     this._addCenteredText(group.title, PdfWriter.GROUP_TITLE_SIZE, 20, 'bold');
@@ -169,6 +166,10 @@ export class PdfWriter {
 
     let first = true;
     for (const checklist of group.checklists) {
+      if (PdfWriter.DEBUG_LAYOUT) {
+        console.log(`Checklist ${checklist.title}`);
+      }
+
       // Calculate where to start the next table.
       let startY = PdfWriter.GROUP_TITLE_SIZE * 2;
       if (!first) {
@@ -183,8 +184,8 @@ export class PdfWriter {
       first = false;
 
       autoTable(this._doc, {
-        // Actual columns are: icon, prompt, spacer, expectation
-        head: [[{ content: checklist.title, colSpan: 4, styles: { halign: 'center', fontSize: 16 } }]],
+        // Actual columns are: prompt, spacer, expectation
+        head: [[{ content: checklist.title, colSpan: 3, styles: { halign: 'center', fontSize: 16 } }]],
         body: this._checklistTableBody(checklist),
         showHead: 'firstPage',
         startY: startY,
@@ -200,74 +201,78 @@ export class PdfWriter {
 
   private _checklistTableBody(checklist: Checklist): RowInput[] {
     return checklist.items.map((item: ChecklistItem) => {
-      const cells: CellDef[] = [];
-      const prompt: CellDef = {
-        content: item.prompt,
+      return this._itemToCells(item);
+    });
+  }
+
+  private _itemToCells(item: ChecklistItem): CellDef[] {
+    if (!this._doc) return [];
+
+    const cells: CellDef[] = [];
+    const prompt: CellDef = {
+      content: item.prompt,
+      styles: {
+        halign: 'left',
+        valign: 'top',
+        minCellWidth: 10,
+      },
+    };
+
+    // We should be able to have the prefix in its own cell and have non-prefixed rows use a colSpan=2 for the prompt, but unfortunately a bug in jspdf-autotable prevents that:
+    // https://github.com/simonbengtsson/jsPDF-AutoTable/issues/686
+    switch (item.type) {
+      case ChecklistItem_Type.ITEM_TITLE:
+        prompt.styles!.fontStyle = 'bold';
+        break;
+      case ChecklistItem_Type.ITEM_SPACE:
+        // TODO: Skip alternating styles for blanks?
+        prompt.styles!.minCellHeight = 2;
+        break;
+      case ChecklistItem_Type.ITEM_WARNING:
+        // TODO: Icon
+        prompt.content = 'WARNING: ' + prompt.content;
+        break;
+      case ChecklistItem_Type.ITEM_CAUTION:
+        // TODO: Icon
+        prompt.content = 'CAUTION: ' + prompt.content;
+        break;
+      case ChecklistItem_Type.ITEM_NOTE:
+        prompt.content = 'NOTE: ' + prompt.content;
+        break;
+    }
+
+    if (item.centered) {
+      prompt.styles!.halign = 'center';
+    } else if (item.indent) {
+      const defaultPadding = 5 / this._doc.internal.scaleFactor;
+      prompt.styles!.cellPadding = {
+        left: item.indent + defaultPadding,
+        // Specifying any cellPadding removes the other default paddings, so must specify all of them.
+        top: defaultPadding,
+        bottom: defaultPadding,
+        right: defaultPadding,
+      };
+    }
+
+    if (item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
+      const expectation: CellDef = {
+        content: item.expectation,
         styles: {
           halign: 'left',
           valign: 'top',
         },
       };
-      let prefix: CellDef | undefined;
-
-      switch (item.type) {
-        case ChecklistItem_Type.ITEM_TITLE:
-          prompt.styles!.fontStyle = 'bold';
-          break;
-        case ChecklistItem_Type.ITEM_SPACE:
-          // TODO: Skip alternating styles for blanks?
-          prompt.styles!.minCellHeight = 2;
-          break;
-        case ChecklistItem_Type.ITEM_WARNING:
-          // TODO: Icon
-          prefix = this._prefixCell('WARNING: ');
-          break;
-        case ChecklistItem_Type.ITEM_CAUTION:
-          // TODO: Icon
-          prefix = this._prefixCell('CAUTION: ');
-          break;
-        case ChecklistItem_Type.ITEM_NOTE:
-          prefix = this._prefixCell('NOTE: ');
-          break;
-      }
-      if (prefix) {
-        cells.push(prefix);
-      }
-
-      if (item.centered) {
-        prompt.styles!.halign = 'center';
-      } else if (prefix) {
-        prefix.styles!.cellPadding = { left: item.indent };
-      } else {
-        prompt.styles!.cellPadding = { left: item.indent };
-      }
-
+      cells.push(prompt, PdfWriter.SPACER_CELL, expectation);
+    } else {
+      prompt.colSpan = 3;
       cells.push(prompt);
+    }
 
-      if (item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
-        const expectation: CellDef = {
-          content: item.expectation,
-          styles: {
-            halign: 'left',
-            valign: 'top',
-          },
-        };
-        cells.push(PdfWriter.SPACER_CELL, expectation);
-      }
+    if (PdfWriter.DEBUG_LAYOUT) {
+      console.log(cells);
+    }
 
-      prompt.colSpan = 5 - cells.length;
-      if (PdfWriter.DEBUG_LAYOUT) {
-        prompt.content += `[span=${prompt.colSpan}]`;
-      }
-
-      return cells;
-    });
-  }
-
-  private _prefixCell(content: string): CellDef {
-    const def = structuredClone(PdfWriter.PREFIX_TEMPLATE);
-    def.content = content;
-    return def;
+    return cells;
   }
 
   private _setCurrentY(y: number) {
