@@ -9,6 +9,7 @@ import {
   ChecklistItem,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
+import { PdfFonts } from './pdf-fonts';
 
 type OrientationType = jsPDFOptions['orientation'];
 type FormatType = jsPDFOptions['format'];
@@ -22,7 +23,6 @@ export interface PdfWriterOptions {
 
 export class PdfWriter {
   private static readonly DEBUG_LAYOUT = false;
-  private static readonly FONT_NAME = 'helvetica';
   private static readonly GROUP_BOX_MARGIN = 0.4;
   private static readonly GROUP_TITLE_SIZE = 3;
   private static readonly MAIN_TITLE_FONT_SIZE = 30;
@@ -41,6 +41,7 @@ export class PdfWriter {
   };
 
   private _doc?: AutoTabledPDF;
+  private _fonts?: PdfFonts;
   private _pageWidth = 0;
   private _pageHeight = 0;
   private _currentY = 0;
@@ -55,11 +56,12 @@ export class PdfWriter {
       putOnlyUsedFonts: true,
     });
     this._doc = doc as AutoTabledPDF;
+    this._fonts = new PdfFonts(this._doc);
 
     this._pageHeight = this._doc.internal.pageSize.getHeight();
     this._pageWidth = this._doc.internal.pageSize.getWidth();
-    // TODO: Add Roboto instead (see https://www.devlinpeck.com/content/jspdf-custom-font).
-    this._doc.setFont(PdfWriter.FONT_NAME, 'bold');
+
+    this._fonts.setDefaultFont(PdfFonts.BOLD_FONT_STYLE);
 
     if (file.metadata && this._options?.outputCoverPage) {
       this._addCover(file.metadata);
@@ -73,7 +75,12 @@ export class PdfWriter {
     if (!this._doc) return;
     // TODO: Fill out all the metadata with a nice layout
     this._setCurrentY(this._pageHeight / 3);
-    this._addCenteredText('Checklists', PdfWriter.TITLE_TO_METADATA_SPACING, PdfWriter.MAIN_TITLE_FONT_SIZE, 'bold');
+    this._addCenteredText(
+      'Checklists',
+      PdfWriter.TITLE_TO_METADATA_SPACING,
+      PdfWriter.MAIN_TITLE_FONT_SIZE,
+      PdfFonts.BOLD_FONT_STYLE,
+    );
 
     if (metadata.aircraftInfo) {
       this._addCenteredText('Aircraft:', PdfWriter.METADATA_HEADER_HEIGHT, PdfWriter.METADATA_HEADER_FONT_SIZE);
@@ -81,7 +88,7 @@ export class PdfWriter {
         metadata.aircraftInfo,
         PdfWriter.METADATA_VALUE_HEIGHT,
         PdfWriter.METADATA_VALUE_FONT_SIZE,
-        'bold',
+        PdfFonts.BOLD_FONT_STYLE,
       );
     }
     if (metadata.makeAndModel) {
@@ -94,7 +101,7 @@ export class PdfWriter {
         metadata.makeAndModel,
         PdfWriter.METADATA_VALUE_HEIGHT,
         PdfWriter.METADATA_VALUE_FONT_SIZE,
-        'bold',
+        PdfFonts.BOLD_FONT_STYLE,
       );
     }
     if (metadata.manufacturerInfo) {
@@ -103,7 +110,7 @@ export class PdfWriter {
         metadata.manufacturerInfo,
         PdfWriter.METADATA_VALUE_HEIGHT,
         PdfWriter.METADATA_VALUE_FONT_SIZE,
-        'bold',
+        PdfFonts.BOLD_FONT_STYLE,
       );
     }
     if (metadata.copyrightInfo) {
@@ -112,7 +119,7 @@ export class PdfWriter {
         metadata.copyrightInfo,
         PdfWriter.METADATA_VALUE_HEIGHT,
         PdfWriter.METADATA_VALUE_FONT_SIZE,
-        'bold',
+        PdfFonts.BOLD_FONT_STYLE,
       );
     }
 
@@ -140,7 +147,7 @@ export class PdfWriter {
     }
 
     this._setCurrentY(PdfWriter.GROUP_TITLE_SIZE);
-    this._addCenteredText(group.title, PdfWriter.GROUP_TITLE_SIZE, 20, 'bold');
+    this._addCenteredText(group.title, PdfWriter.GROUP_TITLE_SIZE, 20, PdfFonts.BOLD_FONT_STYLE);
     this._doc.saveGraphicsState();
 
     let rectColor = 'black';
@@ -218,11 +225,12 @@ export class PdfWriter {
       },
     };
 
-    // We should be able to have the prefix in its own cell and have non-prefixed rows use a colSpan=2 for the prompt, but unfortunately a bug in jspdf-autotable prevents that:
+    // We should be able to have the prefix in its own cell and have non-prefixed rows use a colSpan=2 for the prompt,
+    // but unfortunately a bug in jspdf-autotable prevents that:
     // https://github.com/simonbengtsson/jsPDF-AutoTable/issues/686
     switch (item.type) {
       case ChecklistItem_Type.ITEM_TITLE:
-        prompt.styles!.fontStyle = 'bold';
+        prompt.styles!.fontStyle = PdfFonts.BOLD_FONT_STYLE;
         break;
       case ChecklistItem_Type.ITEM_SPACE:
         // TODO: Skip alternating styles for blanks?
@@ -291,7 +299,7 @@ export class PdfWriter {
     if (fontSize) {
       this._doc.setFontSize(fontSize);
     }
-    this._doc.setFont(PdfWriter.FONT_NAME, fontStyle || 'normal');
+    this._fonts!.setDefaultFont(fontStyle);
     this._doc.text(txt, this._pageWidth / 2, this._currentY, { align: 'center' });
     this._doc.restoreGraphicsState();
 
