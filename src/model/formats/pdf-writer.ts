@@ -1,13 +1,13 @@
 import { jsPDF, jsPDFOptions } from 'jspdf';
 import autoTable, { CellDef, RowInput } from 'jspdf-autotable';
 import {
-  Checklist,
-  ChecklistFile,
-  ChecklistFileMetadata,
-  ChecklistGroup,
-  ChecklistGroup_Category,
-  ChecklistItem,
-  ChecklistItem_Type,
+    Checklist,
+    ChecklistFile,
+    ChecklistFileMetadata,
+    ChecklistGroup,
+    ChecklistGroup_Category,
+    ChecklistItem,
+    ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
 
 type OrientationType = jsPDFOptions['orientation'];
@@ -22,11 +22,12 @@ export interface PdfWriterOptions {
 
 export class PdfWriter {
   private static readonly DEBUG_LAYOUT = false;
+  private static readonly FONT_NAME = 'helvetica';
   private static readonly GROUP_BOX_MARGIN = 0.4;
   private static readonly GROUP_TITLE_SIZE = 3;
   private static readonly MAIN_TITLE_FONT_SIZE = 30;
   private static readonly TITLE_TO_METADATA_SPACING = 15;
-  private static readonly METADATA_HEADER_FONT_SIZE = 15;
+  private static readonly METADATA_HEADER_FONT_SIZE = 12;
   private static readonly METADATA_HEADER_HEIGHT = 2;
   private static readonly METADATA_VALUE_FONT_SIZE = 20;
   private static readonly METADATA_VALUE_HEIGHT = 3;
@@ -48,6 +49,7 @@ export class PdfWriter {
   private _doc?: AutoTabledPDF;
   private _pageWidth = 0;
   private _pageHeight = 0;
+  private _currentY = 0;
 
   constructor(private _options?: PdfWriterOptions) {}
 
@@ -63,7 +65,7 @@ export class PdfWriter {
     this._pageHeight = this._doc.internal.pageSize.getHeight();
     this._pageWidth = this._doc.internal.pageSize.getWidth();
     // TODO: Add Roboto instead (see https://www.devlinpeck.com/content/jspdf-custom-font).
-    this._doc.setFont('helvetica', 'bold');
+    this._doc.setFont(PdfWriter.FONT_NAME, 'bold');
 
     if (file.metadata && this._options?.outputCoverPage) {
       this._addCover(file.metadata);
@@ -76,37 +78,52 @@ export class PdfWriter {
   private _addCover(metadata: ChecklistFileMetadata) {
     if (!this._doc) return;
     // TODO: Fill out all the metadata with a nice layout
-    let currentY = this._pageHeight / 3;
-    this._addCenteredText('Checklists', currentY, PdfWriter.MAIN_TITLE_FONT_SIZE);
-    currentY += PdfWriter.TITLE_TO_METADATA_SPACING;
+    this._setCurrentY(this._pageHeight / 3);
+    this._addCenteredText('Checklists', PdfWriter.TITLE_TO_METADATA_SPACING, PdfWriter.MAIN_TITLE_FONT_SIZE, 'bold');
 
     if (metadata.aircraftInfo) {
-      this._addCenteredText('Aircraft:', currentY, PdfWriter.METADATA_HEADER_FONT_SIZE);
-      currentY += PdfWriter.METADATA_HEADER_HEIGHT;
-      this._addCenteredText(metadata.aircraftInfo, currentY, PdfWriter.METADATA_VALUE_FONT_SIZE);
-      currentY += PdfWriter.METADATA_VALUE_HEIGHT;
+      this._addCenteredText('Aircraft:', PdfWriter.METADATA_HEADER_HEIGHT, PdfWriter.METADATA_HEADER_FONT_SIZE);
+      this._addCenteredText(
+        metadata.aircraftInfo,
+        PdfWriter.METADATA_VALUE_HEIGHT,
+        PdfWriter.METADATA_VALUE_FONT_SIZE,
+        'bold',
+      );
     }
     if (metadata.makeAndModel) {
-      this._addCenteredText('Aircraft make/model:', currentY, PdfWriter.METADATA_HEADER_FONT_SIZE);
-      currentY += PdfWriter.METADATA_HEADER_HEIGHT;
-      this._addCenteredText(metadata.makeAndModel, currentY, PdfWriter.METADATA_VALUE_FONT_SIZE);
-      currentY += PdfWriter.METADATA_VALUE_HEIGHT;
+      this._addCenteredText(
+        'Aircraft make/model:',
+        PdfWriter.METADATA_HEADER_HEIGHT,
+        PdfWriter.METADATA_HEADER_FONT_SIZE,
+      );
+      this._addCenteredText(
+        metadata.makeAndModel,
+        PdfWriter.METADATA_VALUE_HEIGHT,
+        PdfWriter.METADATA_VALUE_FONT_SIZE,
+        'bold',
+      );
     }
     if (metadata.manufacturerInfo) {
-      this._addCenteredText('Manufacturer:', currentY, PdfWriter.METADATA_HEADER_FONT_SIZE);
-      currentY += PdfWriter.METADATA_HEADER_HEIGHT;
-      this._addCenteredText(metadata.manufacturerInfo, currentY, PdfWriter.METADATA_VALUE_FONT_SIZE);
-      currentY += PdfWriter.METADATA_VALUE_HEIGHT;
+      this._addCenteredText('Manufacturer:', PdfWriter.METADATA_HEADER_HEIGHT, PdfWriter.METADATA_HEADER_FONT_SIZE);
+      this._addCenteredText(
+        metadata.manufacturerInfo,
+        PdfWriter.METADATA_VALUE_HEIGHT,
+        PdfWriter.METADATA_VALUE_FONT_SIZE,
+        'bold',
+      );
     }
     if (metadata.copyrightInfo) {
-      this._addCenteredText('Copyright:', currentY, PdfWriter.METADATA_HEADER_FONT_SIZE);
-      currentY += PdfWriter.METADATA_HEADER_HEIGHT;
-      this._addCenteredText(metadata.copyrightInfo, currentY, PdfWriter.METADATA_VALUE_FONT_SIZE);
-      currentY += PdfWriter.METADATA_VALUE_HEIGHT;
+      this._addCenteredText('Copyright:', PdfWriter.METADATA_HEADER_HEIGHT, PdfWriter.METADATA_HEADER_FONT_SIZE);
+      this._addCenteredText(
+        metadata.copyrightInfo,
+        PdfWriter.METADATA_VALUE_HEIGHT,
+        PdfWriter.METADATA_VALUE_FONT_SIZE,
+        'bold',
+      );
     }
 
     // TODO: Add a "generated by" footer
-    this._doc.addPage();
+    this._newPage();
   }
 
   private _addGroups(groups: ChecklistGroup[]) {
@@ -116,7 +133,7 @@ export class PdfWriter {
       this._addGroup(group);
 
       // Force starting a new page for each group.
-      this._doc.addPage();
+      this._newPage();
     }
 
     this._doc.deletePage(this._doc.internal.pages.length - 1);
@@ -125,8 +142,8 @@ export class PdfWriter {
   private _addGroupTitle(group: ChecklistGroup) {
     if (!this._doc) return;
 
-    this._doc.setFontSize(20);
-    this._addCenteredText(group.title, PdfWriter.GROUP_TITLE_SIZE);
+    this._setCurrentY(PdfWriter.GROUP_TITLE_SIZE);
+    this._addCenteredText(group.title, PdfWriter.GROUP_TITLE_SIZE, 20, 'bold');
     this._doc.saveGraphicsState();
 
     let rectColor = 'black';
@@ -158,7 +175,7 @@ export class PdfWriter {
         const lastY = this._doc.lastAutoTable.finalY;
         if (lastY > this._pageHeight / 2) {
           // More than half the page is already used, start on the next page.
-          this._doc.addPage();
+          this._newPage();
         } else {
           startY = lastY + 2;
         }
@@ -253,14 +270,26 @@ export class PdfWriter {
     return def;
   }
 
-  private _addCenteredText(txt: string, y: number, fontSize?: number) {
+  private _setCurrentY(y: number) {
+    this._currentY = y;
+  }
+
+  private _newPage() {
+    this._doc?.addPage();
+    this._setCurrentY(0);
+  }
+
+  private _addCenteredText(txt: string, advanceY: number, fontSize?: number, fontStyle?: string) {
     if (!this._doc) return;
 
-    const oldFontSize = this._doc.getFontSize();
+    this._doc.saveGraphicsState();
     if (fontSize) {
       this._doc.setFontSize(fontSize);
     }
-    this._doc.text(txt, this._pageWidth / 2, y, { align: 'center' });
-    this._doc.setFontSize(oldFontSize);
+    this._doc.setFont(PdfWriter.FONT_NAME, fontStyle || 'normal');
+    this._doc.text(txt, this._pageWidth / 2, this._currentY, { align: 'center' });
+    this._doc.restoreGraphicsState();
+
+    this._currentY += advanceY;
   }
 }
