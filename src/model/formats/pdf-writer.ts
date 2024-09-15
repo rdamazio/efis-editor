@@ -25,13 +25,16 @@ export interface PdfWriterOptions {
 export class PdfWriter {
   private static readonly DEBUG_LAYOUT = false;
   private static readonly GROUP_BOX_MARGIN = 0.4;
-  private static readonly GROUP_TITLE_SIZE = 3;
+  private static readonly GROUP_TITLE_HEIGHT = 3;
+  private static readonly GROUP_TITLE_FONT_SIZE = 20;
   private static readonly MAIN_TITLE_FONT_SIZE = 30;
   private static readonly TITLE_TO_METADATA_SPACING = 15;
   private static readonly METADATA_HEADER_FONT_SIZE = 12;
   private static readonly METADATA_HEADER_HEIGHT = 2;
   private static readonly METADATA_VALUE_FONT_SIZE = 20;
   private static readonly METADATA_VALUE_HEIGHT = 3;
+  private static readonly HEADER_FONT_SIZE = 16;
+  private static readonly CONTENT_FONT_SIZE = 12;
   private static readonly FOOTNOTE_Y = 64;
   private static readonly FOOTNOTE_HEIGHT = 1;
   private static readonly FOOTNOTE_FONT_SIZE = 8;
@@ -158,8 +161,13 @@ export class PdfWriter {
       console.log(`Group ${group.title}`);
     }
 
-    this._setCurrentY(PdfWriter.GROUP_TITLE_SIZE);
-    this._addCenteredText(group.title, PdfWriter.GROUP_TITLE_SIZE, 20, PdfFonts.BOLD_FONT_STYLE);
+    this._setCurrentY(PdfWriter.GROUP_TITLE_HEIGHT);
+    this._addCenteredText(
+      group.title,
+      PdfWriter.GROUP_TITLE_HEIGHT,
+      PdfWriter.GROUP_TITLE_FONT_SIZE,
+      PdfFonts.BOLD_FONT_STYLE,
+    );
     this._doc.saveGraphicsState();
 
     let rectColor = 'black';
@@ -173,7 +181,7 @@ export class PdfWriter {
       PdfWriter.GROUP_BOX_MARGIN,
       PdfWriter.GROUP_BOX_MARGIN,
       this._pageWidth - PdfWriter.GROUP_BOX_MARGIN * 2,
-      PdfWriter.GROUP_TITLE_SIZE + 1,
+      PdfWriter.GROUP_TITLE_HEIGHT + 1,
     );
     this._doc.restoreGraphicsState();
   }
@@ -190,7 +198,7 @@ export class PdfWriter {
       }
 
       // Calculate where to start the next table.
-      let startY = PdfWriter.GROUP_TITLE_SIZE * 2;
+      let startY = PdfWriter.GROUP_TITLE_HEIGHT * 2;
       if (!first) {
         const lastY = this._doc.lastAutoTable.finalY;
         if (lastY > this._pageHeight / 2) {
@@ -204,7 +212,15 @@ export class PdfWriter {
 
       autoTable(this._doc, {
         // Actual columns are: prompt, spacer, expectation
-        head: [[{ content: checklist.title, colSpan: 3, styles: { halign: 'center', fontSize: 16 } }]],
+        head: [
+          [
+            {
+              content: checklist.title,
+              colSpan: 3,
+              styles: { halign: 'center', fontSize: PdfWriter.HEADER_FONT_SIZE },
+            },
+          ],
+        ],
         body: this._checklistTableBody(checklist),
         showHead: 'firstPage',
         startY: startY,
@@ -214,6 +230,9 @@ export class PdfWriter {
               lineWidth: 0.1,
             }
           : undefined,
+        bodyStyles: {
+          fontSize: PdfWriter.CONTENT_FONT_SIZE,
+        },
       });
     }
   }
