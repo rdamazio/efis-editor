@@ -1,5 +1,5 @@
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { afterNextRender, Component, ElementRef, EventEmitter, Injector, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTreeModule, MatTreeNestedDataSource } from '@angular/material/tree';
@@ -16,6 +16,7 @@ import { ChecklistTreeNodeComponent } from './node/node.component';
   styleUrl: './checklist-tree.component.scss',
 })
 export class ChecklistTreeComponent {
+  // TODO: Make this a get/set so we can focus on external set
   @Input() selectedChecklist: Checklist | undefined;
   @Output() selectedChecklistChange = new EventEmitter<Checklist | undefined>();
   @Output() selectedChecklistGroup: ChecklistGroup | undefined;
@@ -23,6 +24,11 @@ export class ChecklistTreeComponent {
   treeControl = new NestedTreeControl<ChecklistTreeNode>((node) => node.children);
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
   private _file?: ChecklistFile;
+
+  constructor(
+    private _element: ElementRef,
+    private _injector: Injector,
+  ) {}
 
   @Output() fileChange = new EventEmitter<ChecklistFile>();
   @Input()
@@ -145,6 +151,7 @@ export class ChecklistTreeComponent {
     }
 
     this._selectChecklist(group.checklists[checklistIdx], group);
+    this._scrollToSelectedChecklist();
   }
 
   selectPreviousChecklist() {
@@ -182,14 +189,55 @@ export class ChecklistTreeComponent {
     }
 
     this._selectChecklist(group.checklists[checklistIdx], group);
+    this._scrollToSelectedChecklist();
   }
 
   private _selectChecklist(checklist?: Checklist, group?: ChecklistGroup) {
     this.selectedChecklist = checklist;
     this.selectedChecklistGroup = group;
     this.selectedChecklistChange.emit(checklist);
+  }
 
-    // TODO: Focus/scroll to selected checklist in the tree.
+  private _scrollToSelectedChecklist() {
+    if (!this.selectedChecklist) return;
+
+    let selectedNode, selectedGroupNode: ChecklistTreeNode | undefined;
+    for (const groupNode of this.treeControl.dataNodes) {
+      if (!groupNode || !groupNode.children) continue;
+      for (const checklistNode of groupNode.children) {
+        if (checklistNode.checklist === this.selectedChecklist) {
+          selectedNode = checklistNode;
+          selectedGroupNode = groupNode;
+          break;
+        }
+      }
+    }
+    if (!selectedNode || !selectedGroupNode) {
+      console.error("Couldn't find selected tree node");
+      return;
+    }
+
+    // Expand the tree to make the node visible.
+    if (!this.treeControl.isExpanded(selectedGroupNode)) {
+      this.treeControl.expand(selectedGroupNode);
+    }
+
+    // Nodes may need to be (re)created after the above, delay the actual scrolling.
+    afterNextRender(
+      () => {
+        const selectedElements = this._element.nativeElement.querySelectorAll('.checklist-selected');
+        if (selectedElements.length !== 1) {
+          console.error('Could not find element for selected node');
+          return;
+        }
+        selectedElements[0].scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        });
+      },
+      { injector: this._injector },
+    );
   }
 
   private _findSelectedChecklist(): { groupIdx?: number; checklistIdx?: number } {
