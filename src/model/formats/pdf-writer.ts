@@ -72,6 +72,8 @@ export class PdfWriter {
     }
     this._addGroups(file.groups);
 
+    this._addPageFooters();
+
     return this._doc.output('blob');
   }
 
@@ -291,6 +293,18 @@ export class PdfWriter {
     }
 
     return cells;
+  }
+
+  private _addPageFooters() {
+    if (!this._doc) return;
+
+    const pageCount = this._doc.internal.pages.length - 1;
+
+    for (let i = 2; i <= pageCount; i++) {
+      this._doc.setPage(i);
+      this._setCurrentY(PdfWriter.FOOTNOTE_Y);
+      this._addCenteredText(`Page ${i} of ${pageCount}`, PdfWriter.FOOTNOTE_HEIGHT, PdfWriter.FOOTNOTE_FONT_SIZE);
+    }
   }
 
   private _setCurrentY(y: number) {
