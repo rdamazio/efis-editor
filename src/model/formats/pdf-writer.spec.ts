@@ -75,7 +75,7 @@ describe('PdfWriter', () => {
   async function parsePdf(data: ArrayBuffer): Promise<pdfjs.PDFDocumentProxy> {
     pdfjs.GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.js';
 
-    return await pdfjs.getDocument({
+    return pdfjs.getDocument({
       data: data,
       useWorkerFetch: false,
       isEvalSupported: false,
