@@ -319,7 +319,8 @@ export class PdfWriter {
 
     const pageCount = this._doc.internal.pages.length - 1;
 
-    for (let i = 2; i <= pageCount; i++) {
+    const firstNumberedPage = this._options?.outputCoverPage ? 2 : 1;
+    for (let i = firstNumberedPage; i <= pageCount; i++) {
       this._doc.setPage(i);
       this._setCurrentY(PdfWriter.FOOTNOTE_Y);
       this._addCenteredText(`Page ${i} of ${pageCount}`, PdfWriter.FOOTNOTE_HEIGHT, PdfWriter.FOOTNOTE_FONT_SIZE);
