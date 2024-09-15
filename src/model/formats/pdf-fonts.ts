@@ -20,8 +20,6 @@ export class PdfFonts {
       PdfFonts.ROBOTO_NORMAL,
     );
     this._registerFont('Roboto-Bold.ttf', PdfFonts.DEFAULT_FONT_NAME, PdfFonts.BOLD_FONT_STYLE, PdfFonts.ROBOTO_BOLD);
-
-    console.log('Fonts', this._doc.getFontList());
   }
 
   private _registerFont(fileName: string, fontName: string, fontStyle: string, contents: string) {
