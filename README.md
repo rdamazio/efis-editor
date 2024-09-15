@@ -9,7 +9,7 @@ This is a web-based editor for file formats used by modern EFIS avionics systems
 > [!IMPORTANT]
 > First, read the disclaimer below carefully. Then:
 
-:point_right:	 Head over to https://rdamazio.github.io/efis-editor/. :point_left:
+:point_right: Head over to https://rdamazio.github.io/efis-editor/. :point_left:
 
 ## Preview
 
@@ -19,13 +19,13 @@ You can try it out directly in the link above, but here's what it currently look
 
 ## Supported file types:
 
-* Checklists:
-  * Advanced Flight systems (AFS)
-  * Dynon Skyview
-  * Foreflight (.fmd file format) - thanks to [zyv](https://github.com/zyv)!
-  * Garmin G3X / G3X Touch / GTN (.ace file format)
-  * Grand Rapids (GRT)
-  * Printable (PDF) - export only
+- Checklists:
+  - Advanced Flight systems (AFS)
+  - Dynon Skyview
+  - Foreflight (.fmd file format) - thanks to [zyv](https://github.com/zyv)!
+  - Garmin G3X / G3X Touch / GTN (.ace file format)
+  - Grand Rapids (GRT)
+  - Printable (PDF) - export only
 
 Internally, files are stored in our own format, so it is possible to import a
 file in one format and then export it in another.
@@ -51,12 +51,13 @@ using these files with the same care that you would any flight testing activity 
 we recommend thoroughly testing them before use during actual operations (including
 checking them with the manufacturer's recommended apps where available, thoroughly
 testing on the ground before flight, having paper copies of your checklists, and any
-other precautions you would take when using an avionics configuration that's ***not
-supported*** or documented by your avionics manufacturer). We take no responsibility if
+other precautions you would take when using an avionics configuration that's **_not
+supported_** or documented by your avionics manufacturer). We take no responsibility if
 it makes your EFIS crash, melt and/or you crash and die while attempting to use
 these files. We obviously also take no responsibility for the actual contents of your
 checklists, or even guarantee that the contents you enter in this app will
-be accurately reflected in your EFIS.
+be accurately reflected in your EFIS. Likewise, we make no guarantee that generated
+printable files will be correct, complete or safe to use as paper backups.
 
 Experimental aircraft use only - use for certificated aircraft is not authorized.
 
@@ -95,7 +96,7 @@ for contributors. The broad TL;DR:
 This is a short list of known areas where contributions would be helpful:
 
 - **UI refinement**: As a backend developer (heck, nowadays I'm not even that, just a manager),
-  my CSS-foo is quite limited. If  you see something that looks odd, please send a PR!
+  my CSS-foo is quite limited. If you see something that looks odd, please send a PR!
 - **Format testing**: I have not tested these files on anything but Garmin avionics. Please
   test and send improvements.
 - **GRT live data**: GRT supports showing live data on the checklist, which is pretty
@@ -115,10 +116,10 @@ This is a short list of known areas where contributions would be helpful:
 
 The following steps can be followed to set up a development environment:
 
-* If you haven't already, [install Node](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs)
-* Clone this project (we recommend using [jj](http://github.com/martinvonz/jj) for that!)
-* `npm install` (will install all dependencies into `node_modules/`)
-* `npm run genproto` (will generate protocol buffer files into `gen/ts/`)
+- If you haven't already, [install Node](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs)
+- Clone this project (we recommend using [jj](http://github.com/martinvonz/jj) for that!)
+- `npm install` (will install all dependencies into `node_modules/`)
+- `npm run genproto` (will generate protocol buffer files into `gen/ts/`)
 
 You can then develop as you normally would any Angular app (e.g. `ng serve`).
 
