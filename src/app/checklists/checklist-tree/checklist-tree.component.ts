@@ -112,12 +112,19 @@ export class ChecklistTreeComponent {
 
   selectNextChecklist() {
     if (!this._file) return;
-    let { groupIdx, checklistIdx } = this._findSelectedChecklist();
-    if (groupIdx === undefined || checklistIdx === undefined) return;
-
-    // If it's the last checklis on the current group, wrap to next group that has a checklist.
     const groups = this._file.groups;
     const numGroups = groups.length;
+    if (!numGroups) return; // Empty file
+
+    let { groupIdx, checklistIdx } = this._findSelectedChecklist();
+    if (groupIdx === undefined || checklistIdx === undefined) {
+      // Nothing was selected - pretend something before the first checklist was,
+      // and it'll get advanced onto the first checklist.
+      groupIdx = 0;
+      checklistIdx = -1;
+    }
+
+    // If it's the last checklist on the current group, wrap to next group that has a checklist.
     let group = groups[groupIdx];
     if (checklistIdx === group.checklists.length - 1) {
       checklistIdx = 0;
@@ -142,11 +149,19 @@ export class ChecklistTreeComponent {
 
   selectPreviousChecklist() {
     if (!this._file) return;
+    const groups = this._file.groups;
+    const numGroups = groups.length;
+    if (!numGroups) return; // Empty file
+
     let { groupIdx, checklistIdx } = this._findSelectedChecklist();
-    if (groupIdx === undefined || checklistIdx === undefined) return;
+    if (groupIdx === undefined || checklistIdx === undefined) {
+      // Nothing was selected - pretend something after the last checklist was,
+      // and it'll get rewinded onto the last checklist.
+      groupIdx = groups.length - 1;
+      checklistIdx = groups[groupIdx].checklists.length;
+    }
 
     // If it's the first checklist on the current group, wrap to prior group that has a checklist.
-    const groups = this._file.groups;
     let group = groups[groupIdx];
     if (checklistIdx === 0) {
       groupIdx--;
