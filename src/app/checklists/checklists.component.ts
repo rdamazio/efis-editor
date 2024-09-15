@@ -195,6 +195,16 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         .subscribe(() => {
           this.items!.moveCurrentItemDown();
         });
+      this._hotkeys
+        .addShortcut({
+          keys: 'meta.i',
+          description: 'Edit file information',
+          preventDefault: true,
+          group: 'Editing',
+        })
+        .subscribe(() => {
+          this.onFileInfo();
+        });
 
       const NEW_ITEM_SHORTCUTS = [
         { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
