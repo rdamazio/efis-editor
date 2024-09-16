@@ -13,6 +13,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
+import scrollIntoView from 'scroll-into-view-if-needed';
 import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 import { ChecklistItemComponent } from './item/item.component';
 
@@ -230,7 +231,8 @@ export class ChecklistItemsComponent {
     const item = this._selectedItemComponent();
     if (item) {
       item.focus();
-      item.containerRef?.nativeElement.scrollIntoView({
+      scrollIntoView(item.containerRef?.nativeElement, {
+        scrollMode: 'if-needed',
         behavior: 'smooth',
         block: 'nearest',
         inline: 'nearest',

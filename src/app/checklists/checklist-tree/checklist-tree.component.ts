@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTreeModule, MatTreeNestedDataSource } from '@angular/material/tree';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
+import scrollIntoView from 'scroll-into-view-if-needed';
 import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
@@ -237,8 +238,8 @@ export class ChecklistTreeComponent {
           return;
         }
 
-        // TODO: Only scroll if element not already visible.
-        selectedElements[0].scrollIntoView({
+        scrollIntoView(selectedElements[0], {
+          scrollMode: 'if-needed',
           behavior: 'smooth',
           block: 'nearest',
           inline: 'nearest',
