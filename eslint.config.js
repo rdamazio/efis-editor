@@ -1,8 +1,12 @@
 // @ts-check
+const depend = require('eslint-plugin-depend');
 const eslint = require('@eslint/js');
-const tseslint = require('typescript-eslint');
 const angular = require('angular-eslint');
-const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
+const jasmine = require('eslint-plugin-jasmine');
+const nosecrets = require('eslint-plugin-no-secrets');
+const prettierRecommended = require('eslint-plugin-prettier/recommended');
+const promise = require('eslint-plugin-promise');
+const tseslint = require('typescript-eslint');
 
 module.exports = tseslint.config(
   {
@@ -12,8 +16,15 @@ module.exports = tseslint.config(
       ...tseslint.configs.recommended,
       ...tseslint.configs.stylistic,
       ...angular.configs.tsRecommended,
-      eslintPluginPrettierRecommended,
+      prettierRecommended,
+      depend.configs['flat/recommended'],
+      promise.configs['flat/recommended'],
+      jasmine.configs.recommended,
     ],
+    plugins: {
+      jasmine: jasmine,
+      'no-secrets': nosecrets,
+    },
     processor: angular.processInlineTemplates,
     rules: {
       '@angular-eslint/directive-selector': [
@@ -24,15 +35,26 @@ module.exports = tseslint.config(
           style: 'camelCase',
         },
       ],
+      'array-callback-return': 'error',
+      eqeqeq: 'error',
+      'jasmine/new-line-before-expect': 'off',
+      'no-await-in-loop': 'error',
+      'no-constructor-return': 'error',
+      'no-duplicate-imports': 'error',
+      'no-implicit-coercion': 'error',
+      'no-secrets/no-secrets': 'error',
+      'no-self-compare': 'error',
+      'no-template-curly-in-string': 'error',
+      'no-unmodified-loop-condition': 'error',
+      'no-unreachable-loop': 'error',
+      'no-useless-assignment': 'error',
+      'no-var': 'error',
+      'require-atomic-updates': 'error',
     },
   },
   {
     files: ['**/*.html'],
-    extends: [
-      ...angular.configs.templateRecommended,
-      ...angular.configs.templateAccessibility,
-      eslintPluginPrettierRecommended,
-    ],
+    extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility, prettierRecommended],
     rules: {
       'prettier/prettier': [
         'error',

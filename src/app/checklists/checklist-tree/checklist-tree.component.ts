@@ -92,7 +92,7 @@ export class ChecklistTreeComponent {
     return node;
   }
 
-  hasChild = (_: number, node: ChecklistTreeNode) => !!node.children && node.children.length > 0;
+  hasChild = (_: number, node: ChecklistTreeNode) => node.children && node.children.length > 0;
 
   onNodeSelect(node: ChecklistTreeNode) {
     let checklist: Checklist | undefined;

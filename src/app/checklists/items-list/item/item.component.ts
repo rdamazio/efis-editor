@@ -37,7 +37,7 @@ export class ChecklistItemComponent {
   readonly ChecklistItem_Type = ChecklistItem_Type;
 
   onEdit(e?: Event) {
-    this._shouldRestoreFocus = document.activeElement == this.containerRef!.nativeElement;
+    this._shouldRestoreFocus = document.activeElement === this.containerRef!.nativeElement;
     e?.stopPropagation();
     this.promptInput!.edit();
     this.expectationInput!.edit();

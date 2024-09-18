@@ -72,7 +72,7 @@ export class AceReader {
     }
 
     const fileCrc = ~new DataView(this._buf, this._offset, 4).getUint32(0, true);
-    if (fileCrc != expectedCrc) {
+    if (fileCrc !== expectedCrc) {
       throw new FormatError(
         'File failed checksum! Expected ' + expectedCrc.toString(16) + ', file has ' + fileCrc.toString(16),
       );
@@ -165,7 +165,7 @@ export class AceReader {
   }
   private peekBytes(len: number): Uint8Array {
     const slice = this._arr!.slice(this._offset, this._offset + len);
-    if (slice.byteLength != len) {
+    if (slice.byteLength !== len) {
       throw new FormatError(`Truncated file: expected to read ${len} bytes, only got ${slice.byteLength}`);
     }
     return slice;

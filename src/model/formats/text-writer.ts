@@ -85,7 +85,7 @@ export class TextWriter {
     const month = now.getMonth() + 1;
     const day = now.getDate();
 
-    this._addPart(this._replaceNumbers(this._options.itemPrefix, checklistIdx, itemIdx++));
+    this._addPart(this._replaceNumbers(this._options.itemPrefix, checklistIdx, itemIdx));
     this._addPart(' ');
     this._addPart(LAST_UPDATED_FOOTER);
     this._addPart(year.toString());

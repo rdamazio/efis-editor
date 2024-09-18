@@ -1,11 +1,11 @@
-import { TestBed } from '@angular/core/testing';
-import { firstValueFrom } from 'rxjs';
 import {
   ChecklistFile,
   ChecklistFileMetadata,
   ChecklistGroup_Category,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
+import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
 import { ChecklistStorage } from './checklist-storage';
 
 describe('ChecklistsService', () => {

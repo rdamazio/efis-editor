@@ -181,7 +181,7 @@ export class ChecklistItemsComponent {
   }
 
   moveCurrentItemUp() {
-    if (!this._selectedItem() || this._selectedIdx == 0) {
+    if (!this._selectedItem() || this._selectedIdx === 0) {
       return;
     }
 

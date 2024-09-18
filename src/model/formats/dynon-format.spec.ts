@@ -17,9 +17,11 @@ describe('DynonFormat', () => {
     it('with no wrapping', async () => {
       await testWriteRead('test-dynon.txt');
     });
+
     it('with 31-column wrapping', async () => {
       await testWriteRead('test-dynon31.txt', 31);
     });
+
     it('with 40-column wrapping', async () => {
       await testWriteRead('test-dynon40.txt', 40);
     });

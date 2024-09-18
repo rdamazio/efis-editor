@@ -47,7 +47,7 @@ export class ChecklistFileInfoComponent {
   }
   set defaultChecklist(val: string) {
     const dotIdx = val.indexOf('.');
-    if (dotIdx == -1) {
+    if (dotIdx === -1) {
       throw new Error(`Invalid checklist value "${val}"`);
     }
 

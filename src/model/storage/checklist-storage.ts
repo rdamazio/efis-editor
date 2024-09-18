@@ -1,4 +1,4 @@
-import { AfterRenderPhase, Injectable, afterNextRender } from '@angular/core';
+import { Injectable, afterNextRender } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
 import { JsonFormat } from '../formats/json-format';
@@ -26,19 +26,23 @@ export class ChecklistStorage {
         }
       };
 
-      afterNextRender(
-        () => {
+      afterNextRender({
+        read: () => {
           setTimeout(() => {
             this._storageResolveFunc();
           });
         },
-        { phase: AfterRenderPhase.Read },
-      );
+      });
     });
 
-    this._browserStorage.then((store) => {
-      this._publishList(store);
-    });
+    this._browserStorage
+      .then((store) => {
+        this._publishList(store);
+        return void {};
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   // For testing only.
@@ -92,9 +96,11 @@ export class ChecklistStorage {
   async clear() {
     // Clear only checklist items.
     const ids = this._filesSubject.value;
+    const allDeletes: Promise<void>[] = [];
     for (const id of ids) {
-      await this.deleteChecklistFile(id);
+      allDeletes.push(this.deleteChecklistFile(id));
     }
+    await Promise.all(allDeletes);
 
     const store = await this._browserStorage;
     this._publishList(store);
