@@ -23,7 +23,6 @@ export interface PdfWriterOptions {
 
 export class PdfWriter {
   private static readonly DEBUG_LAYOUT = false;
-  private static readonly GROUP_BOX_MARGIN = 0.4;
   private static readonly GROUP_TITLE_HEIGHT = 3;
   private static readonly GROUP_TITLE_FONT_SIZE = 20;
   private static readonly MAIN_TITLE_FONT_SIZE = 30;
@@ -40,6 +39,7 @@ export class PdfWriter {
   private static readonly DEFAULT_FONT_NAME = 'Roboto-Regular';
   private static readonly NORMAL_FONT_STYLE = 'normal';
   private static readonly BOLD_FONT_STYLE = 'bold';
+  private static readonly RECT_FILL_STYLE = 'F';
   private static readonly SPACER_CELL: CellDef = {
     content: '. '.repeat(100),
     styles: {
@@ -163,6 +163,19 @@ export class PdfWriter {
       console.log(`Group ${group.title}`);
     }
 
+    this._doc.saveGraphicsState();
+    let rectColor = 'blue';
+    let textColor = 'white';
+    if (group.category === ChecklistGroup_Category.abnormal) {
+      rectColor = 'orange';
+      textColor = 'black';
+    } else if (group.category === ChecklistGroup_Category.emergency) {
+      rectColor = 'red';
+    }
+    this._doc.setFillColor(rectColor);
+    this._doc.setTextColor(textColor);
+    this._doc.rect(0, 0, this._pageWidth, PdfWriter.GROUP_TITLE_HEIGHT + 2, PdfWriter.RECT_FILL_STYLE);
+
     this._setCurrentY(PdfWriter.GROUP_TITLE_HEIGHT);
     this._addCenteredText(
       group.title,
@@ -170,21 +183,7 @@ export class PdfWriter {
       PdfWriter.GROUP_TITLE_FONT_SIZE,
       PdfWriter.BOLD_FONT_STYLE,
     );
-    this._doc.saveGraphicsState();
 
-    let rectColor = 'black';
-    if (group.category === ChecklistGroup_Category.abnormal) {
-      rectColor = 'orange';
-    } else if (group.category === ChecklistGroup_Category.emergency) {
-      rectColor = 'red';
-    }
-    this._doc.setDrawColor(rectColor);
-    this._doc.rect(
-      PdfWriter.GROUP_BOX_MARGIN,
-      PdfWriter.GROUP_BOX_MARGIN,
-      this._pageWidth - PdfWriter.GROUP_BOX_MARGIN * 2,
-      PdfWriter.GROUP_TITLE_HEIGHT + 1,
-    );
     this._doc.restoreGraphicsState();
   }
 
