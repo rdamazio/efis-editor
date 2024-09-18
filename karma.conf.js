@@ -29,6 +29,8 @@ module.exports = function (config) {
       subdir: '.',
       reporters: [{ type: 'html' }, { type: 'text-summary' }],
     },
+    files: [{ pattern: './src/assets/**', included: false, served: true }],
+    proxies: { '/assets': '/base/src/assets' },
     reporters: ['progress', 'kjhtml'],
     browsers: ['ChromeWithoutNagScreen'],
     customLaunchers: {

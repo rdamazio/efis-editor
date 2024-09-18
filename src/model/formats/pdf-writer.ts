@@ -9,7 +9,6 @@ import {
   ChecklistItem,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
-import { PdfFonts } from './pdf-fonts';
 
 type OrientationType = jsPDFOptions['orientation'];
 type FormatType = jsPDFOptions['format'];
@@ -38,6 +37,9 @@ export class PdfWriter {
   private static readonly FOOTNOTE_Y = 64;
   private static readonly FOOTNOTE_HEIGHT = 1;
   private static readonly FOOTNOTE_FONT_SIZE = 8;
+  private static readonly DEFAULT_FONT_NAME = 'Roboto-Regular';
+  private static readonly NORMAL_FONT_STYLE = 'normal';
+  private static readonly BOLD_FONT_STYLE = 'bold';
   private static readonly SPACER_CELL: CellDef = {
     content: '. '.repeat(100),
     styles: {
@@ -48,7 +50,6 @@ export class PdfWriter {
   };
 
   private _doc?: AutoTabledPDF;
-  private _fonts?: PdfFonts;
   private _pageWidth = 0;
   private _pageHeight = 0;
   private _currentY = 0;
@@ -63,12 +64,13 @@ export class PdfWriter {
       putOnlyUsedFonts: true,
     });
     this._doc = doc as AutoTabledPDF;
-    this._fonts = new PdfFonts(this._doc);
 
     this._pageHeight = this._doc.internal.pageSize.getHeight();
     this._pageWidth = this._doc.internal.pageSize.getWidth();
 
-    this._fonts.setDefaultFont(PdfFonts.BOLD_FONT_STYLE);
+    this._doc.addFont('assets/Roboto-Regular.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
+    this._doc.addFont('assets/Roboto-Bold.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
+    this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
 
     if (file.metadata && this._options?.outputCoverPage) {
       this._addCover(file.metadata);
@@ -87,7 +89,7 @@ export class PdfWriter {
       'Checklists',
       PdfWriter.TITLE_TO_METADATA_SPACING,
       PdfWriter.MAIN_TITLE_FONT_SIZE,
-      PdfFonts.BOLD_FONT_STYLE,
+      PdfWriter.BOLD_FONT_STYLE,
     );
 
     if (metadata.aircraftInfo) {
@@ -96,7 +98,7 @@ export class PdfWriter {
         metadata.aircraftInfo,
         PdfWriter.METADATA_VALUE_HEIGHT,
         PdfWriter.METADATA_VALUE_FONT_SIZE,
-        PdfFonts.BOLD_FONT_STYLE,
+        PdfWriter.BOLD_FONT_STYLE,
       );
     }
     if (metadata.makeAndModel) {
@@ -109,7 +111,7 @@ export class PdfWriter {
         metadata.makeAndModel,
         PdfWriter.METADATA_VALUE_HEIGHT,
         PdfWriter.METADATA_VALUE_FONT_SIZE,
-        PdfFonts.BOLD_FONT_STYLE,
+        PdfWriter.BOLD_FONT_STYLE,
       );
     }
     if (metadata.manufacturerInfo) {
@@ -118,7 +120,7 @@ export class PdfWriter {
         metadata.manufacturerInfo,
         PdfWriter.METADATA_VALUE_HEIGHT,
         PdfWriter.METADATA_VALUE_FONT_SIZE,
-        PdfFonts.BOLD_FONT_STYLE,
+        PdfWriter.BOLD_FONT_STYLE,
       );
     }
     if (metadata.copyrightInfo) {
@@ -127,7 +129,7 @@ export class PdfWriter {
         metadata.copyrightInfo,
         PdfWriter.METADATA_VALUE_HEIGHT,
         PdfWriter.METADATA_VALUE_FONT_SIZE,
-        PdfFonts.BOLD_FONT_STYLE,
+        PdfWriter.BOLD_FONT_STYLE,
       );
     }
 
@@ -166,7 +168,7 @@ export class PdfWriter {
       group.title,
       PdfWriter.GROUP_TITLE_HEIGHT,
       PdfWriter.GROUP_TITLE_FONT_SIZE,
-      PdfFonts.BOLD_FONT_STYLE,
+      PdfWriter.BOLD_FONT_STYLE,
     );
     this._doc.saveGraphicsState();
 
@@ -261,7 +263,7 @@ export class PdfWriter {
     // https://github.com/simonbengtsson/jsPDF-AutoTable/issues/686
     switch (item.type) {
       case ChecklistItem_Type.ITEM_TITLE:
-        prompt.styles!.fontStyle = PdfFonts.BOLD_FONT_STYLE;
+        prompt.styles!.fontStyle = PdfWriter.BOLD_FONT_STYLE;
         break;
       case ChecklistItem_Type.ITEM_SPACE:
         // TODO: Skip alternating styles for blanks?
@@ -343,7 +345,7 @@ export class PdfWriter {
     if (fontSize) {
       this._doc.setFontSize(fontSize);
     }
-    this._fonts!.setDefaultFont(fontStyle);
+    this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, fontStyle);
     this._doc.text(txt, this._pageWidth / 2, this._currentY, { align: 'center' });
     this._doc.restoreGraphicsState();
 
