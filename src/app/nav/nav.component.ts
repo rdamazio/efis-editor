@@ -8,10 +8,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { HotkeysService } from '@ngneat/hotkeys';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { AboutComponent } from '../about/about.component';
-import { HotkeysService } from '@ngneat/hotkeys';
 import { HelpComponent } from '../checklists/hotkeys/help/help.component';
 
 @Component({

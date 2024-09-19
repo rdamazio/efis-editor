@@ -1,8 +1,8 @@
 import { GRT_FORMAT_OPTIONS, GrtFormat } from './grt-format';
 import { EXPECTED_CONTENTS } from './test-data';
+import { loadFile } from './test-utils';
 import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
-import { loadFile } from './test-utils';
 
 const GRT_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), GRT_FORMAT_OPTIONS).testCaseify(EXPECTED_CONTENTS);
 

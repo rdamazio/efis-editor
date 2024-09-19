@@ -1,12 +1,4 @@
 import {
-  ForeFlightChecklist,
-  ForeFlightChecklistContainer,
-  ForeFlightChecklistGroup,
-  ForeFlightChecklistItem,
-  ForeFlightChecklistMetadata,
-  ForeFlightChecklistSubgroup,
-} from '../../../gen/ts/foreflight';
-import {
   Checklist,
   ChecklistFile,
   ChecklistFileMetadata,
@@ -15,6 +7,14 @@ import {
   ChecklistItem,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
+import {
+  ForeFlightChecklist,
+  ForeFlightChecklistContainer,
+  ForeFlightChecklistGroup,
+  ForeFlightChecklistItem,
+  ForeFlightChecklistMetadata,
+  ForeFlightChecklistSubgroup,
+} from '../../../gen/ts/foreflight';
 import { ForeFlightFormatError } from './foreflight-format';
 import { ForeFlightUtils } from './foreflight-utils';
 

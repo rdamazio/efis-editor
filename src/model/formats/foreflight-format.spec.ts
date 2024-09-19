@@ -1,11 +1,11 @@
-import { ForeFlightUtils } from './foreflight-utils';
-import { EXPECTED_FOREFLIGHT_CONTENTS } from './test-data';
-import { ForeFlightReader } from './foreflight-reader';
-import { loadFile } from './test-utils';
-import { ForeFlightWriter } from './foreflight-writer';
-import { ForeFlightChecklistMetadata } from '../../../gen/ts/foreflight';
 import { validate } from 'uuid';
 import { ChecklistFileMetadata } from '../../../gen/ts/checklist';
+import { ForeFlightChecklistMetadata } from '../../../gen/ts/foreflight';
+import { ForeFlightReader } from './foreflight-reader';
+import { ForeFlightUtils } from './foreflight-utils';
+import { ForeFlightWriter } from './foreflight-writer';
+import { EXPECTED_FOREFLIGHT_CONTENTS } from './test-data';
+import { loadFile } from './test-utils';
 
 describe('ForeFlightFormat', () => {
   describe('ForeFlightUtils', () => {
