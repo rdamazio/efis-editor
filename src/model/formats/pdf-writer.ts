@@ -1,5 +1,5 @@
 import { jsPDF, jsPDFOptions } from 'jspdf';
-import autoTable, { CellDef, RowInput } from 'jspdf-autotable';
+import autoTable, { CellDef, CellHookData, FontStyle, RowInput } from 'jspdf-autotable';
 import {
   Checklist,
   ChecklistFile,
@@ -13,6 +13,12 @@ import {
 type OrientationType = jsPDFOptions['orientation'];
 type FormatType = jsPDFOptions['format'];
 type AutoTabledPDF = jsPDF & { lastAutoTable: { finalY: number } };
+interface CellPaddingInputStructured {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+}
 
 export interface PdfWriterOptions {
   orientation?: OrientationType;
@@ -44,6 +50,7 @@ export class PdfWriter {
   private static readonly WARNING_PREFIX = 'WARNING: ';
   private static readonly CAUTION_PREFIX = 'CAUTION: ';
   private static readonly NOTE_PREFIX = 'NOTE: ';
+  private static readonly PREFIX_CELL_WIDTH = 5.6;
 
   private static readonly SPACER_CELL: CellDef = {
     content: '. '.repeat(100),
@@ -248,6 +255,9 @@ export class PdfWriter {
         bodyStyles: {
           fontSize: PdfWriter.CONTENT_FONT_SIZE,
         },
+        didDrawCell: (data: CellHookData) => {
+          this._drawPrefixedCell(data);
+        },
       });
     }
   }
@@ -326,6 +336,85 @@ export class PdfWriter {
     return cells;
   }
 
+  private _drawPrefixedCell(data: CellHookData) {
+    if (data.section !== 'body') return;
+    if (data.column.index !== 0) return;
+
+    // Caveat: If we had a plaintext field where the text starts with these prefixes,
+    // we'd also format that - that's probably OK.
+    let contents = data.cell.text.join(' ');
+    let prefix: string | undefined;
+    let prefixFontStyle: FontStyle = PdfWriter.NORMAL_FONT_STYLE;
+    let prefixColor = 'black';
+    if (contents.startsWith(PdfWriter.WARNING_PREFIX)) {
+      prefix = PdfWriter.WARNING_PREFIX;
+      prefixFontStyle = PdfWriter.BOLD_FONT_STYLE;
+      prefixColor = 'red';
+    } else if (contents.startsWith(PdfWriter.CAUTION_PREFIX)) {
+      prefix = PdfWriter.CAUTION_PREFIX;
+      prefixFontStyle = PdfWriter.BOLD_FONT_STYLE;
+      prefixColor = 'orange';
+    } else if (contents.startsWith(PdfWriter.NOTE_PREFIX)) {
+      prefix = PdfWriter.NOTE_PREFIX;
+    }
+    if (!prefix) {
+      // Non-prefixed cell.
+      return;
+    }
+    contents = contents.slice(prefix.length);
+
+    // Draw a nested table for the prefixed item.
+    // This draws over the existing cell but does not replace it.
+    // TODO: There's a small chance that once the contents are wrapped in the nested table, they'll become taller than
+    // the original cell - need to precalculate the height when creating the original cell.
+    autoTable(this._doc, {
+      body: [
+        [
+          {
+            // Use a separate cell for indentation with varying padding
+            // so we can use a fixed-width prefix cell below.
+            content: '',
+            styles: {
+              cellWidth: 'wrap',
+              cellPadding: {
+                left: (data.cell.styles.cellPadding as CellPaddingInputStructured).left,
+              },
+            },
+          },
+          {
+            content: prefix.trim(),
+            styles: {
+              cellWidth: PdfWriter.PREFIX_CELL_WIDTH,
+              cellPadding: {
+                ...this._defaultCellPadding,
+                // Already accounted for in the indentation cell.
+                left: 0,
+              },
+              fontStyle: prefixFontStyle,
+              textColor: prefixColor,
+            },
+          },
+          {
+            content: contents.trim(),
+            styles: {
+              cellPadding: this._defaultCellPadding,
+            },
+          },
+        ],
+      ],
+      startY: data.cell.y,
+      alternateRowStyles: undefined,
+      theme: 'plain',
+      styles: {
+        ...data.cell.styles,
+        // Using the right fill color apparently depends on this being set.
+        lineWidth: PdfWriter.DEBUG_LAYOUT ? 0.1 : 0,
+      },
+      tableWidth: data.cell.width,
+    });
+
+    data.cell.text = [];
+  }
   private _addPageFooters() {
     if (!this._doc) return;
 
