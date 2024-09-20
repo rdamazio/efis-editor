@@ -294,7 +294,7 @@ export class PdfWriter {
         break;
       case ChecklistItem_Type.ITEM_SPACE:
         // TODO: Skip alternating styles for blanks?
-        prompt.styles!.minCellHeight = 2;
+        prompt.styles!.minCellHeight = this._doc.getLineHeight() / this._scaleFactor;
         break;
       case ChecklistItem_Type.ITEM_WARNING:
         // TODO: Icon
@@ -330,7 +330,12 @@ export class PdfWriter {
     } else {
       prompt.colSpan = 3;
       if (prefix) {
-        prompt.content = prefix + prompt.content;
+        // Must precalculate height to make sure text can be re-wrapped during didDrawCell.
+        // Also, to avoid weird mismatches between the pre-calculated wrapping and the actual one,
+        // use the pre-calculated one as the actual contents.
+        const [contentLines, cellHeight] = this._calculatePrefixedCell(item.prompt, item.indent);
+        prompt.content = prefix + contentLines.join('\n');
+        prompt.styles!.minCellHeight = cellHeight;
       }
       cells.push(prompt);
     }
@@ -348,7 +353,8 @@ export class PdfWriter {
 
     // Caveat: If we had a plaintext field where the text starts with these prefixes,
     // we'd also format that - that's probably OK.
-    let contents = data.cell.text.join(' ');
+    let contents = data.cell.text.join('\n');
+
     let prefix: string | undefined;
     let prefixFontStyle: FontStyle = PdfWriter.NORMAL_FONT_STYLE;
     let prefixColor = 'black';
@@ -425,6 +431,49 @@ export class PdfWriter {
   private _indentPadding(indent: number) {
     return indent + this._defaultPadding;
   }
+
+  private _calculatePrefixedCell(text: string, indent: number): [string[], number] {
+    if (!this._doc) return [['NODOC'], 1];
+
+    const tableMargin = PdfWriter.TABLE_MARGIN / this._scaleFactor;
+    const indentWidth = this._indentPadding(indent);
+    const roundWidth = 1.0 / this._scaleFactor;
+
+    // Calculate the cell width that's available for the text contents
+    const contentWidth =
+      // The whole page:
+      this._pageWidth -
+      // The whole table:
+      2 * tableMargin -
+      // The prefix + content (with padding):
+      indentWidth -
+      // The content (with padding):
+      PdfWriter.PREFIX_CELL_WIDTH -
+      // The content (no padding):
+      2 * this._defaultPadding +
+      // autotable adds +1 to the allowed wrapping width to account for rounding.
+      roundWidth;
+
+    // splitTextToSize needs the correct font setting for calculation.
+    // We could pass it through its options param, but options.font would have to come from jspdf's getFont anyway.
+    this._doc.setFontSize(PdfWriter.CONTENT_FONT_SIZE);
+    this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
+
+    // Actually calculate the text wrapping so we know how many lines the cell will take.
+    const splitText = this._doc.splitTextToSize(text, contentWidth);
+    const numLines = splitText.length;
+
+    const lineHeight = this._doc.getLineHeight() / this._scaleFactor;
+    const textHeight = numLines * lineHeight;
+    const cellHeight = textHeight + 2 * this._defaultPadding;
+
+    if (PdfWriter.DEBUG_LAYOUT) {
+      console.log(`Text "${text}": numLines=${numLines}; cellHeight=${cellHeight}`);
+    }
+
+    return [splitText, cellHeight];
+  }
+
   private _addPageFooters() {
     if (!this._doc) return;
 
