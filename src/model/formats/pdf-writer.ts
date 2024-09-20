@@ -40,6 +40,11 @@ export class PdfWriter {
   private static readonly NORMAL_FONT_STYLE = 'normal';
   private static readonly BOLD_FONT_STYLE = 'bold';
   private static readonly RECT_FILL_STYLE = 'F';
+
+  private static readonly WARNING_PREFIX = 'WARNING: ';
+  private static readonly CAUTION_PREFIX = 'CAUTION: ';
+  private static readonly NOTE_PREFIX = 'NOTE: ';
+
   private static readonly SPACER_CELL: CellDef = {
     content: '. '.repeat(100),
     styles: {
@@ -53,6 +58,8 @@ export class PdfWriter {
   private _pageWidth = 0;
   private _pageHeight = 0;
   private _currentY = 0;
+  private _defaultPadding = 0;
+  private _defaultCellPadding?: CellPaddingInputStructured;
 
   constructor(private _options?: PdfWriterOptions) {}
 
@@ -67,6 +74,13 @@ export class PdfWriter {
 
     this._pageHeight = this._doc.internal.pageSize.getHeight();
     this._pageWidth = this._doc.internal.pageSize.getWidth();
+    this._defaultPadding = 5 / this._doc.internal.scaleFactor;
+    this._defaultCellPadding = {
+      left: this._defaultPadding,
+      top: this._defaultPadding,
+      bottom: this._defaultPadding,
+      right: this._defaultPadding,
+    };
 
     this._doc.addFont('assets/Roboto-Regular.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
     this._doc.addFont('assets/Roboto-Bold.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
@@ -270,27 +284,24 @@ export class PdfWriter {
         break;
       case ChecklistItem_Type.ITEM_WARNING:
         // TODO: Icon
-        prompt.content = 'WARNING: ' + prompt.content;
+        prompt.content = PdfWriter.WARNING_PREFIX + prompt.content;
         break;
       case ChecklistItem_Type.ITEM_CAUTION:
         // TODO: Icon
-        prompt.content = 'CAUTION: ' + prompt.content;
+        prompt.content = PdfWriter.CAUTION_PREFIX + prompt.content;
         break;
       case ChecklistItem_Type.ITEM_NOTE:
-        prompt.content = 'NOTE: ' + prompt.content;
+        prompt.content = PdfWriter.NOTE_PREFIX + prompt.content;
         break;
     }
 
     if (item.centered) {
       prompt.styles!.halign = 'center';
     } else if (item.indent) {
-      const defaultPadding = 5 / this._doc.internal.scaleFactor;
       prompt.styles!.cellPadding = {
-        left: item.indent + defaultPadding,
         // Specifying any cellPadding removes the other default paddings, so must specify all of them.
-        top: defaultPadding,
-        bottom: defaultPadding,
-        right: defaultPadding,
+        ...this._defaultCellPadding,
+        left: item.indent + this._defaultPadding,
       };
     }
 
