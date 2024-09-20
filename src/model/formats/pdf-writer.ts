@@ -29,6 +29,7 @@ export interface PdfWriterOptions {
 
 export class PdfWriter {
   private static readonly DEBUG_LAYOUT = false;
+  private static readonly TABLE_MARGIN = 40;
   private static readonly GROUP_TITLE_HEIGHT = 3;
   private static readonly GROUP_TITLE_FONT_SIZE = 20;
   private static readonly MAIN_TITLE_FONT_SIZE = 30;
@@ -56,7 +57,6 @@ export class PdfWriter {
     content: '. '.repeat(100),
     styles: {
       overflow: 'hidden',
-      valign: 'top',
       halign: 'center',
     },
   };
@@ -64,6 +64,7 @@ export class PdfWriter {
   private _doc?: AutoTabledPDF;
   private _pageWidth = 0;
   private _pageHeight = 0;
+  private _scaleFactor = 0;
   private _currentY = 0;
   private _defaultPadding = 0;
   private _defaultCellPadding?: CellPaddingInputStructured;
@@ -81,7 +82,8 @@ export class PdfWriter {
 
     this._pageHeight = this._doc.internal.pageSize.getHeight();
     this._pageWidth = this._doc.internal.pageSize.getWidth();
-    this._defaultPadding = 5 / this._doc.internal.scaleFactor;
+    this._scaleFactor = this._doc.internal.scaleFactor;
+    this._defaultPadding = 5 / this._scaleFactor;
     this._defaultCellPadding = {
       left: this._defaultPadding,
       top: this._defaultPadding,
@@ -245,6 +247,7 @@ export class PdfWriter {
         ],
         body: this._checklistTableBody(checklist),
         showHead: 'firstPage',
+        margin: PdfWriter.TABLE_MARGIN / this._scaleFactor,
         startY: startY,
         rowPageBreak: 'avoid',
         styles: PdfWriter.DEBUG_LAYOUT
@@ -254,6 +257,7 @@ export class PdfWriter {
           : undefined,
         bodyStyles: {
           fontSize: PdfWriter.CONTENT_FONT_SIZE,
+          valign: 'top',
         },
         didDrawCell: (data: CellHookData) => {
           this._drawPrefixedCell(data);
@@ -276,7 +280,6 @@ export class PdfWriter {
       content: item.prompt,
       styles: {
         halign: 'left',
-        valign: 'top',
         minCellWidth: 10,
       },
     };
@@ -284,6 +287,7 @@ export class PdfWriter {
     // We should be able to have the prefix in its own cell and have non-prefixed rows use a colSpan=2 for the prompt,
     // but unfortunately a bug in jspdf-autotable prevents that:
     // https://github.com/simonbengtsson/jsPDF-AutoTable/issues/686
+    let prefix: string | undefined;
     switch (item.type) {
       case ChecklistItem_Type.ITEM_TITLE:
         prompt.styles!.fontStyle = PdfWriter.BOLD_FONT_STYLE;
@@ -294,14 +298,14 @@ export class PdfWriter {
         break;
       case ChecklistItem_Type.ITEM_WARNING:
         // TODO: Icon
-        prompt.content = PdfWriter.WARNING_PREFIX + prompt.content;
+        prefix = PdfWriter.WARNING_PREFIX;
         break;
       case ChecklistItem_Type.ITEM_CAUTION:
         // TODO: Icon
-        prompt.content = PdfWriter.CAUTION_PREFIX + prompt.content;
+        prefix = PdfWriter.CAUTION_PREFIX;
         break;
       case ChecklistItem_Type.ITEM_NOTE:
-        prompt.content = PdfWriter.NOTE_PREFIX + prompt.content;
+        prefix = PdfWriter.NOTE_PREFIX;
         break;
     }
 
@@ -311,7 +315,7 @@ export class PdfWriter {
       prompt.styles!.cellPadding = {
         // Specifying any cellPadding removes the other default paddings, so must specify all of them.
         ...this._defaultCellPadding,
-        left: item.indent + this._defaultPadding,
+        left: this._indentPadding(item.indent),
       };
     }
 
@@ -320,12 +324,14 @@ export class PdfWriter {
         content: item.expectation,
         styles: {
           halign: 'left',
-          valign: 'top',
         },
       };
       cells.push(prompt, PdfWriter.SPACER_CELL, expectation);
     } else {
       prompt.colSpan = 3;
+      if (prefix) {
+        prompt.content = prefix + prompt.content;
+      }
       cells.push(prompt);
     }
 
@@ -367,18 +373,18 @@ export class PdfWriter {
     // This draws over the existing cell but does not replace it.
     // TODO: There's a small chance that once the contents are wrapped in the nested table, they'll become taller than
     // the original cell - need to precalculate the height when creating the original cell.
+    // TODO: Support centering this whole table instead of just the content cell
+    const leftPadding = data.cell.padding('left');
     autoTable(this._doc, {
       body: [
         [
           {
             // Use a separate cell for indentation with varying padding
-            // so we can use a fixed-width prefix cell below.
+            // so we can use a fixed-width left-aligned prefix cell below.
             content: '',
             styles: {
-              cellWidth: 'wrap',
-              cellPadding: {
-                left: (data.cell.styles.cellPadding as CellPaddingInputStructured).left,
-              },
+              cellWidth: leftPadding,
+              cellPadding: 0,
             },
           },
           {
@@ -414,6 +420,10 @@ export class PdfWriter {
     });
 
     data.cell.text = [];
+  }
+
+  private _indentPadding(indent: number) {
+    return indent + this._defaultPadding;
   }
   private _addPageFooters() {
     if (!this._doc) return;
