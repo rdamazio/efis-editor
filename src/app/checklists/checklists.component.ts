@@ -454,7 +454,6 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
       const closePromise = firstValueFrom(pdfDialog.afterClosed());
       file = await closePromise.then((options: PdfWriterOptions): Promise<File> => {
         if (options) {
-          console.log(options);
           return PdfFormat.fromProto(this.selectedFile!, options);
         }
         throw 'PDF dialog cancelled';
