@@ -42,5 +42,5 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button [mat-dialog-close]="data" [disabled]="!filename.validity.valid">Ok</button>
-  <button mat-button (click)="dialogRef.close()">Cancel</button>
+  <button mat-button mat-dialog-close>Cancel</button>
 </mat-dialog-actions>

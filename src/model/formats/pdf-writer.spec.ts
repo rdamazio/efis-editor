@@ -10,7 +10,9 @@ describe('PdfWriter', () => {
   });
 
   it('generates a valid PDF', async () => {
-    const pdf = await writeAndParsePdf({});
+    const pdf = await writeAndParsePdf({
+      outputPageNumbers: true,
+    });
     expect(pdf.numPages).toBeGreaterThan(1);
     const allText = await pdfToText(pdf);
 
@@ -45,8 +47,19 @@ describe('PdfWriter', () => {
     }
   });
 
+  it('generates no page numbers if not requested', async () => {
+    const pdf = await writeAndParsePdf({ outputPageNumbers: false });
+    expect(pdf.numPages).toBeGreaterThan(1);
+    const allText = await pdfToText(pdf);
+
+    // Page numbers should NOT be present.
+    for (let i = 1; i <= pdf.numPages; i++) {
+      expect(allText).not.toContain(`Page ${i} of ${pdf.numPages}`);
+    }
+  });
+
   it('generates a valid cover page and page numbers', async () => {
-    const pdf = await writeAndParsePdf({ outputCoverPage: true });
+    const pdf = await writeAndParsePdf({ outputCoverPage: true, outputPageNumbers: true });
     expect(pdf.numPages).toBeGreaterThan(2);
     const allText = await pdfToText(pdf);
 

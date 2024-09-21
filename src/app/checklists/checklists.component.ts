@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HotkeysDirective, HotkeysService } from '@ngneat/hotkeys';
 import { saveAs } from 'file-saver';
+import { firstValueFrom } from 'rxjs';
 import {
   Checklist,
   ChecklistFile,
@@ -20,10 +21,12 @@ import { ForeFlightUtils } from '../../model/formats/foreflight-utils';
 import { GrtFormat } from '../../model/formats/grt-format';
 import { JsonFormat } from '../../model/formats/json-format';
 import { PdfFormat } from '../../model/formats/pdf-format';
+import { PdfWriterOptions } from '../../model/formats/pdf-writer';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
+import { ExportDialogComponent } from './export-dialog/export-dialog.component';
 import { ChecklistFileInfoComponent, FileInfoDialogData } from './file-info/file-info.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
@@ -440,7 +443,22 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     } else if (formatId === ForeFlightUtils.FILE_EXTENSION) {
       file = await ForeFlightFormat.fromProto(this.selectedFile);
     } else if (formatId === 'pdf') {
-      file = await PdfFormat.fromProto(this.selectedFile);
+      const pdfDialog = this._dialog.open(ExportDialogComponent, {
+        hasBackdrop: true,
+        closeOnNavigation: true,
+        enterAnimationDuration: 200,
+        exitAnimationDuration: 200,
+        role: 'dialog',
+        ariaModal: true,
+      });
+      const closePromise = firstValueFrom(pdfDialog.afterClosed());
+      file = await closePromise.then((options: PdfWriterOptions): Promise<File> => {
+        if (options) {
+          console.log(options);
+          return PdfFormat.fromProto(this.selectedFile!, options);
+        }
+        throw 'PDF dialog cancelled';
+      });
     } else {
       throw new FormatError(`Unknown format "${formatId}"`);
     }

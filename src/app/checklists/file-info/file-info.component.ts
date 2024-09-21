@@ -6,7 +6,6 @@ import {
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
-  MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -37,10 +36,7 @@ export interface FileInfoDialogData {
   styleUrl: './file-info.component.scss',
 })
 export class ChecklistFileInfoComponent {
-  constructor(
-    public dialogRef: MatDialogRef<ChecklistFileInfoComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: FileInfoDialogData,
-  ) {}
+  constructor(@Inject(MAT_DIALOG_DATA) public data: FileInfoDialogData) {}
 
   get defaultChecklist(): string {
     return `${this.data.metadata.defaultGroupIndex}.${this.data.metadata.defaultChecklistIndex}`;

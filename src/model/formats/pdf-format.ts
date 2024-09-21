@@ -3,13 +3,14 @@ import { PdfWriter, PdfWriterOptions } from './pdf-writer';
 
 export class PdfFormat {
   // TODO: Add more PDF format options (popup dialog?)
-  private static PDF_OPTIONS: PdfWriterOptions = {
+  private static DEFAULT_PDF_OPTIONS: PdfWriterOptions = {
     outputCoverPage: true,
     outputCoverPageFooter: true,
+    outputPageNumbers: true,
   };
 
-  public static async fromProto(file: ChecklistFile): Promise<File> {
-    const blob = new PdfWriter(this.PDF_OPTIONS).write(file);
+  public static async fromProto(file: ChecklistFile, options?: PdfWriterOptions): Promise<File> {
+    const blob = new PdfWriter(options || this.DEFAULT_PDF_OPTIONS).write(file);
     return new File([blob], file.metadata!.name + '.pdf');
   }
 }

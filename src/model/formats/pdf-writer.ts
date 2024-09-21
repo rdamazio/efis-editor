@@ -25,6 +25,7 @@ export interface PdfWriterOptions {
   format?: FormatType;
   outputCoverPage?: boolean;
   outputCoverPageFooter?: boolean;
+  outputPageNumbers?: boolean;
 }
 
 export class PdfWriter {
@@ -110,7 +111,9 @@ export class PdfWriter {
     }
     this._addGroups(file.groups);
 
-    this._addPageFooters();
+    if (this._options?.outputPageNumbers) {
+      this._addPageFooters();
+    }
 
     return this._doc.output('blob');
   }

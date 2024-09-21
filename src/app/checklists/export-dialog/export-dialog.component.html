@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>PDF export options</h2>
+<mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Paper size</mat-label>
+    <mat-select required [(value)]="options.format" aria-label="Select the paper size">
+      <mat-optgroup label="Imperial">
+        <mat-option value="letter">Letter (8.5 x 11)</mat-option>
+        <mat-option value="government-letter">Government letter (8 x 10.5)</mat-option>
+        <mat-option value="legal">Legal (8.5 x 14)</mat-option>
+        <mat-option value="junior-legal">Junior legal (5 x 8)</mat-option>
+        <mat-option value="tabloid">Tabloid (17 x 11)</mat-option>
+      </mat-optgroup>
+      <mat-optgroup label="Metric">
+        <mat-option value="a6">A6</mat-option>
+        <mat-option value="a5">A5</mat-option>
+        <mat-option value="a4">A4</mat-option>
+        <mat-option value="a3">A3</mat-option>
+        <mat-option value="a2">A2</mat-option>
+        <mat-option value="a1">A1</mat-option>
+        <mat-option value="a0">A0</mat-option>
+      </mat-optgroup>
+    </mat-select>
+  </mat-form-field>
+
+  <div>
+    <mat-label>Orientation:</mat-label>
+    <mat-radio-group required [(ngModel)]="options.orientation" aria-label="Select the paper orientation">
+      <mat-radio-button value="portrait">Portrait</mat-radio-button>
+      <mat-radio-button value="landscape">Landscape</mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <mat-checkbox [(ngModel)]="options.outputCoverPage">Output cover page</mat-checkbox>
+  <mat-checkbox [(ngModel)]="options.outputPageNumbers">Output page numbers</mat-checkbox>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="options">Ok</button>
+  <button mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions>
