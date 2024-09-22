@@ -396,15 +396,23 @@ export class PdfWriter {
     data.cell.text[0] = firstLine.slice(prefix.length);
     const contents = data.cell.text.join('\n');
 
-    const leftPadding = data.cell.padding('left');
-    const tableWidth = data.cell.width;
-    const margin = this._tableMargin;
+    let leftPadding = data.cell.padding('left');
+    let tableWidth = data.cell.width;
+    let margin = this._tableMargin;
+    if (data.cell.styles.halign === 'center') {
+      // We'll center the entire table instead of the content cell.
+      data.cell.styles.halign = 'left';
+      leftPadding = 0;
+      const textWidth = this._textWidth(data.cell.text);
+      tableWidth = PdfWriter.PREFIX_CELL_WIDTH + textWidth + 2 * this._defaultPadding;
+      margin = (this._pageWidth - tableWidth) / 2;
+      if (PdfWriter.DEBUG_LAYOUT) {
+        console.log(`Centered: textW=${textWidth}, tableWidth=${tableWidth}, margin=${margin}, text="${contents}"`);
+      }
+    }
 
     // Draw a nested table for the prefixed item.
     // This draws over the existing cell but does not replace it.
-    // TODO: There's a small chance that once the contents are wrapped in the nested table, they'll become taller than
-    // the original cell - need to precalculate the height when creating the original cell.
-    // TODO: Support centering this whole table instead of just the content cell
     autoTable(this._doc, {
       body: [
         [
@@ -446,6 +454,8 @@ export class PdfWriter {
         ...data.cell.styles,
         // Using the right fill color apparently depends on this being set.
         lineWidth: PdfWriter.DEBUG_LAYOUT ? 0.1 : 0,
+        minCellWidth: undefined,
+        halign: 'left',
       },
       tableWidth: tableWidth,
     });
@@ -503,6 +513,18 @@ export class PdfWriter {
       // autotable adds +1 to the allowed wrapping width to account for rounding.
       roundWidth
     );
+  }
+
+  private _textWidth(lines: string[], fontSize?: number): number {
+    // Calculate total width as the width of the longest line.
+    const unitWidth = lines.reduce((max: number, line: string) => {
+      const width = this._doc!.getStringUnitWidth(line);
+      if (PdfWriter.DEBUG_LAYOUT) {
+        console.log(`Width=${width} for line "${line}"`);
+      }
+      return Math.max(max, width);
+    }, 0);
+    return (unitWidth * (fontSize || PdfWriter.CONTENT_FONT_SIZE)) / this._scaleFactor;
   }
 
   private _addPageFooters() {
