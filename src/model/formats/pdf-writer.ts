@@ -312,7 +312,7 @@ export class PdfWriter {
         prompt.styles!.fontStyle = PdfWriter.BOLD_FONT_STYLE;
         break;
       case ChecklistItem_Type.ITEM_SPACE:
-        // TODO: Skip alternating styles for blanks?
+        prompt.styles!.fillColor = 255;
         prompt.styles!.minCellHeight = this._doc.getLineHeight() / this._scaleFactor;
         break;
       case ChecklistItem_Type.ITEM_WARNING:
