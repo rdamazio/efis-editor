@@ -352,9 +352,9 @@ export class PdfWriter {
         // Must precalculate height to make sure text can be re-wrapped during didDrawCell.
         // Also, to avoid weird mismatches between the pre-calculated wrapping and the actual one,
         // use the pre-calculated one as the actual contents.
-        const [contentLines, cellHeight] = this._calculatePrefixedCell(item.prompt, item.indent);
-        prompt.content = prefix + contentLines.join('\n');
-        prompt.styles!.minCellHeight = cellHeight;
+        const prefixed = this._calculatePrefixedCell(item.prompt, item.indent);
+        prompt.content = prefix + prefixed.lines.join('\n');
+        prompt.styles!.minCellHeight = prefixed.height;
       }
       cells.push(prompt);
     }
@@ -370,36 +370,41 @@ export class PdfWriter {
     if (data.section !== 'body') return;
     if (data.column.index !== 0) return;
 
+    // Determine item type by the textual prefix.
     // Caveat: If we had a plaintext field where the text starts with these prefixes,
     // we'd also format that - that's probably OK.
-    let contents = data.cell.text.join('\n');
-
+    const firstLine = data.cell.text[0];
     let prefix: string | undefined;
     let prefixFontStyle: FontStyle = PdfWriter.NORMAL_FONT_STYLE;
     let prefixColor = 'black';
-    if (contents.startsWith(PdfWriter.WARNING_PREFIX)) {
+    if (firstLine.startsWith(PdfWriter.WARNING_PREFIX)) {
       prefix = PdfWriter.WARNING_PREFIX;
       prefixFontStyle = PdfWriter.BOLD_FONT_STYLE;
       prefixColor = 'red';
-    } else if (contents.startsWith(PdfWriter.CAUTION_PREFIX)) {
+    } else if (firstLine.startsWith(PdfWriter.CAUTION_PREFIX)) {
       prefix = PdfWriter.CAUTION_PREFIX;
       prefixFontStyle = PdfWriter.BOLD_FONT_STYLE;
       prefixColor = 'orange';
-    } else if (contents.startsWith(PdfWriter.NOTE_PREFIX)) {
+    } else if (firstLine.startsWith(PdfWriter.NOTE_PREFIX)) {
       prefix = PdfWriter.NOTE_PREFIX;
     }
     if (!prefix) {
       // Non-prefixed cell.
       return;
     }
-    contents = contents.slice(prefix.length);
+
+    data.cell.text[0] = firstLine.slice(prefix.length);
+    const contents = data.cell.text.join('\n');
+
+    const leftPadding = data.cell.padding('left');
+    const tableWidth = data.cell.width;
+    const margin = this._tableMargin;
 
     // Draw a nested table for the prefixed item.
     // This draws over the existing cell but does not replace it.
     // TODO: There's a small chance that once the contents are wrapped in the nested table, they'll become taller than
     // the original cell - need to precalculate the height when creating the original cell.
     // TODO: Support centering this whole table instead of just the content cell
-    const leftPadding = data.cell.padding('left');
     autoTable(this._doc, {
       body: [
         [
@@ -435,14 +440,14 @@ export class PdfWriter {
       ],
       startY: data.cell.y,
       alternateRowStyles: undefined,
-      margin: this._tableMargin,
+      margin: margin,
       theme: 'plain',
       styles: {
         ...data.cell.styles,
         // Using the right fill color apparently depends on this being set.
         lineWidth: PdfWriter.DEBUG_LAYOUT ? 0.1 : 0,
       },
-      tableWidth: data.cell.width,
+      tableWidth: tableWidth,
     });
 
     data.cell.text = [];
@@ -452,26 +457,10 @@ export class PdfWriter {
     return indent + this._defaultPadding;
   }
 
-  private _calculatePrefixedCell(text: string, indent: number): [string[], number] {
-    if (!this._doc) return [['NODOC'], 1];
+  private _calculatePrefixedCell(text: string, indent: number): { lines: string[]; height: number } {
+    if (!this._doc) throw 'No document created';
 
-    const indentWidth = this._indentPadding(indent);
-    const roundWidth = 1.0 / this._scaleFactor;
-
-    // Calculate the cell width that's available for the text contents
-    const contentWidth =
-      // The whole page:
-      this._pageWidth -
-      // The whole table:
-      2 * this._tableMargin -
-      // The prefix + content (with padding):
-      indentWidth -
-      // The content (with padding):
-      PdfWriter.PREFIX_CELL_WIDTH -
-      // The content (no padding):
-      2 * this._defaultPadding +
-      // autotable adds +1 to the allowed wrapping width to account for rounding.
-      roundWidth;
+    const maxContentWidth = this._calculatePrefixedContentWidth(indent);
 
     // splitTextToSize needs the correct font setting for calculation.
     // We could pass it through its options param, but options.font would have to come from jspdf's getFont anyway.
@@ -479,7 +468,7 @@ export class PdfWriter {
     this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
 
     // Actually calculate the text wrapping so we know how many lines the cell will take.
-    const splitText = this._doc.splitTextToSize(text, contentWidth);
+    const splitText = this._doc.splitTextToSize(text, maxContentWidth);
     const numLines = splitText.length;
 
     const lineHeight = this._doc.getLineHeight() / this._scaleFactor;
@@ -490,7 +479,30 @@ export class PdfWriter {
       console.log(`Text "${text}": numLines=${numLines}; cellHeight=${cellHeight}`);
     }
 
-    return [splitText, cellHeight];
+    return {
+      lines: splitText,
+      height: cellHeight,
+    };
+  }
+
+  private _calculatePrefixedContentWidth(indent: number): number {
+    const indentWidth = this._indentPadding(indent);
+    const roundWidth = 1.0 / this._scaleFactor;
+
+    // Calculate the cell width that's available for the text contents
+    return (
+      this._pageWidth -
+      // The whole table:
+      2 * this._tableMargin -
+      // The prefix + content (with padding):
+      indentWidth -
+      // The content (with padding):
+      PdfWriter.PREFIX_CELL_WIDTH -
+      // The content (no padding):
+      2 * this._defaultPadding +
+      // autotable adds +1 to the allowed wrapping width to account for rounding.
+      roundWidth
+    );
   }
 
   private _addPageFooters() {
