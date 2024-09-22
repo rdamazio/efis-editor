@@ -30,6 +30,15 @@
   </mat-menu>
   <button
     mat-icon-button
+    matTooltip="Print file"
+    aria-label="Print file"
+    [disabled]="fileIsOpen"
+    (click)="downloadFile.emit('pdf')"
+  >
+    <mat-icon>print</mat-icon>
+  </button>
+  <button
+    mat-icon-button
     matTooltip="Delete file"
     aria-label="Delete file"
     [disabled]="fileIsOpen"
