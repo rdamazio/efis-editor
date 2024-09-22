@@ -97,18 +97,13 @@ This is a short list of known areas where contributions would be helpful:
 
 - **UI refinement**: As a backend developer (heck, nowadays I'm not even that, just a manager),
   my CSS-foo is quite limited. If you see something that looks odd, please send a PR!
-- **Format testing**: I have not tested these files on anything but Garmin avionics. Please
-  test and send improvements.
+- **Format testing**: I have not tested these files on anything but Garmin avionics and
+  ForeFlight. Please test and send improvements.
 - **GRT live data**: GRT supports showing live data on the checklist, which is pretty
   cool. Building that into the app (both to easily select a field to insert, and
   to render it with some fake data) would be nice.
-- **Printing**: It'd be really nice to generate a printable version of a checklist to serve as
-  a backup to the electronic one.
 - **Moving items between checklists**
 - **Reordering/moving checklists or groups**
-- **Default checklist selection**: Garmin supports setting a default checklist, which initially
-  gets displayed when you go into the checklists page. The file format reader/writer supports
-  that, but the UI is not in place to select it.
 - **Configuration files**: I'd like to support more than just checklists.
 - Your favorite missing feature goes here.
 
