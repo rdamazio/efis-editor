@@ -131,6 +131,28 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         this.tree!.selectPreviousChecklist();
       });
 
+    this._hotkeys
+      .addShortcut({
+        keys: 'alt.down',
+        description: 'Select next checklist group',
+        preventDefault: true,
+        group: 'Navigation',
+      })
+      .subscribe(() => {
+        console.log('foo');
+        this.tree!.selectNextGroup();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'alt.up',
+        description: 'Select next checklist group',
+        preventDefault: true,
+        group: 'Navigation',
+      })
+      .subscribe(() => {
+        this.tree!.selectPreviousGroup();
+      });
+
     // TODO: Group navigation/reordering shortcuts
 
     this._hotkeys

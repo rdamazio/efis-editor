@@ -279,6 +279,70 @@ export class ChecklistTreeComponent {
     this._scrollToSelectedChecklist();
   }
 
+  private _findNextGroup(): number | undefined {
+    if (!this._file) return undefined;
+
+    const selectedPos = this._findSelectedChecklist();
+    let groupIdx: number;
+    if (!selectedPos) {
+      // Nothing selected - pretend something before the first group was.
+      groupIdx = -1;
+    } else if (selectedPos.groupIdx === this._file.groups.length - 1) {
+      // Already at the last group
+      return undefined;
+    } else {
+      groupIdx = selectedPos.groupIdx;
+    }
+
+    return groupIdx + 1;
+  }
+
+  private _findPreviousGroup(): number | undefined {
+    if (!this._file) return undefined;
+
+    const selectedPos = this._findSelectedChecklist();
+    let groupIdx: number;
+    if (!selectedPos) {
+      // Nothing selected - pretend something after the last group was.
+      groupIdx = this._file.groups.length;
+    } else if (selectedPos.groupIdx === 0) {
+      // Already at the last group
+      return undefined;
+    } else {
+      groupIdx = selectedPos.groupIdx;
+    }
+
+    return groupIdx - 1;
+  }
+
+  selectNextGroup() {
+    if (!this._file) return;
+    const groupIdx = this._findNextGroup();
+    if (groupIdx === undefined) return;
+    this._selectGroup(groupIdx);
+  }
+
+  selectPreviousGroup() {
+    if (!this._file) return;
+    const groupIdx = this._findPreviousGroup();
+    if (groupIdx === undefined) return;
+    this._selectGroup(groupIdx);
+  }
+
+  private _selectGroup(groupIdx: number) {
+    if (!this._file) return;
+
+    const group = this._file.groups[groupIdx];
+    let checklist: Checklist | undefined = undefined;
+
+    // Select the first checklist of that group, if it has one.
+    if (group.checklists.length) {
+      checklist = group.checklists[0];
+    }
+    this._selectChecklist(checklist, group);
+    this._scrollToSelectedChecklist();
+  }
+
   private _selectChecklist(checklist?: Checklist, group?: ChecklistGroup) {
     this._selectedChecklist = checklist;
     this.selectedChecklistGroup = group;
@@ -286,6 +350,8 @@ export class ChecklistTreeComponent {
   }
 
   private _scrollToSelectedChecklist() {
+    // TODO: If a group is selected but a checklist isn't, scroll to the group.
+    // TODO: If the first item of a group is selected, scroll to the group.
     if (!this._selectedChecklist) return;
 
     let selectedNode, selectedGroupNode: ChecklistTreeNode | undefined;
