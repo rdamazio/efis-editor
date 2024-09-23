@@ -212,7 +212,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         keys: 'shift.up',
         description: 'Move checklist item up',
         preventDefault: true,
-        group: 'Editing',
+        group: 'Reordering',
       })
       .subscribe(() => {
         this.items!.moveCurrentItemUp();
@@ -222,7 +222,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         keys: 'shift.down',
         description: 'Move checklist item down',
         preventDefault: true,
-        group: 'Editing',
+        group: 'Reordering',
       })
       .subscribe(() => {
         this.items!.moveCurrentItemDown();
@@ -232,7 +232,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         keys: 'shift.meta.up',
         description: 'Move checklist up',
         preventDefault: true,
-        group: 'Editing',
+        group: 'Reordering',
       })
       .subscribe(() => {
         this.tree!.moveCurrentChecklistUp();
@@ -242,7 +242,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         keys: 'shift.meta.down',
         description: 'Move checklist down',
         preventDefault: true,
-        group: 'Editing',
+        group: 'Reordering',
       })
       .subscribe(() => {
         this.tree!.moveCurrentChecklistDown();
@@ -252,7 +252,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         keys: 'shift.alt.up',
         description: 'Move checklist group up',
         preventDefault: true,
-        group: 'Editing',
+        group: 'Reordering',
       })
       .subscribe(() => {
         this.tree!.moveCurrentGroupUp();
@@ -262,7 +262,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         keys: 'shift.alt.down',
         description: 'Move checklist group down',
         preventDefault: true,
-        group: 'Editing',
+        group: 'Reordering',
       })
       .subscribe(() => {
         this.tree!.moveCurrentGroupDown();
