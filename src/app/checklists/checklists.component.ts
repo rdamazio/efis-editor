@@ -247,6 +247,26 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.tree!.moveCurrentChecklistDown();
       });
+    this._hotkeys
+      .addShortcut({
+        keys: 'shift.alt.up',
+        description: 'Move checklist group up',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.tree!.moveCurrentGroupUp();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'shift.alt.down',
+        description: 'Move checklist group down',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.tree!.moveCurrentGroupDown();
+      });
 
     this._hotkeys
       .addShortcut({

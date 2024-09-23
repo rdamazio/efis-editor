@@ -343,6 +343,40 @@ export class ChecklistTreeComponent {
     this._scrollToSelectedChecklist();
   }
 
+  moveCurrentGroupUp() {
+    const prevGroupIdx = this._findPreviousGroup();
+    if (prevGroupIdx === undefined) return;
+
+    this._swapSelectedGroup(prevGroupIdx);
+  }
+
+  moveCurrentGroupDown() {
+    const nextGroupIdx = this._findNextGroup();
+    if (nextGroupIdx === undefined) return;
+
+    this._swapSelectedGroup(nextGroupIdx);
+  }
+
+  private _swapSelectedGroup(newGroupIdx: number) {
+    if (!this._file) return;
+    const currentPos = this._findSelectedChecklist();
+    if (!currentPos) return;
+    const currentGroupIdx = currentPos.groupIdx;
+
+    // Swap the groups in the model.
+    [this._file.groups[currentGroupIdx], this._file.groups[newGroupIdx]] = [
+      this._file.groups[newGroupIdx],
+      this._file.groups[currentGroupIdx],
+    ];
+
+    // Update the tree nodes.
+    this.reloadFile(true);
+
+    // The selected checklist/group themselves didn't change, but the fragment to represent them did.
+    this._selectChecklist(this.selectedChecklist, this.selectedChecklistGroup);
+    this._scrollToSelectedChecklist();
+  }
+
   private _selectChecklist(checklist?: Checklist, group?: ChecklistGroup) {
     this._selectedChecklist = checklist;
     this.selectedChecklistGroup = group;
