@@ -384,22 +384,27 @@ export class ChecklistTreeComponent {
   }
 
   private _scrollToSelectedChecklist() {
-    // TODO: If a group is selected but a checklist isn't, scroll to the group.
-    // TODO: If the first item of a group is selected, scroll to the group.
     if (!this._selectedChecklist) return;
 
     let selectedNode, selectedGroupNode: ChecklistTreeNode | undefined;
+    let firstChecklist = true;
     for (const groupNode of this.treeControl.dataNodes) {
-      if (!groupNode || !groupNode.children) continue;
+      if (!groupNode) continue;
+      if (groupNode.group === this.selectedChecklistGroup) {
+        selectedGroupNode = groupNode;
+      }
+
+      if (!groupNode.children) continue;
+      firstChecklist = true;
       for (const checklistNode of groupNode.children) {
         if (checklistNode.checklist === this._selectedChecklist) {
           selectedNode = checklistNode;
-          selectedGroupNode = groupNode;
           break;
         }
+        firstChecklist = false;
       }
     }
-    if (!selectedNode || !selectedGroupNode) {
+    if (!selectedGroupNode) {
       console.error("Couldn't find selected tree node");
       return;
     }
@@ -409,21 +414,33 @@ export class ChecklistTreeComponent {
       this.treeControl.expand(selectedGroupNode);
     }
 
+    let nodeClass = '.checklist-selected';
+    if (firstChecklist || !selectedNode) {
+      nodeClass += ', .group-selected';
+    }
+
     // Nodes may need to be (re)created after the above, delay the actual scrolling.
     afterNextRender(
       () => {
-        const selectedElements = this._element.nativeElement.querySelectorAll('.checklist-selected');
-        if (selectedElements.length !== 1) {
+        const selectedElements = this._element.nativeElement.querySelectorAll(nodeClass);
+        if (!selectedElements) {
           console.error('Could not find element for selected node');
           return;
         }
 
-        scrollIntoView(selectedElements[0], {
-          scrollMode: 'if-needed',
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'nearest',
-        });
+        // Note: this will only work in future versions of Chrome, due to
+        // https://issues.chromium.org/issues/325081538
+        // Until then, only the last element will be scrolled into, meaning that when scrolling down,
+        // we'll correctly scroll into the checklist and the group will become visible, but when
+        // scrolling up the group will not come into view.
+        for (const el of selectedElements) {
+          scrollIntoView(el, {
+            scrollMode: 'if-needed',
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest',
+          });
+        }
       },
       { injector: this._injector },
     );
