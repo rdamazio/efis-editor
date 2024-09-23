@@ -66,6 +66,8 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
   showFilePicker = false;
   showFileUpload = false;
 
+  private _loadingFragment = false;
+
   protected readonly ForeFlightUtils = ForeFlightUtils;
 
   constructor(
@@ -77,161 +79,169 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     private _hotkeys: HotkeysService,
   ) {
     afterNextRender(() => {
-      this._hotkeys.setSequenceDebounce(500);
+      this._registerKeyboardShortcuts();
+    });
+  }
 
-      this._hotkeys.registerHelpModal(() => {
-        HelpComponent.toggleHelp(_dialog);
+  private _registerKeyboardShortcuts() {
+    this._hotkeys.setSequenceDebounce(500);
+
+    this._hotkeys.registerHelpModal(() => {
+      HelpComponent.toggleHelp(this._dialog);
+    });
+
+    this._hotkeys
+      .addShortcut({
+        keys: 'down',
+        description: 'Select next checklist item',
+        preventDefault: true,
+        group: 'Navigation',
+      })
+      .subscribe(() => {
+        this.items!.selectNextItem();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'up',
+        description: 'Select previous checklist item',
+        preventDefault: true,
+        group: 'Navigation',
+      })
+      .subscribe(() => {
+        this.items!.selectPreviousItem();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'meta.down',
+        description: 'Select next checklist',
+        preventDefault: true,
+        group: 'Navigation',
+      })
+      .subscribe(() => {
+        this.tree!.selectNextChecklist();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'meta.up',
+        description: 'Select next checklist',
+        preventDefault: true,
+        group: 'Navigation',
+      })
+      .subscribe(() => {
+        this.tree!.selectPreviousChecklist();
+      });
+    // TODO: meta.shift.up/down to reorder checklists
+    // TODO: Group navigation/reordering shortcuts
+
+    this._hotkeys
+      .addShortcut({
+        keys: 'enter',
+        description: 'Edit checklist item',
+        preventDefault: true,
+        trigger: 'keyup',
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.items!.editCurrentItem();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'delete',
+        description: 'Delete checklist item',
+        preventDefault: true,
+        trigger: 'keyup',
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.items!.deleteCurrentItem();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'shift.right',
+        description: 'Indent checklist item',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.items!.indentCurrentItem(1);
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'shift.left',
+        description: 'Unident checklist item',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.items!.indentCurrentItem(-1);
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'shift.C',
+        description: 'Toggle checklist item centering',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.items!.toggleCurrentItemCenter();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'shift.up',
+        description: 'Move checklist item up',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.items!.moveCurrentItemUp();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'shift.down',
+        description: 'Move checklist item down',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.items!.moveCurrentItemDown();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'meta.i',
+        description: 'Edit file information',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.onFileInfo();
       });
 
+    const NEW_ITEM_SHORTCUTS = [
+      { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
+      { secondKey: 'c', typeDescription: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
+      { secondKey: 'x', typeDescription: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
+      { secondKey: 't', typeDescription: 'title', type: ChecklistItem_Type.ITEM_TITLE },
+      { secondKey: 'w', typeDescription: 'warning', type: ChecklistItem_Type.ITEM_WARNING },
+      { secondKey: 'a', typeDescription: 'caution', type: ChecklistItem_Type.ITEM_CAUTION },
+      { secondKey: 'n', typeDescription: 'note', type: ChecklistItem_Type.ITEM_NOTE },
+      { secondKey: 'b', typeDescription: 'blank', type: ChecklistItem_Type.ITEM_SPACE },
+    ];
+    for (const shortcut of NEW_ITEM_SHORTCUTS) {
       this._hotkeys
-        .addShortcut({
-          keys: 'down',
-          description: 'Select next checklist item',
+        .addSequenceShortcut({
+          keys: `n>${shortcut.secondKey}`,
+          description: `Add new ${shortcut.typeDescription} item`,
           preventDefault: true,
-          group: 'Navigation',
+          group: 'Adding',
         })
         .subscribe(() => {
-          this.items!.selectNextItem();
+          this.items!.onNewItem(shortcut.type);
         });
-      this._hotkeys
-        .addShortcut({
-          keys: 'up',
-          description: 'Select previous checklist item',
-          preventDefault: true,
-          group: 'Navigation',
-        })
-        .subscribe(() => {
-          this.items!.selectPreviousItem();
-        });
-      this._hotkeys
-        .addShortcut({
-          keys: 'meta.down',
-          description: 'Select next checklist',
-          preventDefault: true,
-          group: 'Navigation',
-        })
-        .subscribe(() => {
-          this.tree?.selectNextChecklist();
-        });
-      this._hotkeys
-        .addShortcut({
-          keys: 'meta.up',
-          description: 'Select next checklist',
-          preventDefault: true,
-          group: 'Navigation',
-        })
-        .subscribe(() => {
-          this.tree?.selectPreviousChecklist();
-        });
-      // TODO: meta.shift.up/down to reorder checklists
-      // TODO: Group navigation/reordering shortcuts
+    }
+  }
 
-      this._hotkeys
-        .addShortcut({
-          keys: 'enter',
-          description: 'Edit checklist item',
-          preventDefault: true,
-          trigger: 'keyup',
-          group: 'Editing',
-        })
-        .subscribe(() => {
-          this.items!.editCurrentItem();
-        });
-      this._hotkeys
-        .addShortcut({
-          keys: 'delete',
-          description: 'Delete checklist item',
-          preventDefault: true,
-          trigger: 'keyup',
-          group: 'Editing',
-        })
-        .subscribe(() => {
-          this.items!.deleteCurrentItem();
-        });
-      this._hotkeys
-        .addShortcut({
-          keys: 'shift.right',
-          description: 'Indent checklist item',
-          preventDefault: true,
-          group: 'Editing',
-        })
-        .subscribe(() => {
-          this.items!.indentCurrentItem(1);
-        });
-      this._hotkeys
-        .addShortcut({
-          keys: 'shift.left',
-          description: 'Unident checklist item',
-          preventDefault: true,
-          group: 'Editing',
-        })
-        .subscribe(() => {
-          this.items!.indentCurrentItem(-1);
-        });
-      this._hotkeys
-        .addShortcut({
-          keys: 'shift.C',
-          description: 'Toggle checklist item centering',
-          preventDefault: true,
-          group: 'Editing',
-        })
-        .subscribe(() => {
-          this.items!.toggleCurrentItemCenter();
-        });
-      this._hotkeys
-        .addShortcut({
-          keys: 'shift.up',
-          description: 'Move checklist item up',
-          preventDefault: true,
-          group: 'Editing',
-        })
-        .subscribe(() => {
-          this.items!.moveCurrentItemUp();
-        });
-      this._hotkeys
-        .addShortcut({
-          keys: 'shift.down',
-          description: 'Move checklist item down',
-          preventDefault: true,
-          group: 'Editing',
-        })
-        .subscribe(() => {
-          this.items!.moveCurrentItemDown();
-        });
-      this._hotkeys
-        .addShortcut({
-          keys: 'meta.i',
-          description: 'Edit file information',
-          preventDefault: true,
-          group: 'Editing',
-        })
-        .subscribe(() => {
-          this.onFileInfo();
-        });
-
-      const NEW_ITEM_SHORTCUTS = [
-        { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
-        { secondKey: 'c', typeDescription: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
-        { secondKey: 'x', typeDescription: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
-        { secondKey: 't', typeDescription: 'title', type: ChecklistItem_Type.ITEM_TITLE },
-        { secondKey: 'w', typeDescription: 'warning', type: ChecklistItem_Type.ITEM_WARNING },
-        { secondKey: 'a', typeDescription: 'caution', type: ChecklistItem_Type.ITEM_CAUTION },
-        { secondKey: 'n', typeDescription: 'note', type: ChecklistItem_Type.ITEM_NOTE },
-        { secondKey: 'b', typeDescription: 'blank', type: ChecklistItem_Type.ITEM_SPACE },
-      ];
-      for (const shortcut of NEW_ITEM_SHORTCUTS) {
-        this._hotkeys
-          .addSequenceShortcut({
-            keys: `n>${shortcut.secondKey}`,
-            description: `Add new ${shortcut.typeDescription} item`,
-            preventDefault: true,
-            group: 'Adding',
-          })
-          .subscribe(() => {
-            this.items!.onNewItem(shortcut.type);
-          });
-      }
-    });
+  private _unregisterKeyboardShortcuts() {
+    this._hotkeys.removeShortcuts(this._hotkeys.getHotkeys().map((hk) => hk.keys));
   }
 
   ngOnInit() {
@@ -243,16 +253,15 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this._hotkeys.removeShortcuts(this._hotkeys.getHotkeys().map((hk) => hk.keys));
+    this._unregisterKeyboardShortcuts();
   }
 
-  private loadingFragment = false;
   private async _onFragmentChange(fragment: string | null) {
-    if (this.loadingFragment) {
+    if (this._loadingFragment) {
       // We're the ones setting the fragment, changes are being made directly.
       return;
     }
-    this.loadingFragment = true;
+    this._loadingFragment = true;
 
     const parsed = this._parseFragment(fragment);
     const fileName = parsed.fileName;
@@ -264,7 +273,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     if (fileName) {
       this._loadFragmentChecklist(parsed);
     }
-    this.loadingFragment = false;
+    this._loadingFragment = false;
   }
 
   _loadFragmentChecklist(parsed: ParsedFragment) {
@@ -349,7 +358,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
   }
 
   private async _updateFragment() {
-    if (this.loadingFragment) {
+    if (this._loadingFragment) {
       // We're in the middle of setting a fragment - that triggers loading
       // the file, which then triggers an _updateFragment call (and even
       // worse, before a checklist is selected, which would result in a
@@ -471,7 +480,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     if (!this.selectedFile) return;
 
     const name = this.selectedFile.metadata!.name;
-    // TODO: Look into using a framework that makes nicer dialogs, like ng-bootstrap, sweetalert, sweetalert2 or ng-vibe
+    // TODO: Use proper Material dialogs.
     if (!confirm(`Are you sure you'd like to delete checklist file "${name}"??`)) return;
 
     this.store.deleteChecklistFile(name);
