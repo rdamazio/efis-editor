@@ -9,6 +9,11 @@ import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/che
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
 
+interface ChecklistPosition {
+  groupIdx: number;
+  checklistIdx: number;
+}
+
 @Component({
   selector: 'checklist-tree',
   standalone: true,
@@ -123,18 +128,23 @@ export class ChecklistTreeComponent {
     this._selectChecklist(checklist, checklistGroup);
   }
 
-  selectNextChecklist() {
-    if (!this._file) return;
+  // eslint-disable-next-line no-secrets/no-secrets
+  // TODO: This can probably be merged with _findPreviousChecklist by taking a direction parameter.
+  private _findNextChecklist(): ChecklistPosition | undefined {
+    if (!this._file) return undefined;
     const groups = this._file.groups;
     const numGroups = groups.length;
-    if (!numGroups) return; // Empty file
+    if (!numGroups) return undefined; // Empty file
 
-    let { groupIdx, checklistIdx } = this._findSelectedChecklist();
-    if (groupIdx === undefined || checklistIdx === undefined) {
+    const selectedPos = this._findSelectedChecklist();
+    let checklistIdx, groupIdx: number;
+    if (!selectedPos) {
       // Nothing was selected - pretend something before the first checklist was,
       // and it'll get advanced onto the first checklist.
       groupIdx = 0;
       checklistIdx = -1;
+    } else {
+      ({ groupIdx, checklistIdx } = selectedPos);
     }
 
     // If it's the last checklist on the current group, wrap to next group that has a checklist.
@@ -151,28 +161,30 @@ export class ChecklistTreeComponent {
       }
       if (groupIdx === numGroups) {
         // This was the last checklist of the last group (that has checklists) already.
-        return;
+        return undefined;
       }
     } else {
       checklistIdx++;
     }
 
-    this._selectChecklist(group.checklists[checklistIdx], group);
-    this._scrollToSelectedChecklist();
+    return { groupIdx, checklistIdx };
   }
 
-  selectPreviousChecklist() {
-    if (!this._file) return;
+  private _findPreviousChecklist(): ChecklistPosition | undefined {
+    if (!this._file) return undefined;
     const groups = this._file.groups;
     const numGroups = groups.length;
-    if (!numGroups) return; // Empty file
+    if (!numGroups) return undefined; // Empty file
 
-    let { groupIdx, checklistIdx } = this._findSelectedChecklist();
-    if (groupIdx === undefined || checklistIdx === undefined) {
+    const selectedPos = this._findSelectedChecklist();
+    let checklistIdx, groupIdx: number;
+    if (!selectedPos) {
       // Nothing was selected - pretend something after the last checklist was,
       // and it'll get rewinded onto the last checklist.
       groupIdx = groups.length - 1;
       checklistIdx = groups[groupIdx].checklists.length;
+    } else {
+      ({ groupIdx, checklistIdx } = selectedPos);
     }
 
     // If it's the first checklist on the current group, wrap to prior group that has a checklist.
@@ -188,13 +200,34 @@ export class ChecklistTreeComponent {
       }
       if (groupIdx === -1) {
         // This was the first checklist of the first group (that has checklists) already.
-        return;
+        return undefined;
       }
       checklistIdx = group.checklists.length - 1;
     } else {
       checklistIdx--;
     }
 
+    return { groupIdx, checklistIdx };
+  }
+
+  selectNextChecklist() {
+    if (!this._file) return;
+    const next = this._findNextChecklist();
+    if (!next) return;
+
+    const { groupIdx, checklistIdx } = next;
+    const group = this._file.groups[groupIdx];
+    this._selectChecklist(group.checklists[checklistIdx], group);
+    this._scrollToSelectedChecklist();
+  }
+
+  selectPreviousChecklist() {
+    if (!this._file) return;
+    const prev = this._findPreviousChecklist();
+    if (!prev) return;
+
+    const { groupIdx, checklistIdx } = prev;
+    const group = this._file.groups[groupIdx];
     this._selectChecklist(group.checklists[checklistIdx], group);
     this._scrollToSelectedChecklist();
   }
@@ -249,12 +282,12 @@ export class ChecklistTreeComponent {
     );
   }
 
-  private _findSelectedChecklist(): { groupIdx?: number; checklistIdx?: number } {
-    if (!this._file || !this._selectedChecklist) return { groupIdx: undefined, checklistIdx: undefined };
+  private _findSelectedChecklist(): ChecklistPosition | undefined {
+    if (!this._file || !this._selectedChecklist) return undefined;
 
     // Find the currently selected checklist
     const groups = this._file.groups;
-    let currentGroupIdx: number | undefined;
+    let currentGroupIdx: number;
     let currentChecklistIdx: number | undefined;
     findloop: for (currentGroupIdx = 0; currentGroupIdx < groups.length; currentGroupIdx++) {
       const checklists = groups[currentGroupIdx].checklists;
@@ -265,9 +298,9 @@ export class ChecklistTreeComponent {
         }
       }
     }
-    if (currentGroupIdx === groups.length) {
+    if (currentGroupIdx === groups.length || currentChecklistIdx === undefined) {
       // Current checklist not found.
-      return { groupIdx: undefined, checklistIdx: undefined };
+      return undefined;
     }
     return { groupIdx: currentGroupIdx, checklistIdx: currentChecklistIdx };
   }
