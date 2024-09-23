@@ -130,7 +130,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.tree!.selectPreviousChecklist();
       });
-    // TODO: meta.shift.up/down to reorder checklists
+
     // TODO: Group navigation/reordering shortcuts
 
     this._hotkeys
@@ -205,6 +205,27 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.items!.moveCurrentItemDown();
       });
+    this._hotkeys
+      .addShortcut({
+        keys: 'shift.meta.up',
+        description: 'Move checklist up',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.tree!.moveCurrentChecklistUp();
+      });
+    this._hotkeys
+      .addShortcut({
+        keys: 'shift.meta.down',
+        description: 'Move checklist down',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.tree!.moveCurrentChecklistDown();
+      });
+
     this._hotkeys
       .addShortcut({
         keys: 'meta.i',

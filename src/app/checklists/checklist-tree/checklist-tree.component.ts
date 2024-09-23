@@ -232,6 +232,53 @@ export class ChecklistTreeComponent {
     this._scrollToSelectedChecklist();
   }
 
+  moveCurrentChecklistUp() {
+    const prevPos = this._findPreviousChecklist();
+    if (!prevPos) return;
+
+    this._swapSelectedChecklist(prevPos, 'after');
+  }
+
+  moveCurrentChecklistDown() {
+    const nextPos = this._findNextChecklist();
+    if (!nextPos) return;
+
+    this._swapSelectedChecklist(nextPos, 'before');
+  }
+
+  private _swapSelectedChecklist(newPos: ChecklistPosition, insert: 'before' | 'after') {
+    if (!this._file) return;
+
+    const currentPos = this._findSelectedChecklist();
+    if (!currentPos) return;
+
+    const currentGroup = this._file.groups[currentPos.groupIdx];
+    const newGroup = this._file.groups[newPos.groupIdx];
+
+    if (newGroup === currentGroup) {
+      // Swap the checklists in the model.
+      [currentGroup.checklists[currentPos.checklistIdx], newGroup.checklists[newPos.checklistIdx]] = [
+        newGroup.checklists[newPos.checklistIdx],
+        currentGroup.checklists[currentPos.checklistIdx],
+      ];
+    } else {
+      // Swapping would move a checklist from the other group into the current one - must delete and insert instead.
+      const movedChecklist = currentGroup.checklists.splice(currentPos.checklistIdx, 1)[0];
+      const newChecklistIdx = newPos.checklistIdx + (insert === 'after' ? 1 : 0);
+      newGroup.checklists.splice(newChecklistIdx, 0, movedChecklist);
+    }
+
+    // The checklist may have moved between groups - update the selected group.
+    this.selectedChecklistGroup = newGroup;
+
+    // Update the tree nodes.
+    this.reloadFile(true);
+
+    // The selected checklist itself didn't change, but the fragment to represent it did.
+    this._selectChecklist(this.selectedChecklist, newGroup);
+    this._scrollToSelectedChecklist();
+  }
+
   private _selectChecklist(checklist?: Checklist, group?: ChecklistGroup) {
     this._selectedChecklist = checklist;
     this.selectedChecklistGroup = group;
