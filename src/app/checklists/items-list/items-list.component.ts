@@ -161,7 +161,6 @@ export class ChecklistItemsComponent {
     const item = this._selectedItem();
     if (item && !item.centered) {
       const indent = item.indent + delta;
-      // TODO: De-dupliate this logic with ChecklistItemsComponent
       if (indent >= 0 && indent <= 4) {
         item.indent = indent;
         this.onItemUpdated();

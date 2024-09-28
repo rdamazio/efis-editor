@@ -153,8 +153,6 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         this.tree!.selectPreviousGroup();
       });
 
-    // TODO: Group navigation/reordering shortcuts
-
     this._hotkeys
       .addShortcut({
         keys: 'enter',
