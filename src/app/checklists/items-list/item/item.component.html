@@ -83,6 +83,7 @@
         <editable-label
           #promptInput
           class="prompt-input"
+          [class.prompt-input-editing]="promptInput.editing"
           label="Prompt text"
           [value]="item.prompt"
           (valueChange)="onSavePrompt()"
@@ -99,6 +100,7 @@
           <editable-label
             #expectationInput
             class="expectation-input"
+            [class.expectation-input-editing]="expectationInput.editing"
             label="Expectation text"
             [value]="item.expectation"
             (valueChange)="onSaveExpectation()"

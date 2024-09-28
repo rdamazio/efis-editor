@@ -65,11 +65,6 @@
   content: 'NOTE:';
 }
 
-// TODO: Make this work without ng-deep
-::ng-deep .prompt-input mat-form-field {
-  width: 400px;
-}
-
 .expectation-container {
   flex-grow: 1;
   display: flex;
@@ -87,6 +82,12 @@
   padding-left: 5px;
 }
 
-::ng-deep .expectation mat-form-field {
+.prompt-input-editing {
+  display: inline-block;
+  width: 400px;
+}
+
+.expectation-input-editing {
+  display: inline-block;
   width: 300px;
 }

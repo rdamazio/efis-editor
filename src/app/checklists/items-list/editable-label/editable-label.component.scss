@@ -2,5 +2,6 @@
 
 .editable-input {
   height: 32px;
+  width: 100%;
   @include mat.all-component-densities(-3);
 }
