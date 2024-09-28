@@ -13,6 +13,7 @@ interface ChecklistPosition {
   groupIdx: number;
   checklistIdx: number;
 }
+type MovementDirection = 'up' | 'down';
 
 @Component({
   selector: 'checklist-tree',
@@ -128,91 +129,86 @@ export class ChecklistTreeComponent {
     this._selectChecklist(checklist, checklistGroup);
   }
 
-  // eslint-disable-next-line no-secrets/no-secrets
-  // TODO: This can probably be merged with _findPreviousChecklist by taking a direction parameter.
-  private _findNextChecklist(): ChecklistPosition | undefined {
+  private _findNextChecklist(direction: MovementDirection): ChecklistPosition | undefined {
     if (!this._file) return undefined;
     const groups = this._file.groups;
     const numGroups = groups.length;
     if (!numGroups) return undefined; // Empty file
 
+    const next = direction === 'down';
     const selectedPos = this._findSelectedChecklist();
     let checklistIdx, groupIdx: number;
     if (!selectedPos) {
-      // Nothing was selected - pretend something before the first checklist was,
-      // and it'll get advanced onto the first checklist.
-      groupIdx = 0;
-      checklistIdx = -1;
+      // Nothing was selected - pretend something before the first or after the last checklist was,
+      // and it'll get advanced onto the first or last checklist.
+      groupIdx = next ? 0 : groups.length - 1;
+      checklistIdx = next ? -1 : groups[groupIdx].checklists.length;
     } else {
       ({ groupIdx, checklistIdx } = selectedPos);
     }
 
     // If it's the last checklist on the current group, wrap to next group that has a checklist.
     let group = groups[groupIdx];
-    if (checklistIdx === group.checklists.length - 1) {
-      checklistIdx = 0;
-      groupIdx++;
-      while (groupIdx < numGroups) {
+    const delta = next ? 1 : -1;
+    const lastChecklistIdx = next ? group.checklists.length - 1 : 0;
+    const afterLastGroupIdx = next ? numGroups : -1;
+    if (checklistIdx === lastChecklistIdx) {
+      groupIdx += delta;
+
+      while (groupIdx !== afterLastGroupIdx) {
         group = groups[groupIdx];
         if (group.checklists.length > 0) {
           break;
         }
-        groupIdx++;
+        groupIdx += delta;
       }
-      if (groupIdx === numGroups) {
+      if (groupIdx === afterLastGroupIdx) {
         // This was the last checklist of the last group (that has checklists) already.
         return undefined;
       }
+      checklistIdx = next ? 0 : group.checklists.length - 1;
     } else {
-      checklistIdx++;
-    }
-
-    return { groupIdx, checklistIdx };
-  }
-
-  private _findPreviousChecklist(): ChecklistPosition | undefined {
-    if (!this._file) return undefined;
-    const groups = this._file.groups;
-    const numGroups = groups.length;
-    if (!numGroups) return undefined; // Empty file
-
-    const selectedPos = this._findSelectedChecklist();
-    let checklistIdx, groupIdx: number;
-    if (!selectedPos) {
-      // Nothing was selected - pretend something after the last checklist was,
-      // and it'll get rewinded onto the last checklist.
-      groupIdx = groups.length - 1;
-      checklistIdx = groups[groupIdx].checklists.length;
-    } else {
-      ({ groupIdx, checklistIdx } = selectedPos);
-    }
-
-    // If it's the first checklist on the current group, wrap to prior group that has a checklist.
-    let group = groups[groupIdx];
-    if (checklistIdx === 0) {
-      groupIdx--;
-      while (groupIdx >= 0) {
-        group = groups[groupIdx];
-        if (group.checklists.length > 0) {
-          break;
-        }
-        groupIdx--;
-      }
-      if (groupIdx === -1) {
-        // This was the first checklist of the first group (that has checklists) already.
-        return undefined;
-      }
-      checklistIdx = group.checklists.length - 1;
-    } else {
-      checklistIdx--;
+      checklistIdx += delta;
     }
 
     return { groupIdx, checklistIdx };
   }
 
   selectNextChecklist() {
+    this._selectNextChecklist('down');
+  }
+
+  selectPreviousChecklist() {
+    this._selectNextChecklist('up');
+  }
+
+  selectNextGroup() {
+    this._selectNextGroup('down');
+  }
+
+  selectPreviousGroup() {
+    this._selectNextGroup('up');
+  }
+
+  moveCurrentChecklistUp() {
+    this._moveCurrentChecklist('up');
+  }
+
+  moveCurrentChecklistDown() {
+    this._moveCurrentChecklist('down');
+  }
+
+  moveCurrentGroupUp() {
+    this._moveCurrentGroup('up');
+  }
+
+  moveCurrentGroupDown() {
+    this._moveCurrentGroup('down');
+  }
+
+  private _selectNextChecklist(direction: MovementDirection) {
     if (!this._file) return;
-    const next = this._findNextChecklist();
+    const next = this._findNextChecklist(direction);
     if (!next) return;
 
     const { groupIdx, checklistIdx } = next;
@@ -221,33 +217,11 @@ export class ChecklistTreeComponent {
     this._scrollToSelectedChecklist();
   }
 
-  selectPreviousChecklist() {
+  private _moveCurrentChecklist(direction: MovementDirection) {
     if (!this._file) return;
-    const prev = this._findPreviousChecklist();
-    if (!prev) return;
 
-    const { groupIdx, checklistIdx } = prev;
-    const group = this._file.groups[groupIdx];
-    this._selectChecklist(group.checklists[checklistIdx], group);
-    this._scrollToSelectedChecklist();
-  }
-
-  moveCurrentChecklistUp() {
-    const prevPos = this._findPreviousChecklist();
-    if (!prevPos) return;
-
-    this._swapSelectedChecklist(prevPos, 'after');
-  }
-
-  moveCurrentChecklistDown() {
-    const nextPos = this._findNextChecklist();
-    if (!nextPos) return;
-
-    this._swapSelectedChecklist(nextPos, 'before');
-  }
-
-  private _swapSelectedChecklist(newPos: ChecklistPosition, insert: 'before' | 'after') {
-    if (!this._file) return;
+    const newPos = this._findNextChecklist(direction);
+    if (!newPos) return;
 
     const currentPos = this._findSelectedChecklist();
     if (!currentPos) return;
@@ -264,7 +238,7 @@ export class ChecklistTreeComponent {
     } else {
       // Swapping would move a checklist from the other group into the current one - must delete and insert instead.
       const movedChecklist = currentGroup.checklists.splice(currentPos.checklistIdx, 1)[0];
-      const newChecklistIdx = newPos.checklistIdx + (insert === 'after' ? 1 : 0);
+      const newChecklistIdx = newPos.checklistIdx + (direction === 'up' ? 1 : 0);
       newGroup.checklists.splice(newChecklistIdx, 0, movedChecklist);
     }
 
@@ -279,58 +253,33 @@ export class ChecklistTreeComponent {
     this._scrollToSelectedChecklist();
   }
 
-  private _findNextGroup(): number | undefined {
+  private _findNextGroup(direction: MovementDirection): number | undefined {
     if (!this._file) return undefined;
 
+    const next = direction === 'down';
     const selectedPos = this._findSelectedChecklist();
     let groupIdx: number;
     if (!selectedPos) {
-      // Nothing selected - pretend something before the first group was.
-      groupIdx = -1;
-    } else if (selectedPos.groupIdx === this._file.groups.length - 1) {
-      // Already at the last group
+      // Nothing selected - pretend something before the first or after the last group was.
+      groupIdx = next ? -1 : this._file.groups.length;
+    } else if (selectedPos.groupIdx === (next ? this._file.groups.length - 1 : 0)) {
+      // Already at the last/first group
       return undefined;
     } else {
       groupIdx = selectedPos.groupIdx;
     }
 
-    return groupIdx + 1;
-  }
-
-  private _findPreviousGroup(): number | undefined {
-    if (!this._file) return undefined;
-
-    const selectedPos = this._findSelectedChecklist();
-    let groupIdx: number;
-    if (!selectedPos) {
-      // Nothing selected - pretend something after the last group was.
-      groupIdx = this._file.groups.length;
-    } else if (selectedPos.groupIdx === 0) {
-      // Already at the last group
-      return undefined;
+    if (next) {
+      return groupIdx + 1;
     } else {
-      groupIdx = selectedPos.groupIdx;
+      return groupIdx - 1;
     }
-
-    return groupIdx - 1;
   }
 
-  selectNextGroup() {
+  private _selectNextGroup(direction: MovementDirection) {
     if (!this._file) return;
-    const groupIdx = this._findNextGroup();
+    const groupIdx = this._findNextGroup(direction);
     if (groupIdx === undefined) return;
-    this._selectGroup(groupIdx);
-  }
-
-  selectPreviousGroup() {
-    if (!this._file) return;
-    const groupIdx = this._findPreviousGroup();
-    if (groupIdx === undefined) return;
-    this._selectGroup(groupIdx);
-  }
-
-  private _selectGroup(groupIdx: number) {
-    if (!this._file) return;
 
     const group = this._file.groups[groupIdx];
     let checklist: Checklist | undefined = undefined;
@@ -343,21 +292,10 @@ export class ChecklistTreeComponent {
     this._scrollToSelectedChecklist();
   }
 
-  moveCurrentGroupUp() {
-    const prevGroupIdx = this._findPreviousGroup();
-    if (prevGroupIdx === undefined) return;
+  private _moveCurrentGroup(direction: MovementDirection) {
+    const newGroupIdx = this._findNextGroup(direction);
+    if (newGroupIdx === undefined) return;
 
-    this._swapSelectedGroup(prevGroupIdx);
-  }
-
-  moveCurrentGroupDown() {
-    const nextGroupIdx = this._findNextGroup();
-    if (nextGroupIdx === undefined) return;
-
-    this._swapSelectedGroup(nextGroupIdx);
-  }
-
-  private _swapSelectedGroup(newGroupIdx: number) {
     if (!this._file) return;
     const currentPos = this._findSelectedChecklist();
     if (!currentPos) return;
