@@ -1,7 +1,20 @@
 @use '@angular/material' as mat;
 
-.editable-input {
-  height: 32px;
+.editable-input-field {
   width: 100%;
-  @include mat.all-component-densities(-3);
+
+  // Make it short enough that editing doesn't change line height
+  @include mat.all-component-densities(-5);
+  height: 28px;
+  --mat-form-field-container-vertical-padding: 0;
+
+  // Center it relative to the item row
+  position: relative;
+  top: -6px;
+}
+
+.editable-input {
+  // Keep the input also centered on the row
+  position: relative;
+  top: 6px;
 }

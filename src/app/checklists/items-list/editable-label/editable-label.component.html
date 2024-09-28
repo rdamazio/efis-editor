@@ -1,13 +1,14 @@
 @if (!editing) {
   {{ value }}
 } @else {
-  <mat-form-field appearance="outline" class="editable-input">
+  <mat-form-field appearance="outline" class="editable-input-field">
     <mat-label>{{ label }}</mat-label>
     <input
       #promptInput
       matInput
       required
       type="text"
+      class="editable-input"
       [formControl]="control"
       (beforeinput)="onBeforeInput($event)"
       (keyup.enter)="$event.stopPropagation(); value = promptInput.value; save()"
@@ -17,7 +18,6 @@
       mat-icon-button
       mat-medium-icon-button
       matSuffix
-      class="item-icon"
       matTooltip="Save (⏎)"
       [attr.aria-label]="'Save changes to ' + label"
       [disabled]="!this.control.valid"
@@ -29,7 +29,6 @@
       mat-icon-button
       mat-medium-icon-button
       matSuffix
-      class="item-icon"
       matTooltip="Cancel (Esc)"
       [attr.aria-label]="'Cancel changes to ' + label"
       (click)="cancel()"
