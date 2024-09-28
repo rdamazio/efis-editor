@@ -136,7 +136,7 @@ export class ChecklistTreeComponent {
     if (!numGroups) return undefined; // Empty file
 
     const next = direction === 'down';
-    const selectedPos = this._findSelectedChecklist();
+    const selectedPos = this.selectedChecklistPosition();
     let checklistIdx, groupIdx: number;
     if (!selectedPos) {
       // Nothing was selected - pretend something before the first or after the last checklist was,
@@ -223,7 +223,7 @@ export class ChecklistTreeComponent {
     const newPos = this._findNextChecklist(direction);
     if (!newPos) return;
 
-    const currentPos = this._findSelectedChecklist();
+    const currentPos = this.selectedChecklistPosition();
     if (!currentPos) return;
 
     const currentGroup = this._file.groups[currentPos.groupIdx];
@@ -257,7 +257,7 @@ export class ChecklistTreeComponent {
     if (!this._file) return undefined;
 
     const next = direction === 'down';
-    const selectedPos = this._findSelectedChecklist();
+    const selectedPos = this.selectedChecklistPosition();
     let groupIdx: number;
     if (!selectedPos) {
       // Nothing selected - pretend something before the first or after the last group was.
@@ -297,7 +297,7 @@ export class ChecklistTreeComponent {
     if (newGroupIdx === undefined) return;
 
     if (!this._file) return;
-    const currentPos = this._findSelectedChecklist();
+    const currentPos = this.selectedChecklistPosition();
     if (!currentPos) return;
     const currentGroupIdx = currentPos.groupIdx;
 
@@ -384,7 +384,7 @@ export class ChecklistTreeComponent {
     );
   }
 
-  private _findSelectedChecklist(): ChecklistPosition | undefined {
+  selectedChecklistPosition(): ChecklistPosition | undefined {
     if (!this._file || !this._selectedChecklist) return undefined;
 
     // Find the currently selected checklist

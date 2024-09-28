@@ -406,17 +406,10 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
       return this.selectedFile.metadata.name;
     }
 
-    // TODO: Can probably use the tree node indices directly instead.
-    for (const [groupIdx, group] of this.selectedFile.groups.entries()) {
-      if (group === this.tree.selectedChecklistGroup) {
-        for (const [checklistIdx, checklist] of group.checklists.entries()) {
-          if (checklist === this.tree.selectedChecklist) {
-            return `${this.selectedFile.metadata.name}/${groupIdx}/${checklistIdx}`;
-          }
-        }
-      }
+    const selectedPos = this.tree.selectedChecklistPosition();
+    if (selectedPos) {
+      return `${this.selectedFile.metadata.name}/${selectedPos.groupIdx}/${selectedPos.checklistIdx}`;
     }
-
     return this.selectedFile.metadata.name;
   }
 
