@@ -36,6 +36,7 @@
     "@angular/router": "^18.2.4",
     "@angular/ssr": "^18.2.4",
     "@ngneat/hotkeys": "^4.0.0",
+    "@sweetalert2/ngx-sweetalert2": "^12.4.0",
     "buffer": "^6.0.3",
     "buffer-crc32": "^1.0.0",
     "escape-string-regexp": "^5.0.0",
@@ -48,6 +49,7 @@
     "ngx-file-drop": "^16.0.0",
     "rxjs": "~7.8.1",
     "scroll-into-view-if-needed": "^3.1.0",
+    "sweetalert2": "^11.14.1",
     "tslib": "^2.7.0",
     "uuid": "^10.0.0",
     "zone.js": "^0.14.10"

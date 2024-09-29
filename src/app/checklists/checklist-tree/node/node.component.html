@@ -55,7 +55,20 @@
       mat-small-icon-button
       [attr.aria-label]="'Delete ' + node.title"
       [matTooltip]="'Delete ' + node.title + ' and all its items'"
-      (click)="nodeDelete.emit(node)"
+      [swal]="{
+        titleText: node.checklist ? 'Delete checklist?' : 'Delete group?',
+        text: node.checklist
+          ? 'Are you sure you\'d like to delete checklist &quot;' + node.title + '&quot;?'
+          : 'Are you sure you\'d like to delete checklist group &quot;' +
+            node.title +
+            '&quot; and all checklists within??',
+        icon: 'warning',
+        showConfirmButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Delete!',
+        confirmButtonColor: '#d32f2f',
+      }"
+      (confirm)="nodeDelete.emit(node)"
     >
       <mat-icon>delete</mat-icon>
     </button>

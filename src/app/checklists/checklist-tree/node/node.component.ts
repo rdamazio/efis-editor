@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node';
@@ -11,7 +12,16 @@ import { ChecklistTreeNode } from './node';
 @Component({
   selector: 'checklist-tree-node',
   standalone: true,
-  imports: [MatButtonModule, MatIconButtonSizesModule, MatIconModule, MatTooltipModule, NgIf, MatSelect, MatOption],
+  imports: [
+    MatButtonModule,
+    MatIconButtonSizesModule,
+    MatIconModule,
+    MatTooltipModule,
+    NgIf,
+    MatSelect,
+    MatOption,
+    SweetAlert2Module,
+  ],
   templateUrl: './node.component.html',
   styleUrl: './node.component.scss',
 })

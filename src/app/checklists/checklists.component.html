@@ -3,7 +3,7 @@
     <checklist-command-bar
       [hasFiles]="(store.listChecklistFiles() | async)?.length === 0"
       [fileIsOpen]="!!!selectedFile"
-      (newFile)="onNewFile()"
+      (newFile)="onNewFile($event)"
       (openFile)="onOpenFile()"
       (uploadFile)="onUploadFile()"
       (downloadFile)="onDownloadFile($event)"

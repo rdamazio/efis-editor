@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { ChecklistTreeNodeComponent } from './node.component';
 
 describe('NodeComponent', () => {
@@ -8,7 +9,7 @@ describe('NodeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChecklistTreeNodeComponent],
+      imports: [ChecklistTreeNodeComponent, SweetAlert2Module.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistTreeNodeComponent);

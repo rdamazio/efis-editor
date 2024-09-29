@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTreeModule, MatTreeNestedDataSource } from '@angular/material/tree';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import scrollIntoView from 'scroll-into-view-if-needed';
+import Swal from 'sweetalert2';
 import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
@@ -100,7 +101,7 @@ export class ChecklistTreeComponent {
 
   hasChild = (_: number, node: ChecklistTreeNode) => node.children && node.children.length > 0;
 
-  onNodeSelect(node: ChecklistTreeNode) {
+  async onNodeSelect(node: ChecklistTreeNode) {
     let checklist: Checklist | undefined;
     let checklistGroup: ChecklistGroup | undefined;
     if (!node.isAddNew) {
@@ -110,7 +111,7 @@ export class ChecklistTreeComponent {
       if (node.group) {
         // Adding new checklist to a group.
         checklist = Checklist.create();
-        if (!this.fillTitle(checklist, 'checklist')) {
+        if (!(await this.fillTitle(checklist, 'checklist'))) {
           return;
         }
         checklistGroup = node.group;
@@ -118,7 +119,7 @@ export class ChecklistTreeComponent {
       } else {
         // Adding new group to the file.
         checklistGroup = ChecklistGroup.create();
-        if (!this.fillTitle(checklistGroup, 'checklist group')) {
+        if (!(await this.fillTitle(checklistGroup, 'checklist group'))) {
           return;
         }
         this._file!.groups.push(checklistGroup);
@@ -407,14 +408,13 @@ export class ChecklistTreeComponent {
     return { groupIdx: currentGroupIdx, checklistIdx: currentChecklistIdx };
   }
 
-  onChecklistRename(node: ChecklistTreeNode) {
-    this.fillTitle(node.checklist!, 'checklist');
-    this.reloadFile(true);
+  async onChecklistRename(node: ChecklistTreeNode) {
+    if (await this.fillTitle(node.checklist!, 'checklist')) {
+      this.reloadFile(true);
+    }
   }
 
   onChecklistDelete(node: ChecklistTreeNode) {
-    if (!confirm(`Are you sure you'd like to delete checklist "${node.checklist!.title}"??`)) return;
-
     // Update the default checklist index if needed.
     if (
       this.file &&
@@ -433,17 +433,13 @@ export class ChecklistTreeComponent {
     this.reloadFile(true);
   }
 
-  onGroupRename(node: ChecklistTreeNode) {
-    this.fillTitle(node.group!, 'checklist group');
-    this.reloadFile(true);
+  async onGroupRename(node: ChecklistTreeNode) {
+    if (await this.fillTitle(node.group!, 'checklist group')) {
+      this.reloadFile(true);
+    }
   }
 
   onGroupDelete(node: ChecklistTreeNode) {
-    if (
-      !confirm(`Are you sure you'd like to delete checklist group "${node.group!.title}" and all checklists within??`)
-    )
-      return;
-
     // Update the default group index if needed.
     if (this.file && this.file.metadata) {
       if (this.file.metadata.defaultGroupIndex === node.groupIdx) {
@@ -479,12 +475,18 @@ export class ChecklistTreeComponent {
     this.treeControl.collapseAll();
   }
 
-  private fillTitle(pb: Checklist | ChecklistGroup, promptType: string): boolean {
-    const title = prompt(`Enter ${promptType} title:`, pb.title);
-    if (!title) {
+  private async fillTitle(pb: Checklist | ChecklistGroup, promptType: string): Promise<boolean> {
+    const result = await Swal.fire({
+      title: `Enter ${promptType} title:`,
+      input: 'text',
+      inputPlaceholder: `My ${promptType} title`,
+      inputValue: pb.title,
+    });
+
+    if (!result.isConfirmed) {
       return false;
     }
-    pb.title = title;
+    pb.title = result.value; // eslint-disable-line require-atomic-updates
     return true;
   }
 }

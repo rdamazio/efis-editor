@@ -426,14 +426,9 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onNewFile() {
+  onNewFile(fileName: string) {
     this.showFilePicker = false;
     this.showFileUpload = false;
-
-    const name = prompt('Enter a name for the new file:');
-    if (!name) {
-      return;
-    }
 
     // Save an empty file with that name.
     const file: ChecklistFile = {
@@ -458,7 +453,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         },
       ],
       metadata: ChecklistFileMetadata.create({
-        name: name,
+        name: fileName,
       }),
     };
     this.store.saveChecklistFile(file);
@@ -534,8 +529,6 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     if (!this.selectedFile) return;
 
     const name = this.selectedFile.metadata!.name;
-    // TODO: Use proper Material dialogs.
-    if (!confirm(`Are you sure you'd like to delete checklist file "${name}"??`)) return;
 
     this.store.deleteChecklistFile(name);
     this._displayFile(undefined);

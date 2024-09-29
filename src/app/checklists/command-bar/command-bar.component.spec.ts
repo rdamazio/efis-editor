@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { ChecklistCommandBarComponent } from './command-bar.component';
 
 describe('ChecklistCommandBarComponent', () => {
@@ -8,7 +9,7 @@ describe('ChecklistCommandBarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChecklistCommandBarComponent],
+      imports: [ChecklistCommandBarComponent, SweetAlert2Module.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistCommandBarComponent);
