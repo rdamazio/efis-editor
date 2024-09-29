@@ -1,10 +1,11 @@
 import { AsyncPipe } from '@angular/common';
-import { afterNextRender, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { afterNextRender, Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HotkeysDirective, HotkeysService } from '@ngneat/hotkeys';
 import { saveAs } from 'file-saver';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { firstValueFrom } from 'rxjs';
 import {
   Checklist,
@@ -53,6 +54,7 @@ interface ParsedFragment {
     ChecklistTreeComponent,
     HotkeysDirective,
     MatDialogModule,
+    NgxSpinnerModule,
   ],
   templateUrl: './checklists.component.html',
   styleUrl: './checklists.component.scss',
@@ -69,14 +71,17 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
   private _loadingFragment = false;
 
   protected readonly ForeFlightUtils = ForeFlightUtils;
+  protected readonly DOWNLOAD_SPINNER = 'download-spinner';
 
   constructor(
     public store: ChecklistStorage,
     private _dialog: MatDialog,
     private _snackBar: MatSnackBar,
+    private _spinner: NgxSpinnerService,
     private _route: ActivatedRoute,
     private _router: Router,
     private _hotkeys: HotkeysService,
+    private _injector: Injector,
   ) {
     afterNextRender(() => {
       this._registerKeyboardShortcuts();
@@ -139,7 +144,6 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         group: 'Navigation',
       })
       .subscribe(() => {
-        console.log('foo');
         this.tree!.selectNextGroup();
       });
     this._hotkeys
@@ -483,23 +487,23 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
 
     if (!this.selectedFile) return;
 
-    let file: File;
+    let file: Promise<File>;
     if (formatId === 'ace') {
-      file = await AceFormat.fromProto(this.selectedFile);
+      file = AceFormat.fromProto(this.selectedFile);
     } else if (formatId === 'json') {
-      file = await JsonFormat.fromProto(this.selectedFile);
+      file = JsonFormat.fromProto(this.selectedFile);
     } else if (formatId === 'afs') {
-      file = await DynonFormat.fromProto(this.selectedFile, 'CHKLST.AFD');
+      file = DynonFormat.fromProto(this.selectedFile, 'CHKLST.AFD');
     } else if (formatId === 'dynon') {
-      file = await DynonFormat.fromProto(this.selectedFile, 'checklist.txt');
+      file = DynonFormat.fromProto(this.selectedFile, 'checklist.txt');
     } else if (formatId === 'dynon31') {
-      file = await DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 31);
+      file = DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 31);
     } else if (formatId === 'dynon40') {
-      file = await DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 40);
+      file = DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 40);
     } else if (formatId === 'grt') {
-      file = await GrtFormat.fromProto(this.selectedFile);
+      file = GrtFormat.fromProto(this.selectedFile);
     } else if (formatId === ForeFlightUtils.FILE_EXTENSION) {
-      file = await ForeFlightFormat.fromProto(this.selectedFile);
+      file = ForeFlightFormat.fromProto(this.selectedFile);
     } else if (formatId === 'pdf') {
       const pdfDialog = this._dialog.open(ExportDialogComponent, {
         hasBackdrop: true,
@@ -510,16 +514,34 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         ariaModal: true,
       });
       const closePromise = firstValueFrom(pdfDialog.afterClosed());
-      file = await closePromise.then((options: PdfWriterOptions): Promise<File> => {
+      file = closePromise.then((options: PdfWriterOptions): Promise<File> => {
         if (options) {
           return PdfFormat.fromProto(this.selectedFile!, options);
         }
         throw 'PDF dialog cancelled';
       });
     } else {
-      throw new FormatError(`Unknown format "${formatId}"`);
+      file = Promise.reject(new FormatError(`Unknown format "${formatId}"`));
     }
-    saveAs(file, file.name);
+
+    // Some format generations, notably PDF, can take a while - show a spinner.
+    this._spinner
+      .show(this.DOWNLOAD_SPINNER)
+      .then(() => {
+        // Let the spinner be rendered while we generate the file.
+        return afterNextRender(
+          async () => {
+            try {
+              const f = await file;
+              saveAs(f, f.name);
+            } finally {
+              this._spinner.hide(this.DOWNLOAD_SPINNER);
+            }
+          },
+          { injector: this._injector },
+        );
+      })
+      .catch(console.error.bind(console));
   }
 
   onDeleteFile() {
