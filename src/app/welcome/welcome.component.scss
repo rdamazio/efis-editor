@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 .container {
   padding: 20px;
 }
@@ -10,6 +12,7 @@
 .filetype-card {
   max-width: 400px;
   border-radius: 8px;
+  @include mat.elevation(10);
 }
 
 .callout {
@@ -17,6 +20,7 @@
   padding: 10px;
   border-radius: 10px;
   display: inline-flex;
+  @include mat.elevation(5);
 }
 
 .danger {
