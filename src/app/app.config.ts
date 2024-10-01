@@ -11,6 +11,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withEnabledBlockingInitialNavigation()),
     provideClientHydration(),
     provideAnimationsAsync(),
-    importProvidersFrom(SweetAlert2Module.forRoot()),
+    importProvidersFrom(
+      SweetAlert2Module.forRoot({
+        provideSwal: () => import('sweetalert2/dist/sweetalert2.js'),
+      }),
+    ),
   ],
 };

@@ -37,6 +37,7 @@
     "@angular/ssr": "^18.2.4",
     "@ngneat/hotkeys": "^4.0.0",
     "@sweetalert2/ngx-sweetalert2": "^12.4.0",
+    "@sweetalert2/themes": "^5.0.18",
     "buffer": "^6.0.3",
     "buffer-crc32": "^1.0.0",
     "escape-string-regexp": "^5.0.0",
