@@ -33,7 +33,6 @@ module.exports = tseslint.config(
     },
     processor: angular.processInlineTemplates,
     rules: {
-      '@typescript-eslint/consistent-type-exports': 'error',
       '@angular-eslint/directive-selector': [
         'error',
         {
@@ -42,7 +41,9 @@ module.exports = tseslint.config(
           style: 'camelCase',
         },
       ],
+      '@typescript-eslint/consistent-type-exports': 'error',
       '@typescript-eslint/no-confusing-void-expression': 'error',
+      '@typescript-eslint/no-deprecated': 'error',
       '@typescript-eslint/no-meaningless-void-operator': 'error',
       '@typescript-eslint/no-mixed-enums': 'error',
       '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
