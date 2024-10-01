@@ -24,59 +24,63 @@ export class ChecklistFileUploadComponent {
 
   protected readonly ForeFlightUtils = ForeFlightUtils;
 
-  onDropped(files: NgxFileDropEntry[]) {
+  async onDropped(files: NgxFileDropEntry[]) {
+    const uploads: Promise<unknown>[] = [];
     for (const f of files) {
       const fileEntry = f.fileEntry as FileSystemFileEntry;
-      fileEntry.file(async (file: File) => {
-        const extension = file.name.slice(file.name.lastIndexOf('.') + 1).toLowerCase();
+      uploads.push(
+        fileEntry.file(async (file: File) => {
+          const extension = file.name.slice(file.name.lastIndexOf('.') + 1).toLowerCase();
 
-        if (extension === 'fmd') {
-          try {
-            this.fileUploaded.emit(await ForeFlightFormat.toProto(file));
-            return;
-          } catch (e) {
-            console.error('Failed to parse as ForeFlight: ', e);
+          if (extension === 'fmd') {
+            try {
+              this.fileUploaded.emit(await ForeFlightFormat.toProto(file));
+              return;
+            } catch (e) {
+              console.error('Failed to parse as ForeFlight: ', e);
+            }
+          } else if (extension === 'ace') {
+            try {
+              this.fileUploaded.emit(await AceFormat.toProto(file));
+              return;
+            } catch (e) {
+              console.error('Failed to parse as ACE: ', e);
+            }
+          } else if (extension === 'txt') {
+            try {
+              this.fileUploaded.emit(await GrtFormat.toProto(file));
+              return;
+            } catch (e) {
+              console.error('Failed to parse as GRT: ', e);
+            }
+            try {
+              this.fileUploaded.emit(await DynonFormat.toProto(file));
+              return;
+            } catch (e) {
+              console.error('Failed to parse as Dynon: ', e);
+            }
+          } else if (extension === 'afd') {
+            try {
+              this.fileUploaded.emit(await DynonFormat.toProto(file));
+              return;
+            } catch (e) {
+              console.error('Failed to parse as AFD: ', e);
+            }
+          } else if (extension === 'json') {
+            try {
+              this.fileUploaded.emit(await JsonFormat.toProto(file));
+              return;
+            } catch (e) {
+              console.error('Failed to parse as JSON: ', e);
+            }
+          } else {
+            console.error(`Unknown file extension "${extension}".`);
           }
-        } else if (extension === 'ace') {
-          try {
-            this.fileUploaded.emit(await AceFormat.toProto(file));
-            return;
-          } catch (e) {
-            console.error('Failed to parse as ACE: ', e);
-          }
-        } else if (extension === 'txt') {
-          try {
-            this.fileUploaded.emit(await GrtFormat.toProto(file));
-            return;
-          } catch (e) {
-            console.error('Failed to parse as GRT: ', e);
-          }
-          try {
-            this.fileUploaded.emit(await DynonFormat.toProto(file));
-            return;
-          } catch (e) {
-            console.error('Failed to parse as Dynon: ', e);
-          }
-        } else if (extension === 'afd') {
-          try {
-            this.fileUploaded.emit(await DynonFormat.toProto(file));
-            return;
-          } catch (e) {
-            console.error('Failed to parse as AFD: ', e);
-          }
-        } else if (extension === 'json') {
-          try {
-            this.fileUploaded.emit(await JsonFormat.toProto(file));
-            return;
-          } catch (e) {
-            console.error('Failed to parse as JSON: ', e);
-          }
-        } else {
-          console.error(`Unknown file extension "${extension}".`);
-        }
 
-        this._snackBar.open(`Failed to parse uploaded file.`, '', { duration: 5000 });
-      });
+          this._snackBar.open(`Failed to parse uploaded file.`, '', { duration: 5000 });
+        }),
+      );
     }
+    await Promise.all(uploads);
   }
 }

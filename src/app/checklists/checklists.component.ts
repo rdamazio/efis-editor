@@ -277,8 +277,8 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         preventDefault: true,
         group: 'Editing',
       })
-      .subscribe(() => {
-        this.onFileInfo();
+      .subscribe(async () => {
+        await this.onFileInfo();
       });
 
     const NEW_ITEM_SHORTCUTS = [
@@ -430,7 +430,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onNewFile(fileName: string) {
+  async onNewFile(fileName: string) {
     this.showFilePicker = false;
     this.showFileUpload = false;
 
@@ -460,8 +460,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         name: fileName,
       }),
     };
-    this.store.saveChecklistFile(file);
-    this._displayFile(file);
+    await Promise.all([this.store.saveChecklistFile(file), this._displayFile(file)]);
   }
 
   onOpenFile() {
@@ -474,11 +473,10 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     this.showFileUpload = !this.showFileUpload;
   }
 
-  onFileUploaded(file: ChecklistFile) {
+  async onFileUploaded(file: ChecklistFile) {
     this.showFileUpload = false;
 
-    this.store.saveChecklistFile(file);
-    this._displayFile(file);
+    await Promise.all([this.store.saveChecklistFile(file), this._displayFile(file)]);
   }
 
   async onDownloadFile(formatId: string) {
@@ -525,7 +523,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     }
 
     // Some format generations, notably PDF, can take a while - show a spinner.
-    this._spinner
+    return this._spinner
       .show(this.DOWNLOAD_SPINNER)
       .then(() => {
         // Let the spinner be rendered while we generate the file.
@@ -535,7 +533,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
               const f = await file;
               saveAs(f, f.name);
             } finally {
-              this._spinner.hide(this.DOWNLOAD_SPINNER);
+              await this._spinner.hide(this.DOWNLOAD_SPINNER);
             }
           },
           { injector: this._injector },
@@ -544,7 +542,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
       .catch(console.error.bind(console));
   }
 
-  onDeleteFile() {
+  async onDeleteFile() {
     this.showFilePicker = false;
     this.showFileUpload = false;
 
@@ -552,12 +550,11 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
 
     const name = this.selectedFile.metadata!.name;
 
-    this.store.deleteChecklistFile(name);
-    this._displayFile(undefined);
+    await Promise.all([this.store.deleteChecklistFile(name), this._displayFile(undefined)]);
     this._snackBar.open(`Deleted checklist "${name}".`, '', { duration: 2000 });
   }
 
-  onFileInfo() {
+  async onFileInfo() {
     this.showFilePicker = false;
     this.showFileUpload = false;
 
@@ -577,19 +574,23 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
       ariaModal: true,
     });
 
-    dialogRef.afterClosed().subscribe((updatedData: FileInfoDialogData) => {
-      if (!updatedData || !this.selectedFile) return;
+    await firstValueFrom(dialogRef.afterClosed())
+      .then((updatedData: FileInfoDialogData): Promise<unknown> => {
+        if (!updatedData || !this.selectedFile) throw new Error('Metadata change cancelled');
 
-      const oldName = this.selectedFile.metadata!.name;
-      const newName = updatedData.metadata.name;
-      this.selectedFile.metadata = updatedData.metadata;
-      this.store.saveChecklistFile(this.selectedFile);
-      if (oldName !== newName) {
-        // File was renamed, delete old one from storage.
-        this.store.deleteChecklistFile(oldName);
-        this.filePicker!.selectedFile = newName;
-      }
-    });
+        const oldName = this.selectedFile.metadata!.name;
+        const newName = updatedData.metadata.name;
+        this.selectedFile.metadata = updatedData.metadata;
+        const promises = [this.store.saveChecklistFile(this.selectedFile)];
+        if (oldName !== newName) {
+          // File was renamed, delete old one from storage.
+          promises.push(this.store.deleteChecklistFile(oldName));
+          this.filePicker!.selectedFile = newName;
+          // TODO: Update fragment
+        }
+        return Promise.all(promises);
+      })
+      .catch(console.error.bind(console));
   }
 
   async onFileSelected(id?: string) {
@@ -602,7 +603,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         file = loadedFile;
       }
     }
-    this._displayFile(file);
+    await this._displayFile(file);
   }
 
   async onChecklistSelected() {
@@ -625,13 +626,13 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     // TODO: Add filename to topbar, add rename pencil there
   }
 
-  onFileChanged(file: ChecklistFile) {
-    this.store.saveChecklistFile(file);
+  async onFileChanged(file: ChecklistFile) {
+    await this.store.saveChecklistFile(file);
   }
 
-  onChecklistChanged() {
+  async onChecklistChanged() {
     if (this.selectedFile) {
-      this.store.saveChecklistFile(this.selectedFile);
+      await this.store.saveChecklistFile(this.selectedFile);
     }
   }
 }
