@@ -11,6 +11,12 @@ const tseslint = require('typescript-eslint');
 module.exports = tseslint.config(
   {
     files: ['**/*.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        project: './tsconfig.json',
+      },
+    },
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.recommended,
