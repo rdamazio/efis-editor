@@ -19,8 +19,8 @@ module.exports = tseslint.config(
     },
     extends: [
       eslint.configs.recommended,
-      ...tseslint.configs.recommended,
       ...tseslint.configs.stylistic,
+      ...tseslint.configs.recommendedTypeChecked,
       ...angular.configs.tsRecommended,
       prettierRecommended,
       depend.configs['flat/recommended'],
@@ -39,6 +39,12 @@ module.exports = tseslint.config(
           type: 'attribute',
           prefix: 'app',
           style: 'camelCase',
+        },
+      ],
+      '@typescript-eslint/unbound-method': [
+        'error',
+        {
+          ignoreStatic: true,
         },
       ],
       'array-callback-return': 'error',
