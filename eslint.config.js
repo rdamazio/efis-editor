@@ -19,8 +19,8 @@ module.exports = tseslint.config(
     },
     extends: [
       eslint.configs.recommended,
-      ...tseslint.configs.stylistic,
       ...tseslint.configs.recommendedTypeChecked,
+      ...tseslint.configs.stylisticTypeChecked,
       ...angular.configs.tsRecommended,
       prettierRecommended,
       depend.configs['flat/recommended'],
