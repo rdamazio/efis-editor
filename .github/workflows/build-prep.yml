@@ -21,12 +21,7 @@ jobs:
       - name: Install ProtoC
         uses: arduino/setup-protoc@v3
       - name: Generate protos
-        run: |
-          protoc \
-            --proto_path=src/model/proto \
-            --plugin=protoc-gen-ts=node_modules/@protobuf-ts/plugin/bin/protoc-gen-ts \
-            --ts_out=gen/ts \
-            src/model/proto/*.proto
+        run: npm run genproto
       - name: Archive prepared artifacts
         run: tar --exclude=.jj --exclude=.git -cvf prepared-source.tar * .*
       - name: Upload prepared artifacts
