@@ -109,7 +109,7 @@ export class ForeFlightWriter {
           case ChecklistItem_Type.ITEM_WARNING: {
             const text = ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.get(itemEFIS.type) + itemEFIS.prompt;
             const [lastItemFF, lastItemEFIS] = accumulator[accumulator.length - 1] || [];
-            if (lastItemFF && lastItemEFIS && lastItemEFIS.indent < itemEFIS.indent) {
+            if (accumulator.length && lastItemEFIS.indent < itemEFIS.indent) {
               // If this is an indented text item, then...
               const appendNote = (field: string, text: string) => {
                 const typedField = field as keyof typeof lastItemFF;

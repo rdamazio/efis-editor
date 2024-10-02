@@ -328,7 +328,6 @@ export class ChecklistTreeComponent {
     let selectedNode, selectedGroupNode: ChecklistTreeNode | undefined;
     let firstChecklist = true;
     for (const groupNode of this.treeControl.dataNodes) {
-      if (!groupNode) continue;
       if (groupNode.group === this.selectedChecklistGroup) {
         selectedGroupNode = groupNode;
       }
@@ -362,7 +361,7 @@ export class ChecklistTreeComponent {
     afterNextRender(
       () => {
         const selectedElements = this._element.nativeElement.querySelectorAll(nodeClass);
-        if (!selectedElements) {
+        if (!selectedElements.length) {
           console.error('Could not find element for selected node');
           return;
         }

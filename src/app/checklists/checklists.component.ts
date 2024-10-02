@@ -518,7 +518,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         ariaModal: true,
       });
       const closePromise = firstValueFrom(pdfDialog.afterClosed());
-      file = closePromise.then((options: PdfWriterOptions): Promise<File> => {
+      file = closePromise.then((options?: PdfWriterOptions): Promise<File> => {
         if (options) {
           return PdfFormat.fromProto(this.selectedFile!, options);
         }
@@ -585,7 +585,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     });
 
     await firstValueFrom(dialogRef.afterClosed())
-      .then((updatedData: FileInfoDialogData): Promise<unknown> => {
+      .then((updatedData?: FileInfoDialogData): Promise<unknown> => {
         if (!updatedData || !this.selectedFile) throw new Error('Metadata change cancelled');
 
         const oldName = this.selectedFile.metadata!.name;
@@ -628,7 +628,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     if (file?.metadata) {
       // Make the file selected the next time the picker gets displayed
       this.filePicker!.selectedFile = file.metadata.name;
-      this._snackBar.open(`Loaded checklist "${file.metadata?.name}".`, '', { duration: 2000 });
+      this._snackBar.open(`Loaded checklist "${file.metadata.name}".`, '', { duration: 2000 });
     }
 
     await this._updateFragment();

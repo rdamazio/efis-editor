@@ -58,9 +58,7 @@ export class ForeFlightReader {
   }
 
   private static checklistGroupToEFIS(checklistGroup: ForeFlightChecklistGroup): ChecklistGroup[] {
-    return checklistGroup.items
-      ? checklistGroup.items.map((item) => ForeFlightReader.checklistSubgroupToEFIS(checklistGroup.groupType, item))
-      : []; // if the FF group (not subgroup!) is empty, drop it - we need a subgroup to represent a group
+    return checklistGroup.items.map((item) => ForeFlightReader.checklistSubgroupToEFIS(checklistGroup.groupType, item));
   }
 
   private static checklistSubgroupToEFIS(
@@ -70,14 +68,14 @@ export class ForeFlightReader {
     return {
       category: category,
       title: checklistSubgroup.title,
-      checklists: checklistSubgroup.items?.map(ForeFlightReader.checklistToEFIS) || [], // items might be missing
+      checklists: checklistSubgroup.items.map(ForeFlightReader.checklistToEFIS),
     };
   }
 
   private static checklistToEFIS(checkList: ForeFlightChecklist): Checklist {
     return {
       title: checkList.title,
-      items: checkList.items?.flatMap(ForeFlightReader.checklistItemToEFIS) || [], // items might be missing
+      items: checkList.items.flatMap(ForeFlightReader.checklistItemToEFIS),
     };
   }
 

@@ -91,6 +91,7 @@ export class PdfWriter {
     this._tableMargin = this._pageWidth * PdfWriter.TABLE_MARGIN_FRACTION;
     this._footNoteY = this._pageHeight - this._tableMargin / 2;
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (PdfWriter.DEBUG_LAYOUT) {
       console.log(
         `PDF page: w=${this._pageWidth}, h=${this._pageHeight}, sf=${this._scaleFactor}, margin=${this._tableMargin}, footnote=${this._footNoteY}, pad=${this._defaultPadding}`,
@@ -202,6 +203,7 @@ export class PdfWriter {
 
   private _addGroupTitle(group: ChecklistGroup) {
     if (!this._doc) return;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (PdfWriter.DEBUG_LAYOUT) {
       console.log(`Group ${group.title}`);
     }
@@ -237,6 +239,7 @@ export class PdfWriter {
 
     let first = true;
     for (const checklist of group.checklists) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (PdfWriter.DEBUG_LAYOUT) {
         console.log(`Checklist ${checklist.title}`);
       }
@@ -270,7 +273,7 @@ export class PdfWriter {
         margin: this._tableMargin,
         startY: startY,
         rowPageBreak: 'avoid',
-        styles: PdfWriter.DEBUG_LAYOUT
+        styles: PdfWriter.DEBUG_LAYOUT // eslint-disable-line @typescript-eslint/no-unnecessary-condition
           ? {
               lineWidth: 0.1,
             }
@@ -360,6 +363,7 @@ export class PdfWriter {
       cells.push(prompt);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (PdfWriter.DEBUG_LAYOUT) {
       console.log(cells);
     }
@@ -407,6 +411,7 @@ export class PdfWriter {
       const textWidth = this._textWidth(data.cell.text);
       tableWidth = PdfWriter.PREFIX_CELL_WIDTH + textWidth + 2 * this._defaultPadding;
       margin = (this._pageWidth - tableWidth) / 2;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (PdfWriter.DEBUG_LAYOUT) {
         console.log(`Centered: textW=${textWidth}, tableWidth=${tableWidth}, margin=${margin}, text="${contents}"`);
       }
@@ -454,7 +459,7 @@ export class PdfWriter {
       styles: {
         ...data.cell.styles,
         // Using the right fill color apparently depends on this being set.
-        lineWidth: PdfWriter.DEBUG_LAYOUT ? 0.1 : 0,
+        lineWidth: PdfWriter.DEBUG_LAYOUT ? 0.1 : 0, // eslint-disable-line @typescript-eslint/no-unnecessary-condition
         minCellWidth: undefined,
         halign: 'left',
       },
@@ -486,6 +491,7 @@ export class PdfWriter {
     const textHeight = numLines * lineHeight;
     const cellHeight = textHeight + 2 * this._defaultPadding;
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (PdfWriter.DEBUG_LAYOUT) {
       console.log(`Text "${text}": numLines=${numLines}; cellHeight=${cellHeight}`);
     }
@@ -520,6 +526,7 @@ export class PdfWriter {
     // Calculate total width as the width of the longest line.
     const unitWidth = lines.reduce((max: number, line: string) => {
       const width = this._doc!.getStringUnitWidth(line);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (PdfWriter.DEBUG_LAYOUT) {
         console.log(`Width=${width} for line "${line}"`);
       }

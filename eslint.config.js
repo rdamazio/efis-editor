@@ -48,6 +48,7 @@ module.exports = tseslint.config(
         },
       ],
       '@typescript-eslint/no-confusing-void-expression': 'error',
+      '@typescript-eslint/no-unnecessary-condition': ['error', { allowConstantLoopConditions: true }],
       'array-callback-return': 'error',
       eqeqeq: 'error',
       'jasmine/new-line-before-expect': 'off',
