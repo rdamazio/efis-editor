@@ -518,7 +518,7 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         if (options) {
           return PdfFormat.fromProto(this.selectedFile!, options);
         }
-        throw 'PDF dialog cancelled';
+        throw new Error('PDF dialog cancelled');
       });
     } else {
       file = Promise.reject(new FormatError(`Unknown format "${formatId}"`));

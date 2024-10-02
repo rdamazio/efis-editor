@@ -9,6 +9,7 @@ import {
   ChecklistItem,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
+import { FormatError } from './error';
 
 type OrientationType = jsPDFOptions['orientation'];
 type FormatType = jsPDFOptions['format'];
@@ -468,7 +469,7 @@ export class PdfWriter {
   }
 
   private _calculatePrefixedCell(text: string, indent: number): { lines: string[]; height: number } {
-    if (!this._doc) throw 'No document created';
+    if (!this._doc) throw new FormatError('No document created');
 
     const maxContentWidth = this._calculatePrefixedContentWidth(indent);
 
