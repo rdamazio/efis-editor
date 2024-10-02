@@ -38,7 +38,7 @@ export class ChecklistStorage {
         this._publishList(store);
         return void {};
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.error(error);
       });
   }
