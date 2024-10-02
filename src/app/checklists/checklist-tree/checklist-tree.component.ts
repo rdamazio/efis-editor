@@ -221,11 +221,30 @@ export class ChecklistTreeComponent {
   private _moveCurrentChecklist(direction: MovementDirection) {
     if (!this._file) return;
 
-    const newPos = this._findNextChecklist(direction);
-    if (!newPos) return;
-
     const currentPos = this.selectedChecklistPosition();
     if (!currentPos) return;
+
+    const upDirection = direction === 'up';
+    const delta = upDirection ? -1 : 1;
+
+    // Whether we're at the last group in the given direction.
+    const lastGroupIdx = upDirection ? 0 : this._file.groups.length - 1;
+    const lastGroup = currentPos.groupIdx === lastGroupIdx;
+
+    let newPos = this._findNextChecklist(direction);
+
+    if (!newPos && lastGroup) {
+      // There's nothing after the current position to move into.
+      return;
+    }
+
+    if (!newPos || Math.abs(newPos.groupIdx - currentPos.groupIdx) > 1) {
+      // There's an empty group right after this one - move into that.
+      newPos = {
+        checklistIdx: 0,
+        groupIdx: currentPos.groupIdx + delta,
+      };
+    }
 
     const currentGroup = this._file.groups[currentPos.groupIdx];
     const newGroup = this._file.groups[newPos.groupIdx];
@@ -239,7 +258,7 @@ export class ChecklistTreeComponent {
     } else {
       // Swapping would move a checklist from the other group into the current one - must delete and insert instead.
       const movedChecklist = currentGroup.checklists.splice(currentPos.checklistIdx, 1)[0];
-      const newChecklistIdx = newPos.checklistIdx + (direction === 'up' ? 1 : 0);
+      const newChecklistIdx = newPos.checklistIdx + (upDirection ? 1 : 0);
       newGroup.checklists.splice(newChecklistIdx, 0, movedChecklist);
     }
 
