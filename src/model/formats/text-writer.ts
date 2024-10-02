@@ -24,7 +24,7 @@ export class TextWriter {
     this._titleSuffix = this._options.titlePrefixSuffix.split('').reverse().join('');
   }
 
-  public async write(file: ChecklistFile): Promise<Blob> {
+  public write(file: ChecklistFile): Blob {
     this._addLine(HEADER_COMMENT);
 
     let firstGroup = true;

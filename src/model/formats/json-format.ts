@@ -12,8 +12,8 @@ export class JsonFormat {
     return checklist;
   }
 
-  public static async fromProto(file: ChecklistFile): Promise<File> {
+  public static fromProto(file: ChecklistFile): Promise<File> {
     const contents = ChecklistFile.toJsonString(file, { prettySpaces: 2 });
-    return new File([contents], file.metadata!.name + '.json');
+    return Promise.resolve(new File([contents], file.metadata!.name + '.json'));
   }
 }

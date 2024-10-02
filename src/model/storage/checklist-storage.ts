@@ -20,7 +20,7 @@ export class ChecklistStorage {
           resolve(localStorage);
         } else {
           console.log('No local storage!!');
-          reject('No local storage found');
+          reject(new Error('No local storage found'));
         }
       };
 

@@ -54,7 +54,7 @@ describe('ChecklistsService', () => {
     TestBed.configureTestingModule({});
     store = TestBed.inject(ChecklistStorage);
     store.forceBrowserStorage();
-    localStorage.clear();
+    await store.clear();
   });
 
   it('should be created', () => {
@@ -68,7 +68,7 @@ describe('ChecklistsService', () => {
   describe('should save and read each checklist', () => {
     [A_CHECKLIST_FILE, ANOTHER_CHECKLIST_FILE, YET_ANOTHER_CHECKLIST_FILE].forEach((file) => {
       beforeEach(async () => {
-        localStorage.clear();
+        await store.clear();
       });
 
       it('should save and read back a checklist', async () => {

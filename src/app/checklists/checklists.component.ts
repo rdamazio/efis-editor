@@ -277,8 +277,11 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
         preventDefault: true,
         group: 'Editing',
       })
-      .subscribe(async () => {
-        await this.onFileInfo();
+      .subscribe(() => {
+        const fn = async () => {
+          await this.onFileInfo();
+        };
+        fn().catch(console.error.bind(console));
       });
 
     const NEW_ITEM_SHORTCUTS = [
@@ -310,10 +313,13 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._route.fragment.subscribe(async (fragment) => {
-      // We use fragment-based navigation because of the routing limitations associated with GH Pages.
-      // (yes, I could make 404.html point to index.html, but that's just horrible)
-      await this._onFragmentChange(fragment);
+    this._route.fragment.subscribe((fragment) => {
+      const fn = async () => {
+        // We use fragment-based navigation because of the routing limitations associated with GH Pages.
+        // (yes, I could make 404.html point to index.html, but that's just horrible)
+        await this._onFragmentChange(fragment);
+      };
+      fn().catch(console.error.bind(console));
     });
   }
 
@@ -528,13 +534,17 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
       .then(() => {
         // Let the spinner be rendered while we generate the file.
         return afterNextRender(
-          async () => {
-            try {
-              const f = await file;
-              saveAs(f, f.name);
-            } finally {
-              await this._spinner.hide(this.DOWNLOAD_SPINNER);
-            }
+          () => {
+            const fn = async () => {
+              try {
+                const f = await file;
+                saveAs(f, f.name);
+              } finally {
+                await this._spinner.hide(this.DOWNLOAD_SPINNER);
+              }
+            };
+            // eslint-disable-next-line promise/no-nesting
+            fn().catch(console.error.bind(console));
           },
           { injector: this._injector },
         );

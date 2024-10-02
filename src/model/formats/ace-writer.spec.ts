@@ -19,7 +19,7 @@ describe('AceWriter', () => {
     expect(writtenData).toEqual(readData);
   });
 
-  describe('try writing files without a name', async () => {
+  describe('try writing files without a name', () => {
     [
       ChecklistFile.create({
         metadata: undefined,
