@@ -27,8 +27,8 @@ export class GrtFormat {
     return new TextReader(file, GRT_FORMAT_OPTIONS).read();
   }
 
-  public static fromProto(file: ChecklistFile): Promise<File> {
+  public static fromProto(file: ChecklistFile): File {
     const blob = new TextWriter(GRT_FORMAT_OPTIONS).write(file);
-    return Promise.resolve(new File([blob], 'checklist.txt'));
+    return new File([blob], 'checklist.txt');
   }
 }

@@ -79,7 +79,7 @@ export class ChecklistStorage {
     if (!file.metadata?.name) {
       throw new Error('Must specify checklist file name in metadata.');
     }
-    const blob = await JsonFormat.fromProto(file);
+    const blob = JsonFormat.fromProto(file);
     store.setItem(CHECKLIST_PREFIX + file.metadata.name, await blob.text());
     this._publishList(store);
   }

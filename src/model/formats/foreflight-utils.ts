@@ -64,7 +64,7 @@ export class ForeFlightUtils {
         };
   }
 
-  private static getKey(keyUsage: KeyUsage): Promise<CryptoKey> {
+  private static async getKey(keyUsage: KeyUsage): Promise<CryptoKey> {
     return window.crypto.subtle.importKey(
       'raw',
       ForeFlightUtils.CIPHER_KEY,

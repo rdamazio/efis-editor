@@ -27,16 +27,16 @@ export class ChecklistFileUploadComponent {
 
   async onDropped(files: NgxFileDropEntry[]) {
     const parsedFiles: Promise<ChecklistFile | void>[] = files
-      .map((entry: NgxFileDropEntry): Promise<File> => {
+      .map(async (entry: NgxFileDropEntry): Promise<File> => {
         const fsEntry = entry.fileEntry as FileSystemFileEntry;
 
         return new Promise((resolve, reject) => {
           fsEntry.file(resolve, reject);
         });
       })
-      .map((filePromise: Promise<File>): Promise<ChecklistFile | void> => {
+      .map(async (filePromise: Promise<File>): Promise<ChecklistFile | void> => {
         return filePromise
-          .then((file: File): Promise<ChecklistFile> => {
+          .then(async (file: File): Promise<ChecklistFile> => {
             return this._parseFile(file);
           })
           .then((checklistFile: ChecklistFile): ChecklistFile => {
@@ -51,7 +51,7 @@ export class ChecklistFileUploadComponent {
     await Promise.all(parsedFiles);
   }
 
-  private _parseFile(file: File): Promise<ChecklistFile> {
+  private async _parseFile(file: File): Promise<ChecklistFile> {
     const extension = file.name.slice(file.name.lastIndexOf('.') + 1).toLowerCase();
     if (extension === 'fmd') {
       return ForeFlightFormat.toProto(file);

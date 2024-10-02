@@ -50,6 +50,7 @@ module.exports = tseslint.config(
       '@typescript-eslint/no-confusing-void-expression': 'error',
       '@typescript-eslint/no-unnecessary-condition': ['error', { allowConstantLoopConditions: true }],
       '@typescript-eslint/prefer-readonly': 'error',
+      '@typescript-eslint/promise-function-async': 'error',
       'array-callback-return': 'error',
       eqeqeq: 'error',
       'jasmine/new-line-before-expect': 'off',

@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     importProvidersFrom(
       SweetAlert2Module.forRoot({
-        provideSwal: () => import('sweetalert2/dist/sweetalert2.js'),
+        provideSwal: async () => import('sweetalert2/dist/sweetalert2.js'),
       }),
     ),
   ],
