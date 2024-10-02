@@ -31,6 +31,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    needs: buildprep
     steps:
       - name: Fetch prepared artifacts
         uses: actions/download-artifact@v4
