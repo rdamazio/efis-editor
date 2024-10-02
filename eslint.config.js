@@ -33,6 +33,7 @@ module.exports = tseslint.config(
     },
     processor: angular.processInlineTemplates,
     rules: {
+      '@typescript-eslint/consistent-type-exports': 'error',
       '@angular-eslint/directive-selector': [
         'error',
         {
@@ -41,17 +42,20 @@ module.exports = tseslint.config(
           style: 'camelCase',
         },
       ],
-      '@typescript-eslint/unbound-method': [
-        'error',
-        {
-          ignoreStatic: true,
-        },
-      ],
       '@typescript-eslint/no-confusing-void-expression': 'error',
+      '@typescript-eslint/no-meaningless-void-operator': 'error',
+      '@typescript-eslint/no-mixed-enums': 'error',
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
       '@typescript-eslint/no-unnecessary-condition': ['error', { allowConstantLoopConditions: true }],
+      '@typescript-eslint/no-unnecessary-qualifier': 'error',
+      '@typescript-eslint/no-unnecessary-template-expression': 'error',
       '@typescript-eslint/prefer-readonly': 'error',
+      '@typescript-eslint/prefer-reduce-type-parameter': 'error',
+      '@typescript-eslint/prefer-return-this-type': 'error',
       '@typescript-eslint/promise-function-async': 'error',
+      '@typescript-eslint/require-array-sort-compare': ['error', { ignoreStringArrays: true }],
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      '@typescript-eslint/unbound-method': ['error', { ignoreStatic: true }],
       'array-callback-return': 'error',
       eqeqeq: 'error',
       'jasmine/new-line-before-expect': 'off',
