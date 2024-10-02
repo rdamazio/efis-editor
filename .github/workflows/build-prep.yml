@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "21.7.3"
+          node-version: '21.7.3'
           cache: 'npm'
       - name: Install npm dependencies
         run: npm ci
@@ -28,7 +28,7 @@ jobs:
             --ts_out=gen/ts \
             src/model/proto/*.proto
       - name: Archive prepared artifacts
-        run: tar cf prepared-source.tar *
+        run: tar --exclude=.jj --exclude=.git -cvf prepared-source.tar * .*
       - name: Upload prepared artifacts
         uses: actions/upload-artifact@v4
         with:
