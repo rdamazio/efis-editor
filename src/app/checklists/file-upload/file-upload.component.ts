@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { FileSystemFileEntry, NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop';
+import { NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop';
 import { ChecklistFile } from '../../../../gen/ts/checklist';
 import { AceFormat } from '../../../model/formats/ace-format';
 import { DynonFormat } from '../../../model/formats/dynon-format';
+import { FormatError } from '../../../model/formats/error';
 import { ForeFlightFormat } from '../../../model/formats/foreflight-format';
 import { ForeFlightUtils } from '../../../model/formats/foreflight-utils';
 import { GrtFormat } from '../../../model/formats/grt-format';
@@ -25,62 +26,43 @@ export class ChecklistFileUploadComponent {
   protected readonly ForeFlightUtils = ForeFlightUtils;
 
   async onDropped(files: NgxFileDropEntry[]) {
-    const uploads: Promise<unknown>[] = [];
-    for (const f of files) {
-      const fileEntry = f.fileEntry as FileSystemFileEntry;
-      uploads.push(
-        fileEntry.file(async (file: File) => {
-          const extension = file.name.slice(file.name.lastIndexOf('.') + 1).toLowerCase();
+    const parsedFiles: Promise<ChecklistFile | void>[] = files
+      .map((entry: NgxFileDropEntry): Promise<File> => {
+        const fsEntry = entry.fileEntry as FileSystemFileEntry;
 
-          if (extension === 'fmd') {
-            try {
-              this.fileUploaded.emit(await ForeFlightFormat.toProto(file));
-              return;
-            } catch (e) {
-              console.error('Failed to parse as ForeFlight: ', e);
-            }
-          } else if (extension === 'ace') {
-            try {
-              this.fileUploaded.emit(await AceFormat.toProto(file));
-              return;
-            } catch (e) {
-              console.error('Failed to parse as ACE: ', e);
-            }
-          } else if (extension === 'txt') {
-            try {
-              this.fileUploaded.emit(await GrtFormat.toProto(file));
-              return;
-            } catch (e) {
-              console.error('Failed to parse as GRT: ', e);
-            }
-            try {
-              this.fileUploaded.emit(await DynonFormat.toProto(file));
-              return;
-            } catch (e) {
-              console.error('Failed to parse as Dynon: ', e);
-            }
-          } else if (extension === 'afd') {
-            try {
-              this.fileUploaded.emit(await DynonFormat.toProto(file));
-              return;
-            } catch (e) {
-              console.error('Failed to parse as AFD: ', e);
-            }
-          } else if (extension === 'json') {
-            try {
-              this.fileUploaded.emit(await JsonFormat.toProto(file));
-              return;
-            } catch (e) {
-              console.error('Failed to parse as JSON: ', e);
-            }
-          } else {
-            console.error(`Unknown file extension "${extension}".`);
-          }
+        return new Promise((resolve, reject) => fsEntry.file(resolve, reject));
+      })
+      .map((filePromise: Promise<File>): Promise<ChecklistFile | void> => {
+        return filePromise
+          .then((file: File): Promise<ChecklistFile> => {
+            return this._parseFile(file);
+          })
+          .then((checklistFile: ChecklistFile): ChecklistFile => {
+            this.fileUploaded.emit(checklistFile);
+            return checklistFile;
+          })
+          .catch((reason) => {
+            console.error('Failed to parse file: ', reason);
+            this._snackBar.open(`Failed to parse uploaded file.`, '', { duration: 5000 });
+          });
+      });
+    await Promise.all(parsedFiles);
+  }
 
-          this._snackBar.open(`Failed to parse uploaded file.`, '', { duration: 5000 });
-        }),
-      );
+  private _parseFile(file: File): Promise<ChecklistFile> {
+    const extension = file.name.slice(file.name.lastIndexOf('.') + 1).toLowerCase();
+    if (extension === 'fmd') {
+      return ForeFlightFormat.toProto(file);
+    } else if (extension === 'ace') {
+      return AceFormat.toProto(file);
+    } else if (extension === 'txt') {
+      return Promise.any([GrtFormat.toProto(file), DynonFormat.toProto(file)]);
+    } else if (extension === 'afd') {
+      return DynonFormat.toProto(file);
+    } else if (extension === 'json') {
+      return JsonFormat.toProto(file);
+    } else {
+      throw new FormatError(`Unknown file extension "${extension}".`);
     }
-    await Promise.all(uploads);
   }
 }
