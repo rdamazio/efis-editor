@@ -35,9 +35,9 @@ export class TextReader {
   ) {
     this._titleSuffix = this._options.titlePrefixSuffix.split('').reverse().join('');
     this._checklistPrefixMatch =
-      this._options.checklistPrefixMatcher || new RegExp('^' + escapeStringRegexp(this._options.checklistPrefix) + '$');
+      this._options.checklistPrefixMatcher ?? new RegExp('^' + escapeStringRegexp(this._options.checklistPrefix) + '$');
     this._itemPrefixMatch =
-      this._options.itemPrefixMatcher || new RegExp('^' + escapeStringRegexp(this._options.itemPrefix) + '$');
+      this._options.itemPrefixMatcher ?? new RegExp('^' + escapeStringRegexp(this._options.itemPrefix) + '$');
     this._checklistNumOffset = this._options.checklistZeroIndexed ? 0 : 1;
     this._itemNumOffset = this._options.checklistItemZeroIndexed ? 0 : 1;
   }

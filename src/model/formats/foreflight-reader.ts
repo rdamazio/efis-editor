@@ -45,6 +45,7 @@ export class ForeFlightReader {
 
   public static getChecklistMetadata(file: File, metadata: ForeFlightChecklistMetadata): ChecklistFileMetadata {
     return ChecklistFileMetadata.create({
+      // eslint-disable-next-line  @typescript-eslint/prefer-nullish-coalescing
       name: metadata.name || file.name.replace(new RegExp(`\\.${ForeFlightUtils.FILE_EXTENSION}$`), ''),
       aircraftInfo: metadata.tailNumber,
       makeAndModel: metadata.detail,
@@ -129,7 +130,7 @@ export class ForeFlightReader {
       // Check Item with a note
       checklistItem.note
     ) {
-      for (const noteLine of ForeFlightUtils.splitLines(possibleNote || '')) {
+      for (const noteLine of ForeFlightUtils.splitLines(possibleNote ?? '')) {
         result.push(
           ChecklistItem.create({
             indent: ForeFlightUtils.NOTE_INDENT,

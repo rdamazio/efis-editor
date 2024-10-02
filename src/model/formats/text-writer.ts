@@ -80,7 +80,7 @@ export class TextWriter {
     }
     this._addLine(this._replaceNumbers(this._options.itemPrefix, checklistIdx, itemIdx++));
 
-    const now = TextWriter.testingTime || new Date();
+    const now = TextWriter.testingTime ?? new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
     const day = now.getDate();

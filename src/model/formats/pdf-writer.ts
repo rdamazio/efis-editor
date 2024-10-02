@@ -76,8 +76,8 @@ export class PdfWriter {
 
   public write(file: ChecklistFile): Blob {
     const doc = new jsPDF({
-      format: this._options?.format || 'letter',
-      orientation: this._options?.orientation || 'portrait',
+      format: this._options?.format ?? 'letter',
+      orientation: this._options?.orientation ?? 'portrait',
       unit: 'em',
       putOnlyUsedFonts: true,
     });
@@ -525,7 +525,7 @@ export class PdfWriter {
       }
       return Math.max(max, width);
     }, 0);
-    return (unitWidth * (fontSize || PdfWriter.CONTENT_FONT_SIZE)) / this._scaleFactor;
+    return (unitWidth * (fontSize ?? PdfWriter.CONTENT_FONT_SIZE)) / this._scaleFactor;
   }
 
   private _addPageFooters() {
