@@ -420,7 +420,7 @@ export class ChecklistTreeComponent {
       this.file &&
       this.file.metadata &&
       this.file.metadata.defaultGroupIndex === node.groupIdx &&
-      this.file.metadata.defaultChecklistIndex! >= node.checklistIdx! &&
+      this.file.metadata.defaultChecklistIndex >= node.checklistIdx! &&
       this.file.metadata.defaultChecklistIndex > 0
     ) {
       this.file.metadata.defaultChecklistIndex--;
@@ -428,7 +428,7 @@ export class ChecklistTreeComponent {
 
     node.group!.checklists.splice(node.checklistIdx!, 1);
     if (this._selectedChecklist === node.checklist!) {
-      this._selectChecklist(undefined, node.group!);
+      this._selectChecklist(undefined, node.group);
     }
     this.reloadFile(true);
   }
