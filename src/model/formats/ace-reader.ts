@@ -30,7 +30,7 @@ export class AceReader {
 
     const header = this.readBytes(AceConstants.HEADER.byteLength);
     if (!equal(header, AceConstants.HEADER)) {
-      throw new FormatError(`Unexpected file header in ${this._file.name}: ${header}`);
+      throw new FormatError(`Unexpected file header in ${this._file.name}: ${String(header)}`);
     }
     const defaultGroup = this.readBytes(1)[0];
     const defaultChecklist = this.readBytes(1)[0];
