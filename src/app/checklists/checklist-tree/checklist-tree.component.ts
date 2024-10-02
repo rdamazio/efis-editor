@@ -31,7 +31,7 @@ export class ChecklistTreeComponent {
   private _selectedChecklist?: Checklist;
 
   constructor(
-    private _element: ElementRef,
+    private _element: ElementRef<Element>,
     private _injector: Injector,
   ) {}
 
@@ -372,14 +372,14 @@ export class ChecklistTreeComponent {
         // Until then, only the last element will be scrolled into, meaning that when scrolling down,
         // we'll correctly scroll into the checklist and the group will become visible, but when
         // scrolling up the group will not come into view.
-        for (const el of selectedElements) {
+        selectedElements.forEach((el: Element) => {
           scrollIntoView(el, {
             scrollMode: 'if-needed',
             behavior: 'smooth',
             block: 'nearest',
             inline: 'nearest',
           });
-        }
+        });
       },
       { injector: this._injector },
     );
@@ -486,7 +486,7 @@ export class ChecklistTreeComponent {
     if (!result.isConfirmed) {
       return false;
     }
-    pb.title = result.value; // eslint-disable-line require-atomic-updates
+    pb.title = result.value as string; // eslint-disable-line require-atomic-updates
     return true;
   }
 }

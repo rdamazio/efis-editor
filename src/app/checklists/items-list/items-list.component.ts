@@ -228,9 +228,9 @@ export class ChecklistItemsComponent {
 
   private _focusSelectedItem() {
     const item = this._selectedItemComponent();
-    if (item) {
+    if (item && item.containerRef) {
       item.focus();
-      scrollIntoView(item.containerRef?.nativeElement, {
+      scrollIntoView(item.containerRef.nativeElement, {
         scrollMode: 'if-needed',
         behavior: 'smooth',
         block: 'nearest',

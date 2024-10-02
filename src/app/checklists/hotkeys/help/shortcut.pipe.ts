@@ -13,7 +13,7 @@ export class ShortcutPipe implements PipeTransform {
       // Work around a bug where altleft is not recognized, but alt is not rendered correctly on OSX.
       .replaceAll('alt.', 'altleft.');
     const builtinPipe = new HotkeysShortcutPipe();
-    const transformedValue = builtinPipe.transform(fixedValue);
+    const transformedValue = builtinPipe.transform(fixedValue) as string;
     // Work around another bug where the built-in Pipe uses the wrong symbol for enter.
     return transformedValue.replaceAll('&#8996;', '&#8629;');
   }

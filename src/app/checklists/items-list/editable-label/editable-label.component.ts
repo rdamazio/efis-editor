@@ -28,7 +28,7 @@ export class EditableLabelComponent {
 
   control = new FormControl('');
   private _savedValue = '';
-  @ViewChild('promptInput') input!: ElementRef;
+  @ViewChild('promptInput') input!: ElementRef<HTMLElement>;
 
   @Output() cancelled = new EventEmitter<boolean>();
   @Output() editing = false;

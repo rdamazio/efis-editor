@@ -9,13 +9,11 @@ const CHECKLIST_PREFIX = 'checklists:';
   providedIn: 'root',
 })
 export class ChecklistStorage {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  private _browserStorage: Promise<any>;
-  private _storageResolveFunc: any;
+  private _browserStorage: Promise<Storage>;
+  private _storageResolveFunc?: () => void;
 
   constructor() {
-    this._browserStorage = new Promise<any>((resolve, reject) => {
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+    this._browserStorage = new Promise<Storage>((resolve, reject) => {
       this._storageResolveFunc = () => {
         if (Object.prototype.hasOwnProperty.call(global, 'localStorage')) {
           console.log('Initialized local storage');
@@ -29,7 +27,7 @@ export class ChecklistStorage {
       afterNextRender({
         read: () => {
           setTimeout(() => {
-            this._storageResolveFunc();
+            this._storageResolveFunc!();
           });
         },
       });
@@ -47,7 +45,7 @@ export class ChecklistStorage {
 
   // For testing only.
   forceBrowserStorage() {
-    this._storageResolveFunc();
+    this._storageResolveFunc!();
   }
 
   private _filesSubject = new BehaviorSubject<string[]>([]);
@@ -56,8 +54,7 @@ export class ChecklistStorage {
     return this._file$;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private _publishList(store: any) {
+  private _publishList(store: Storage) {
     const names: string[] = [];
     for (let i = 0; i < store.length; i++) {
       const k = store.key(i);

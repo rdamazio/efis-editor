@@ -478,7 +478,7 @@ export class PdfWriter {
     this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
 
     // Actually calculate the text wrapping so we know how many lines the cell will take.
-    const splitText = this._doc.splitTextToSize(text, maxContentWidth);
+    const splitText = this._doc.splitTextToSize(text, maxContentWidth) as string[];
     const numLines = splitText.length;
 
     const lineHeight = this._doc.getLineHeight() / this._scaleFactor;

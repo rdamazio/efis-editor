@@ -29,7 +29,7 @@ export class ChecklistItemComponent {
   @Output() itemDeleted = new EventEmitter<boolean>();
   @Output() itemFocused = new EventEmitter<boolean>();
   @Output() itemBlurred = new EventEmitter<boolean>();
-  @ViewChild('container') containerRef?: ElementRef;
+  @ViewChild('container') containerRef?: ElementRef<HTMLElement>;
   @ViewChild('promptInput') promptInput?: EditableLabelComponent;
   @ViewChild('expectationInput') expectationInput?: EditableLabelComponent;
   private _shouldRestoreFocus = false;
