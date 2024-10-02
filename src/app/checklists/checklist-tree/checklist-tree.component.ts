@@ -417,8 +417,7 @@ export class ChecklistTreeComponent {
   onChecklistDelete(node: ChecklistTreeNode) {
     // Update the default checklist index if needed.
     if (
-      this.file &&
-      this.file.metadata &&
+      this.file?.metadata &&
       this.file.metadata.defaultGroupIndex === node.groupIdx &&
       this.file.metadata.defaultChecklistIndex >= node.checklistIdx! &&
       this.file.metadata.defaultChecklistIndex > 0
@@ -441,7 +440,7 @@ export class ChecklistTreeComponent {
 
   onGroupDelete(node: ChecklistTreeNode) {
     // Update the default group index if needed.
-    if (this.file && this.file.metadata) {
+    if (this.file?.metadata) {
       if (this.file.metadata.defaultGroupIndex === node.groupIdx) {
         // The group containing the current default was deleted, reset.
         this.file.metadata.defaultGroupIndex = 0;

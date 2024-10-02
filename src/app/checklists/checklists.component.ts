@@ -406,11 +406,11 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
   }
 
   private _buildFragment(): string {
-    if (!this.selectedFile || !this.selectedFile.metadata?.name) {
+    if (!this.selectedFile?.metadata?.name) {
       return '';
     }
 
-    if (!this.tree || !this.tree.selectedChecklist) {
+    if (!this.tree?.selectedChecklist) {
       return this.selectedFile.metadata.name;
     }
 
