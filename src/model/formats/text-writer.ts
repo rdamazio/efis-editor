@@ -16,11 +16,11 @@ import {
 export class TextWriter {
   private readonly CRLF = '\r\n';
   private readonly _titleSuffix: string;
-  private _parts: string[] = new Array<string>();
+  private readonly _parts: string[] = new Array<string>();
   // Let tests override our date.
   public static testingTime: Date | undefined;
 
-  constructor(private _options: TextFormatOptions) {
+  constructor(private readonly _options: TextFormatOptions) {
     this._titleSuffix = this._options.titlePrefixSuffix.split('').reverse().join('');
   }
 

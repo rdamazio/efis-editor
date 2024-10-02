@@ -57,8 +57,8 @@ export class ChecklistItemsComponent {
   }
 
   constructor(
-    private _injector: Injector,
-    private _snackBar: MatSnackBar,
+    private readonly _injector: Injector,
+    private readonly _snackBar: MatSnackBar,
   ) {}
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {

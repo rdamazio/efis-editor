@@ -75,13 +75,13 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
 
   constructor(
     public store: ChecklistStorage,
-    private _dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _spinner: NgxSpinnerService,
-    private _route: ActivatedRoute,
-    private _router: Router,
-    private _hotkeys: HotkeysService,
-    private _injector: Injector,
+    private readonly _dialog: MatDialog,
+    private readonly _snackBar: MatSnackBar,
+    private readonly _spinner: NgxSpinnerService,
+    private readonly _route: ActivatedRoute,
+    private readonly _router: Router,
+    private readonly _hotkeys: HotkeysService,
+    private readonly _injector: Injector,
   ) {
     afterNextRender(() => {
       this._registerKeyboardShortcuts();

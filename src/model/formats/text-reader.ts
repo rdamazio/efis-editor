@@ -30,8 +30,8 @@ export class TextReader {
   private readonly _itemNumOffset: number;
 
   constructor(
-    private _file: File,
-    private _options: TextFormatOptions,
+    private readonly _file: File,
+    private readonly _options: TextFormatOptions,
   ) {
     this._titleSuffix = this._options.titlePrefixSuffix.split('').reverse().join('');
     this._checklistPrefixMatch =

@@ -72,7 +72,7 @@ export class PdfWriter {
 
   private _currentY = 0;
 
-  constructor(private _options?: PdfWriterOptions) {}
+  constructor(private readonly _options?: PdfWriterOptions) {}
 
   public write(file: ChecklistFile): Blob {
     const doc = new jsPDF({

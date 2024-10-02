@@ -19,7 +19,7 @@ export class AceReader {
   private _arr: Uint8Array | undefined;
   private _offset = 0;
 
-  constructor(private _file: File) {}
+  constructor(private readonly _file: File) {}
 
   public async read(): Promise<ChecklistFile> {
     // Format parsing largely inspired by http://github.com/MaggieLeber/checklist

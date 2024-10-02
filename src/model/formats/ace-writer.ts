@@ -4,7 +4,7 @@ import * as AceConstants from './ace-constants';
 import { FormatError } from './error';
 
 export class AceWriter {
-  private _parts: BlobPart[] = [];
+  private readonly _parts: BlobPart[] = [];
 
   public async write(file: ChecklistFile): Promise<Blob> {
     if (!file.metadata?.name) {

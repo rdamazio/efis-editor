@@ -32,16 +32,16 @@ import { HelpComponent } from '../checklists/hotkeys/help/help.component';
   ],
 })
 export class NavComponent {
-  private breakpointObserver = inject(BreakpointObserver);
+  private readonly _breakpointObserver = inject(BreakpointObserver);
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
+  isHandset$: Observable<boolean> = this._breakpointObserver.observe(Breakpoints.Handset).pipe(
     map((result) => result.matches),
     shareReplay(),
   );
 
   constructor(
-    public _hotkeys: HotkeysService,
-    private _dialog: MatDialog,
+    protected hotkeys: HotkeysService,
+    private readonly _dialog: MatDialog,
   ) {}
 
   showAbout() {
@@ -53,7 +53,7 @@ export class NavComponent {
   }
 
   showKeyboardShortcuts() {
-    if (this._hotkeys.getHotkeys().length === 0) {
+    if (this.hotkeys.getHotkeys().length === 0) {
       return;
     }
 

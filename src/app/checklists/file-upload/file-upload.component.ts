@@ -21,7 +21,7 @@ import { JsonFormat } from '../../../model/formats/json-format';
 export class ChecklistFileUploadComponent {
   @Output() fileUploaded = new EventEmitter<ChecklistFile>();
 
-  constructor(private _snackBar: MatSnackBar) {}
+  constructor(private readonly _snackBar: MatSnackBar) {}
 
   protected readonly ForeFlightUtils = ForeFlightUtils;
 

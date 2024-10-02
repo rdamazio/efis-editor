@@ -31,8 +31,8 @@ export class ChecklistTreeComponent {
   private _selectedChecklist?: Checklist;
 
   constructor(
-    private _element: ElementRef<Element>,
-    private _injector: Injector,
+    private readonly _element: ElementRef<Element>,
+    private readonly _injector: Injector,
   ) {}
 
   @Output() selectedChecklistChange = new EventEmitter<Checklist | undefined>();

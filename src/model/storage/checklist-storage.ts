@@ -9,7 +9,7 @@ const CHECKLIST_PREFIX = 'checklists:';
   providedIn: 'root',
 })
 export class ChecklistStorage {
-  private _browserStorage: Promise<Storage>;
+  private readonly _browserStorage: Promise<Storage>;
   private _storageResolveFunc?: () => void;
 
   constructor() {
@@ -48,8 +48,8 @@ export class ChecklistStorage {
     this._storageResolveFunc!();
   }
 
-  private _filesSubject = new BehaviorSubject<string[]>([]);
-  private _file$ = this._filesSubject.asObservable();
+  private readonly _filesSubject = new BehaviorSubject<string[]>([]);
+  private readonly _file$ = this._filesSubject.asObservable();
   listChecklistFiles(): Observable<string[]> {
     return this._file$;
   }

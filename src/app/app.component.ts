@@ -11,9 +11,9 @@ import { NavComponent } from './nav/nav.component';
 export class AppComponent implements OnInit {
   title = 'EFIS Editor';
 
-  constructor(private matIconRegistry: MatIconRegistry) {}
+  constructor(private readonly _matIconRegistry: MatIconRegistry) {}
 
   ngOnInit(): void {
-    this.matIconRegistry.setDefaultFontSetClass('material-symbols-outlined');
+    this._matIconRegistry.setDefaultFontSetClass('material-symbols-outlined');
   }
 }
