@@ -74,6 +74,8 @@ export class ForeFlightWriter {
     return itemsEFIS
       .reduce<[ForeFlightChecklistItem, ChecklistItem][]>((accumulator, itemEFIS) => {
         switch (itemEFIS.type) {
+          case ChecklistItem_Type.ITEM_UNKNOWN:
+            throw new Error(`Unknown item type for "${itemEFIS.prompt}"`);
           case ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE:
             accumulator.push([
               {

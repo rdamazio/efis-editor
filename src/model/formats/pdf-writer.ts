@@ -330,6 +330,9 @@ export class PdfWriter {
       case ChecklistItem_Type.ITEM_NOTE:
         prefix = PdfWriter.NOTE_PREFIX;
         break;
+      default:
+        // Keep the defaults.
+        break;
     }
 
     if (item.centered) {
@@ -561,7 +564,7 @@ export class PdfWriter {
     if (!this._doc) return;
 
     this._doc.saveGraphicsState();
-    if (fontSize) {
+    if (fontSize !== undefined) {
       this._doc.setFontSize(fontSize);
     }
     this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, fontStyle);
