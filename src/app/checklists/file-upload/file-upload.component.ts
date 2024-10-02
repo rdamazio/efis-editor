@@ -30,7 +30,9 @@ export class ChecklistFileUploadComponent {
       .map((entry: NgxFileDropEntry): Promise<File> => {
         const fsEntry = entry.fileEntry as FileSystemFileEntry;
 
-        return new Promise((resolve, reject) => fsEntry.file(resolve, reject));
+        return new Promise((resolve, reject) => {
+          fsEntry.file(resolve, reject);
+        });
       })
       .map((filePromise: Promise<File>): Promise<ChecklistFile | void> => {
         return filePromise
