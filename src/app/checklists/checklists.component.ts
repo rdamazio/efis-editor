@@ -1,5 +1,15 @@
-import { AsyncPipe } from '@angular/common';
-import { afterNextRender, Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AsyncPipe, isPlatformServer } from '@angular/common';
+import {
+  afterNextRender,
+  AfterViewInit,
+  Component,
+  Inject,
+  Injector,
+  OnDestroy,
+  OnInit,
+  PLATFORM_ID,
+  ViewChild,
+} from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -59,7 +69,7 @@ interface ParsedFragment {
   templateUrl: './checklists.component.html',
   styleUrl: './checklists.component.scss',
 })
-export class ChecklistsComponent implements OnInit, OnDestroy {
+export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedFile?: ChecklistFile;
   @ViewChild('tree') tree?: ChecklistTreeComponent;
   @ViewChild('items') items?: ChecklistItemsComponent;
@@ -82,13 +92,20 @@ export class ChecklistsComponent implements OnInit, OnDestroy {
     private readonly _router: Router,
     private readonly _hotkeys: HotkeysService,
     private readonly _injector: Injector,
-  ) {
-    afterNextRender(() => {
+    @Inject(PLATFORM_ID) private readonly _platformId: object,
+  ) {}
+
+  ngAfterViewInit() {
+    // Shortcut registration affects global state which then changes the parent NavComponent.
+    setTimeout(() => {
       this._registerKeyboardShortcuts();
     });
   }
 
   private _registerKeyboardShortcuts() {
+    // Hotkey registration needs navigator.
+    if (isPlatformServer(this._platformId)) return;
+
     this._hotkeys.setSequenceDebounce(500);
 
     this._hotkeys.registerHelpModal(() => {
