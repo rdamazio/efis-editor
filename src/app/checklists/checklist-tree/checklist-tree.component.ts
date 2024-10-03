@@ -298,16 +298,24 @@ export class ChecklistTreeComponent {
 
   private _selectNextGroup(direction: MovementDirection) {
     if (!this._file) return;
-    const groupIdx = this._findNextGroup(direction);
+    let groupIdx = this._findNextGroup(direction);
     if (groupIdx === undefined) return;
 
-    const group = this._file.groups[groupIdx];
-    let checklist: Checklist | undefined = undefined;
-
-    // Select the first checklist of that group, if it has one.
-    if (group.checklists.length) {
-      checklist = group.checklists[0];
+    // What we're really selecting is a checklist in the next group that has one - so
+    // advance the group until we find one.
+    // If in the future we allow selection of empty groups, we can change this.
+    const delta = direction === 'down' ? 1 : -1;
+    while (!this._file.groups[groupIdx].checklists.length) {
+      groupIdx += delta;
+      if (groupIdx === this._file.groups.length || groupIdx === -1) {
+        // Only found empty groups after the current one.
+        return;
+      }
     }
+
+    const group = this._file.groups[groupIdx];
+    const checklist = group.checklists[0];
+
     this._selectChecklist(checklist, group);
     this._scrollToSelectedChecklist();
   }
