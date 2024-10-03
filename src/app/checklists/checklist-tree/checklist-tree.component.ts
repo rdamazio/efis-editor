@@ -1,8 +1,16 @@
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { afterNextRender, Component, ElementRef, EventEmitter, Injector, Input, Output } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Injector,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTreeModule, MatTreeNestedDataSource } from '@angular/material/tree';
+import { MatTree, MatTreeModule, MatTreeNestedDataSource } from '@angular/material/tree';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
@@ -25,7 +33,7 @@ type MovementDirection = 'up' | 'down';
 })
 export class ChecklistTreeComponent {
   @Output() selectedChecklistGroup: ChecklistGroup | undefined;
-  treeControl = new NestedTreeControl<ChecklistTreeNode>((node) => node.children);
+  @ViewChild(MatTree) tree: MatTree<ChecklistTreeNode> | undefined;
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
   private _file?: ChecklistFile;
   private _selectedChecklist?: Checklist;
@@ -68,8 +76,7 @@ export class ChecklistTreeComponent {
     }
 
     this.dataSource.data = data;
-    this.treeControl.dataNodes = data;
-    this.treeControl.expandAll();
+    this.tree!.expandAll();
 
     if (modified) {
       this.fileChange.emit(this._file);
@@ -100,6 +107,7 @@ export class ChecklistTreeComponent {
   }
 
   hasChild = (_: number, node: ChecklistTreeNode) => node.children && node.children.length > 0;
+  childrenAccessor = (node: ChecklistTreeNode) => node.children ?? [];
 
   async onNodeSelect(node: ChecklistTreeNode) {
     let checklist: Checklist | undefined;
@@ -354,7 +362,7 @@ export class ChecklistTreeComponent {
 
     let selectedNode, selectedGroupNode: ChecklistTreeNode | undefined;
     let firstChecklist = true;
-    for (const groupNode of this.treeControl.dataNodes) {
+    for (const groupNode of this.dataSource.data) {
       if (groupNode.group === this.selectedChecklistGroup) {
         selectedGroupNode = groupNode;
       }
@@ -375,8 +383,8 @@ export class ChecklistTreeComponent {
     }
 
     // Expand the tree to make the node visible.
-    if (!this.treeControl.isExpanded(selectedGroupNode)) {
-      this.treeControl.expand(selectedGroupNode);
+    if (!this.tree!.isExpanded(selectedGroupNode)) {
+      this.tree!.expand(selectedGroupNode);
     }
 
     let nodeClass = '.checklist-selected';
@@ -485,19 +493,21 @@ export class ChecklistTreeComponent {
   }
 
   isAllExpanded(): boolean {
-    return this.dataSource.data.every((node) => this.treeControl.isExpanded(node));
+    return this.dataSource.data.every((node) => this.tree!.isExpanded(node));
   }
 
   isAllCollapsed(): boolean {
-    return this.treeControl.expansionModel.isEmpty();
+    return !this.dataSource.data.some((node: ChecklistTreeNode) => {
+      return this.tree!.isExpanded(node);
+    });
   }
 
   expandAll() {
-    this.treeControl.expandAll();
+    this.tree!.expandAll();
   }
 
   collapseAll() {
-    this.treeControl.collapseAll();
+    this.tree!.collapseAll();
   }
 
   private async fillTitle(pb: Checklist | ChecklistGroup, promptType: string): Promise<boolean> {

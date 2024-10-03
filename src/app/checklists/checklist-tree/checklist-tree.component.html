@@ -1,4 +1,4 @@
-<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="checklist-tree">
+<mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor" class="checklist-tree">
   <!-- This is the tree node template for leaf nodes -->
   <!-- There is inline padding applied to this node using styles.
        This padding value depends on the mat-icon-button width. -->
@@ -16,7 +16,7 @@
     <div class="mat-tree-node" [class.group-selected]="node.group && selectedChecklistGroup === node.group">
       <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.title">
         <mat-icon class="mat-icon-rtl-mirror">
-          {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+          {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
         </mat-icon>
       </button>
       <checklist-tree-node [node]="node" (nodeRename)="onGroupRename(node)" (nodeDelete)="onGroupDelete(node)" />
@@ -24,7 +24,7 @@
 
     <!-- There is inline padding applied to this div using styles.
         This padding value depends on the mat-icon-button width.  -->
-    <div [class.checklist-tree-invisible]="!treeControl.isExpanded(node)" role="group">
+    <div [class.checklist-tree-invisible]="!tree.isExpanded(node)" role="group">
       <ng-container matTreeNodeOutlet></ng-container>
     </div>
   </mat-nested-tree-node>
