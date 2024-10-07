@@ -37,7 +37,7 @@ module.exports = tseslint.config(
         'error',
         {
           type: 'attribute',
-          prefix: 'app',
+          prefix: ['app', 'checklist'],
           style: 'camelCase',
         },
       ],

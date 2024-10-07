@@ -1,3 +1,4 @@
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import {
   afterNextRender,
   Component,
@@ -6,7 +7,9 @@ import {
   Injector,
   Input,
   Output,
+  QueryList,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +18,7 @@ import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
+import { ChecklistDragDirective } from './dragdrop.directive';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
 
@@ -27,13 +31,22 @@ type MovementDirection = 'up' | 'down';
 @Component({
   selector: 'checklist-tree',
   standalone: true,
-  imports: [ChecklistTreeNodeComponent, MatButtonModule, MatIconButtonSizesModule, MatIconModule, MatTreeModule],
+  imports: [
+    CdkDropList,
+    ChecklistDragDirective,
+    ChecklistTreeNodeComponent,
+    MatButtonModule,
+    MatIconButtonSizesModule,
+    MatIconModule,
+    MatTreeModule,
+  ],
   templateUrl: './checklist-tree.component.html',
   styleUrl: './checklist-tree.component.scss',
 })
 export class ChecklistTreeComponent {
   @Output() selectedChecklistGroup: ChecklistGroup | undefined;
   @ViewChild(MatTree) tree: MatTree<ChecklistTreeNode> | undefined;
+  @ViewChildren(CdkDropList) allDropLists?: QueryList<CdkDropList<ChecklistTreeNode>>;
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
   private _file?: ChecklistFile;
   private _selectedChecklist?: Checklist;
@@ -136,6 +149,40 @@ export class ChecklistTreeComponent {
       // Leave checklist unset
     }
     this._selectChecklist(checklist, checklistGroup);
+  }
+
+  onDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
+    console.log(event);
+    const newGroup = event.container.data.group!;
+    if (event.previousContainer === event.container) {
+      moveItemInArray(newGroup.checklists, event.previousIndex, event.currentIndex);
+    } else {
+      const oldGroup = event.previousContainer.data.group!;
+      transferArrayItem(oldGroup.checklists, newGroup.checklists, event.previousIndex, event.currentIndex);
+    }
+
+    // Rebuild the nodes with updated data.
+    this.reloadFile(true);
+
+    // The selected checklist itself didn't change, but the fragment to represent may have.
+    this._selectChecklist(this.selectedChecklist, newGroup);
+    this._scrollToSelectedChecklist();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  dropSortPredicate(dropGroupIdx: number, index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
+    if (!this._file) return false;
+
+    // Disallow dropping after "Add checklist" node.
+    return index < this._file.groups[dropGroupIdx].checklists.length;
+  }
+
+  allGroupIds(): string[] {
+    if (!this._file) return [];
+
+    // We could use allDropLists, but this is faster and can be done statically,
+    // without an additional change detection cycle.
+    return this._file.groups.map((v: ChecklistGroup, idx: number) => `group_${idx}`);
   }
 
   private _findNextChecklist(direction: MovementDirection): ChecklistPosition | undefined {
