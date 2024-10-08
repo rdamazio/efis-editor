@@ -5,6 +5,7 @@
   <mat-tree-node
     *matTreeNodeDef="let node"
     matTreeNodePadding
+    matTreeNodePaddingIndent="12px"
     [class.checklist-selected]="node.checklist && selectedChecklist === node.checklist"
     (click)="onNodeSelect(node)"
     [allDropLists]="allDropLists"
