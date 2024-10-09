@@ -151,7 +151,7 @@ export class ChecklistTreeComponent {
     this._selectChecklist(checklist, checklistGroup);
   }
 
-  onDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
+  onChecklistDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
     const newGroup = event.container.data.group!;
     if (event.previousContainer === event.container) {
       moveItemInArray(newGroup.checklists, event.previousIndex, event.currentIndex);
@@ -169,7 +169,7 @@ export class ChecklistTreeComponent {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  dropSortPredicate(dropGroupIdx: number, index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
+  checklistDropSortPredicate(dropGroupIdx: number, index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
     if (!this._file) return false;
 
     // Disallow dropping after "Add checklist" node.

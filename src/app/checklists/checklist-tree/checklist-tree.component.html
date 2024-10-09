@@ -30,8 +30,8 @@
     cdkDropList
     [cdkDropListData]="node"
     [cdkDropListConnectedTo]="allGroupIds()"
-    [cdkDropListSortPredicate]="dropSortPredicate.bind(this, node.groupIdx)"
-    (cdkDropListDropped)="onDrop($event)"
+    [cdkDropListSortPredicate]="checklistDropSortPredicate.bind(this, node.groupIdx)"
+    (cdkDropListDropped)="onChecklistDrop($event)"
   >
     <div class="mat-tree-node" [class.group-selected]="node.group && selectedChecklistGroup === node.group">
       <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.title">
