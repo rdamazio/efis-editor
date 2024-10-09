@@ -82,5 +82,14 @@
     >
       <mat-icon>delete</mat-icon>
     </button>
+
+    <button
+      *ngIf="!node.checklist && !node.isAddNew"
+      mat-icon-button
+      mat-small-icon-button
+      matTooltip="Drag to reorder"
+    >
+      <mat-icon cdkDragHandle>drag_handle</mat-icon>
+    </button>
   </div>
 </div>

@@ -32,6 +32,7 @@ type MovementDirection = 'up' | 'down';
   selector: 'checklist-tree',
   standalone: true,
   imports: [
+    CdkDrag,
     CdkDropList,
     ChecklistDragDirective,
     ChecklistTreeNodeComponent,
@@ -151,6 +152,20 @@ export class ChecklistTreeComponent {
     this._selectChecklist(checklist, checklistGroup);
   }
 
+  onGroupDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
+    if (!this._file) return;
+
+    const groups = this._file.groups;
+    moveItemInArray(groups, event.previousIndex, event.currentIndex);
+
+    // Rebuild the nodes with updated data.
+    this.reloadFile(true);
+
+    // The selected checklist itself didn't change, but the fragment to represent may have.
+    this._selectChecklist(this.selectedChecklist, this.selectedChecklistGroup);
+    this._scrollToSelectedChecklist();
+  }
+
   onChecklistDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
     const newGroup = event.container.data.group!;
     if (event.previousContainer === event.container) {
@@ -166,6 +181,18 @@ export class ChecklistTreeComponent {
     // The selected checklist itself didn't change, but the fragment to represent may have.
     this._selectChecklist(this.selectedChecklist, newGroup);
     this._scrollToSelectedChecklist();
+  }
+
+  groupEnterPredicate(enter: CdkDrag<ChecklistTreeNode>): boolean {
+    return !enter.data.checklist;
+  }
+
+  checklistEnterPredicate(enter: CdkDrag<ChecklistTreeNode>): boolean {
+    return Boolean(enter.data.checklist);
+  }
+
+  groupDropSortPredicate(index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
+    return !item.data.isAddNew && !item.data.checklist;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,4 +1,13 @@
-<mat-tree #tree [dataSource]="dataSource" [childrenAccessor]="childrenAccessor" class="checklist-tree">
+<mat-tree
+  #tree
+  [dataSource]="dataSource"
+  [childrenAccessor]="childrenAccessor"
+  class="checklist-tree"
+  cdkDropList
+  [cdkDropListEnterPredicate]="groupEnterPredicate.bind(this)"
+  [cdkDropListSortPredicate]="groupDropSortPredicate.bind(this)"
+  (cdkDropListDropped)="onGroupDrop($event)"
+>
   <!-- This is the tree node template for leaf nodes -->
   <!-- There is inline padding applied to this node using styles.
        This padding value depends on the mat-icon-button width. -->
@@ -24,12 +33,19 @@
   </mat-tree-node>
 
   <!-- This is the tree node template for expandable nodes -->
+  <!-- TODO: Dragging of groups could use a better preview and placeholder -->
   <mat-nested-tree-node
     *matTreeNodeDef="let node; when: hasChild"
     id="group_{{ node.groupIdx }}"
+    checklistDrag
+    [checklistDragNode]="group"
+    cdkDragLockAxis="y"
+    [cdkDragData]="node"
+    [cdkDragDisabled]="!node.group"
     cdkDropList
     [cdkDropListData]="node"
     [cdkDropListConnectedTo]="allGroupIds()"
+    [cdkDropListEnterPredicate]="checklistEnterPredicate.bind(this)"
     [cdkDropListSortPredicate]="checklistDropSortPredicate.bind(this, node.groupIdx)"
     (cdkDropListDropped)="onChecklistDrop($event)"
   >
@@ -39,7 +55,7 @@
           {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
         </mat-icon>
       </button>
-      <checklist-tree-node [node]="node" (nodeRename)="onGroupRename(node)" (nodeDelete)="onGroupDelete(node)" />
+      <checklist-tree-node #group [node]="node" (nodeRename)="onGroupRename(node)" (nodeDelete)="onGroupDelete(node)" />
     </div>
 
     <!-- There is inline padding applied to this div using styles.
