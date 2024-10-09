@@ -1,5 +1,6 @@
+import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { NgIf } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatOption, MatSelect } from '@angular/material/select';
@@ -13,6 +14,7 @@ import { ChecklistTreeNode } from './node';
   selector: 'checklist-tree-node',
   standalone: true,
   imports: [
+    CdkDragHandle,
     MatButtonModule,
     MatIconButtonSizesModule,
     MatIconModule,
@@ -29,6 +31,7 @@ export class ChecklistTreeNodeComponent {
   @Input() node!: ChecklistTreeNode;
   @Output() nodeRename = new EventEmitter<ChecklistTreeNode>();
   @Output() nodeDelete = new EventEmitter<ChecklistTreeNode>();
+  @ViewChild(CdkDragHandle) dragHandle?: CdkDragHandle;
 
   hideButtons = true;
 

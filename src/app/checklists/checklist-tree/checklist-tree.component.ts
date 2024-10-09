@@ -18,7 +18,7 @@ import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
-import { ChecklistDragDirective } from './dragdrop.directive';
+import { ChecklistDragDirective } from './drag.directive';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
 
@@ -152,7 +152,6 @@ export class ChecklistTreeComponent {
   }
 
   onDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
-    console.log(event);
     const newGroup = event.container.data.group!;
     if (event.previousContainer === event.container) {
       moveItemInArray(newGroup.checklists, event.previousIndex, event.currentIndex);

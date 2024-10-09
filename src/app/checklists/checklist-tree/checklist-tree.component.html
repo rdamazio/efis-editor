@@ -10,11 +10,17 @@
     (click)="onNodeSelect(node)"
     [allDropLists]="allDropLists"
     checklistDrag
+    [checklistDragNode]="item"
     cdkDragLockAxis="y"
     [cdkDragData]="node"
     [cdkDragDisabled]="!node.checklist"
   >
-    <checklist-tree-node [node]="node" (nodeRename)="onChecklistRename(node)" (nodeDelete)="onChecklistDelete(node)" />
+    <checklist-tree-node
+      #item
+      [node]="node"
+      (nodeRename)="onChecklistRename(node)"
+      (nodeDelete)="onChecklistDelete(node)"
+    />
   </mat-tree-node>
 
   <!-- This is the tree node template for expandable nodes -->

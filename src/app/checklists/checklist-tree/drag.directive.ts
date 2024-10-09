@@ -2,6 +2,7 @@ import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { AfterViewInit, Directive, EventEmitter, Input, OnDestroy, QueryList } from '@angular/core';
 import { takeUntil } from 'rxjs';
 import { ChecklistTreeNode } from './node/node';
+import { ChecklistTreeNodeComponent } from './node/node.component';
 
 @Directive({
   selector: '[checklistDrag]',
@@ -9,6 +10,7 @@ import { ChecklistTreeNode } from './node/node';
 })
 export class ChecklistDragDirective extends CdkDrag<ChecklistTreeNode> implements AfterViewInit, OnDestroy {
   @Input() allDropLists?: QueryList<CdkDropList<ChecklistTreeNode>>;
+  @Input() checklistDragNode?: ChecklistTreeNodeComponent;
 
   private readonly _destroyed2 = new EventEmitter<boolean>();
 
@@ -23,6 +25,13 @@ export class ChecklistDragDirective extends CdkDrag<ChecklistTreeNode> implement
         });
       }
     });
+
+    // Also dynamically register drag handles that were passed in to us.
+    // This must be done before the parent's ngAfterViewInit, which uses them.
+    const handle = this.checklistDragNode?.dragHandle;
+    if (handle) {
+      this._addHandle(handle);
+    }
 
     super.ngAfterViewInit();
   }
