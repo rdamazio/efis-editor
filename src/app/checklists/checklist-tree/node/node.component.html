@@ -1,5 +1,7 @@
 <div
   class="checklist-tree-node"
+  [attr.groupIdx]="node.groupIdx"
+  [attr.checklistIdx]="node.checklistIdx"
   (mouseover)="hideButtons = false"
   (focus)="hideButtons = false"
   (mouseleave)="hideButtons = true"

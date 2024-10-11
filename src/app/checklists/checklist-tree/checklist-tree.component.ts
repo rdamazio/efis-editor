@@ -217,12 +217,48 @@ export class ChecklistTreeComponent {
     event: CdkDragDrop<ChecklistTreeNode, ChecklistTreeNode | ChecklistItem[], ChecklistTreeNode | ChecklistItem>,
   ): void {
     if (ChecklistItem.is(event.item.data)) {
-      // TODO
+      const prevItems = event.previousContainer.data as ChecklistItem[];
+      const prevItemIdx = event.previousIndex;
+      const newGroupIdx = event.container.data.groupIdx!;
+      const dropElement = event.event.target as HTMLElement;
+
+      this._onChecklistItemDrop(prevItems, prevItemIdx, newGroupIdx, dropElement);
     } else {
       const prevContainer = event.previousContainer as CdkDropList<ChecklistTreeNode>;
       this._onChecklistDrop(event.container, prevContainer, event.currentIndex, event.previousIndex);
     }
     this._preparePlaceholder(event.container, event.item, false);
+  }
+
+  private _onChecklistItemDrop(
+    previousItems: ChecklistItem[],
+    previousItemIdx: number,
+    newGroupIdx: number,
+    dropElement: HTMLElement,
+  ) {
+    if (!this._file) return;
+
+    const previousPos = this.selectedChecklistPosition();
+    if (!previousPos) return;
+
+    // Due to https://github.com/angular/components/issues/23766, we get a bogus
+    // event.currentIndex, and must manually determine what checklist the item was
+    // dropped on.
+    const groupIdxAttr = dropElement.attributes.getNamedItem('groupIdx');
+    const checklistIdxAttr = dropElement.attributes.getNamedItem('checklistIdx');
+    if (!checklistIdxAttr || !groupIdxAttr) return;
+
+    const groupIdxFromAttr = parseInt(groupIdxAttr.value, 10);
+    if (groupIdxFromAttr !== newGroupIdx) {
+      console.error(`Mismatch in group index: ${newGroupIdx} vs ${groupIdxAttr.value}`);
+    }
+
+    const newChecklistIdx = parseInt(checklistIdxAttr.value, 10);
+    const newItems = this._file.groups[newGroupIdx].checklists[newChecklistIdx].items;
+
+    transferArrayItem(previousItems, newItems, previousItemIdx, newItems.length);
+
+    // We didn't change the tree structure, no reason to reload the contents.
   }
 
   private _onChecklistDrop(
