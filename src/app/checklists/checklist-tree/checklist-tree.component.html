@@ -29,6 +29,7 @@
       [node]="node"
       (nodeRename)="onChecklistRename(node)"
       (nodeDelete)="onChecklistDelete(node)"
+      [disableButtonHover]="dragging"
     />
   </mat-tree-node>
 
@@ -48,6 +49,8 @@
     [cdkDropListEnterPredicate]="checklistEnterPredicate.bind(this)"
     [cdkDropListSortPredicate]="checklistDropSortPredicate.bind(this, node.groupIdx)"
     (cdkDropListDropped)="onChecklistDrop($event)"
+    (cdkDropListEntered)="onLeafEntered()"
+    (cdkDropListExited)="onLeafExited()"
   >
     <div class="mat-tree-node" [class.group-selected]="node.group && selectedChecklistGroup === node.group">
       <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.title">
@@ -55,7 +58,13 @@
           {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
         </mat-icon>
       </button>
-      <checklist-tree-node #group [node]="node" (nodeRename)="onGroupRename(node)" (nodeDelete)="onGroupDelete(node)" />
+      <checklist-tree-node
+        #group
+        [node]="node"
+        (nodeRename)="onGroupRename(node)"
+        (nodeDelete)="onGroupDelete(node)"
+        [disableButtonHover]="dragging"
+      />
     </div>
 
     <!-- There is inline padding applied to this div using styles.

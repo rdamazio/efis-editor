@@ -18,7 +18,7 @@
     *ngIf="node.checklist"
     cdkDragHandle
     class="mat-icon-rtl-mirror checklist-tree-drag-icon"
-    [style.visibility]="hideButtons ? 'hidden' : 'visible'"
+    [style.visibility]="hideButtons || disableButtonHover ? 'hidden' : 'visible'"
     matTooltip="Drag to reorder"
   >
     drag_handle
@@ -49,7 +49,7 @@
   <div
     class="checklist-tree-node-buttons"
     *ngIf="!node.isAddNew"
-    [style.visibility]="hideButtons ? 'hidden' : 'visible'"
+    [style.visibility]="hideButtons || disableButtonHover ? 'hidden' : 'visible'"
   >
     <button
       mat-icon-button

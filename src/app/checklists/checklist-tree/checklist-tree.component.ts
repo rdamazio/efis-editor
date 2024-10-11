@@ -51,6 +51,7 @@ export class ChecklistTreeComponent {
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
   private _file?: ChecklistFile;
   private _selectedChecklist?: Checklist;
+  dragging = false;
 
   constructor(
     private readonly _element: ElementRef<Element>,
@@ -181,6 +182,8 @@ export class ChecklistTreeComponent {
     // The selected checklist itself didn't change, but the fragment to represent may have.
     this._selectChecklist(this.selectedChecklist, newGroup);
     this._scrollToSelectedChecklist();
+
+    this._preparePlaceholder(false);
   }
 
   groupEnterPredicate(enter: CdkDrag<ChecklistTreeNode>): boolean {
@@ -193,6 +196,14 @@ export class ChecklistTreeComponent {
 
   groupDropSortPredicate(index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
     return !item.data.isAddNew && !item.data.checklist;
+  }
+
+  onLeafEntered() {
+    this._preparePlaceholder(true);
+  }
+
+  onLeafExited() {
+    this._preparePlaceholder(false);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -209,6 +220,10 @@ export class ChecklistTreeComponent {
     // We could use allDropLists, but this is faster and can be done statically,
     // without an additional change detection cycle.
     return this._file.groups.map((v: ChecklistGroup, idx: number) => `group_${idx}`);
+  }
+
+  private _preparePlaceholder(draggingState: boolean) {
+    this.dragging = draggingState;
   }
 
   private _findNextChecklist(direction: MovementDirection): ChecklistPosition | undefined {

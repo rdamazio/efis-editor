@@ -29,6 +29,7 @@ import { ChecklistTreeNode } from './node';
 })
 export class ChecklistTreeNodeComponent {
   @Input() node!: ChecklistTreeNode;
+  @Input() disableButtonHover = false;
   @Output() nodeRename = new EventEmitter<ChecklistTreeNode>();
   @Output() nodeDelete = new EventEmitter<ChecklistTreeNode>();
   @ViewChild(CdkDragHandle) dragHandle?: CdkDragHandle;
