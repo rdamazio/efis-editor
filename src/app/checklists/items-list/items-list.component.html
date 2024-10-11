@@ -1,8 +1,16 @@
 <div class="container">
   @if (_checklist) {
-    <div cdkDropList class="list" [cdkDropListData]="_checklist.items" (cdkDropListDropped)="onDrop($event)">
+    <div
+      id="items-drop-list"
+      cdkDropList
+      class="list"
+      [cdkDropListData]="_checklist.items"
+      [cdkDropListConnectedTo]="['group_0', 'group_1']"
+      (cdkDropListDropped)="onDrop($event)"
+    >
+      <!-- TODO: Fix connectedTo above -->
       @for (item of _checklist.items; track item; let i = $index) {
-        <div class="list-item" cdkDrag cdkDragLockAxis="y">
+        <div class="list-item" cdkDrag [cdkDragData]="item">
           <checklist-item
             #item
             [item]="item"

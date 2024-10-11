@@ -1,4 +1,12 @@
-import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDragEnter,
+  CdkDragExit,
+  CdkDropList,
+  moveItemInArray,
+  transferArrayItem,
+} from '@angular/cdk/drag-drop';
 import {
   afterNextRender,
   Component,
@@ -17,7 +25,7 @@ import { MatTree, MatTreeModule, MatTreeNestedDataSource } from '@angular/materi
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
-import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
+import { Checklist, ChecklistFile, ChecklistGroup, ChecklistItem } from '../../../../gen/ts/checklist';
 import { ChecklistDragDirective } from './drag.directive';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
@@ -175,32 +183,54 @@ export class ChecklistTreeComponent {
     this._scrollToSelectedChecklist();
   }
 
-  onLeafEntered() {
-    this._preparePlaceholder(true);
+  onLeafEntered(event: CdkDragEnter<ChecklistTreeNode, ChecklistTreeNode | ChecklistItem>) {
+    this._preparePlaceholder(event.container, event.item, true);
   }
 
-  onLeafExited() {
-    this._preparePlaceholder(false);
+  onLeafExited(event: CdkDragExit<ChecklistTreeNode, ChecklistTreeNode | ChecklistItem>) {
+    this._preparePlaceholder(event.container, event.item, false);
   }
 
-  leafEnterPredicate(enter: CdkDrag<ChecklistTreeNode>): boolean {
-    return Boolean(enter.data.checklist);
+  leafEnterPredicate(enter: CdkDrag<ChecklistTreeNode | ChecklistItem>): boolean {
+    const data = enter.data;
+    if (ChecklistItem.is(data)) {
+      return true;
+    } else {
+      // ChecklistTreeNode
+      return Boolean(data.checklist);
+    }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  leafDropSortPredicate(dropGroupIdx: number, index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
+  leafDropSortPredicate(
+    dropGroupIdx: number,
+    index: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    item: CdkDrag<ChecklistTreeNode | ChecklistItem>,
+  ): boolean {
     if (!this._file) return false;
 
     // Disallow dropping after "Add checklist" node.
     return index < this._file.groups[dropGroupIdx].checklists.length;
   }
 
-  onLeafDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
-    const previousContainer = event.previousContainer;
-    const newContainer = event.container;
-    const previousIndex = event.previousIndex;
-    const newIndex = event.currentIndex;
+  onLeafDrop(
+    event: CdkDragDrop<ChecklistTreeNode, ChecklistTreeNode | ChecklistItem[], ChecklistTreeNode | ChecklistItem>,
+  ): void {
+    if (ChecklistItem.is(event.item.data)) {
+      // TODO
+    } else {
+      const prevContainer = event.previousContainer as CdkDropList<ChecklistTreeNode>;
+      this._onChecklistDrop(event.container, prevContainer, event.currentIndex, event.previousIndex);
+    }
+    this._preparePlaceholder(event.container, event.item, false);
+  }
 
+  private _onChecklistDrop(
+    newContainer: CdkDropList<ChecklistTreeNode>,
+    previousContainer: CdkDropList<ChecklistTreeNode>,
+    newIndex: number,
+    previousIndex: number,
+  ) {
     const newGroup = newContainer.data.group!;
     if (previousContainer === newContainer) {
       moveItemInArray(newGroup.checklists, previousIndex, newIndex);
@@ -225,8 +255,27 @@ export class ChecklistTreeComponent {
     return this._file.groups.map((v: ChecklistGroup, idx: number) => `group_${idx}`);
   }
 
-  private _preparePlaceholder(draggingState: boolean) {
+  private _preparePlaceholder(
+    container: CdkDropList<ChecklistTreeNode>,
+    drag: CdkDrag<ChecklistTreeNode | ChecklistItem>,
+    draggingState: boolean,
+  ) {
     this.dragging = draggingState;
+
+    if (ChecklistItem.is(drag.data)) {
+      // We want placeholder for checklist items to be completely hidden so it looks
+      // like items are being dragged on top of a checklist. We accomplish this by
+      // setting additional styles on the placeholder, and disabling sorting temporarily.
+      const placeholder = drag.getPlaceholderElement();
+      const classes = placeholder.classList;
+      if (draggingState) {
+        classes.add('cdk-drag-placeholder-into-tree');
+      } else {
+        classes.remove('cdk-drag-placeholder-into-tree');
+      }
+      container.sortingDisabled = draggingState;
+      container._dropListRef.sortingDisabled = draggingState;
+    }
   }
 
   private _findNextChecklist(direction: MovementDirection): ChecklistPosition | undefined {
