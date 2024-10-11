@@ -153,6 +153,14 @@ export class ChecklistTreeComponent {
     this._selectChecklist(checklist, checklistGroup);
   }
 
+  groupEnterPredicate(enter: CdkDrag<ChecklistTreeNode>): boolean {
+    return !enter.data.checklist;
+  }
+
+  groupDropSortPredicate(index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
+    return !item.data.isAddNew && !item.data.checklist;
+  }
+
   onGroupDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
     if (!this._file) return;
 
@@ -167,37 +175,6 @@ export class ChecklistTreeComponent {
     this._scrollToSelectedChecklist();
   }
 
-  onChecklistDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
-    const newGroup = event.container.data.group!;
-    if (event.previousContainer === event.container) {
-      moveItemInArray(newGroup.checklists, event.previousIndex, event.currentIndex);
-    } else {
-      const oldGroup = event.previousContainer.data.group!;
-      transferArrayItem(oldGroup.checklists, newGroup.checklists, event.previousIndex, event.currentIndex);
-    }
-
-    // Rebuild the nodes with updated data.
-    this.reloadFile(true);
-
-    // The selected checklist itself didn't change, but the fragment to represent may have.
-    this._selectChecklist(this.selectedChecklist, newGroup);
-    this._scrollToSelectedChecklist();
-
-    this._preparePlaceholder(false);
-  }
-
-  groupEnterPredicate(enter: CdkDrag<ChecklistTreeNode>): boolean {
-    return !enter.data.checklist;
-  }
-
-  checklistEnterPredicate(enter: CdkDrag<ChecklistTreeNode>): boolean {
-    return Boolean(enter.data.checklist);
-  }
-
-  groupDropSortPredicate(index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
-    return !item.data.isAddNew && !item.data.checklist;
-  }
-
   onLeafEntered() {
     this._preparePlaceholder(true);
   }
@@ -206,12 +183,38 @@ export class ChecklistTreeComponent {
     this._preparePlaceholder(false);
   }
 
+  leafEnterPredicate(enter: CdkDrag<ChecklistTreeNode>): boolean {
+    return Boolean(enter.data.checklist);
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  checklistDropSortPredicate(dropGroupIdx: number, index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
+  leafDropSortPredicate(dropGroupIdx: number, index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
     if (!this._file) return false;
 
     // Disallow dropping after "Add checklist" node.
     return index < this._file.groups[dropGroupIdx].checklists.length;
+  }
+
+  onLeafDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
+    const previousContainer = event.previousContainer;
+    const newContainer = event.container;
+    const previousIndex = event.previousIndex;
+    const newIndex = event.currentIndex;
+
+    const newGroup = newContainer.data.group!;
+    if (previousContainer === newContainer) {
+      moveItemInArray(newGroup.checklists, previousIndex, newIndex);
+    } else {
+      const oldGroup = previousContainer.data.group!;
+      transferArrayItem(oldGroup.checklists, newGroup.checklists, previousIndex, newIndex);
+    }
+
+    // Rebuild the nodes with updated data.
+    this.reloadFile(true);
+
+    // The selected checklist itself didn't change, but the fragment to represent may have.
+    this._selectChecklist(this.selectedChecklist, newGroup);
+    this._scrollToSelectedChecklist();
   }
 
   allGroupIds(): string[] {

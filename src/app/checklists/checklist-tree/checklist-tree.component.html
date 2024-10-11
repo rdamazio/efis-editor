@@ -17,8 +17,8 @@
     matTreeNodePaddingIndent="12px"
     [class.checklist-selected]="node.checklist && selectedChecklist === node.checklist"
     (click)="onNodeSelect(node)"
-    [allDropLists]="allDropLists"
     checklistDrag
+    [allDropLists]="allDropLists"
     [checklistDragNode]="item"
     cdkDragLockAxis="y"
     [cdkDragData]="node"
@@ -46,9 +46,9 @@
     cdkDropList
     [cdkDropListData]="node"
     [cdkDropListConnectedTo]="allGroupIds()"
-    [cdkDropListEnterPredicate]="checklistEnterPredicate.bind(this)"
-    [cdkDropListSortPredicate]="checklistDropSortPredicate.bind(this, node.groupIdx)"
-    (cdkDropListDropped)="onChecklistDrop($event)"
+    [cdkDropListEnterPredicate]="leafEnterPredicate.bind(this)"
+    [cdkDropListSortPredicate]="leafDropSortPredicate.bind(this, node.groupIdx)"
+    (cdkDropListDropped)="onLeafDrop($event)"
     (cdkDropListEntered)="onLeafEntered()"
     (cdkDropListExited)="onLeafExited()"
   >
