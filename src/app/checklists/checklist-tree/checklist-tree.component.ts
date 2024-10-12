@@ -208,13 +208,22 @@ export class ChecklistTreeComponent {
   leafDropSortPredicate(
     dropGroupIdx: number,
     index: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     item: CdkDrag<ChecklistTreeNode | ChecklistItem>,
   ): boolean {
     if (!this._file) return false;
 
-    // Disallow dropping after "Add checklist" node.
-    return index < this._file.groups[dropGroupIdx].checklists.length;
+    if (ChecklistItem.is(item.data)) {
+      // Due to https://github.com/angular/components/issues/23766, we get a bogus
+      // index. Unlike in onLeafDrop, however, we don't get enough information to
+      // determine it, and we don't even get called again as the item gets dragged
+      // onto other elements because Angular thinks the index hasn't changed - so
+      // our only option is to return true here and let onLeafDrop reject a bad
+      // drop location. Since we hide the placeholder anyway, this should be fine.
+      return true;
+    } else {
+      // Disallow dropping after "Add checklist" node.
+      return index < this._file.groups[dropGroupIdx].checklists.length;
+    }
   }
 
   onLeafDrop(
