@@ -25,7 +25,13 @@ import { MatTree, MatTreeModule, MatTreeNestedDataSource } from '@angular/materi
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
-import { Checklist, ChecklistFile, ChecklistGroup, ChecklistItem } from '../../../../gen/ts/checklist';
+import {
+  Checklist,
+  ChecklistFile,
+  ChecklistGroup,
+  ChecklistGroup_Category,
+  ChecklistItem,
+} from '../../../../gen/ts/checklist';
 import { ChecklistDragDirective } from './drag.directive';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
@@ -153,7 +159,9 @@ export class ChecklistTreeComponent {
         node.group.checklists.push(checklist);
       } else {
         // Adding new group to the file.
-        checklistGroup = ChecklistGroup.create();
+        checklistGroup = ChecklistGroup.create({
+          category: ChecklistGroup_Category.normal,
+        });
         if (!(await this.fillTitle(checklistGroup, 'checklist group'))) {
           return;
         }
