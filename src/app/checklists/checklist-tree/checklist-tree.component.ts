@@ -248,8 +248,11 @@ export class ChecklistTreeComponent {
     // Due to https://github.com/angular/components/issues/23766, we get a bogus
     // event.currentIndex, and must manually determine what checklist the item was
     // dropped on.
-    const groupIdxAttr = dropElement.attributes.getNamedItem('groupIdx');
-    const checklistIdxAttr = dropElement.attributes.getNamedItem('checklistIdx');
+    const treeNodeElement = dropElement.closest('.checklist-tree-node');
+    if (!treeNodeElement) return;
+
+    const groupIdxAttr = treeNodeElement.attributes.getNamedItem('groupIdx');
+    const checklistIdxAttr = treeNodeElement.attributes.getNamedItem('checklistIdx');
     if (!checklistIdxAttr || !groupIdxAttr) return;
 
     const groupIdxFromAttr = parseInt(groupIdxAttr.value, 10);
