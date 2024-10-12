@@ -102,8 +102,6 @@ This is a short list of known areas where contributions would be helpful:
 - **GRT live data**: GRT supports showing live data on the checklist, which is pretty
   cool. Building that into the app (both to easily select a field to insert, and
   to render it with some fake data) would be nice.
-- **Moving items between checklists**
-- **Reordering/moving checklists or groups**
 - **Configuration files**: I'd like to support more than just checklists.
 - Your favorite missing feature goes here.
 
