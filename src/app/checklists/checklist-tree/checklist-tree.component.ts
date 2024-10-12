@@ -302,12 +302,14 @@ export class ChecklistTreeComponent {
       // We want placeholder for checklist items to be completely hidden so it looks
       // like items are being dragged on top of a checklist. We accomplish this by
       // setting additional styles on the placeholder, and disabling sorting temporarily.
-      const placeholder = drag.getPlaceholderElement();
-      const classes = placeholder.classList;
-      if (draggingState) {
-        classes.add('cdk-drag-placeholder-into-tree');
-      } else {
-        classes.remove('cdk-drag-placeholder-into-tree');
+      const placeholder = drag.getPlaceholderElement() as HTMLElement | null;
+      if (placeholder) {
+        const classes = placeholder.classList;
+        if (draggingState) {
+          classes.add('cdk-drag-placeholder-into-tree');
+        } else {
+          classes.remove('cdk-drag-placeholder-into-tree');
+        }
       }
       container.sortingDisabled = draggingState;
       container._dropListRef.sortingDisabled = draggingState;
