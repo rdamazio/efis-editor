@@ -39,6 +39,7 @@
   <checklist-items
     #items
     class="checklist-items"
+    [groupDropListIds]="tree.groupDropListsIds"
     [(checklist)]="tree.selectedChecklist"
     (checklistChange)="onChecklistChanged()"
   />

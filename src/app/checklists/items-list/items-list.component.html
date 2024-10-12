@@ -5,10 +5,9 @@
       cdkDropList
       class="list"
       [cdkDropListData]="_checklist.items"
-      [cdkDropListConnectedTo]="['group_0', 'group_1']"
+      [cdkDropListConnectedTo]="groupDropListIds"
       (cdkDropListDropped)="onDrop($event)"
     >
-      <!-- TODO: Fix connectedTo above -->
       @for (item of _checklist.items; track item; let i = $index) {
         <div class="list-item" cdkDrag [cdkDragData]="item">
           <checklist-item

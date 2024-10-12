@@ -38,6 +38,7 @@ export class ChecklistItemsComponent {
   // TODO: Customize snackbar to allow multiple undos.
   readonly UNDO_LEVELS = 1;
 
+  @Input() groupDropListIds: string[] = [];
   @ViewChildren(ChecklistItemComponent) items!: QueryList<ChecklistItemComponent>;
   _checklist?: Checklist;
   _selectedIdx: number | null = null;

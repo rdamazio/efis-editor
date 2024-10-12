@@ -45,7 +45,7 @@
     [cdkDragDisabled]="!node.group"
     cdkDropList
     [cdkDropListData]="node"
-    [cdkDropListConnectedTo]="allGroupIds()"
+    [cdkDropListConnectedTo]="groupDropListsIds"
     [cdkDropListEnterPredicate]="leafEnterPredicate.bind(this)"
     [cdkDropListSortPredicate]="leafDropSortPredicate.bind(this, node.groupIdx)"
     (cdkDropListDropped)="onLeafDrop($event)"

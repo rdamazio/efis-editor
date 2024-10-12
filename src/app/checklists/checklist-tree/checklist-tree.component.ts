@@ -54,6 +54,7 @@ type MovementDirection = 'up' | 'down';
 })
 export class ChecklistTreeComponent {
   @Output() selectedChecklistGroup: ChecklistGroup | undefined;
+  @Output() groupDropListsIds: string[] = [];
   @ViewChild(MatTree) tree: MatTree<ChecklistTreeNode> | undefined;
   @ViewChildren(CdkDropList) allDropLists?: QueryList<CdkDropList<ChecklistTreeNode>>;
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
@@ -96,6 +97,9 @@ export class ChecklistTreeComponent {
         title: 'Add new checklist group',
         isAddNew: true,
       });
+      this.groupDropListsIds = this._file.groups.map((v: ChecklistGroup, idx: number) => `group_${idx}`);
+    } else {
+      this.groupDropListsIds = [];
     }
 
     this.dataSource.data = data;
@@ -281,14 +285,6 @@ export class ChecklistTreeComponent {
     // The selected checklist itself didn't change, but the fragment to represent may have.
     this._selectChecklist(this.selectedChecklist, newGroup);
     this._scrollToSelectedChecklist();
-  }
-
-  allGroupIds(): string[] {
-    if (!this._file) return [];
-
-    // We could use allDropLists, but this is faster and can be done statically,
-    // without an additional change detection cycle.
-    return this._file.groups.map((v: ChecklistGroup, idx: number) => `group_${idx}`);
   }
 
   private _preparePlaceholder(
