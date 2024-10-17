@@ -25,8 +25,26 @@ You can try it out directly in the link above, but here's what it currently look
   - Foreflight (.fmd file format) - thanks to [zyv](https://github.com/zyv)!
   - Garmin G3X / G3X Touch / GTN (.ace file format)
   - Grand Rapids (GRT)
-  - Printable (PDF) - export only
+  - Printable (PDF) - export only, selectable page size
+  - Raw (JSON) - the editor's internal format (for lossless backup purposes)
 
+Different checklist file formats support different subsets of all the features in the editor:
+
+| **Feature**                | Garmin             | AFS/Dynon            | GRT                  | Foreflight           | PDF                |
+| -------------------------- | ------------------ | -------------------- | -------------------- | -------------------- | ------------------ |
+| Checklist groups           | :white_check_mark: | :white_check_mark: ¹ | :white_check_mark: ¹ | :white_check_mark:   | :white_check_mark: |
+| Checklist group categories | :x:                | :x:                  | :x:                  | :white_check_mark:   | :white_check_mark: |
+| Item types                 | :white_check_mark: | :white_check_mark: ² | :white_check_mark: ² | :white_check_mark:   | :white_check_mark: |
+| Indentation                | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :x:                  | :white_check_mark: |
+| Centering                  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :x:                  | :white_check_mark: |
+| Default checklist/group    | :white_check_mark: | :x:                  | :x:                  | :x:                  | :x:                |
+| Checklist metadata         | :white_check_mark: | :white_check_mark: ³ | :white_check_mark: ³ | :white_check_mark: ⁴ | :white_check_mark: |
+
+¹ Groups names after the first will become part of the exported checklist name<br>
+² Prefixes, suffixes and formatting used to differentiate types<br>
+³ Output as a separate checklist (last)<br>
+⁴ Only file name, aircraft information and make/model (not manufacturer or copyright info)<br>
+<br>
 Internally, files are stored in our own format, so it is possible to import a
 file in one format and then export it in another.
 
@@ -35,6 +53,16 @@ file in one format and then export it in another.
 For now, this is a standalone web app that doesn't talk to any servers. To accomplish this, files are
 stored on your browser's local storage. This does mean that if you lose your device or clear your
 browser's data, they will be lost - so download your files and keep a copy safe.
+
+## Editor features
+
+- Import/export from the formats above
+- Multiple checklist files
+- Checklist item editing, reordering, moving within a file
+- Checklist renaming, reordering
+- Checklist group renaming, reordering
+- Checklist metadata editing, including Garmin's default group/checklist
+- Keyboard shortcuts for navigation and editing
 
 ## Disclaimer
 
