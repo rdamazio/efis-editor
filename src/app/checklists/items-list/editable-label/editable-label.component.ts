@@ -6,11 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
+import { DynamicDataPipe } from './dynamic-data.pipe';
 
 @Component({
   selector: 'editable-label',
   standalone: true,
   imports: [
+    DynamicDataPipe,
     MatButtonModule,
     MatFormFieldModule,
     MatIconButtonSizesModule,

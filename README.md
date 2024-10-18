@@ -39,6 +39,7 @@ Different checklist file formats support different subsets of all the features i
 | Centering                  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :x:                  | :white_check_mark: |
 | Default checklist/group    | :white_check_mark: | :x:                  | :x:                  | :x:                  | :x:                |
 | Checklist metadata         | :white_check_mark: | :white_check_mark: ³ | :white_check_mark: ³ | :white_check_mark: ⁴ | :white_check_mark: |
+| Dynamic data               | :x:                | :x:                  | :white_check_mark:   | :x:                  | :x:                |
 
 ¹ Groups names after the first will become part of the exported checklist name<br>
 ² Prefixes, suffixes and formatting used to differentiate types<br>
@@ -127,9 +128,6 @@ This is a short list of known areas where contributions would be helpful:
   my CSS-foo is quite limited. If you see something that looks odd, please send a PR!
 - **Format testing**: I have not tested these files on anything but Garmin avionics and
   ForeFlight. Please test and send improvements.
-- **GRT live data**: GRT supports showing live data on the checklist, which is pretty
-  cool. Building that into the app (both to easily select a field to insert, and
-  to render it with some fake data) would be nice.
 - **Configuration files**: I'd like to support more than just checklists.
 - Your favorite missing feature goes here.
 
