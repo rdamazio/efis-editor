@@ -39,7 +39,7 @@ Different checklist file formats support different subsets of all the features i
 | Centering                  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :x:                  | :white_check_mark: |
 | Default checklist/group    | :white_check_mark: | :x:                  | :x:                  | :x:                  | :x:                |
 | Checklist metadata         | :white_check_mark: | :white_check_mark: ³ | :white_check_mark: ³ | :white_check_mark: ⁴ | :white_check_mark: |
-| Dynamic data               | :x:                | :x:                  | :white_check_mark:   | :x:                  | :x:                |
+| Live data                  | :x:                | :x:                  | :white_check_mark:   | :x:                  | :x:                |
 
 ¹ Groups names after the first will become part of the exported checklist name<br>
 ² Prefixes, suffixes and formatting used to differentiate types<br>
@@ -64,6 +64,7 @@ browser's data, they will be lost - so download your files and keep a copy safe.
 - Checklist group renaming, reordering
 - Checklist metadata editing, including Garmin's default group/checklist
 - Keyboard shortcuts for navigation and editing
+- Renders (fake) live data in place of GRT tokens like %1% (see GRT user manual for all tokens)
 
 ## Disclaimer
 
