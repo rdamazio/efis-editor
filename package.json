@@ -64,7 +64,7 @@
     "@types/express": "^5.0.0",
     "@types/file-saver": "^2.0.7",
     "@types/jasmine": "~5.1.4",
-    "@types/node": "^22.7.4",
+    "@types/node": "^22.7.7",
     "@types/uuid": "^10.0.0",
     "angular-eslint": "18.3.1",
     "eslint": "^9.12.0",
