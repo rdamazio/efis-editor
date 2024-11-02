@@ -3,6 +3,7 @@ import equal from 'fast-deep-equal';
 import {
   Checklist,
   ChecklistFile,
+  ChecklistFileMetadata,
   ChecklistGroup,
   ChecklistGroup_Category,
   ChecklistItem,
@@ -56,7 +57,7 @@ export class AceReader {
 
     const outFile: ChecklistFile = {
       groups: [],
-      metadata: {
+      metadata: ChecklistFileMetadata.create({
         name: name,
         defaultGroupIndex: defaultGroup,
         defaultChecklistIndex: defaultChecklist,
@@ -64,7 +65,7 @@ export class AceReader {
         aircraftInfo: aircraftInfo,
         manufacturerInfo: manufacturerInfo,
         copyrightInfo: copyrightInfo,
-      },
+      }),
     };
 
     while (!this.consumeLine(AceConstants.FILE_END)) {

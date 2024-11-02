@@ -1,6 +1,6 @@
 import { ChecklistFile, ChecklistGroup_Category, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
 
-export const EXPECTED_CONTENTS: ChecklistFile = {
+export const EXPECTED_CONTENTS = ChecklistFile.create({
   groups: [
     {
       category: ChecklistGroup_Category.normal,
@@ -83,9 +83,9 @@ export const EXPECTED_CONTENTS: ChecklistFile = {
     manufacturerInfo: 'Test manufacturer',
     copyrightInfo: 'Test copyright',
   },
-};
+});
 
-export const EXPECTED_FOREFLIGHT_CONTENTS = {
+export const EXPECTED_FOREFLIGHT_CONTENTS = ChecklistFile.create({
   groups: [
     { category: ChecklistGroup_Category.normal, title: 'Empty subgroup', checklists: [] },
     {
@@ -174,4 +174,4 @@ export const EXPECTED_FOREFLIGHT_CONTENTS = {
     manufacturerInfo: '',
     copyrightInfo: '',
   },
-};
+});
