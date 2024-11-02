@@ -11,10 +11,10 @@ export class LazyBrowserStorage {
     this.storage = new Promise<Storage>((resolve, reject) => {
       this._storageResolveFunc = () => {
         if (Object.prototype.hasOwnProperty.call(global, 'localStorage')) {
-          console.log('Initialized local storage');
+          console.debug('Initialized local storage');
           resolve(localStorage);
         } else {
-          console.log('No local storage!!');
+          console.error('No local storage!!');
           reject(new Error('No local storage found'));
         }
       };

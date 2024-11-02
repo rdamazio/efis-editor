@@ -40,5 +40,9 @@ module.exports = function (config) {
       },
     },
     restartOnFileChange: true,
+    browserConsoleLogOptions: {
+      level: 'info',
+      terminal: true,
+    },
   });
 };
