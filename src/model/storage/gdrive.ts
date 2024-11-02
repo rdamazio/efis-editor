@@ -253,6 +253,14 @@ export class GoogleDriveStorage {
           syncOperations.push(this._synchronizeLocalFile(name, remoteFile));
         }
 
+        // Synchronize checklists that only exist on the remote.
+        for (const [name, remoteFile] of remoteFileMap.entries()) {
+          // If it also exists locally, it was already synchronized above.
+          if (localChecklistNames.includes(name)) continue;
+
+          syncOperations.push(this._downloadFile(remoteFile));
+        }
+
         return Promise.all(syncOperations);
       },
     );
