@@ -22,9 +22,8 @@ export class ChecklistStorage {
   }
 
   private readonly _filesSubject = new BehaviorSubject<string[]>([]);
-  private readonly _file$ = this._filesSubject.asObservable();
   listChecklistFiles(): Observable<string[]> {
-    return this._file$;
+    return this._filesSubject.asObservable();
   }
 
   private _publishList(store: Storage) {
