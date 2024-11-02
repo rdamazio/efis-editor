@@ -1,7 +1,8 @@
-import { Injectable, afterNextRender } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
 import { JsonFormat } from '../formats/json-format';
+import { LazyBrowserStorage } from './browser-storage';
 
 const CHECKLIST_PREFIX = 'checklists:';
 
@@ -9,43 +10,15 @@ const CHECKLIST_PREFIX = 'checklists:';
   providedIn: 'root',
 })
 export class ChecklistStorage {
-  private readonly _browserStorage: Promise<Storage>;
-  private _storageResolveFunc?: () => void;
-
-  constructor() {
-    this._browserStorage = new Promise<Storage>((resolve, reject) => {
-      this._storageResolveFunc = () => {
-        if (Object.prototype.hasOwnProperty.call(global, 'localStorage')) {
-          console.log('Initialized local storage');
-          resolve(localStorage);
-        } else {
-          console.log('No local storage!!');
-          reject(new Error('No local storage found'));
-        }
-      };
-
-      afterNextRender({
-        read: () => {
-          setTimeout(() => {
-            this._storageResolveFunc!();
-          });
-        },
-      });
-    });
-
-    this._browserStorage
-      .then((store) => {
+  constructor(private readonly _browserStorage: LazyBrowserStorage) {
+    _browserStorage.storage
+      .then((store: Storage) => {
         this._publishList(store);
         return void {};
       })
       .catch((error: unknown) => {
         console.error(error);
       });
-  }
-
-  // For testing only.
-  forceBrowserStorage() {
-    this._storageResolveFunc!();
   }
 
   private readonly _filesSubject = new BehaviorSubject<string[]>([]);
@@ -66,7 +39,7 @@ export class ChecklistStorage {
   }
 
   async getChecklistFile(id: string): Promise<ChecklistFile | null> {
-    const store = await this._browserStorage;
+    const store = await this._browserStorage.storage;
     const blob = store.getItem(CHECKLIST_PREFIX + id);
     if (blob) {
       return JsonFormat.toProto(new File([blob], id));
@@ -75,7 +48,7 @@ export class ChecklistStorage {
   }
 
   async saveChecklistFile(file: ChecklistFile) {
-    const store = await this._browserStorage;
+    const store = await this._browserStorage.storage;
     if (!file.metadata?.name) {
       throw new Error('Must specify checklist file name in metadata.');
     }
@@ -85,7 +58,7 @@ export class ChecklistStorage {
   }
 
   async deleteChecklistFile(id: string) {
-    const store = await this._browserStorage;
+    const store = await this._browserStorage.storage;
     store.removeItem(CHECKLIST_PREFIX + id);
     this._publishList(store);
   }
@@ -99,7 +72,7 @@ export class ChecklistStorage {
     }
     await Promise.all(allDeletes);
 
-    const store = await this._browserStorage;
+    const store = await this._browserStorage.storage;
     this._publishList(store);
   }
 }

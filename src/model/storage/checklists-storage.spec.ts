@@ -6,6 +6,7 @@ import {
   ChecklistGroup_Category,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
+import { LazyBrowserStorage } from './browser-storage';
 import { ChecklistStorage } from './checklist-storage';
 
 describe('ChecklistsService', () => {
@@ -52,8 +53,10 @@ describe('ChecklistsService', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({});
+    const browserStore = TestBed.inject(LazyBrowserStorage);
+    browserStore.forceBrowserStorage();
+
     store = TestBed.inject(ChecklistStorage);
-    store.forceBrowserStorage();
     await store.clear();
   });
 
