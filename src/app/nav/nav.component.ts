@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { HotkeysService } from '@ngneat/hotkeys';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -27,6 +28,7 @@ import { HelpComponent } from '../checklists/hotkeys/help/help.component';
     MatListModule,
     MatSidenavModule,
     MatToolbarModule,
+    MatTooltipModule,
     RouterLink,
     RouterOutlet,
   ],
@@ -41,7 +43,8 @@ export class NavComponent {
   );
 
   cloudIconDisabled = false;
-  cloudIcon = 'cloud_off';
+  cloudIcon = '';
+  cloudIconTooltip = '';
 
   constructor(
     protected hotkeys: HotkeysService,
@@ -78,18 +81,23 @@ export class NavComponent {
     switch (state) {
       case DriveSyncState.DISCONNECTED:
         this.cloudIcon = 'cloud_off';
+        this.cloudIconTooltip = 'Google drive disconnected. Click to connect and synchronize.';
         break;
       case DriveSyncState.SYNCING:
         this.cloudIcon = 'cloud_sync';
+        this.cloudIconTooltip = 'Google Drive synchronization in progress...';
         break;
       case DriveSyncState.NEEDS_SYNC:
         this.cloudIcon = 'cloud_upload';
+        this.cloudIconTooltip = 'Google Drive synchronization pending';
         break;
       case DriveSyncState.IN_SYNC:
         this.cloudIcon = 'cloud_done';
+        this.cloudIconTooltip = 'In sync with Google Drive. Click to force synchronization.';
         break;
       case DriveSyncState.FAILED:
         this.cloudIcon = 'cloud_alert';
+        this.cloudIconTooltip = 'Google drive synchronization failed.';
         break;
     }
 

@@ -6,14 +6,20 @@
   <span class="topbar-spacer"></span>
   <button
     mat-icon-button
-    aria-label="Synchronize with Google Drive"
     [disabled]="cloudIconDisabled"
+    [matTooltip]="cloudIconTooltip"
+    aria-label="Synchronize with Google Drive"
     (click)="synchronizeToCloud()"
   >
     <mat-icon>{{ cloudIcon }}</mat-icon>
   </button>
   @if (hotkeys.getHotkeys().length > 0) {
-    <button mat-icon-button aria-label="Show keyboard shortcuts" (click)="showKeyboardShortcuts()">
+    <button
+      mat-icon-button
+      matTooltip="Show keyboard shortcuts"
+      aria-label="Show keyboard shortcuts"
+      (click)="showKeyboardShortcuts()"
+    >
       <mat-icon>keyboard</mat-icon>
     </button>
   }
