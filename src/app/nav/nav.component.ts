@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -26,6 +27,7 @@ import { HelpComponent } from '../checklists/hotkeys/help/help.component';
     MatDialogModule,
     MatIconModule,
     MatListModule,
+    MatMenuModule,
     MatSidenavModule,
     MatToolbarModule,
     MatTooltipModule,
@@ -43,6 +45,7 @@ export class NavComponent {
   );
 
   cloudIconDisabled = false;
+  disconnectCloudDisabled = true;
   cloudIcon = '';
   cloudIconTooltip = '';
 
@@ -75,8 +78,13 @@ export class NavComponent {
     void this._gdrive.synchronize();
   }
 
+  async disableCloudSync() {
+    return this._gdrive.disableSync();
+  }
+
   private _updateCloudUi(state: DriveSyncState) {
     this.cloudIconDisabled = state === DriveSyncState.SYNCING;
+    this.disconnectCloudDisabled = state === DriveSyncState.DISCONNECTED;
 
     switch (state) {
       case DriveSyncState.DISCONNECTED:

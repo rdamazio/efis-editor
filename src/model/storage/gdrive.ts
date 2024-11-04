@@ -47,6 +47,10 @@ export enum DriveSyncState {
  *                          access token immediately, retrying up to 3 times.
  * IN_SYNC -> SYNCING: Periodic synchronization (every 60 seconds) happens even if no local
  *                     changes were made, to ensure remote changes are downloaded.
+ * NEEDS_SYNC -> DISCONNECTED
+ * or IN_SYNC -> DISCONNECTED
+ * or  FAILED -> DISCONNECTED: If the user explicitly disconnects from Google Drive.
+ *
  * Synchronization itself is based on filenames and modification times. Specifically:
  * - If a file only exists locally, it's uploaded
  * - If a file only exists remotely, it's downloaded
@@ -198,6 +202,26 @@ export class GoogleDriveStorage {
       console.error('Request failed: ', reason);
       throw new Error('gDrive request failed with status ' + reason.status);
     }
+  }
+
+  public async disableSync() {
+    if (!this._token) return;
+    console.debug('SYNC: Disabling');
+
+    this._stopBackgroundSync();
+
+    // Get rid of the token immediately - worst case, if revoking it fails, we'll still be disconnected.
+    const oldToken = this._token;
+    this._token = undefined;
+    (await this._browserStorage).removeItem(GoogleDriveStorage.TOKEN_STORAGE_KEY);
+
+    // Transition to disconnected only after the token is discarded above so
+    // there's no chance it'll be used for another sync.
+    this._stateSubject.next(DriveSyncState.DISCONNECTED);
+
+    return new Promise<void>((resolve) => {
+      google.accounts.oauth2.revoke(oldToken, resolve);
+    });
   }
 
   public async synchronize() {

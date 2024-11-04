@@ -8,11 +8,17 @@
     mat-icon-button
     [disabled]="cloudIconDisabled"
     [matTooltip]="cloudIconTooltip"
+    [matMenuTriggerFor]="cloudMenu"
     aria-label="Synchronize with Google Drive"
-    (click)="synchronizeToCloud()"
   >
     <mat-icon>{{ cloudIcon }}</mat-icon>
   </button>
+  <mat-menu #cloudMenu="matMenu">
+    <button mat-menu-item (click)="synchronizeToCloud()">Synchronize to Google Drive</button>
+    <button mat-menu-item [disabled]="disconnectCloudDisabled" (click)="disableCloudSync()">
+      Disconnect from Google Drive
+    </button>
+  </mat-menu>
   @if (hotkeys.getHotkeys().length > 0) {
     <button
       mat-icon-button
