@@ -44,3 +44,5 @@ jobs:
       - uses: codespell-project/actions-codespell@v2
         with:
           path: src
+      - uses: marocchino/validate-dependabot@v3
+        id: validate

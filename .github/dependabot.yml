@@ -6,46 +6,49 @@
 version: 2
 updates:
   # Maintain dependencies for npm
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: 'npm' # See documentation for possible values
+    directory: '/' # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
     open-pull-requests-limit: 100
     groups:
       infra:
         applies-to: version-updates
         patterns:
-        - "@angular*"
-        - "@types/node"
-        - "*express*"
-        - "*jasmine*"
-        - "karma*"
-        - "*protobuf*"
-        - "rxjs"
-        - "tslib"
-        - "typescript"
-        - "zone.js"
+          - '@angular*'
+          - '@types/node'
+          - '*express*'
+          - '*jasmine*'
+          - 'karma*'
+          - '*protobuf*'
+          - 'rxjs'
+          - 'tslib'
+          - 'typescript'
+          - 'zone.js'
         exclude-patterns:
-        - "*eslint*"
-        - "*prettier*"
+          - '*eslint*'
+          - '*prettier*'
       minor-and-patch:
         applies-to: security-updates
         patterns:
-        - "@angular*"
+          - '@angular*'
       lint:
         applies-to: version-updates
-        - "*eslint*"
-        - "*prettier*"
+        patterns:
+          - '*eslint*'
+          - '*prettier*'
       pdf:
         applies-to: version-updates
-        - "*pdf*"
+        patterns:
+          - '*pdf*'
       sweetalert:
         applies-to: version-updates
-        - "*sweetalert*"
+        patterns:
+          - '*sweetalert*'
 
- # Maintain dependencies for GitHub Actions
-  - package-ecosystem: "github-actions"
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: 'github-actions'
     # Workflow files stored in the default location of `.github/workflows`. (You don't need to specify `/.github/workflows` for `directory`. You can use `directory: "/"`.)
-    directory: "/"
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
