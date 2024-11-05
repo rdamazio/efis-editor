@@ -80,7 +80,7 @@
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "pdfjs-dist": "^4.7.76",
+    "pdfjs-dist": "^4.8.69",
     "prettier": "^3.3.3",
     "prettier-eslint": "^16.3.0",
     "typescript": "~5.5.4",
