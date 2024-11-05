@@ -55,7 +55,7 @@ module.exports = tseslint.config(
       '@typescript-eslint/prefer-return-this-type': 'error',
       '@typescript-eslint/promise-function-async': 'error',
       '@typescript-eslint/require-array-sort-compare': ['error', { ignoreStringArrays: true }],
-      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      '@typescript-eslint/switch-exhaustiveness-check': ['error', { considerDefaultExhaustiveForUnions: true }],
       '@typescript-eslint/unbound-method': ['error', { ignoreStatic: true }],
       'array-callback-return': 'error',
       eqeqeq: 'error',
