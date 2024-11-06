@@ -28,6 +28,11 @@ export enum DriveSyncState {
 
 type PostAuthFunction = () => Promise<void>;
 
+interface LocalDeletion {
+  fileName: string;
+  deletionTime: Date;
+}
+
 /**
  * Service to synchronize storage to Google Drive as application data.
  *
@@ -72,6 +77,7 @@ type PostAuthFunction = () => Promise<void>;
 })
 export class GoogleDriveStorage {
   private static readonly TOKEN_STORAGE_KEY = 'gdrive_token';
+  private static readonly LOCAL_DELETIONS_STORAGE_KEY = 'local_deletions';
   private static readonly UPLOAD_API_PATH = '/upload/drive/v3/files';
   // eslint-disable-next-line no-secrets/no-secrets
   private static readonly CLIENT_ID = '561910372899-o32ockiiaiv1elinrfvcnfelashd0ctl.apps.googleusercontent.com';
@@ -88,7 +94,6 @@ export class GoogleDriveStorage {
   private _token?: string;
   private _needsSync = false;
   private _lastChecklistList: string[] = [];
-  private _pendingDeletions: string[] = [];
   private _syncInterval?: number;
   private _lastSync = new Date();
 
@@ -133,7 +138,9 @@ export class GoogleDriveStorage {
       console.debug('SYNC: gDrive API initialized');
       const store = all[1];
       this._token = store.getItem(GoogleDriveStorage.TOKEN_STORAGE_KEY) ?? undefined;
-      this._checklistStorage.listChecklistFiles().subscribe(this._onChecklistsUpdated.bind(this));
+      this._checklistStorage.listChecklistFiles().subscribe((checklists: string[]) => {
+        void this._onChecklistsUpdated(checklists);
+      });
 
       if (this._token) {
         this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
@@ -295,19 +302,21 @@ export class GoogleDriveStorage {
     );
     // List local checklists.
     const localChecklists = firstValueFrom(this._checklistStorage.listChecklistFiles());
+    const localDeletions = this._getLocalDeletions();
 
     // Actually perform synchronization.
-    const syncOps = Promise.all([remoteFiles, localChecklists]).then(
-      async ([remoteFileMap, localChecklistNames]: [Map<string, gapi.client.drive.File>, string[]]) => {
+    const syncOps = Promise.all([remoteFiles, localChecklists, localDeletions]).then(
+      async ([remoteFileMap, localChecklistNames, localDeletions]: [
+        Map<string, gapi.client.drive.File>,
+        string[],
+        LocalDeletion[],
+      ]) => {
         const syncOperations: Promise<void>[] = [];
 
         // Synchronize files that were deleted locally.
-        if (this._pendingDeletions.length) {
-          console.debug(`SYNC: Deleting remote checklists [${this._pendingDeletions.toString()}]`);
-        }
-        for (const name of this._pendingDeletions) {
-          const remoteFile = remoteFileMap.get(name);
-          syncOperations.push(this._synchronizeLocalDeletion(name, localChecklistNames, remoteFile));
+        for (const deletion of localDeletions) {
+          const remoteFile = remoteFileMap.get(deletion.fileName);
+          syncOperations.push(this._synchronizeLocalDeletion(deletion, localChecklistNames, remoteFile));
         }
 
         // Synchronize all local checklists (including ones that also exist remotely).
@@ -328,8 +337,8 @@ export class GoogleDriveStorage {
       },
     );
     return syncOps
-      .then(() => {
-        this._pendingDeletions = [];
+      .then(async () => {
+        await this._setLocalDeletions([]);
         this._stateSubject.next(DriveSyncState.IN_SYNC);
         this._retryCount = 0;
         this._startBackgroundSync();
@@ -339,27 +348,37 @@ export class GoogleDriveStorage {
   }
 
   private async _synchronizeLocalDeletion(
-    name: string,
+    deletion: LocalDeletion,
     localChecklistNames: string[],
     remoteFile?: gapi.client.drive.File,
   ): Promise<void> {
     // File was already not on gDrive.
     if (!remoteFile?.id) {
-      console.debug(`SYNC: Not deleting remote file '${name}' - not on Drive`);
+      console.debug(`SYNC: Not deleting remote file '${deletion.fileName}' - not on Drive`);
       return;
     }
     // File was already trashed.
     if (remoteFile.trashed) {
-      console.debug(`SYNC: Not deleting remote file '${name}' - already trashed`);
+      console.debug(`SYNC: Not deleting remote file '${deletion.fileName}' - already trashed`);
       return;
     }
     // Another local checklist with the same name was created since the deletion?
-    if (localChecklistNames.includes(name)) {
-      console.debug(`SYNC: Not deleting remote file '${name}' - recreated locally`);
+    if (localChecklistNames.includes(deletion.fileName)) {
+      console.debug(`SYNC: Not deleting remote file '${deletion.fileName}' - recreated locally`);
       return;
     }
 
-    console.debug(`SYNC: Deleting remote checklist '${name}'`);
+    // If the file was written after the local deletion, keep what was written (it'll be downloaded again).
+    let remoteModifiedTime: Date | undefined;
+    if (remoteFile.modifiedTime) {
+      remoteModifiedTime = new Date(remoteFile.modifiedTime);
+    }
+    if (!remoteModifiedTime || remoteModifiedTime >= deletion.deletionTime) {
+      console.debug(`SYNC: Not deleting remote file '${deletion.fileName}' - remote file is newer than deletion.`);
+      return;
+    }
+
+    console.debug(`SYNC: Deleting remote checklist '${deletion.fileName}'`);
     return this._trashFile(remoteFile.id);
   }
 
@@ -546,19 +565,42 @@ export class GoogleDriveStorage {
     }
   }
 
-  private _onChecklistsUpdated(checklists: string[]) {
+  private async _getLocalDeletions(): Promise<LocalDeletion[]> {
+    const store = await this._browserStorage;
+    const deletionsJson = store.getItem(GoogleDriveStorage.LOCAL_DELETIONS_STORAGE_KEY);
+    if (!deletionsJson) return [];
+
+    return JSON.parse(deletionsJson) as LocalDeletion[];
+  }
+
+  private async _setLocalDeletions(deletions: LocalDeletion[]) {
+    const store = await this._browserStorage;
+    store.setItem(GoogleDriveStorage.LOCAL_DELETIONS_STORAGE_KEY, JSON.stringify(deletions));
+  }
+
+  private async _onChecklistsUpdated(checklists: string[]) {
+    // Detect newly deleted checklists.
+    const newlyDeletedNames = this._lastChecklistList.filter((x) => !checklists.includes(x));
+    const localDeletions: LocalDeletion[] = newlyDeletedNames.map((name: string): LocalDeletion => {
+      return { fileName: name, deletionTime: new Date() };
+    });
+
+    this._lastChecklistList = Array.from(checklists);
+
+    // Merge it with previously-known deletions.
+    const previousDeletions = await this._getLocalDeletions();
+    const previousDeletionsToKeep = previousDeletions.filter((deletion: LocalDeletion) => {
+      // If it was also deleted again just now, keep the newer one.
+      return !newlyDeletedNames.includes(deletion.fileName);
+    });
+    localDeletions.push(...previousDeletionsToKeep);
+    await this._setLocalDeletions(localDeletions);
+
+    console.debug(`SYNC: needed, deletions=${localDeletions.length}`);
     this._needsSync = true;
     if (this._stateSubject.value === DriveSyncState.IN_SYNC) {
       this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
     }
-
-    // Detect newly deleted checklists.
-    // TODO: Keep track of local deletions using browser storage so it's not lost if user reloads before a sync.
-    const newlyDeleted = this._lastChecklistList.filter((x) => !checklists.includes(x));
-    this._lastChecklistList = Array.from(checklists);
-    this._pendingDeletions.push(...newlyDeleted);
-
-    console.debug(`SYNC: needed, deletions=${this._pendingDeletions.length}`);
   }
 
   public getState(): Observable<DriveSyncState> {
