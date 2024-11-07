@@ -1,5 +1,5 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +11,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { HotkeysService } from '@ngneat/hotkeys';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { Observable } from 'rxjs';
+import { SwalComponent, SwalPortalTargets, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { firstValueFrom, Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
 import { AboutComponent } from '../about/about.component';
@@ -33,10 +34,14 @@ import { HelpComponent } from '../checklists/hotkeys/help/help.component';
     MatTooltipModule,
     RouterLink,
     RouterOutlet,
+    SweetAlert2Module,
   ],
 })
 @UntilDestroy()
 export class NavComponent {
+  @ViewChild('cloudSyncSwal')
+  public readonly syncSwal!: SwalComponent;
+
   private readonly _breakpointObserver = inject(BreakpointObserver);
 
   isHandset$: Observable<boolean> = this._breakpointObserver.observe(Breakpoints.Handset).pipe(
@@ -51,6 +56,7 @@ export class NavComponent {
 
   constructor(
     protected hotkeys: HotkeysService,
+    protected readonly swalTargets: SwalPortalTargets,
     private readonly _dialog: MatDialog,
     private readonly _gdrive: GoogleDriveStorage,
     private readonly _changeDet: ChangeDetectorRef,
@@ -74,8 +80,20 @@ export class NavComponent {
     HelpComponent.toggleHelp(this._dialog);
   }
 
-  synchronizeToCloud() {
-    void this._gdrive.synchronize();
+  async startCloudSync() {
+    const currentState = await firstValueFrom(this._gdrive.getState());
+    if (currentState === DriveSyncState.DISCONNECTED) {
+      const result = await this.syncSwal.fire();
+      if (!result.isConfirmed) {
+        return void 0;
+      }
+    }
+
+    return this.synchronizeToCloud();
+  }
+
+  async synchronizeToCloud() {
+    return this._gdrive.synchronize();
   }
 
   async disableCloudSync() {
