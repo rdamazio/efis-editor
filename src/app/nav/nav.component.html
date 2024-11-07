@@ -54,11 +54,13 @@
     #cloudDisconnectSwal
     title="Google Drive synchronization"
     icon="warning"
+    input="checkbox"
+    inputPlaceholder="Delete all EFIS Editor data from Google Drive"
     [showConfirmButton]="true"
     [showCancelButton]="true"
     confirmButtonText="Stop Google Drive synchronization"
     confirmButtonColor="#d32f2f"
-    (confirm)="disableCloudSync()"
+    (confirm)="disableCloudSync($event)"
   >
     <ng-container *swalPortal="swalTargets.content">
       This will stop synchronizing data to Google Drive. All future changes to your files will be stored only on your

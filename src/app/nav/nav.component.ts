@@ -96,7 +96,10 @@ export class NavComponent {
     return this._gdrive.synchronize();
   }
 
-  async disableCloudSync() {
+  async disableCloudSync(deleteData: boolean) {
+    if (deleteData) {
+      await this._gdrive.deleteAllData();
+    }
     return this._gdrive.disableSync();
   }
 

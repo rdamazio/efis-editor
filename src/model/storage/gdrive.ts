@@ -2,7 +2,7 @@
 /// <reference types="@types/google.accounts"/>
 import { HttpStatusCode } from '@angular/common/http';
 import { afterNextRender, Injectable } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, filter, firstValueFrom, Observable } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
 import { LazyBrowserStorage } from './browser-storage';
 import { ChecklistStorage } from './checklist-storage';
@@ -202,6 +202,27 @@ export class GoogleDriveStorage {
       console.error('Request failed: ', reason);
       throw new Error('gDrive request failed with status ' + reason.status);
     }
+  }
+
+  public async deleteAllData(): Promise<void> {
+    this._stopBackgroundSync();
+
+    // Wait until we're not syncing anymore.
+    await firstValueFrom(this._stateSubject.asObservable().pipe(filter((state) => state !== DriveSyncState.SYNCING)));
+
+    const existingFiles = await this._listFiles(GoogleDriveStorage.CHECKLIST_MIME_TYPE);
+
+    const ops: Promise<gapi.client.Response<void>>[] = [];
+    // TODO: Consider using batching: https://developers.google.com/drive/api/guides/performance#batch-requests
+    for (const file of existingFiles) {
+      if (!file.id) continue;
+
+      console.debug(`SYNC: Deleting remote file ${file.name}`);
+      // If user asked to delete their data, use actual deletion rather than moving to the trash.
+      ops.push(gapi.client.drive.files.delete({ fileId: file.id }));
+    }
+    // TODO: Failure handling (including needing to call authenticate to delete the files).
+    return Promise.all(ops).then(() => void 0);
   }
 
   public async disableSync() {
