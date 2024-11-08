@@ -26,6 +26,8 @@ export enum DriveSyncState {
   FAILED = 4,
 }
 
+type PostAuthFunction = () => Promise<void>;
+
 /**
  * Service to synchronize storage to Google Drive as application data.
  *
@@ -152,7 +154,7 @@ export class GoogleDriveStorage {
     });
   }
 
-  private _authenticate() {
+  private _authenticate(nextStep: PostAuthFunction) {
     console.debug('SYNC: auth start');
 
     // Based on https://developers.google.com/identity/oauth2/web/guides/use-token-model
@@ -176,7 +178,7 @@ export class GoogleDriveStorage {
 
           // Do a first synchronization with this token.
           this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
-          return this.synchronize();
+          return nextStep();
         });
       },
     });
@@ -184,7 +186,7 @@ export class GoogleDriveStorage {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private _handleRequestFailure(reason: gapi.client.Response<any>) {
+  private _handleRequestFailure(retryFunc: PostAuthFunction, reason: gapi.client.Response<any>) {
     this._retryCount++;
 
     if (reason.status === HttpStatusCode.Unauthorized || reason.status === HttpStatusCode.Forbidden) {
@@ -193,7 +195,7 @@ export class GoogleDriveStorage {
 
       if (this._retryCount < GoogleDriveStorage.MAX_RETRIES) {
         this._stateSubject.next(DriveSyncState.DISCONNECTED);
-        this._authenticate();
+        this._authenticate(retryFunc);
       } else {
         this._stateSubject.next(DriveSyncState.FAILED);
       }
@@ -221,8 +223,9 @@ export class GoogleDriveStorage {
       // If user asked to delete their data, use actual deletion rather than moving to the trash.
       ops.push(gapi.client.drive.files.delete({ fileId: file.id }));
     }
-    // TODO: Failure handling (including needing to call authenticate to delete the files).
-    return Promise.all(ops).then(() => void 0);
+    return Promise.all(ops)
+      .then(() => void 0)
+      .catch(this._handleRequestFailure.bind(this, this.deleteAllData.bind(this)));
   }
 
   public async disableSync() {
@@ -251,7 +254,7 @@ export class GoogleDriveStorage {
       return;
     }
     if (this._stateSubject.value === DriveSyncState.DISCONNECTED) {
-      this._authenticate();
+      this._authenticate(this.synchronize.bind(this));
       return;
     }
 
@@ -332,7 +335,7 @@ export class GoogleDriveStorage {
         this._startBackgroundSync();
         return void 0;
       })
-      .catch(this._handleRequestFailure.bind(this));
+      .catch(this._handleRequestFailure.bind(this, this.synchronize.bind(this)));
   }
 
   private async _synchronizeLocalDeletion(
