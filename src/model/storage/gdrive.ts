@@ -4,6 +4,7 @@ import { HttpStatusCode } from '@angular/common/http';
 import { afterNextRender, Injectable } from '@angular/core';
 import { BehaviorSubject, filter, firstValueFrom, Observable, Subject } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
+import { environment } from '../../environments/environment';
 import { LazyBrowserStorage } from './browser-storage';
 import { ChecklistStorage } from './checklist-storage';
 import { MultipartEncoder } from './multipart';
@@ -79,8 +80,6 @@ export class GoogleDriveStorage {
   private static readonly TOKEN_STORAGE_KEY = 'gdrive_token';
   private static readonly LOCAL_DELETIONS_STORAGE_KEY = 'local_deletions';
   private static readonly UPLOAD_API_PATH = '/upload/drive/v3/files';
-  // eslint-disable-next-line no-secrets/no-secrets
-  private static readonly CLIENT_ID = '561910372899-o32ockiiaiv1elinrfvcnfelashd0ctl.apps.googleusercontent.com';
   private static readonly API_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
   private static readonly CHECKLIST_MIME_TYPE = 'application/vnd.damazio.efis-editor.checklist';
   private static readonly CHECKLIST_EXTENSION = '.checklist';
@@ -168,7 +167,7 @@ export class GoogleDriveStorage {
     // Based on https://developers.google.com/identity/oauth2/web/guides/use-token-model
     // TODO: Do we need to switch to authorization code model so we don't get frequent refresh popups
     const client = google.accounts.oauth2.initTokenClient({
-      client_id: GoogleDriveStorage.CLIENT_ID,
+      client_id: environment.googleDriveClientId,
       scope: GoogleDriveStorage.API_SCOPE,
       include_granted_scopes: true,
       prompt: '',

@@ -11,6 +11,7 @@ const tseslint = require('typescript-eslint');
 module.exports = tseslint.config(
   {
     files: ['**/*.ts'],
+    ignores: ['src/environments/dev-keys.ts'],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {

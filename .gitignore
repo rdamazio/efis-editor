@@ -7,6 +7,9 @@
 /bazel-out
 /gen
 
+# Dev-only resources
+/src/environments/dev-keys.ts
+
 # Node
 /node_modules
 npm-debug.log
