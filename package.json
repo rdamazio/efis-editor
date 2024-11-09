@@ -20,7 +20,7 @@
     "spell:fix": "codespell -w -i 3 src/",
     "prepush": "npm install && npm run lint && npm run format && npm run spell && npm run test:headless && npx -y @bugron/validate-dependabot-yaml@latest",
     "prepush:fix": "npm run format:fix && npm run spell:fix",
-    "push": "jj branch set -r @- main && jj git push -b main"
+    "push": "jj bookmark move main --to @- && jj git push -b main"
   },
   "private": true,
   "dependencies": {
