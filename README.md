@@ -174,7 +174,7 @@ The following steps can be followed to set up a development environment:
 - `npm run genproto` (will generate protocol buffer files into `gen/ts/`)
 - `npm run genkeys` (will populate a dummy dev-only client ID into src/environments/dev-keys.ts)
 - If you plan to use/change the Google Drive synchronization feature while running locally,
-  edit src/environments/environment.ts to set your own OAuth client ID that allows localhost
+  edit src/environments/dev-keys.ts to set your own OAuth client ID that allows localhost
   connections. See the [Drive API documentation](https://developers.google.com/drive/api/) for
   how to do obtain a client ID.
 
