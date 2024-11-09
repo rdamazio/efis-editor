@@ -2,7 +2,7 @@
 /// <reference types="@types/google.accounts"/>
 import { HttpStatusCode } from '@angular/common/http';
 import { afterNextRender, Injectable } from '@angular/core';
-import { BehaviorSubject, filter, firstValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, filter, firstValueFrom, Observable, Subject } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
 import { LazyBrowserStorage } from './browser-storage';
 import { ChecklistStorage } from './checklist-storage';
@@ -90,6 +90,7 @@ export class GoogleDriveStorage {
 
   private readonly _browserStorage: Promise<Storage>;
   private readonly _stateSubject = new BehaviorSubject<DriveSyncState>(DriveSyncState.DISCONNECTED);
+  private readonly _downloadSubject = new Subject<string>();
   private _retryCount = 0;
   private _token?: string;
   private _needsSync = false;
@@ -473,8 +474,11 @@ export class GoogleDriveStorage {
             `SYNC: potential name mismatch '${remoteFile.name}' vs '${checklist.metadata?.name}' (file ID '${fileId}')`,
           );
         }
-        return this._checklistStorage.saveChecklistFile(checklist, modifiedTime);
-        // TODO: If the current checklist was overwritten by a download, reload it.
+        return this._checklistStorage.saveChecklistFile(checklist, modifiedTime).then(() => {
+          // Let the UI know that our local data has changed
+          this._downloadSubject.next(checklist.metadata!.name);
+          return void 0;
+        });
       });
   }
 
@@ -605,5 +609,9 @@ export class GoogleDriveStorage {
 
   public getState(): Observable<DriveSyncState> {
     return this._stateSubject.asObservable();
+  }
+
+  public onDownloads(): Observable<string> {
+    return this._downloadSubject.asObservable();
   }
 }

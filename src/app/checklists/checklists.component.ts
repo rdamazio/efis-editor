@@ -43,6 +43,8 @@ import { ChecklistFilePickerComponent } from './file-picker/file-picker.componen
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { HelpComponent } from './hotkeys/help/help.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
+import { GoogleDriveStorage } from '../../model/storage/gdrive';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 interface ParsedFragment {
   fileName?: string;
@@ -69,6 +71,7 @@ interface ParsedFragment {
   templateUrl: './checklists.component.html',
   styleUrl: './checklists.component.scss',
 })
+@UntilDestroy()
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedFile?: ChecklistFile;
   @ViewChild('tree') tree?: ChecklistTreeComponent;
@@ -85,6 +88,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     public store: ChecklistStorage,
+    private readonly _gdrive: GoogleDriveStorage,
     private readonly _dialog: MatDialog,
     private readonly _snackBar: MatSnackBar,
     private readonly _spinner: NgxSpinnerService,
@@ -100,6 +104,19 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this._registerKeyboardShortcuts();
     });
+
+    this._gdrive
+      .onDownloads()
+      .pipe(untilDestroyed(this))
+      .subscribe((name: string) => {
+        if (this.selectedFile?.metadata?.name === name) {
+          // The currently-displayed file was just replaced by a remote version - reload it.
+          // Unfortunately, if the user is in the middle of typing something when this happens,
+          // they may lose that unsaved edit.
+          void this.onFileSelected(name);
+          this._snackBar.open(`The currently-loaded file was replaced by a newer version.`, '', { duration: 5000 });
+        }
+      });
   }
 
   private _registerKeyboardShortcuts() {
