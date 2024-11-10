@@ -96,7 +96,7 @@ export class GoogleDriveStorage {
   private _needsSync = false;
   private _lastChecklistList: string[] = [];
   private _syncInterval?: number;
-  private _lastSync = new Date();
+  private _lastSync = new Date(0);
 
   constructor(
     private readonly _checklistStorage: ChecklistStorage,
@@ -131,11 +131,7 @@ export class GoogleDriveStorage {
         return void 0;
       });
 
-    return Promise.all([
-      apiLoad,
-      this._browserStorage,
-      firstValueFrom(this._checklistStorage.listChecklistFiles()),
-    ]).then((all: [void, Storage, string[]]) => {
+    return Promise.all([apiLoad, this._browserStorage]).then((all: [void, Storage]) => {
       console.debug('SYNC: gDrive API initialized');
       const store = all[1];
       this._token = store.getItem(GoogleDriveStorage.TOKEN_STORAGE_KEY) ?? undefined;
@@ -144,14 +140,21 @@ export class GoogleDriveStorage {
           access_token: this._token,
         } as gapi.auth.GoogleApiOAuth2TokenObject);
       }
+
+      let first = true;
       this._checklistStorage.listChecklistFiles().subscribe((checklists: string[]) => {
-        void this._onChecklistsUpdated(checklists);
+        void this._onChecklistsUpdated(checklists).then(async () => {
+          // The above will trigger the first _needsSync, but if we're connected, we force a first
+          // immediate synchronization.
+          if (first && this._token) {
+            first = false;
+            this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
+            return this.synchronize();
+          }
+          return void 0;
+        });
       });
 
-      if (this._token) {
-        this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
-        void this.synchronize();
-      }
       return void 0;
     });
   }
