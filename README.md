@@ -162,6 +162,8 @@ This is a short list of known areas where contributions would be helpful:
 - **Format testing**: I have not tested these files on anything but Garmin avionics and
   ForeFlight. Please test and send improvements.
 - **Configuration files**: I'd like to support more than just checklists.
+- **Unit tests**: I added unit testing for some of the most critical parts (like file format
+  parsing/generation), but a lot of the app does not have coverage yet.
 - Your favorite missing feature goes here.
 
 ## Development setup
