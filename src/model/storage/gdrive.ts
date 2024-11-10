@@ -339,8 +339,11 @@ export class GoogleDriveStorage {
     return syncOps
       .then(async () => {
         await this._setLocalDeletions([]);
-        this._stateSubject.next(DriveSyncState.IN_SYNC);
         this._retryCount = 0;
+
+        // It's possible that new changes came in while we were syncing - set the next state accordingly.
+        this._stateSubject.next(this._needsSync ? DriveSyncState.NEEDS_SYNC : DriveSyncState.IN_SYNC);
+
         this._startBackgroundSync();
         return void 0;
       })
