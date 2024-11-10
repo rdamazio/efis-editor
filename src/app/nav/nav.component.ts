@@ -1,5 +1,5 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectorRef, Component, inject, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, inject, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -51,6 +51,7 @@ export class NavComponent {
 
   cloudIconDisabled = false;
   disconnectCloudDisabled = true;
+  needsSync = false;
   cloudIcon = '';
   cloudIconTooltip = '';
 
@@ -104,19 +105,23 @@ export class NavComponent {
   }
 
   private _updateCloudUi(state: DriveSyncState) {
-    this.cloudIconDisabled = state === DriveSyncState.SYNCING;
-    this.disconnectCloudDisabled = state === DriveSyncState.DISCONNECTED;
+    this.cloudIconDisabled = false;
+    this.disconnectCloudDisabled = false;
+    this.needsSync = false;
 
     switch (state) {
       case DriveSyncState.DISCONNECTED:
+        this.disconnectCloudDisabled = true;
         this.cloudIcon = 'cloud_off';
         this.cloudIconTooltip = 'Google drive disconnected. Click to connect and synchronize.';
         break;
       case DriveSyncState.SYNCING:
+        this.cloudIconDisabled = true;
         this.cloudIcon = 'cloud_sync';
         this.cloudIconTooltip = 'Google Drive synchronization in progress...';
         break;
       case DriveSyncState.NEEDS_SYNC:
+        this.needsSync = true;
         this.cloudIcon = 'cloud_upload';
         this.cloudIconTooltip = 'Google Drive synchronization pending';
         break;
@@ -131,5 +136,17 @@ export class NavComponent {
     }
 
     this._changeDet.markForCheck();
+  }
+
+  @HostListener('window:beforeunload')
+  onPageUnload() {
+    if (this.needsSync) {
+      // Get synchronization going right away. There's no guarantee that it'll complete.
+      void this._gdrive.synchronize();
+
+      // Trigger a confirmation dialog.
+      return false;
+    }
+    return true;
   }
 }
