@@ -90,6 +90,7 @@ export class GoogleDriveStorage {
   private readonly _browserStorage: Promise<Storage>;
   private readonly _stateSubject = new BehaviorSubject<DriveSyncState>(DriveSyncState.DISCONNECTED);
   private readonly _downloadSubject = new Subject<string>();
+  private readonly _errorSubject = new Subject<string>();
   private _retryCount = 0;
   private _token?: string;
   private _needsSync = false;
@@ -194,6 +195,7 @@ export class GoogleDriveStorage {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _handleRequestFailure(retryFunc: PostAuthFunction, reason: gapi.client.Response<any>) {
+    console.debug(`SYNC: failed. retries=${this._retryCount}, reason`, reason);
     this._retryCount++;
 
     if (reason.status === HttpStatusCode.Unauthorized || reason.status === HttpStatusCode.Forbidden) {
@@ -205,10 +207,10 @@ export class GoogleDriveStorage {
         this._authenticate(retryFunc);
       } else {
         this._stateSubject.next(DriveSyncState.FAILED);
+        this._errorSubject.next(`Google Drive synchronization failed after ${this._retryCount} retries.`);
       }
     } else {
       this._stateSubject.next(DriveSyncState.FAILED);
-      console.error('Request failed: ', reason);
       throw new Error('gDrive request failed with status ' + reason.status);
     }
   }
@@ -615,5 +617,9 @@ export class GoogleDriveStorage {
 
   public onDownloads(): Observable<string> {
     return this._downloadSubject.asObservable();
+  }
+
+  public onErrors(): Observable<string> {
+    return this._errorSubject.asObservable();
   }
 }

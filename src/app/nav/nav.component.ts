@@ -17,6 +17,7 @@ import { map, shareReplay } from 'rxjs/operators';
 import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
 import { AboutComponent } from '../about/about.component';
 import { HelpComponent } from '../checklists/hotkeys/help/help.component';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-nav',
@@ -30,6 +31,7 @@ import { HelpComponent } from '../checklists/hotkeys/help/help.component';
     MatListModule,
     MatMenuModule,
     MatSidenavModule,
+    MatSnackBarModule,
     MatToolbarModule,
     MatTooltipModule,
     RouterLink,
@@ -59,10 +61,12 @@ export class NavComponent {
     protected hotkeys: HotkeysService,
     protected readonly swalTargets: SwalPortalTargets,
     private readonly _dialog: MatDialog,
+    private readonly _snackBar: MatSnackBar,
     private readonly _gdrive: GoogleDriveStorage,
     private readonly _changeDet: ChangeDetectorRef,
   ) {
     this._gdrive.getState().pipe(untilDestroyed(this)).subscribe(this._updateCloudUi.bind(this));
+    this._gdrive.onErrors().pipe(untilDestroyed(this)).subscribe(this._onSyncError.bind(this));
   }
 
   showAbout() {
@@ -136,6 +140,15 @@ export class NavComponent {
     }
 
     this._changeDet.markForCheck();
+  }
+
+  private _onSyncError(error: string) {
+    const snack = this._snackBar.open(error, 'Retry sync', {
+      duration: 5000,
+    });
+    snack.onAction().subscribe(() => {
+      void this._gdrive.synchronize();
+    });
   }
 
   @HostListener('window:beforeunload')
