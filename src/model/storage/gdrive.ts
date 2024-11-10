@@ -139,6 +139,11 @@ export class GoogleDriveStorage {
       console.debug('SYNC: gDrive API initialized');
       const store = all[1];
       this._token = store.getItem(GoogleDriveStorage.TOKEN_STORAGE_KEY) ?? undefined;
+      if (this._token) {
+        gapi.auth.setToken({
+          access_token: this._token,
+        } as gapi.auth.GoogleApiOAuth2TokenObject);
+      }
       this._checklistStorage.listChecklistFiles().subscribe((checklists: string[]) => {
         void this._onChecklistsUpdated(checklists);
       });
