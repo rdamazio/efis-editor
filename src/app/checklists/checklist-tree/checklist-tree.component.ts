@@ -46,7 +46,6 @@ type MovementDirection = 'up' | 'down';
   selector: 'checklist-tree',
   standalone: true,
   imports: [
-    CdkDrag,
     CdkDropList,
     ChecklistDragDirective,
     ChecklistTreeNodeComponent,

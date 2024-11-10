@@ -13,7 +13,8 @@ import {
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HotkeysDirective, HotkeysService } from '@ngneat/hotkeys';
+import { HotkeysService } from '@ngneat/hotkeys';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { saveAs } from 'file-saver';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { firstValueFrom } from 'rxjs';
@@ -34,6 +35,7 @@ import { JsonFormat } from '../../model/formats/json-format';
 import { PdfFormat } from '../../model/formats/pdf-format';
 import { PdfWriterOptions } from '../../model/formats/pdf-writer';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
+import { GoogleDriveStorage } from '../../model/storage/gdrive';
 import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
@@ -43,8 +45,6 @@ import { ChecklistFilePickerComponent } from './file-picker/file-picker.componen
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { HelpComponent } from './hotkeys/help/help.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
-import { GoogleDriveStorage } from '../../model/storage/gdrive';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 interface ParsedFragment {
   fileName?: string;
@@ -59,12 +59,10 @@ interface ParsedFragment {
     AsyncPipe,
     ChecklistCommandBarComponent,
     ChecklistFilePickerComponent,
-    ChecklistFileInfoComponent,
     ChecklistFileUploadComponent,
     ChecklistItemsComponent,
     ChecklistTreeBarComponent,
     ChecklistTreeComponent,
-    HotkeysDirective,
     MatDialogModule,
     NgxSpinnerModule,
   ],

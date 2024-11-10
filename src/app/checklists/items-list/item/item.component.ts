@@ -1,5 +1,4 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
-import { NgIf } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,7 +17,6 @@ import { EditableLabelComponent } from '../editable-label/editable-label.compone
     MatIconButtonSizesModule,
     MatIconModule,
     MatTooltipModule,
-    NgIf,
   ],
   templateUrl: './item.component.html',
   styleUrl: './item.component.scss',

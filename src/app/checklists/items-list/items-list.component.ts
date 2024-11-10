@@ -1,5 +1,4 @@
 import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { NgIf } from '@angular/common';
 import {
   afterNextRender,
   Component,
@@ -22,7 +21,7 @@ import { ChecklistItemComponent } from './item/item.component';
   templateUrl: './items-list.component.html',
   styleUrl: './items-list.component.scss',
   standalone: true,
-  imports: [CdkDrag, CdkDragPlaceholder, CdkDropList, ChecklistItemComponent, MatButtonModule, MatIconModule, NgIf],
+  imports: [CdkDrag, CdkDragPlaceholder, CdkDropList, ChecklistItemComponent, MatButtonModule, MatIconModule],
 })
 export class ChecklistItemsComponent {
   readonly ITEM_TYPES: { label: string; type: ChecklistItem_Type }[] = [
