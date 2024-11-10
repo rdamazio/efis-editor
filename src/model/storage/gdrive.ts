@@ -189,6 +189,17 @@ export class GoogleDriveStorage {
           return nextStep();
         });
       },
+      error_callback: (error: google.accounts.oauth2.ClientConfigError) => {
+        console.debug('SYNC: auth failed', error);
+        if (error.type === 'popup_failed_to_open') {
+          this._errorSubject.next('Failed to open popup to refresh Google Drive auth token - are popups blocked?');
+        } else if (error.type === 'popup_closed') {
+          this._errorSubject.next('Google Drive authentication cancelled - synchronization disabled.');
+          void this.disableSync(false);
+        } else {
+          this._errorSubject.next('Google Drive authentication failed: ' + error.message);
+        }
+      },
     });
     client.requestAccessToken();
   }
@@ -237,8 +248,7 @@ export class GoogleDriveStorage {
       .catch(this._handleRequestFailure.bind(this, this.deleteAllData.bind(this)));
   }
 
-  public async disableSync() {
-    if (!this._token) return;
+  public async disableSync(revokeToken: boolean) {
     console.debug('SYNC: Disabling');
 
     this._stopBackgroundSync();
@@ -252,9 +262,13 @@ export class GoogleDriveStorage {
     // there's no chance it'll be used for another sync.
     this._stateSubject.next(DriveSyncState.DISCONNECTED);
 
-    return new Promise<void>((resolve) => {
-      google.accounts.oauth2.revoke(oldToken, resolve);
-    });
+    if (oldToken && revokeToken) {
+      return new Promise<void>((resolve) => {
+        google.accounts.oauth2.revoke(oldToken, resolve);
+      });
+    } else {
+      return void 0;
+    }
   }
 
   public async synchronize() {
@@ -434,7 +448,6 @@ export class GoogleDriveStorage {
       // eslint-disable-next-line no-await-in-loop
       const fileList = await gapi.client.drive.files
         .list({
-          // oauth_token: this._token,
           spaces: 'appDataFolder',
           q: `mimeType = '${mimeType}'`,
           fields: 'nextPageToken, files(id, name, modifiedTime, mimeType, trashed)',

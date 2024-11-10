@@ -105,7 +105,7 @@ export class NavComponent {
     if (deleteData) {
       await this._gdrive.deleteAllData();
     }
-    return this._gdrive.disableSync();
+    return this._gdrive.disableSync(true);
   }
 
   private _updateCloudUi(state: DriveSyncState) {
