@@ -88,13 +88,10 @@ export class NavComponent {
   async startCloudSync() {
     const currentState = await firstValueFrom(this._gdrive.getState());
     if (currentState === DriveSyncState.DISCONNECTED) {
-      const result = await this.syncSwal.fire();
-      if (!result.isConfirmed) {
-        return void 0;
-      }
+      return this.syncSwal.fire();
+    } else {
+      return this.synchronizeToCloud();
     }
-
-    return this.synchronizeToCloud();
   }
 
   async synchronizeToCloud() {
