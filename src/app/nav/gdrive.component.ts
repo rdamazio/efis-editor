@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, HostListener, ViewChild } from '@angular/
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { SwalComponent, SwalPortalTargets, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -12,7 +12,7 @@ import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
 @Component({
   selector: 'gdrive-nav',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatTooltipModule, SweetAlert2Module],
+  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatSnackBarModule, MatTooltipModule, SweetAlert2Module],
   templateUrl: './gdrive.component.html',
   styleUrl: './gdrive.component.scss',
 })
