@@ -21,6 +21,7 @@ This is a web-based editor for file formats used by modern EFIS avionics systems
 - Checklist metadata editing, including Garmin's default group/checklist
 - Keyboard shortcuts for navigation and editing
 - Renders (fake) live data in place of GRT tokens like %1% (see GRT user manual for all tokens)
+- (optional) Google Drive™ synchronization
 
 ## Preview
 
@@ -68,7 +69,7 @@ browser's data, they will be lost - so download your files and keep a copy safe.
 
 ## Cloud synchronization
 
-Optionally, you may connect the web app to Google Drive™ to both safekeep your files
+Optionally, you may connect the web app to Google Drive to both safekeep your files
 automatically, and to be able to use this app across multiple devices (if you connect
 the app to Drive on each of them). This works by synchronizing the file storage described
 above to Google Drive.
