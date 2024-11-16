@@ -436,6 +436,11 @@ export class GoogleDriveStorage {
   }
 
   private async _downloadFile(remoteFile: gapi.client.drive.File): Promise<void> {
+    if (remoteFile.trashed) {
+      console.debug(`SYNC: Not downloading trashed file '${remoteFile.name}'`);
+      return;
+    }
+
     console.debug(`SYNC: Downloading file '${remoteFile.name}'.`);
     const fileId = remoteFile.id!;
 
