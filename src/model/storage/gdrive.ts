@@ -357,6 +357,7 @@ export class GoogleDriveStorage {
         this._stateSubject.next(this._needsSync ? DriveSyncState.NEEDS_SYNC : DriveSyncState.IN_SYNC);
 
         this._startBackgroundSync();
+        console.debug('SYNC: Cleanup done');
         return void 0;
       })
       .catch(this._handleRequestFailure.bind(this, this.synchronize.bind(this)));
@@ -456,7 +457,6 @@ export class GoogleDriveStorage {
       modifiedTime = new Date(remoteFile.modifiedTime);
     }
 
-    console.debug(`SYNC: Downloading file '${remoteFile.name}'.`);
     return this._api.downloadFile(fileId).then(async (fileContents: string): Promise<void> => {
       const checklist = ChecklistFile.fromJsonString(fileContents);
       if (checklist.metadata?.name + GoogleDriveStorage.CHECKLIST_EXTENSION !== remoteFile.name) {
@@ -521,6 +521,7 @@ export class GoogleDriveStorage {
     // Detect newly deleted checklists.
     const newlyDeletedNames = this._lastChecklistList.filter((x) => !checklists.includes(x));
     const localDeletions: LocalDeletion[] = newlyDeletedNames.map((name: string): LocalDeletion => {
+      console.debug(`SYNC: Detected deletion of '${name}'`);
       return { fileName: name, deletionTime: new Date() };
     });
 
@@ -528,6 +529,7 @@ export class GoogleDriveStorage {
 
     // Merge it with previously-known deletions.
     const previousDeletions = await this._getLocalDeletions();
+    console.debug(`SYNC: Previous deletions: '${JSON.stringify(previousDeletions)}'`);
     const previousDeletionsToKeep = previousDeletions.filter((deletion: LocalDeletion) => {
       // If it was also deleted again just now, keep the newer one.
       return !newlyDeletedNames.includes(deletion.fileName);
@@ -535,7 +537,7 @@ export class GoogleDriveStorage {
     localDeletions.push(...previousDeletionsToKeep);
     await this._setLocalDeletions(localDeletions);
 
-    console.debug(`SYNC: needed, deletions=${localDeletions.length}`);
+    console.debug(`SYNC: needed, deletions=${JSON.stringify(localDeletions)}`);
     this._needsSync = true;
     if (this._stateSubject.value === DriveSyncState.IN_SYNC) {
       this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
