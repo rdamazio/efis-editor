@@ -54,6 +54,7 @@ export class ChecklistStorage {
 
   async saveChecklistFile(file: ChecklistFile, mtime?: Date) {
     const store = await this._browserStorage.storage;
+    file = ChecklistFile.clone(file);
     if (!file.metadata?.name) {
       throw new Error('Must specify checklist file name in metadata.');
     }

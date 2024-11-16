@@ -394,12 +394,17 @@ export class GoogleDriveStorage {
     // This includes the case where the remote file was trashed but it was recreated locally.
     if (!remoteModifiedTime || !remoteId || localModifiedTime > remoteModifiedTime) {
       console.debug(`SYNC: Uploading file '${name}'.`);
+
+      // To avoid synchronization confusion, drop the mtime from the uploaded JSON.
+      const uploadedChecklist = ChecklistFile.clone(checklist);
+      uploadedChecklist.metadata!.modifiedTime = 0;
+
       return this._api.uploadFile(
         name + GoogleDriveStorage.CHECKLIST_EXTENSION,
         remoteId,
         GoogleDriveStorage.CHECKLIST_MIME_TYPE,
         localModifiedTime,
-        ChecklistFile.toJsonString(checklist),
+        ChecklistFile.toJsonString(uploadedChecklist),
       );
     }
 
