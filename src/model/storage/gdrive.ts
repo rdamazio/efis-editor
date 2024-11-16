@@ -1,13 +1,11 @@
 /// <reference types="@types/gapi.client.drive-v3" />
-/// <reference types="@types/google.accounts"/>
 import { HttpStatusCode } from '@angular/common/http';
-import { afterNextRender, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, filter, firstValueFrom, Observable, Subject } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
-import { environment } from '../../environments/environment';
 import { LazyBrowserStorage } from './browser-storage';
 import { ChecklistStorage } from './checklist-storage';
-import { MultipartEncoder } from './multipart';
+import { GoogleDriveApi } from './gdrive-api';
 
 export enum DriveSyncState {
   // User has not enabled synchronization to Google Drive.
@@ -79,8 +77,6 @@ interface LocalDeletion {
 export class GoogleDriveStorage {
   private static readonly TOKEN_STORAGE_KEY = 'gdrive_token';
   private static readonly LOCAL_DELETIONS_STORAGE_KEY = 'local_deletions';
-  private static readonly UPLOAD_API_PATH = '/upload/drive/v3/files';
-  private static readonly API_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
   private static readonly CHECKLIST_MIME_TYPE = 'application/vnd.damazio.efis-editor.checklist';
   private static readonly CHECKLIST_EXTENSION = '.checklist';
   private static readonly LONG_SYNC_INTERVAL_MS = 60_000;
@@ -92,53 +88,34 @@ export class GoogleDriveStorage {
   private readonly _downloadSubject = new Subject<string>();
   private readonly _errorSubject = new Subject<string>();
   private _retryCount = 0;
-  private _token?: string;
   private _needsSync = false;
   private _lastChecklistList: string[] = [];
   private _syncInterval?: number;
   private _lastSync = new Date(0);
 
   constructor(
+    private readonly _api: GoogleDriveApi,
     private readonly _checklistStorage: ChecklistStorage,
     lazyStorage: LazyBrowserStorage,
   ) {
     this._browserStorage = lazyStorage.storage;
 
-    afterNextRender({
-      write: () => {
-        void this._initApi();
-      },
-    });
     this._stateSubject.asObservable().subscribe((state: DriveSyncState) => {
       console.debug('SYNC: state ' + state.toString());
     });
+
+    // We should technically wait for this on every single entry point, but
+    // it'll be done by the time they're called.
+    void this._initApi();
   }
 
   private async _initApi() {
-    const apiLoad = Promise.all([
-      this._loadScript('https://accounts.google.com/gsi/client'),
-      this._loadScript('https://apis.google.com/js/api.js'),
-    ])
-      .then(async () => {
-        return new Promise<void>((resolve) => {
-          gapi.load('client', () => {
-            resolve();
-          });
-        });
-      })
-      .then(async () => {
-        await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
-        return void 0;
-      });
-
-    return Promise.all([apiLoad, this._browserStorage]).then((all: [void, Storage]) => {
+    return Promise.all([this._api.load(), this._browserStorage]).then((all: [void, Storage]) => {
       console.debug('SYNC: gDrive API initialized');
       const store = all[1];
-      this._token = store.getItem(GoogleDriveStorage.TOKEN_STORAGE_KEY) ?? undefined;
-      if (this._token) {
-        gapi.auth.setToken({
-          access_token: this._token,
-        } as gapi.auth.GoogleApiOAuth2TokenObject);
+      const token = store.getItem(GoogleDriveStorage.TOKEN_STORAGE_KEY) ?? undefined;
+      if (token) {
+        this._api.accessToken = token;
       }
 
       let first = true;
@@ -146,7 +123,7 @@ export class GoogleDriveStorage {
         void this._onChecklistsUpdated(checklists).then(async () => {
           // The above will trigger the first _needsSync, but if we're connected, we force a first
           // immediate synchronization.
-          if (first && this._token) {
+          if (first && token) {
             first = false;
             this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
             return this.synchronize();
@@ -158,75 +135,52 @@ export class GoogleDriveStorage {
       return void 0;
     });
   }
-  private async _loadScript(src: string): Promise<void> {
-    return new Promise<void>(function (resolve, reject) {
-      const s = document.createElement('script');
-      s.src = src;
-      s.onload = () => {
-        resolve();
-      };
-      s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
 
-  private _authenticate(nextStep: PostAuthFunction) {
+  private async _authenticate(): Promise<void> {
     console.debug('SYNC: auth start');
-
-    // Based on https://developers.google.com/identity/oauth2/web/guides/use-token-model
-    // TODO: Do we need to switch to authorization code model so we don't get frequent refresh popups
-    const client = google.accounts.oauth2.initTokenClient({
-      client_id: environment.googleDriveClientId,
-      scope: GoogleDriveStorage.API_SCOPE,
-      include_granted_scopes: true,
-      prompt: '',
-      callback: (resp: google.accounts.oauth2.TokenResponse) => {
-        if (!resp.access_token) {
-          console.error('Failed to get access token: ', resp);
-          return;
-        }
-
-        console.debug('SYNC: auth complete');
-
-        void this._browserStorage.then(async (store: Storage) => {
-          this._token = resp.access_token;
-          store.setItem(GoogleDriveStorage.TOKEN_STORAGE_KEY, this._token);
-
-          // Do a first synchronization with this token.
-          this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
-          return nextStep();
-        });
-      },
-      error_callback: (error: google.accounts.oauth2.ClientConfigError) => {
-        console.debug('SYNC: auth failed', error);
-        if (error.type === 'popup_failed_to_open') {
-          this._errorSubject.next('Failed to open popup to refresh Google Drive auth token - are popups blocked?');
-        } else if (error.type === 'popup_closed') {
-          this._errorSubject.next('Google Drive authentication cancelled - synchronization disabled.');
-          void this.disableSync(false);
-        } else {
-          this._errorSubject.next('Google Drive authentication failed: ' + error.message);
-        }
-      },
+    const apiAuth = this._api.authenticate().catch((error: google.accounts.oauth2.ClientConfigError) => {
+      console.debug('SYNC: auth failed', error);
+      if (error.type === 'popup_failed_to_open') {
+        this._errorSubject.next('Failed to open popup to refresh Google Drive auth token - are popups blocked?');
+      } else if (error.type === 'popup_closed') {
+        this._errorSubject.next('Google Drive authentication cancelled - synchronization disabled.');
+        void this.disableSync(false);
+      } else {
+        this._errorSubject.next('Google Drive authentication failed: ' + error.message);
+      }
+      return '';
     });
-    client.requestAccessToken();
+
+    return Promise.all([this._browserStorage, apiAuth]).then(([store, token]: [Storage, string]) => {
+      if (!token) {
+        throw new Error('Auth success but token missing?');
+      }
+
+      store.setItem(GoogleDriveStorage.TOKEN_STORAGE_KEY, token);
+
+      // Do a first synchronization with this token.
+      this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
+      return void 0;
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private _handleRequestFailure(retryFunc: PostAuthFunction, reason: gapi.client.Response<any>) {
+  private async _handleRequestFailure(retryFunc: PostAuthFunction, reason: gapi.client.Response<any>) {
     console.debug(`SYNC: failed. retries=${this._retryCount}, reason`, reason);
     this._retryCount++;
 
     if (reason.status === HttpStatusCode.Unauthorized || reason.status === HttpStatusCode.Forbidden) {
       console.debug('SYNC: Refreshing token');
-      this._token = undefined;
+      this._api.accessToken = undefined;
 
       if (this._retryCount < GoogleDriveStorage.MAX_RETRIES) {
         this._stateSubject.next(DriveSyncState.DISCONNECTED);
-        this._authenticate(retryFunc);
+        return this._authenticate().then(retryFunc);
       } else {
         this._stateSubject.next(DriveSyncState.FAILED);
-        this._errorSubject.next(`Google Drive synchronization failed after ${this._retryCount} retries.`);
+        const errorTxt = `Google Drive synchronization failed after ${this._retryCount} retries.`;
+        this._errorSubject.next(errorTxt);
+        throw new Error(errorTxt);
       }
     } else {
       this._stateSubject.next(DriveSyncState.FAILED);
@@ -240,16 +194,18 @@ export class GoogleDriveStorage {
     // Wait until we're not syncing anymore.
     await firstValueFrom(this._stateSubject.asObservable().pipe(filter((state) => state !== DriveSyncState.SYNCING)));
 
-    const existingFiles = await this._listFiles(GoogleDriveStorage.CHECKLIST_MIME_TYPE);
+    const existingFiles = await this._api.listFiles({
+      mimeType: GoogleDriveStorage.CHECKLIST_MIME_TYPE,
+    });
 
-    const ops: Promise<gapi.client.Response<void>>[] = [];
+    const ops: Promise<void>[] = [];
     // TODO: Consider using batching: https://developers.google.com/drive/api/guides/performance#batch-requests
     for (const file of existingFiles) {
       if (!file.id) continue;
 
       console.debug(`SYNC: Deleting remote file ${file.name}`);
       // If user asked to delete their data, use actual deletion rather than moving to the trash.
-      ops.push(gapi.client.drive.files.delete({ fileId: file.id }));
+      ops.push(this._api.deleteFile(file.id));
     }
     return Promise.all(ops)
       .then(() => void 0)
@@ -262,21 +218,17 @@ export class GoogleDriveStorage {
     this._stopBackgroundSync();
 
     // Get rid of the token immediately - worst case, if revoking it fails, we'll still be disconnected.
-    const oldToken = this._token;
-    this._token = undefined;
     (await this._browserStorage).removeItem(GoogleDriveStorage.TOKEN_STORAGE_KEY);
+
+    if (revokeToken) {
+      await this._api.revokeAccessToken();
+    } else {
+      this._api.accessToken = undefined;
+    }
 
     // Transition to disconnected only after the token is discarded above so
     // there's no chance it'll be used for another sync.
     this._stateSubject.next(DriveSyncState.DISCONNECTED);
-
-    if (oldToken && revokeToken) {
-      return new Promise<void>((resolve) => {
-        google.accounts.oauth2.revoke(oldToken, resolve);
-      });
-    } else {
-      return void 0;
-    }
   }
 
   public async synchronize() {
@@ -285,8 +237,9 @@ export class GoogleDriveStorage {
       return;
     }
     if (this._stateSubject.value === DriveSyncState.DISCONNECTED) {
-      this._authenticate(this.synchronize.bind(this));
-      return;
+      return this._authenticate().then(async (): Promise<void> => {
+        return this.synchronize();
+      });
     }
 
     console.debug('SYNC START');
@@ -299,8 +252,16 @@ export class GoogleDriveStorage {
     this._needsSync = false;
 
     // List remote checklists.
-    const remoteFiles = this._listFiles(GoogleDriveStorage.CHECKLIST_MIME_TYPE).then(
-      (existingFiles: gapi.client.drive.File[]) => {
+    const remoteFiles = this._api
+      .listFiles({
+        mimeType: GoogleDriveStorage.CHECKLIST_MIME_TYPE,
+        fields: 'nextPageToken, files(id, name, modifiedTime, mimeType, trashed)',
+        // This ensures that, if a name collision happens, we take the latest one into account.
+        orderBy: 'modifiedTime',
+      })
+      .then((existingFiles: gapi.client.drive.File[]) => {
+        console.debug('SYNC: LIST', existingFiles);
+
         // Map from file names to gDrive file IDs.
         const remoteFileMap = new Map<string, gapi.client.drive.File>();
         for (const file of existingFiles) {
@@ -322,8 +283,7 @@ export class GoogleDriveStorage {
           remoteFileMap.set(name, file);
         }
         return remoteFileMap;
-      },
-    );
+      });
     // List local checklists.
     const localChecklists = firstValueFrom(this._checklistStorage.listChecklistFiles());
     const localDeletions = this._getLocalDeletions();
@@ -406,7 +366,7 @@ export class GoogleDriveStorage {
     }
 
     console.debug(`SYNC: Deleting remote checklist '${deletion.fileName}'`);
-    return this._trashFile(remoteFile.id);
+    return this._api.trashFile(remoteFile.id);
   }
 
   private async _synchronizeLocalFile(name: string, remoteFile?: gapi.client.drive.File): Promise<void> {
@@ -424,7 +384,7 @@ export class GoogleDriveStorage {
     // This includes the case where the remote file was trashed but it was recreated locally.
     if (!remoteModifiedTime || !remoteId || localModifiedTime > remoteModifiedTime) {
       console.debug(`SYNC: Uploading file '${name}'.`);
-      return this._uploadFile(
+      return this._api.uploadFile(
         name + GoogleDriveStorage.CHECKLIST_EXTENSION,
         remoteId,
         GoogleDriveStorage.CHECKLIST_MIME_TYPE,
@@ -449,34 +409,8 @@ export class GoogleDriveStorage {
     return;
   }
 
-  private async _listFiles(mimeType: string): Promise<gapi.client.drive.File[]> {
-    const files: gapi.client.drive.File[] = [];
-    let nextPageToken: string | undefined;
-    do {
-      // eslint-disable-next-line no-await-in-loop
-      const fileList = await gapi.client.drive.files
-        .list({
-          spaces: 'appDataFolder',
-          q: `mimeType = '${mimeType}'`,
-          fields: 'nextPageToken, files(id, name, modifiedTime, mimeType, trashed)',
-          // This ensures that, if a name collision happens, we take the latest one into account.
-          orderBy: 'modifiedTime',
-          pageToken: nextPageToken,
-        })
-        .then((resp: gapi.client.Response<gapi.client.drive.FileList>) => {
-          console.debug('SYNC: LIST', resp);
-          nextPageToken = resp.result.nextPageToken;
-          return resp.result.files;
-        });
-      if (fileList) {
-        files.push(...fileList);
-      }
-    } while (nextPageToken);
-
-    return files;
-  }
-
   private async _downloadFile(remoteFile: gapi.client.drive.File): Promise<void> {
+    console.debug(`SYNC: Downloading file '${remoteFile.name}'.`);
     const fileId = remoteFile.id!;
 
     let modifiedTime: Date | undefined;
@@ -485,87 +419,18 @@ export class GoogleDriveStorage {
     }
 
     console.debug(`SYNC: Downloading file '${remoteFile.name}'.`);
-    return gapi.client.drive.files
-      .get({
-        fileId: fileId,
-        alt: 'media',
-      })
-      .then(async (response: gapi.client.Response<gapi.client.drive.File>) => {
-        const fileContents = response.body;
-
-        const checklist = ChecklistFile.fromJsonString(fileContents);
-        if (checklist.metadata?.name + GoogleDriveStorage.CHECKLIST_EXTENSION !== remoteFile.name) {
-          console.warn(
-            `SYNC: potential name mismatch '${remoteFile.name}' vs '${checklist.metadata?.name}' (file ID '${fileId}')`,
-          );
-        }
-        return this._checklistStorage.saveChecklistFile(checklist, modifiedTime).then(() => {
-          // Let the UI know that our local data has changed
-          this._downloadSubject.next(checklist.metadata!.name);
-          return void 0;
-        });
+    return this._api.downloadFile(fileId).then(async (fileContents: string): Promise<void> => {
+      const checklist = ChecklistFile.fromJsonString(fileContents);
+      if (checklist.metadata?.name + GoogleDriveStorage.CHECKLIST_EXTENSION !== remoteFile.name) {
+        console.warn(
+          `SYNC: potential name mismatch '${remoteFile.name}' vs '${checklist.metadata?.name}' (file ID '${fileId}')`,
+        );
+      }
+      return this._checklistStorage.saveChecklistFile(checklist, modifiedTime).then(() => {
+        // Let the UI know that our local data has changed
+        this._downloadSubject.next(checklist.metadata!.name);
+        return void 0;
       });
-  }
-
-  private async _uploadFile(
-    name: string,
-    existingId: string | undefined,
-    mimeType: string,
-    mtime: Date,
-    contents: string,
-  ) {
-    if (!existingId) {
-      existingId = await gapi.client.drive.files
-        .create({
-          resource: {
-            name: name,
-            mimeType: mimeType,
-            // Set a modified time in the past so that, if the upload step fails, we try to upload
-            // again (instead of keeping the create time which may be newer than the file's local
-            // mtime, and would result in us downloading it).
-            modifiedTime: '1970-01-01T00:00:00Z',
-            parents: ['appDataFolder'],
-          },
-        })
-        .then((resp: gapi.client.Response<gapi.client.drive.File>) => {
-          console.debug('SYNC: Created file', resp);
-          return resp.result.id;
-        });
-    }
-
-    // We have to use multipart upload so the modified time is kept.
-    const metadata: gapi.client.drive.File = {
-      modifiedTime: mtime.toISOString(),
-      // If file was previously trashed and we're re-uploading it, take it out of the trash.
-      trashed: false,
-    };
-
-    const multipart = new MultipartEncoder();
-    multipart.addPart(JSON.stringify(metadata), { mimeType: 'application/json' });
-    multipart.addPart(contents, { mimeType: mimeType, base64encode: true });
-
-    const uploaded = await gapi.client.request({
-      path: GoogleDriveStorage.UPLOAD_API_PATH + '/' + existingId,
-      method: 'PATCH',
-      headers: {
-        'Content-Type': multipart.contentType(),
-      },
-      params: {
-        // We don't need any result fields.
-        fields: '',
-        uploadType: 'multipart',
-      },
-      body: multipart.finish(),
-    });
-    console.debug('SYNC: UPLOAD', uploaded);
-  }
-
-  private async _trashFile(id: string) {
-    await gapi.client.drive.files.update({
-      fileId: id,
-      resource: {
-        trashed: true,
-      },
     });
   }
 
