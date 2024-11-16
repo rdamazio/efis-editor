@@ -82,10 +82,10 @@ interface LocalDeletionJson {
   providedIn: 'root',
 })
 export class GoogleDriveStorage {
+  public static readonly CHECKLIST_MIME_TYPE = 'application/vnd.damazio.efis-editor.checklist';
+  public static readonly CHECKLIST_EXTENSION = '.checklist';
   private static readonly TOKEN_STORAGE_KEY = 'gdrive_token';
   private static readonly LOCAL_DELETIONS_STORAGE_KEY = 'local_deletions';
-  private static readonly CHECKLIST_MIME_TYPE = 'application/vnd.damazio.efis-editor.checklist';
-  private static readonly CHECKLIST_EXTENSION = '.checklist';
   private static readonly LONG_SYNC_INTERVAL_MS = 60_000;
   private static readonly SHORT_SYNC_INTERVAL_MS = 10_000;
   private static readonly MAX_RETRIES = 3;
