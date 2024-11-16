@@ -27,9 +27,16 @@ export enum DriveSyncState {
 
 type PostAuthFunction = () => Promise<void>;
 
+/** Represents a local deletion. */
 interface LocalDeletion {
   fileName: string;
   deletionTime: Date;
+}
+
+/** The structure that JSON.parse reads LocalDeletion objects in. */
+interface LocalDeletionJson {
+  fileName: string;
+  deletionTime: string;
 }
 
 /**
@@ -495,7 +502,14 @@ export class GoogleDriveStorage {
     const deletionsJson = store.getItem(GoogleDriveStorage.LOCAL_DELETIONS_STORAGE_KEY);
     if (!deletionsJson) return [];
 
-    return JSON.parse(deletionsJson) as LocalDeletion[];
+    // While JSON.stringify below properly serializes dates, JSON.parse does not parse them back.
+    const parsedDeletions = JSON.parse(deletionsJson) as LocalDeletionJson[];
+    return parsedDeletions.map((d: LocalDeletionJson): LocalDeletion => {
+      return {
+        fileName: d.fileName,
+        deletionTime: new Date(d.deletionTime),
+      };
+    });
   }
 
   private async _setLocalDeletions(deletions: LocalDeletion[]) {
