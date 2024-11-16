@@ -308,9 +308,17 @@ export class GoogleDriveStorage {
         const syncOperations: Promise<void>[] = [];
 
         // Synchronize files that were deleted locally.
+        // We first filter the list of which ones we'll really delete, since in corner cases
+        // we may want to download them instead.
+        localDeletions = localDeletions.filter((deletion: LocalDeletion) => {
+          const remoteFile = remoteFileMap.get(deletion.fileName);
+          return this._filterLocalDeletion(deletion, localChecklistNames, remoteFile);
+        });
         for (const deletion of localDeletions) {
           const remoteFile = remoteFileMap.get(deletion.fileName);
-          syncOperations.push(this._synchronizeLocalDeletion(deletion, localChecklistNames, remoteFile));
+          if (!remoteFile?.id) continue;
+
+          syncOperations.push(this._api.trashFile(remoteFile.id));
         }
 
         // Synchronize all local checklists (including ones that also exist remotely).
@@ -323,6 +331,9 @@ export class GoogleDriveStorage {
         for (const [name, remoteFile] of remoteFileMap.entries()) {
           // If it also exists locally, it was already synchronized above.
           if (localChecklistNames.includes(name)) continue;
+
+          // If we started to deleted it above, skip.
+          if (localDeletions.find((d: LocalDeletion) => d.fileName === name)) continue;
 
           syncOperations.push(this._downloadFile(remoteFile));
         }
@@ -344,25 +355,25 @@ export class GoogleDriveStorage {
       .catch(this._handleRequestFailure.bind(this, this.synchronize.bind(this)));
   }
 
-  private async _synchronizeLocalDeletion(
+  private _filterLocalDeletion(
     deletion: LocalDeletion,
     localChecklistNames: string[],
     remoteFile?: gapi.client.drive.File,
-  ): Promise<void> {
+  ): boolean {
     // File was already not on gDrive.
     if (!remoteFile?.id) {
       console.debug(`SYNC: Not deleting remote file '${deletion.fileName}' - not on Drive`);
-      return;
+      return false;
     }
     // File was already trashed.
     if (remoteFile.trashed) {
       console.debug(`SYNC: Not deleting remote file '${deletion.fileName}' - already trashed`);
-      return;
+      return false;
     }
     // Another local checklist with the same name was created since the deletion?
     if (localChecklistNames.includes(deletion.fileName)) {
       console.debug(`SYNC: Not deleting remote file '${deletion.fileName}' - recreated locally`);
-      return;
+      return false;
     }
 
     // If the file was written after the local deletion, keep what was written (it'll be downloaded again).
@@ -372,11 +383,11 @@ export class GoogleDriveStorage {
     }
     if (!remoteModifiedTime || remoteModifiedTime >= deletion.deletionTime) {
       console.debug(`SYNC: Not deleting remote file '${deletion.fileName}' - remote file is newer than deletion.`);
-      return;
+      return false;
     }
 
     console.debug(`SYNC: Deleting remote checklist '${deletion.fileName}'`);
-    return this._api.trashFile(remoteFile.id);
+    return true;
   }
 
   private async _synchronizeLocalFile(name: string, remoteFile?: gapi.client.drive.File): Promise<void> {
