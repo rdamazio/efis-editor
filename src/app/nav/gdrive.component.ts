@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -17,7 +17,7 @@ import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
   styleUrl: './gdrive.component.scss',
 })
 @UntilDestroy()
-export class GoogleDriveComponent {
+export class GoogleDriveComponent implements OnInit, OnDestroy {
   @ViewChild('cloudSyncSwal')
   public readonly syncSwal!: SwalComponent;
 
@@ -32,9 +32,16 @@ export class GoogleDriveComponent {
     private readonly _snackBar: MatSnackBar,
     private readonly _gdrive: GoogleDriveStorage,
     private readonly _changeDet: ChangeDetectorRef,
-  ) {
+  ) {}
+
+  ngOnInit() {
     this._gdrive.getState().pipe(untilDestroyed(this)).subscribe(this._updateCloudUi.bind(this));
     this._gdrive.onErrors().pipe(untilDestroyed(this)).subscribe(this._onSyncError.bind(this));
+    void this._gdrive.init();
+  }
+
+  ngOnDestroy() {
+    this._gdrive.destroy();
   }
 
   async startCloudSync() {

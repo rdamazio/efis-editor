@@ -1,7 +1,7 @@
 /// <reference types="@types/gapi.client.drive-v3" />
 import { HttpStatusCode } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, filter, firstValueFrom, Observable, Subject } from 'rxjs';
+import { EventEmitter, Injectable } from '@angular/core';
+import { BehaviorSubject, filter, firstValueFrom, Observable, Subject, takeUntil } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
 import { LazyBrowserStorage } from './browser-storage';
 import { ChecklistStorage } from './checklist-storage';
@@ -87,6 +87,7 @@ export class GoogleDriveStorage {
   private readonly _stateSubject = new BehaviorSubject<DriveSyncState>(DriveSyncState.DISCONNECTED);
   private readonly _downloadSubject = new Subject<string>();
   private readonly _errorSubject = new Subject<string>();
+  private readonly _destroyed = new EventEmitter<void>();
   private _retryCount = 0;
   private _needsSync = false;
   private _lastChecklistList: string[] = [];
@@ -100,17 +101,16 @@ export class GoogleDriveStorage {
   ) {
     this._browserStorage = lazyStorage.storage;
 
-    this._stateSubject.asObservable().subscribe((state: DriveSyncState) => {
-      console.debug('SYNC: state ' + state.toString());
-    });
-
-    // We should technically wait for this on every single entry point, but
-    // it'll be done by the time they're called.
-    void this._initApi();
+    this._stateSubject
+      .asObservable()
+      .pipe(takeUntil(this._destroyed))
+      .subscribe((state: DriveSyncState) => {
+        console.debug('SYNC: state ' + state.toString());
+      });
   }
 
-  private async _initApi() {
-    return Promise.all([this._api.load(), this._browserStorage]).then((all: [void, Storage]) => {
+  public async init() {
+    return Promise.all([this._api.load(), this._browserStorage]).then(async (all: [void, Storage]) => {
       console.debug('SYNC: gDrive API initialized');
       const store = all[1];
       const token = store.getItem(GoogleDriveStorage.TOKEN_STORAGE_KEY) ?? undefined;
@@ -118,22 +118,32 @@ export class GoogleDriveStorage {
         this._api.accessToken = token;
       }
 
-      let first = true;
-      this._checklistStorage.listChecklistFiles().subscribe((checklists: string[]) => {
-        void this._onChecklistsUpdated(checklists).then(async () => {
-          // The above will trigger the first _needsSync, but if we're connected, we force a first
-          // immediate synchronization.
-          if (first && token) {
-            first = false;
-            this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
-            return this.synchronize();
-          }
-          return void 0;
-        });
+      return new Promise((resolve) => {
+        let first = true;
+        this._checklistStorage
+          .listChecklistFiles()
+          .pipe(takeUntil(this._destroyed))
+          .subscribe((checklists: string[]) => {
+            void this._onChecklistsUpdated(checklists).then(async () => {
+              // The above will trigger the first _needsSync, but if we're connected, we force a first
+              // immediate synchronization.
+              if (first) {
+                first = false;
+                if (token) {
+                  this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
+                  await this.synchronize();
+                }
+                resolve(void 0);
+              }
+              return void 0;
+            });
+          });
       });
-
-      return void 0;
     });
+  }
+
+  public destroy() {
+    this._destroyed.emit();
   }
 
   private async _authenticate(): Promise<void> {

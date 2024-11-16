@@ -19,6 +19,10 @@ export class GoogleDriveApi {
   constructor(private readonly _injector: Injector) {}
 
   public async load() {
+    if (this._loaded) {
+      return;
+    }
+
     return new Promise<void>((resolve) => {
       afterNextRender(
         {
@@ -50,7 +54,10 @@ export class GoogleDriveApi {
         const gDriveLoad = gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
         return Promise.all([authInit, gDriveLoad]);
       })
-      .then(() => void 0);
+      .then(() => {
+        this._loaded = true;
+        return void 0;
+      });
   }
 
   private async _loadScript(src: string): Promise<void> {
