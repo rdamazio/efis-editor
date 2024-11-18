@@ -273,7 +273,7 @@ export class GoogleDriveStorage {
     const remoteFiles = this._api
       .listFiles({
         mimeType: GoogleDriveStorage.CHECKLIST_MIME_TYPE,
-        fields: 'nextPageToken, files(id, name, modifiedTime, mimeType, trashed)',
+        fields: 'files(id, name, modifiedTime, mimeType, trashed)',
         // This ensures that, if a name collision happens, we take the latest one into account.
         orderBy: 'modifiedTime',
       })
