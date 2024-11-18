@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { ChecklistFile, ChecklistGroup } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../formats/test-data';
@@ -15,8 +15,10 @@ describe('ChecklistsService', () => {
   const NEWER_MTIME_UNIX = Math.floor(NEWER_MTIME.valueOf() / 1000);
   const OLDER_MTIME = new Date('2022-10-05T20:45:00Z');
   const OLDER_MTIME_UNIX = Math.floor(OLDER_MTIME.valueOf() / 1000);
+  const FAKE_NOW = new Date('2023-11-18T02:33:44Z');
   const FILE_NAME = EXPECTED_CONTENTS.metadata!.name;
   const FILE_ID = fileIdForName(FILE_NAME);
+  let clock: jasmine.Clock;
   let store: ChecklistStorage;
   let lazyBrowserStore: LazyBrowserStorage;
   let browserStore: Storage;
@@ -26,6 +28,9 @@ describe('ChecklistsService', () => {
   let allDownloads: string[];
 
   beforeEach(async () => {
+    clock = jasmine.clock();
+    clock.install();
+    clock.mockDate(FAKE_NOW);
     gdriveApi = jasmine.createSpyObj<GoogleDriveApi>('GoogleDriveApi', [
       'load',
       'authenticate',
@@ -74,6 +79,7 @@ describe('ChecklistsService', () => {
     gdrive.destroy();
     await store.clear();
     browserStore.clear();
+    clock.uninstall();
   }));
 
   async function expectState(state: DriveSyncState) {
@@ -447,4 +453,68 @@ describe('ChecklistsService', () => {
     expectedWithMtime.metadata!.modifiedTime = OLDER_MTIME_UNIX;
     expect(checklist).toEqual(expectedWithMtime);
   });
+
+  it('should periodically sync every 60s when no new changes exist', fakeAsync(async () => {
+    gdriveApi.listFiles.and.resolveTo([]);
+    await gdrive.synchronize();
+    tick();
+    expectStates([
+      DriveSyncState.DISCONNECTED,
+      DriveSyncState.NEEDS_SYNC,
+      DriveSyncState.SYNCING,
+      DriveSyncState.IN_SYNC,
+    ]);
+    allStates = [];
+
+    const numIntervals = Math.ceil(
+      GoogleDriveStorage.LONG_SYNC_INTERVAL_MS / GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS,
+    );
+    for (let i = 0; i < numIntervals - 1; i++) {
+      tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+      expectStates([]);
+    }
+    tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+    expectStates([DriveSyncState.SYNCING, DriveSyncState.IN_SYNC]);
+    allStates = [];
+
+    tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+    expectStates([]);
+
+    // Must happen earlier to clean up for fakeAsync.
+    gdrive.destroy();
+  }));
+
+  it('should periodically sync every 10s when new changes exist', fakeAsync(async () => {
+    gdriveApi.listFiles.and.resolveTo([]);
+
+    await gdrive.synchronize();
+    tick();
+    expectStates([
+      DriveSyncState.DISCONNECTED,
+      DriveSyncState.NEEDS_SYNC,
+      DriveSyncState.SYNCING,
+      DriveSyncState.IN_SYNC,
+    ]);
+    allStates = [];
+
+    tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+    expectStates([]);
+
+    // Make a change that will need synchronization.
+    // Note: store.saveChecklistFile doesn't work well with fakeAsync: https://github.com/angular/angular/issues/31702
+    await store.clear();
+    tick();
+    await expectState(DriveSyncState.NEEDS_SYNC);
+
+    // Check that synchronization happened.
+    tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+    expectStates([DriveSyncState.NEEDS_SYNC, DriveSyncState.SYNCING, DriveSyncState.IN_SYNC]);
+    allStates = [];
+
+    tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+    expectStates([]);
+
+    // Must happen earlier to clean up for fakeAsync.
+    gdrive.destroy();
+  }));
 });

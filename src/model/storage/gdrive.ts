@@ -84,10 +84,10 @@ interface LocalDeletionJson {
 export class GoogleDriveStorage {
   public static readonly CHECKLIST_MIME_TYPE = 'application/vnd.damazio.efis-editor.checklist';
   public static readonly CHECKLIST_EXTENSION = '.checklist';
+  public static readonly LONG_SYNC_INTERVAL_MS = 60_000;
+  public static readonly SHORT_SYNC_INTERVAL_MS = 10_000;
   private static readonly TOKEN_STORAGE_KEY = 'gdrive_token';
   private static readonly LOCAL_DELETIONS_STORAGE_KEY = 'local_deletions';
-  private static readonly LONG_SYNC_INTERVAL_MS = 60_000;
-  private static readonly SHORT_SYNC_INTERVAL_MS = 10_000;
   private static readonly MAX_RETRIES = 3;
 
   private readonly _browserStorage: Promise<Storage>;
@@ -150,6 +150,7 @@ export class GoogleDriveStorage {
   }
 
   public destroy() {
+    this._stopBackgroundSync();
     this._destroyed.emit();
   }
 
@@ -479,12 +480,11 @@ export class GoogleDriveStorage {
     }
 
     this._syncInterval = window.setInterval(() => {
-      console.debug(`SYNC TIMER: needed=${this._needsSync}`);
-
       // Synchronize if there are local changes, or if it's been a while (to pull remote changes).
       const now = new Date();
       const msSinceLastSync = now.valueOf() - this._lastSync.valueOf();
-      if (this._needsSync || msSinceLastSync > GoogleDriveStorage.LONG_SYNC_INTERVAL_MS) {
+      console.debug(`SYNC TIMER: needed=${this._needsSync}, sinceLast=${msSinceLastSync}ms`);
+      if (this._needsSync || msSinceLastSync >= GoogleDriveStorage.LONG_SYNC_INTERVAL_MS) {
         void this.synchronize();
       }
     }, GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
