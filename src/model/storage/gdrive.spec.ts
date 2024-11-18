@@ -16,6 +16,8 @@ describe('ChecklistsService', () => {
   const OLDER_MTIME = new Date('2022-10-05T20:45:00Z');
   const OLDER_MTIME_UNIX = Math.floor(OLDER_MTIME.valueOf() / 1000);
   const FAKE_NOW = new Date('2023-11-18T02:33:44Z');
+  const NOW_PLUS_10M = new Date(FAKE_NOW.valueOf() + 10 * 60 * 1000);
+  const NOW_PLUS_10M_UNIX = Math.floor(NOW_PLUS_10M.valueOf() / 1000);
   const FILE_NAME = EXPECTED_CONTENTS.metadata!.name;
   const FILE_ID = fileIdForName(FILE_NAME);
   let clock: jasmine.Clock;
@@ -108,7 +110,7 @@ describe('ChecklistsService', () => {
 
   function newFile(name: string, modifiedTime?: Date, mimeType?: string): gapi.client.drive.File {
     if (!modifiedTime) {
-      modifiedTime = new Date();
+      modifiedTime = FAKE_NOW;
     }
     const fileId = fileIdForName(name);
     if (!mimeType || mimeType === GoogleDriveStorage.CHECKLIST_MIME_TYPE) {
@@ -337,17 +339,12 @@ describe('ChecklistsService', () => {
   });
 
   it('should download a remote file when locally deleted less recently than the remote was modified', async () => {
-    // The local deletion will get the current timestamp, so pretend the remote file is modified later.
-    const futureMtime = new Date();
-    futureMtime.setMinutes(futureMtime.getMinutes() + 10);
-    futureMtime.setMilliseconds(0);
-    const futureMtimeUnix = Math.floor(futureMtime.valueOf() / 1000);
-
     await store.saveChecklistFile(EXPECTED_CONTENTS, NEWER_MTIME);
     await store.deleteChecklistFile(FILE_NAME);
 
     // Verify that the download happened.
-    gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, futureMtime)]);
+    // The local deletion will get the current timestamp, so pretend the remote file is modified later.
+    gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, NOW_PLUS_10M)]);
     gdriveApi.downloadFile.withArgs(FILE_ID).and.resolveTo(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
     await gdrive.synchronize();
     await gdrive.synchronize();
@@ -362,7 +359,7 @@ describe('ChecklistsService', () => {
     const savedChecklist = await store.getChecklistFile(FILE_NAME);
     expect(savedChecklist).toBeTruthy();
     const expectedWithMtime = ChecklistFile.clone(EXPECTED_CONTENTS);
-    expectedWithMtime.metadata!.modifiedTime = futureMtimeUnix;
+    expectedWithMtime.metadata!.modifiedTime = NOW_PLUS_10M_UNIX;
     expect(savedChecklist).toEqual(expectedWithMtime);
   });
 
@@ -406,10 +403,7 @@ describe('ChecklistsService', () => {
     await store.deleteChecklistFile(FILE_NAME);
 
     // Use mtime newer than the deletion.
-    const futureMtime = new Date();
-    futureMtime.setMinutes(futureMtime.getMinutes() + 10);
-    futureMtime.setMilliseconds(0);
-    await store.saveChecklistFile(EXPECTED_CONTENTS, futureMtime);
+    await store.saveChecklistFile(EXPECTED_CONTENTS, NOW_PLUS_10M);
 
     gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, OLDER_MTIME)]);
     gdriveApi.trashFile.withArgs(FILE_ID).and.resolveTo();
@@ -417,7 +411,7 @@ describe('ChecklistsService', () => {
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
-    expectUpload(EXPECTED_CONTENTS, futureMtime, true);
+    expectUpload(EXPECTED_CONTENTS, NOW_PLUS_10M, true);
     expect(gdriveApi.downloadFile).not.toHaveBeenCalled();
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
   });
