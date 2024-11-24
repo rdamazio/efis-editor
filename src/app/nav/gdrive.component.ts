@@ -1,34 +1,33 @@
-import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { SwalComponent, SwalPortalTargets, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
-import { firstValueFrom } from 'rxjs';
 import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
+import { GoogleDriveConnectDialogComponent } from '../checklists/dialogs/gdrive-connect-dialog/gdrive-connect-dialog.component';
+import { GoogleDriveDisconnectDialogComponent } from '../checklists/dialogs/gdrive-disconnect-dialog/gdrive-disconnect-dialog.component';
 
 @Component({
   selector: 'gdrive-nav',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatSnackBarModule, MatTooltipModule, SweetAlert2Module],
+  imports: [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatSnackBarModule, MatTooltipModule],
   templateUrl: './gdrive.component.html',
   styleUrl: './gdrive.component.scss',
 })
 @UntilDestroy()
 export class GoogleDriveComponent implements OnInit, OnDestroy {
-  @ViewChild('cloudSyncSwal')
-  public readonly syncSwal!: SwalComponent;
-
   cloudIconDisabled = false;
   disconnectCloudDisabled = true;
   needsSync = false;
+  needsConnectDialog = true;
   cloudIcon = '';
   cloudIconTooltip = '';
 
   constructor(
-    protected readonly swalTargets: SwalPortalTargets,
+    private readonly _dialog: MatDialog,
     private readonly _snackBar: MatSnackBar,
     private readonly _gdrive: GoogleDriveStorage,
     private readonly _changeDet: ChangeDetectorRef,
@@ -45,20 +44,23 @@ export class GoogleDriveComponent implements OnInit, OnDestroy {
   }
 
   async startCloudSync() {
-    const currentState = await firstValueFrom(this._gdrive.getState());
-    if (currentState === DriveSyncState.DISCONNECTED) {
-      return this.syncSwal.fire();
-    } else {
-      return this.synchronizeToCloud();
+    if (this.needsConnectDialog) {
+      const confirmed = await GoogleDriveConnectDialogComponent.confirmConnection(this._dialog);
+      if (!confirmed) return void 0;
     }
+
+    return this.synchronizeToCloud();
   }
 
   async synchronizeToCloud() {
     return this._gdrive.synchronize();
   }
 
-  async disableCloudSync(deleteData: boolean) {
-    if (deleteData) {
+  async disconnectCloudSync() {
+    const returned = await GoogleDriveDisconnectDialogComponent.confirmDisconnection(this._dialog);
+    if (!returned) return void 0;
+
+    if (returned.deleteAllData) {
       await this._gdrive.deleteAllData();
     }
     return this._gdrive.disableSync(true);
@@ -68,10 +70,12 @@ export class GoogleDriveComponent implements OnInit, OnDestroy {
     this.cloudIconDisabled = false;
     this.disconnectCloudDisabled = false;
     this.needsSync = false;
+    this.needsConnectDialog = false;
 
     switch (state) {
       case DriveSyncState.DISCONNECTED:
         this.disconnectCloudDisabled = true;
+        this.needsConnectDialog = true;
         this.cloudIcon = 'cloud_off';
         this.cloudIconTooltip = 'Google drive disconnected. Click to connect and synchronize.';
         break;

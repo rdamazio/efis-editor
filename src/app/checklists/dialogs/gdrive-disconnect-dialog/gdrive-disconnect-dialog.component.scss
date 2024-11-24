@@ -1,0 +1,22 @@
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 25px;
+}
+
+.warning-icon {
+  color: red;
+  transform: scale(2);
+  margin-top: 15px;
+  margin-left: 10px;
+  margin-right: 30px;
+}
+
+.disconnect-ok {
+  background-color: red;
+}

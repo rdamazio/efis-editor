@@ -1,17 +1,5 @@
 <div class="command-bar">
-  <button
-    mat-icon-button
-    matTooltip="New file"
-    aria-label="New file"
-    [swal]="{
-      titleText: 'New checklist file',
-      input: 'text',
-      inputLabel: 'File name',
-      inputPlaceholder: 'My checklist file',
-      inputValidator: isValidFileName,
-    }"
-    (confirm)="newFile.emit($event)"
-  >
+  <button mat-icon-button matTooltip="New file" aria-label="New file" (click)="onNewFile()">
     <mat-icon>note_add</mat-icon>
   </button>
   <button
@@ -54,16 +42,7 @@
     matTooltip="Delete file"
     aria-label="Delete file"
     [disabled]="fileIsOpen"
-    [swal]="{
-      titleText: 'Delete file?',
-      text: 'Are you sure you\'d like to delete this file and all checklists within?',
-      icon: 'warning',
-      showConfirmButton: true,
-      showCancelButton: true,
-      confirmButtonText: 'Delete!',
-      confirmButtonColor: '#d32f2f',
-    }"
-    (confirm)="deleteFile.emit(true)"
+    (click)="onDeleteFile()"
   >
     <mat-icon>delete</mat-icon>
   </button>

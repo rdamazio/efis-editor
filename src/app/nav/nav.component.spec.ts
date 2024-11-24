@@ -3,7 +3,6 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { RouterModule } from '@angular/router';
 import { NavComponent } from './nav.component';
-import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 describe('NavComponent', () => {
   let component: NavComponent;
@@ -11,7 +10,7 @@ describe('NavComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NoopAnimationsModule, RouterModule.forRoot([]), SweetAlert2Module.forRoot()],
+      imports: [NoopAnimationsModule, RouterModule.forRoot([])],
     }).compileComponents();
   });
 

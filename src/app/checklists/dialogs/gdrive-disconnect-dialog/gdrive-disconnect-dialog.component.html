@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Google Drive synchronization</h2>
+
+<mat-dialog-content class="content" [formGroup]="formData">
+  <div class="main-content">
+    <div>
+      <mat-icon class="warning-icon">warning</mat-icon>
+    </div>
+
+    This will stop synchronizing data to Google Drive. All future changes to your files will be stored only on your
+    local browser storage unless you start synchronization again.
+    <br /><br />
+
+    Your existing synchronized data will be left on Google Drive unless you select to also delete it.
+  </div>
+
+  <mat-checkbox formControlName="deleteAllData"> Delete all EFIS Editor data from Google Drive </mat-checkbox>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button class="disconnect-ok" [mat-dialog-close]="getReturnData()">Stop synchronization</button>
+  <button mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions>

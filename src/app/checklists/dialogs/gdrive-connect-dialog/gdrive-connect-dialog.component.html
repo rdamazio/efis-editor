@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Google Drive synchronization</h2>
+
+<mat-dialog-content class="content">
+  <div class="gdrive-logo">
+    <img src="assets/gdrive_logo.png" alt="Google Drive logo" />
+  </div>
+  <div>
+    When you enable Google Drive synchronization, files stored by this app on your browser's storage will automatically
+    be uploaded to Google Drive for safekeeping.
+    <br /><br />
+
+    If you enable synchronization on multiple devices/browsers using the same Google account, changes made on one device
+    will also be downloaded to other devices when they synchronize.
+    <br /><br />
+
+    EFIS editor data is synchronized as application-specific data, meaning it's stored in its own, hidden folder, and no
+    other Google Drive data will be accessible to this app. You can delete this data from Google Drive at any time.
+    <br /><br />
+
+    Please see
+    <a href="https://github.com/rdamazio/efis-editor?tab=readme-ov-file#cloud-synchronization" target="_blank"
+      >documentation on GitHub</a
+    >
+    for more details and important caveats.
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="true">Synchronize</button>
+  <button mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions>

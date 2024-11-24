@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>Delete {{ data.entityType }}?</h2>
+<mat-dialog-content class="content">
+  <mat-icon class="warning-icon" inline>warning</mat-icon>
+
+  Are you sure you'd like to delete {{ data.entityDescription }}??
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button class="delete-ok" mat-button [mat-dialog-close]="true">Delete!</button>
+  <button class="delete-cancel" mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions>

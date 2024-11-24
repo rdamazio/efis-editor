@@ -20,11 +20,11 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTree, MatTreeModule, MatTreeNestedDataSource } from '@angular/material/tree';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import scrollIntoView from 'scroll-into-view-if-needed';
-import Swal from 'sweetalert2/dist/sweetalert2.js';
 import {
   Checklist,
   ChecklistFile,
@@ -32,6 +32,7 @@ import {
   ChecklistGroup_Category,
   ChecklistItem,
 } from '../../../../gen/ts/checklist';
+import { TitleDialogComponent } from '../dialogs/title-dialog/title-dialog.component';
 import { ChecklistDragDirective } from './drag.directive';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
@@ -50,6 +51,7 @@ type MovementDirection = 'up' | 'down';
     ChecklistDragDirective,
     ChecklistTreeNodeComponent,
     MatButtonModule,
+    MatDialogModule,
     MatIconButtonSizesModule,
     MatIconModule,
     MatTreeModule,
@@ -69,6 +71,7 @@ export class ChecklistTreeComponent {
 
   constructor(
     private readonly _element: ElementRef<Element>,
+    private readonly _dialog: MatDialog,
     private readonly _injector: Injector,
   ) {}
 
@@ -704,17 +707,18 @@ export class ChecklistTreeComponent {
   }
 
   private async fillTitle(pb: Checklist | ChecklistGroup, promptType: string): Promise<boolean> {
-    const result = await Swal.fire({
-      title: `Enter ${promptType} title:`,
-      input: 'text',
-      inputPlaceholder: `My ${promptType} title`,
-      inputValue: pb.title,
-    });
+    const title = await TitleDialogComponent.promptForTitle(
+      {
+        promptType: promptType,
+        initialTitle: pb.title,
+      },
+      this._dialog,
+    );
 
-    if (!result.isConfirmed) {
+    if (!title) {
       return false;
     }
-    pb.title = result.value as string; // eslint-disable-line require-atomic-updates
+    pb.title = title; // eslint-disable-line require-atomic-updates
     return true;
   }
 }

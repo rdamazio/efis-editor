@@ -39,12 +39,12 @@ import { GoogleDriveStorage } from '../../model/storage/gdrive';
 import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
-import { ExportDialogComponent } from './export-dialog/export-dialog.component';
 import { ChecklistFileInfoComponent, FileInfoDialogData } from './file-info/file-info.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { HelpComponent } from './hotkeys/help/help.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
+import { ExportDialogComponent } from './export-dialog/export-dialog.component';
 
 interface ParsedFragment {
   fileName?: string;
@@ -618,7 +618,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     await firstValueFrom(dialogRef.afterClosed())
       .then(async (updatedData?: FileInfoDialogData): Promise<unknown> => {
-        if (!updatedData || !this.selectedFile) throw new Error('Metadata change cancelled');
+        if (!updatedData || !this.selectedFile) return;
 
         const oldName = this.selectedFile.metadata!.name;
         const newName = updatedData.metadata.name;

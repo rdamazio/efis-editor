@@ -9,58 +9,7 @@
 </button>
 <mat-menu #cloudMenu="matMenu">
   <button mat-menu-item (click)="startCloudSync()">Synchronize to Google Drive</button>
-  <button mat-menu-item [disabled]="disconnectCloudDisabled" [swal]="cloudDisconnectSwal">
+  <button mat-menu-item (click)="disconnectCloudSync()" [disabled]="disconnectCloudDisabled">
     Disconnect from Google Drive
   </button>
 </mat-menu>
-
-<swal
-  #cloudSyncSwal
-  title="Google Drive synchronization"
-  imageUrl="assets/gdrive_logo.png"
-  [showConfirmButton]="true"
-  [showCancelButton]="true"
-  confirmButtonText="Synchronize to Google Drive"
-  (confirm)="synchronizeToCloud()"
->
-  <ng-container *swalPortal="swalTargets.content">
-    When you enable Google Drive synchronization, files stored by this app on your browser's storage will automatically
-    be uploaded to Google Drive for safekeeping.
-    <br /><br />
-
-    If you enable synchronization on multiple devices/browsers using the same Google account, changes made on one device
-    will also be downloaded to other devices when they synchronize.
-    <br /><br />
-
-    EFIS editor data is synchronized as application-specific data, meaning it's stored in its own, hidden folder, and no
-    other Google Drive data will be accessible to this app. You can delete this data from Google Drive at any time.
-    <br /><br />
-
-    Please see
-    <a href="https://github.com/rdamazio/efis-editor?tab=readme-ov-file#cloud-synchronization" target="_blank"
-      >documentation on GitHub</a
-    >
-    for more details and important caveats.
-  </ng-container>
-</swal>
-
-<swal
-  #cloudDisconnectSwal
-  title="Google Drive synchronization"
-  icon="warning"
-  input="checkbox"
-  inputPlaceholder="Delete all EFIS Editor data from Google Drive"
-  [showConfirmButton]="true"
-  [showCancelButton]="true"
-  confirmButtonText="Stop Google Drive synchronization"
-  confirmButtonColor="#d32f2f"
-  (confirm)="disableCloudSync($event)"
->
-  <ng-container *swalPortal="swalTargets.content">
-    This will stop synchronizing data to Google Drive. All future changes to your files will be stored only on your
-    local browser storage unless you start synchronization again.
-    <br /><br />
-
-    Your existing synchronized data will be left on Google Drive unless you select to also delete it.
-  </ng-container>
-</swal>
