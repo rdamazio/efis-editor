@@ -11,7 +11,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { ChecklistFileMetadata, ChecklistGroup } from '../../../../gen/ts/checklist';
+import { ChecklistFileMetadata, ChecklistGroup } from '../../../../../gen/ts/checklist';
 
 export interface FileInfoDialogData {
   metadata: ChecklistFileMetadata;

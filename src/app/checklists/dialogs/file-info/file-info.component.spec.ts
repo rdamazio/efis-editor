@@ -5,7 +5,7 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { ChecklistFileMetadata } from '../../../../gen/ts/checklist';
+import { ChecklistFileMetadata } from '../../../../../gen/ts/checklist';
 import { ChecklistFileInfoComponent } from './file-info.component';
 
 describe('ChecklistFileInfoComponent', () => {

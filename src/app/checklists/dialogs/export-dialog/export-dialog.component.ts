@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
-import { PdfWriterOptions } from '../../../model/formats/pdf-writer';
+import { PdfWriterOptions } from '../../../../model/formats/pdf-writer';
 
 @Component({
   selector: 'app-export-dialog',
