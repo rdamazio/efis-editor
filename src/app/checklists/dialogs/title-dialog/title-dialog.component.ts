@@ -20,7 +20,6 @@ export interface TitleDialogData {
 
 @Component({
   selector: 'checklist-title-dialog',
-  standalone: true,
   imports: [
     FormsModule,
     MatButtonModule,

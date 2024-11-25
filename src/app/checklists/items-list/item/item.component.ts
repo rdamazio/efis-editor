@@ -9,7 +9,6 @@ import { EditableLabelComponent } from '../editable-label/editable-label.compone
 
 @Component({
   selector: 'checklist-item',
-  standalone: true,
   imports: [
     CdkDragHandle,
     EditableLabelComponent,

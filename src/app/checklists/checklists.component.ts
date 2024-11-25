@@ -54,7 +54,6 @@ interface ParsedFragment {
 
 @Component({
   selector: 'app-checklists',
-  standalone: true,
   imports: [
     AsyncPipe,
     ChecklistCommandBarComponent,

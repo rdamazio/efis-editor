@@ -19,7 +19,6 @@ import { GoogleDriveComponent } from './gdrive.component';
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrl: './nav.component.scss',
-  standalone: true,
   imports: [
     GoogleDriveComponent,
     MatButtonModule,

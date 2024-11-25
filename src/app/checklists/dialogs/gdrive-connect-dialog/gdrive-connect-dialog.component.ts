@@ -11,7 +11,6 @@ import { filter, lastValueFrom, Observable, startWith } from 'rxjs';
 
 @Component({
   selector: 'gdrive-connect-dialog',
-  standalone: true,
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose],
   templateUrl: './gdrive-connect-dialog.component.html',
   styleUrl: './gdrive-connect-dialog.component.scss',

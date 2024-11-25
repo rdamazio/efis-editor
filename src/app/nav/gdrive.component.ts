@@ -12,7 +12,6 @@ import { GoogleDriveDisconnectDialogComponent } from '../checklists/dialogs/gdri
 
 @Component({
   selector: 'gdrive-nav',
-  standalone: true,
   imports: [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatSnackBarModule, MatTooltipModule],
   templateUrl: './gdrive.component.html',
   styleUrl: './gdrive.component.scss',

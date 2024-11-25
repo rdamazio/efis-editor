@@ -20,7 +20,6 @@ import { ChecklistItemComponent } from './item/item.component';
   selector: 'checklist-items',
   templateUrl: './items-list.component.html',
   styleUrl: './items-list.component.scss',
-  standalone: true,
   imports: [CdkDrag, CdkDragPlaceholder, CdkDropList, ChecklistItemComponent, MatButtonModule, MatIconModule],
 })
 export class ChecklistItemsComponent {

@@ -20,7 +20,6 @@ export interface GoogleDriveDisconnectDialogReturnData {
 
 @Component({
   selector: 'gdrive-disconnect-dialog',
-  standalone: true,
   imports: [
     FormsModule,
     MatButtonModule,

@@ -11,7 +11,6 @@ import { PdfWriterOptions } from '../../../../model/formats/pdf-writer';
 
 @Component({
   selector: 'app-export-dialog',
-  standalone: true,
   imports: [
     FormsModule,
     MatButtonModule,

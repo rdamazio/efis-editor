@@ -45,7 +45,6 @@ type MovementDirection = 'up' | 'down';
 
 @Component({
   selector: 'checklist-tree',
-  standalone: true,
   imports: [
     CdkDropList,
     ChecklistDragDirective,

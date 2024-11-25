@@ -19,7 +19,6 @@ export interface FileInfoDialogData {
 }
 
 @Component({
-  standalone: true,
   imports: [
     FormsModule,
     MatButtonModule,

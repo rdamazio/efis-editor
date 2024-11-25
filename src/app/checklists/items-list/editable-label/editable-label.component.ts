@@ -10,7 +10,6 @@ import { DynamicDataPipe } from './dynamic-data.pipe';
 
 @Component({
   selector: 'editable-label',
-  standalone: true,
   imports: [
     DynamicDataPipe,
     MatButtonModule,

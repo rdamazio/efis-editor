@@ -7,7 +7,6 @@ import { ShortcutPipe } from './shortcut.pipe';
 
 @Component({
   selector: 'app-help',
-  standalone: true,
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatTableModule, ShortcutPipe],
   templateUrl: './help.component.html',
   styleUrl: './help.component.scss',

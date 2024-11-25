@@ -13,7 +13,6 @@ import { ChecklistTreeNode } from './node';
 
 @Component({
   selector: 'checklist-tree-node',
-  standalone: true,
   imports: [
     CdkDragHandle,
     MatButtonModule,

@@ -13,7 +13,6 @@ import { JsonFormat } from '../../../model/formats/json-format';
 
 @Component({
   selector: 'checklist-file-upload',
-  standalone: true,
   imports: [MatIconModule, NgxFileDropModule],
   templateUrl: './file-upload.component.html',
   styleUrl: './file-upload.component.scss',

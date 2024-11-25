@@ -6,7 +6,6 @@ import { ForeFlightUtils } from '../../model/formats/foreflight-utils';
 
 @Component({
   selector: 'app-welcome',
-  standalone: true,
   imports: [MatButtonModule, MatCardModule, RouterLink],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.scss',

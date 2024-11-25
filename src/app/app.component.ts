@@ -4,7 +4,6 @@ import { NavComponent } from './nav/nav.component';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [MatIconModule, NavComponent],
   template: '<app-nav />',
 })
