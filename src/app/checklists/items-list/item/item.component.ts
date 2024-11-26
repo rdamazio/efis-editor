@@ -1,5 +1,5 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, Input, output, viewChild } from '@angular/core';
+import { Component, ElementRef, input, output, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -21,10 +21,7 @@ import { EditableLabelComponent } from '../editable-label/editable-label.compone
   styleUrl: './item.component.scss',
 })
 export class ChecklistItemComponent {
-  // TODO: Skipped for migration because:
-  //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
-  //  and migrating would break narrowing currently.
-  @Input() item!: ChecklistItem;
+  readonly item = input.required<ChecklistItem>();
   readonly itemChange = output<ChecklistItem>();
   readonly itemDeleted = output<boolean>();
   readonly itemFocused = output<boolean>();
@@ -56,14 +53,14 @@ export class ChecklistItemComponent {
   }
 
   onSavePrompt() {
-    this.item.prompt = this.promptInput().value;
+    this.item().prompt = this.promptInput().value;
     this.onItemUpdated();
     this.expectationInput().save();
     this._restoreFocus();
   }
 
   onSaveExpectation() {
-    this.item.expectation = this.expectationInput().value;
+    this.item().expectation = this.expectationInput().value;
     this.onItemUpdated();
     this.promptInput().save();
     this._restoreFocus();
@@ -83,7 +80,7 @@ export class ChecklistItemComponent {
   }
 
   onItemUpdated() {
-    this.itemChange.emit(this.item);
+    this.itemChange.emit(this.item());
   }
 
   onDelete() {

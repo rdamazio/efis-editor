@@ -1,113 +1,111 @@
+@let it = item();
+
 <div #container class="item-container" tabindex="0" (focus)="itemFocused.emit(true)" (blur)="itemBlurred.emit(true)">
-  @if (item) {
-    <div class="actions">
-      <mat-icon cdkDragHandle class="mat-icon-rtl-mirror action-icon drag-icon" matTooltip="Drag to reorder">
-        drag_pan
+  <div class="actions">
+    <mat-icon cdkDragHandle class="mat-icon-rtl-mirror action-icon drag-icon" matTooltip="Drag to reorder">
+      drag_pan
+    </mat-icon>
+    <button
+      mat-icon-button
+      mat-medium-icon-button
+      class="action-icon"
+      matTooltip="Edit this line"
+      [attr.aria-label]="'Edit ' + it.prompt"
+      [disabled]="it.type === ChecklistItem_Type.ITEM_SPACE"
+      (click)="onEdit($event)"
+    >
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      mat-medium-icon-button
+      class="action-icon"
+      matTooltip="Delete this line"
+      [attr.aria-label]="'Delete ' + it.prompt"
+      (click)="onDelete()"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      mat-medium-icon-button
+      class="action-icon"
+      matTooltip="Indent left"
+      [attr.aria-label]="'Indent ' + it.prompt + ' left'"
+      [disabled]="it.indent === 0 || it.centered || it.type === ChecklistItem_Type.ITEM_SPACE"
+      (click)="onIndent(it, -1)"
+    >
+      <mat-icon>format_indent_decrease</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      mat-medium-icon-button
+      class="action-icon"
+      matTooltip="Indent right"
+      [attr.aria-label]="'Indent ' + it.prompt + ' right'"
+      [disabled]="it.indent === 4 || it.centered || it.type === ChecklistItem_Type.ITEM_SPACE"
+      (click)="onIndent(it, 1)"
+    >
+      <mat-icon>format_indent_increase</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      mat-medium-icon-button
+      class="action-icon"
+      [matTooltip]="(it.centered ? 'Left-justify' : 'Center') + ' this line'"
+      [attr.aria-label]="'Center ' + it.prompt"
+      [disabled]="it.type === ChecklistItem_Type.ITEM_SPACE || it.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
+      (click)="onCenterToggle(it)"
+    >
+      <mat-icon>
+        @if (it.centered) {
+          format_align_left
+        } @else {
+          format_align_center
+        }
       </mat-icon>
-      <button
-        mat-icon-button
-        mat-medium-icon-button
-        class="action-icon"
-        matTooltip="Edit this line"
-        [attr.aria-label]="'Edit ' + item.prompt"
-        [disabled]="item.type === ChecklistItem_Type.ITEM_SPACE"
-        (click)="onEdit($event)"
-      >
-        <mat-icon>edit</mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        mat-medium-icon-button
-        class="action-icon"
-        matTooltip="Delete this line"
-        [attr.aria-label]="'Delete ' + item.prompt"
-        (click)="onDelete()"
-      >
-        <mat-icon>delete</mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        mat-medium-icon-button
-        class="action-icon"
-        matTooltip="Indent left"
-        [attr.aria-label]="'Indent ' + item.prompt + ' left'"
-        [disabled]="item.indent === 0 || item.centered || item.type === ChecklistItem_Type.ITEM_SPACE"
-        (click)="onIndent(item, -1)"
-      >
-        <mat-icon>format_indent_decrease</mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        mat-medium-icon-button
-        class="action-icon"
-        matTooltip="Indent right"
-        [attr.aria-label]="'Indent ' + item.prompt + ' right'"
-        [disabled]="item.indent === 4 || item.centered || item.type === ChecklistItem_Type.ITEM_SPACE"
-        (click)="onIndent(item, 1)"
-      >
-        <mat-icon>format_indent_increase</mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        mat-medium-icon-button
-        class="action-icon"
-        [matTooltip]="(item.centered ? 'Left-justify' : 'Center') + ' this line'"
-        [attr.aria-label]="'Center ' + item.prompt"
-        [disabled]="
-          item.type === ChecklistItem_Type.ITEM_SPACE || item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE
-        "
-        (click)="onCenterToggle(item)"
-      >
-        <mat-icon>
-          @if (item.centered) {
-            format_align_left
-          } @else {
-            format_align_center
-          }
-        </mat-icon>
-      </button>
-    </div>
-    <div class="item" [class.item-centered]="item.centered" tabindex="0">
-      <span
-        class="prompt"
-        [class.prompt-challenge]="item.type === ChecklistItem_Type.ITEM_CHALLENGE"
-        [class.prompt-challenge-response]="item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
-        [class.prompt-title]="item.type === ChecklistItem_Type.ITEM_TITLE"
-        [class.prompt-warning]="item.type === ChecklistItem_Type.ITEM_WARNING"
-        [class.prompt-caution]="item.type === ChecklistItem_Type.ITEM_CAUTION"
-        [class.prompt-note]="item.type === ChecklistItem_Type.ITEM_NOTE"
-        [class.prompt-space]="item.type === ChecklistItem_Type.ITEM_SPACE"
-        [style.padding-left]="item.centered ? '' : 10 + item.indent * 25 + 'px'"
-      >
-        <!-- TODO: Find a better solution than to save/cancel independent fields together -->
+    </button>
+  </div>
+  <div class="item" [class.item-centered]="it.centered" tabindex="0">
+    <span
+      class="prompt"
+      [class.prompt-challenge]="it.type === ChecklistItem_Type.ITEM_CHALLENGE"
+      [class.prompt-challenge-response]="it.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
+      [class.prompt-title]="it.type === ChecklistItem_Type.ITEM_TITLE"
+      [class.prompt-warning]="it.type === ChecklistItem_Type.ITEM_WARNING"
+      [class.prompt-caution]="it.type === ChecklistItem_Type.ITEM_CAUTION"
+      [class.prompt-note]="it.type === ChecklistItem_Type.ITEM_NOTE"
+      [class.prompt-space]="it.type === ChecklistItem_Type.ITEM_SPACE"
+      [style.padding-left]="it.centered ? '' : 10 + it.indent * 25 + 'px'"
+    >
+      <!-- TODO: Find a better solution than to save/cancel independent fields together -->
+      <editable-label
+        #promptInput
+        class="prompt-input"
+        [class.prompt-input-editing]="promptInput.editing"
+        label="Prompt text"
+        [value]="it.prompt"
+        (valueChange)="onSavePrompt()"
+        (cancelled)="onCancelEdit()"
+      />
+    </span>
+    <!-- hidden doesn't work if display is set -->
+    <span
+      [class.expectation-container]="it.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
+      [hidden]="it.type !== ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
+    >
+      <span class="expectation-spacer"></span>
+      <span class="expectation">
         <editable-label
-          #promptInput
-          class="prompt-input"
-          [class.prompt-input-editing]="promptInput.editing"
-          label="Prompt text"
-          [value]="item.prompt"
-          (valueChange)="onSavePrompt()"
+          #expectationInput
+          class="expectation-input"
+          [class.expectation-input-editing]="expectationInput.editing"
+          label="Expectation text"
+          [value]="it.expectation"
+          (valueChange)="onSaveExpectation()"
           (cancelled)="onCancelEdit()"
         />
       </span>
-      <!-- hidden doesn't work if display is set -->
-      <span
-        [class.expectation-container]="item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
-        [hidden]="item.type !== ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
-      >
-        <span class="expectation-spacer"></span>
-        <span class="expectation">
-          <editable-label
-            #expectationInput
-            class="expectation-input"
-            [class.expectation-input-editing]="expectationInput.editing"
-            label="Expectation text"
-            [value]="item.expectation"
-            (valueChange)="onSaveExpectation()"
-            (cancelled)="onCancelEdit()"
-          />
-        </span>
-      </span>
-    </div>
-  }
+    </span>
+  </div>
 </div>
