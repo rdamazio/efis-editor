@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:hmr": "NG_HMR_TEMPLATES=1 ng serve",
     "start:prod": "ng serve --configuration production",
     "start:ssr": "ng build && node dist/efis-editor/server/server.mjs",
     "build": "ng build",
