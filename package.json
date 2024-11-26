@@ -67,7 +67,7 @@
     "@types/jasmine": "~5.1.4",
     "@types/node": "^22.9.0",
     "@types/uuid": "^10.0.0",
-    "angular-eslint": "18.4.0",
+    "angular-eslint": "18.4.2",
     "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-depend": "^0.12.0",
@@ -82,9 +82,9 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "pdfjs-dist": "^4.8.69",
-    "prettier": "^3.3.3",
+    "prettier": "^3.4.0",
     "prettier-eslint": "^16.3.0",
     "typescript": "~5.5.4",
-    "typescript-eslint": "8.15.0"
+    "typescript-eslint": "8.16.0"
   }
 }
