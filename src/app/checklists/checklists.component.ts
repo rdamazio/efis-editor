@@ -8,7 +8,6 @@ import {
   OnDestroy,
   OnInit,
   PLATFORM_ID,
-  ViewChild,
   viewChild,
 } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -74,20 +73,6 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedFile?: ChecklistFile;
   readonly tree = viewChild.required<ChecklistTreeComponent>('tree');
   readonly items = viewChild.required<ChecklistItemsComponent>('items');
-
-  private _filePicker?: ChecklistFilePickerComponent;
-
-  @ViewChild('filePicker')
-  set filePicker(picker: ChecklistFilePickerComponent | undefined) {
-    this._filePicker = picker;
-
-    // Fragment parsing may have happened before the component was hydrated.
-    if (picker) {
-      setTimeout(() => {
-        picker.selectedFile = this.selectedFile?.metadata?.name ?? '';
-      });
-    }
-  }
 
   showFilePicker = false;
   showFileUpload = false;
@@ -641,7 +626,6 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         if (oldName !== newName) {
           // File was renamed, delete old one from storage.
           promises.push(this.store.deleteChecklistFile(oldName));
-          this._filePicker!.selectedFile = newName;
           // TODO: Update fragment
         }
         return Promise.all(promises);
@@ -671,10 +655,6 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.tree().file = file;
 
     if (file?.metadata) {
-      // Make the file selected the next time the picker gets displayed
-      if (this._filePicker) {
-        this._filePicker.selectedFile = file.metadata.name;
-      }
       this._snackBar.open(`Loaded checklist "${file.metadata.name}".`, '', { duration: 2000 });
     }
 

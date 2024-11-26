@@ -1,7 +1,7 @@
 <div class="container">
   <mat-form-field class="dropdown">
     <mat-label>Select checklist file</mat-label>
-    <mat-select [(value)]="selectedFile" (selectionChange)="selectedFileChange.emit(selectedFile)">
+    <mat-select [(value)]="selectedFile" (selectionChange)="fileSelected.emit(selectedFile())">
       <mat-option *ngFor="let file of fileNames()" value="{{ file }}">
         {{ file }}
       </mat-option>

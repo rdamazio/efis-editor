@@ -23,8 +23,8 @@
         ]"
       />
       <checklist-file-picker
-        #filePicker
-        (selectedFileChange)="onFileSelected($event)"
+        [selectedFile]="selectedFile?.metadata?.name ?? ''"
+        (fileSelected)="onFileSelected($event)"
         [fileNames]="(store.listChecklistFiles() | async) || []"
         [style.display]="showFilePicker ? '' : 'none'"
       />
