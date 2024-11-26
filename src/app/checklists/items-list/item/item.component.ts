@@ -53,14 +53,14 @@ export class ChecklistItemComponent {
   }
 
   onSavePrompt() {
-    this.item().prompt = this.promptInput().value;
+    this.item().prompt = this.promptInput().value();
     this.onItemUpdated();
     this.expectationInput().save();
     this._restoreFocus();
   }
 
   onSaveExpectation() {
-    this.item().expectation = this.expectationInput().value;
+    this.item().expectation = this.expectationInput().value();
     this.onItemUpdated();
     this.promptInput().save();
     this._restoreFocus();

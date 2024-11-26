@@ -1,5 +1,5 @@
-@if (!editing) {
-  {{ value | dynamicData }}
+@if (!editing()) {
+  {{ value() | dynamicData }}
 } @else {
   <mat-form-field appearance="outline" class="editable-input-field">
     <mat-label>{{ label() }}</mat-label>
@@ -11,7 +11,7 @@
       class="editable-input"
       [formControl]="control"
       (beforeinput)="onBeforeInput($event)"
-      (keyup.enter)="$event.stopPropagation(); value = promptInput.value; save()"
+      (keyup.enter)="$event.stopPropagation(); save()"
       (keyup.escape)="$event.stopPropagation(); cancel()"
     />
     <button
@@ -21,7 +21,7 @@
       matTooltip="Save (⏎)"
       [attr.aria-label]="'Save changes to ' + label()"
       [disabled]="!this.control.valid"
-      (click)="value = promptInput.value; save()"
+      (click)="save()"
     >
       <mat-icon>save</mat-icon>
     </button>

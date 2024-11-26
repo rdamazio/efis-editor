@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, input, Output, output, viewChild } from '@angular/core';
+import { Component, ElementRef, input, model, output, viewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
@@ -28,52 +28,44 @@ export class EditableLabelComponent {
   private readonly RESTRICTED_CHARS = ['~'];
 
   control = new FormControl('');
-  private _savedValue = '';
   readonly input = viewChild.required<ElementRef<HTMLElement>>('promptInput');
 
   readonly cancelled = output<boolean>();
-  @Output() editing = false;
+  readonly editing = model<boolean>();
+  readonly value = model('');
   readonly label = input('');
   readonly disallowEmpty = input(false);
 
-  readonly valueChange = output<string>();
-  // TODO: Skipped for migration because:
-  //  Accessor inputs cannot be migrated as they are too complex.
-  @Input()
-  get value(): string {
-    return this._savedValue;
-  }
-  set value(v: string) {
-    this._savedValue = v;
-    this.control.setValue(v);
+  constructor() {
+    this.editing.set(false);
   }
 
   save() {
-    if (this.editing) {
-      this.editing = false;
-      this._savedValue = this.control.value!;
-      this.valueChange.emit(this._savedValue);
+    if (this.editing()) {
+      this.editing.set(false);
+      this.value.set(this.control.value!);
     }
   }
 
   edit() {
-    this.editing = true;
+    this.control.setValue(this.value());
+    this.editing.set(true);
   }
 
   focus() {
     // setTimeout is needed to remove focusing from the execution stack and allow the input element to be created first
     // See https://v17.angular.io/api/core/ViewChild for the details.
     setTimeout(() => {
-      if (this.editing) {
+      if (this.editing()) {
         this.input().nativeElement.focus();
       }
     });
   }
 
   cancel() {
-    if (this.editing) {
-      this.editing = false;
-      this.control.setValue(this._savedValue);
+    if (this.editing()) {
+      this.editing.set(false);
+      this.control.setValue(this.value());
       this.cancelled.emit(true);
     }
   }
