@@ -3,10 +3,6 @@
 .editable-input-field {
   width: 100%;
 
-  // Center it relative to the item row
-  position: relative;
-  top: -6px;
-
   // Make it short enough that editing doesn't change line height
   height: 28px;
   --mat-form-field-container-vertical-padding: 0;
@@ -16,5 +12,4 @@
 .editable-input {
   // Keep the input also centered on the row
   position: relative;
-  top: 6px;
 }
