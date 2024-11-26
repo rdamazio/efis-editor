@@ -12,11 +12,11 @@ describe('NodeComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistTreeNodeComponent);
-    component = fixture.componentInstance;
-    component.node = {
+    fixture.componentRef.setInput('node', {
       isAddNew: false,
       title: 'Test',
-    };
+    });
+    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 

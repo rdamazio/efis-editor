@@ -1,6 +1,6 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { NgIf } from '@angular/common';
-import { Component, Input, input, output, viewChild } from '@angular/core';
+import { Component, input, output, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -28,9 +28,8 @@ import { ChecklistTreeNode } from './node';
   styleUrl: './node.component.scss',
 })
 export class ChecklistTreeNodeComponent {
-  // TODO: Skipped for migration because:
-  //  Your application code writes to the input. This prevents migration.
-  @Input() node!: ChecklistTreeNode;
+  node = input.required<ChecklistTreeNode>();
+
   readonly disableButtonHover = input(false);
   readonly nodeRename = output<ChecklistTreeNode>();
   readonly nodeDelete = output<ChecklistTreeNode>();
@@ -47,15 +46,15 @@ export class ChecklistTreeNodeComponent {
   constructor(private readonly _dialog: MatDialog) {}
 
   get checklistGroupCategory(): ChecklistGroup_Category {
-    return this.node.group!.category;
+    return this.node().group!.category;
   }
   set checklistGroupCategory(value: ChecklistGroup_Category) {
-    this.node.group!.category = value;
+    this.node().group!.category = value;
   }
 
   async onDelete() {
-    const isChecklist = Boolean(this.node.checklist);
-    const nodeTitle = this.node.title;
+    const isChecklist = Boolean(this.node().checklist);
+    const nodeTitle = this.node().title;
     const confirmed = await DeleteDialogComponent.confirmDeletion(
       {
         entityType: isChecklist ? 'checklist' : 'group',
@@ -67,7 +66,7 @@ export class ChecklistTreeNodeComponent {
     );
 
     if (confirmed) {
-      this.nodeDelete.emit(this.node);
+      this.nodeDelete.emit(this.node());
     }
   }
 }
