@@ -12,8 +12,7 @@ import {
   Component,
   ElementRef,
   Injector,
-  Input,
-  Output,
+  model,
   output,
   QueryList,
   viewChild,
@@ -59,65 +58,56 @@ type MovementDirection = 'up' | 'down';
   styleUrl: './checklist-tree.component.scss',
 })
 export class ChecklistTreeComponent {
-  @Output() selectedChecklistGroup: ChecklistGroup | undefined;
-  @Output() groupDropListsIds: string[] = [];
+  readonly file = model<ChecklistFile>();
+  readonly fileModified = output<ChecklistFile>();
+  readonly selectedChecklist = model<Checklist>();
+  readonly selectedChecklistGroup = model<ChecklistGroup>();
+  readonly groupDropListIds = model<string[]>([]);
   readonly tree = viewChild.required(MatTree);
   @ViewChildren(CdkDropList) allDropLists?: QueryList<CdkDropList<ChecklistTreeNode>>;
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
-  private _file?: ChecklistFile;
-  private _selectedChecklist?: Checklist;
+
   dragging = false;
 
   constructor(
     private readonly _element: ElementRef<Element>,
     private readonly _dialog: MatDialog,
     private readonly _injector: Injector,
-  ) {}
+  ) {
+    this.selectedChecklist.subscribe((checklist?: Checklist) => {
+      if (checklist) {
+        this._scrollToSelectedChecklist();
+      }
+    });
 
-  readonly selectedChecklistChange = output<Checklist | undefined>();
-  // TODO: Skipped for migration because:
-  //  Accessor inputs cannot be migrated as they are too complex.
-  @Input() get selectedChecklist(): Checklist | undefined {
-    return this._selectedChecklist;
-  }
-  set selectedChecklist(checklist: Checklist | undefined) {
-    this._selectedChecklist = checklist;
-    this._scrollToSelectedChecklist();
-  }
-
-  readonly fileChange = output<ChecklistFile | undefined>();
-  // TODO: Skipped for migration because:
-  //  Accessor inputs cannot be migrated as they are too complex.
-  @Input()
-  get file(): ChecklistFile | undefined {
-    return this._file;
-  }
-  set file(file: ChecklistFile | undefined) {
-    this._file = file;
-    this.reloadFile(false);
-    if (this._selectedChecklist || this.selectedChecklistGroup) {
-      this._selectChecklist(undefined, undefined);
-    }
+    this.file.subscribe(() => {
+      // When a new file is loaded, drop the current checklist/group selection.
+      this.reloadFile(false);
+      if (this.selectedChecklist() || this.selectedChecklistGroup()) {
+        this._selectChecklist(undefined, undefined);
+      }
+    });
   }
 
   private reloadFile(modified: boolean) {
     let data: ChecklistTreeNode[] = [];
-    if (this._file) {
-      data = this._file.groups.map(ChecklistTreeComponent.groupToNode);
+    const file = this.file();
+    if (file) {
+      data = file.groups.map(ChecklistTreeComponent.groupToNode);
       data.push({
         title: 'Add new checklist group',
         isAddNew: true,
       });
-      this.groupDropListsIds = this._file.groups.map((v: ChecklistGroup, idx: number) => `group_${idx}`);
+      this.groupDropListIds.set(file.groups.map((v: ChecklistGroup, idx: number) => `group_${idx}`));
     } else {
-      this.groupDropListsIds = [];
+      this.groupDropListIds.set([]);
     }
 
     this.dataSource.data = data;
     this.tree().expandAll();
 
-    if (modified) {
-      this.fileChange.emit(this._file);
+    if (modified && file) {
+      this.fileModified.emit(file);
     }
   }
 
@@ -170,7 +160,7 @@ export class ChecklistTreeComponent {
         if (!(await this.fillTitle(checklistGroup, 'checklist group'))) {
           return;
         }
-        this._file!.groups.push(checklistGroup);
+        this.file()!.groups.push(checklistGroup);
       }
       this.reloadFile(true);
       // Leave checklist unset
@@ -187,16 +177,17 @@ export class ChecklistTreeComponent {
   }
 
   onGroupDrop(event: CdkDragDrop<ChecklistTreeNode>): void {
-    if (!this._file) return;
+    const file = this.file();
+    if (!file) return;
 
-    const groups = this._file.groups;
+    const groups = file.groups;
     moveItemInArray(groups, event.previousIndex, event.currentIndex);
 
     // Rebuild the nodes with updated data.
     this.reloadFile(true);
 
     // The selected checklist itself didn't change, but the fragment to represent may have.
-    this._selectChecklist(this.selectedChecklist, this.selectedChecklistGroup);
+    this._selectChecklist(this.selectedChecklist(), this.selectedChecklistGroup());
     this._scrollToSelectedChecklist();
   }
 
@@ -223,7 +214,8 @@ export class ChecklistTreeComponent {
     index: number,
     item: CdkDrag<ChecklistTreeNode | ChecklistItem>,
   ): boolean {
-    if (!this._file) return false;
+    const file = this.file();
+    if (!file) return false;
 
     if (ChecklistItem.is(item.data)) {
       // Due to https://github.com/angular/components/issues/23766, we get a bogus
@@ -235,7 +227,7 @@ export class ChecklistTreeComponent {
       return true;
     } else {
       // Disallow dropping after "Add checklist" node.
-      return index < this._file.groups[dropGroupIdx].checklists.length;
+      return index < file.groups[dropGroupIdx].checklists.length;
     }
   }
 
@@ -262,7 +254,8 @@ export class ChecklistTreeComponent {
     newGroupIdx: number,
     dropElement: HTMLElement,
   ) {
-    if (!this._file) return;
+    const file = this.file();
+    if (!file) return;
 
     const previousPos = this.selectedChecklistPosition();
     if (!previousPos) return;
@@ -283,7 +276,7 @@ export class ChecklistTreeComponent {
     }
 
     const newChecklistIdx = parseInt(checklistIdxAttr.value, 10);
-    const newItems = this._file.groups[newGroupIdx].checklists[newChecklistIdx].items;
+    const newItems = file.groups[newGroupIdx].checklists[newChecklistIdx].items;
 
     transferArrayItem(previousItems, newItems, previousItemIdx, newItems.length);
 
@@ -308,7 +301,7 @@ export class ChecklistTreeComponent {
     this.reloadFile(true);
 
     // The selected checklist itself didn't change, but the fragment to represent may have.
-    this._selectChecklist(this.selectedChecklist, newGroup);
+    this._selectChecklist(this.selectedChecklist(), newGroup);
     this._scrollToSelectedChecklist();
   }
 
@@ -338,8 +331,9 @@ export class ChecklistTreeComponent {
   }
 
   private _findNextChecklist(direction: MovementDirection): ChecklistPosition | undefined {
-    if (!this._file) return undefined;
-    const groups = this._file.groups;
+    const file = this.file();
+    if (!file) return undefined;
+    const groups = file.groups;
     const numGroups = groups.length;
     if (!numGroups) return undefined; // Empty file
 
@@ -415,18 +409,20 @@ export class ChecklistTreeComponent {
   }
 
   private _selectNextChecklist(direction: MovementDirection) {
-    if (!this._file) return;
+    const file = this.file();
+    if (!file) return;
     const next = this._findNextChecklist(direction);
     if (!next) return;
 
     const { groupIdx, checklistIdx } = next;
-    const group = this._file.groups[groupIdx];
+    const group = file.groups[groupIdx];
     this._selectChecklist(group.checklists[checklistIdx], group);
     this._scrollToSelectedChecklist();
   }
 
   private _moveCurrentChecklist(direction: MovementDirection) {
-    if (!this._file) return;
+    const file = this.file();
+    if (!file) return;
 
     const currentPos = this.selectedChecklistPosition();
     if (!currentPos) return;
@@ -435,7 +431,7 @@ export class ChecklistTreeComponent {
     const delta = upDirection ? -1 : 1;
 
     // Whether we're at the last group in the given direction.
-    const lastGroupIdx = upDirection ? 0 : this._file.groups.length - 1;
+    const lastGroupIdx = upDirection ? 0 : file.groups.length - 1;
     const lastGroup = currentPos.groupIdx === lastGroupIdx;
 
     let newPos = this._findNextChecklist(direction);
@@ -453,8 +449,8 @@ export class ChecklistTreeComponent {
       };
     }
 
-    const currentGroup = this._file.groups[currentPos.groupIdx];
-    const newGroup = this._file.groups[newPos.groupIdx];
+    const currentGroup = file.groups[currentPos.groupIdx];
+    const newGroup = file.groups[newPos.groupIdx];
 
     if (newGroup === currentGroup) {
       // Swap the checklists in the model.
@@ -470,26 +466,27 @@ export class ChecklistTreeComponent {
     }
 
     // The checklist may have moved between groups - update the selected group.
-    this.selectedChecklistGroup = newGroup;
+    this.selectedChecklistGroup.set(newGroup);
 
     // Update the tree nodes.
     this.reloadFile(true);
 
     // The selected checklist itself didn't change, but the fragment to represent it did.
-    this._selectChecklist(this.selectedChecklist, newGroup);
+    this._selectChecklist(this.selectedChecklist(), newGroup);
     this._scrollToSelectedChecklist();
   }
 
   private _findNextGroup(direction: MovementDirection): number | undefined {
-    if (!this._file) return undefined;
+    const file = this.file();
+    if (!file) return undefined;
 
     const next = direction === 'down';
     const selectedPos = this.selectedChecklistPosition();
     let groupIdx: number;
     if (!selectedPos) {
       // Nothing selected - pretend something before the first or after the last group was.
-      groupIdx = next ? -1 : this._file.groups.length;
-    } else if (selectedPos.groupIdx === (next ? this._file.groups.length - 1 : 0)) {
+      groupIdx = next ? -1 : file.groups.length;
+    } else if (selectedPos.groupIdx === (next ? file.groups.length - 1 : 0)) {
       // Already at the last/first group
       return undefined;
     } else {
@@ -504,7 +501,8 @@ export class ChecklistTreeComponent {
   }
 
   private _selectNextGroup(direction: MovementDirection) {
-    if (!this._file) return;
+    const file = this.file();
+    if (!file) return;
     let groupIdx = this._findNextGroup(direction);
     if (groupIdx === undefined) return;
 
@@ -512,15 +510,15 @@ export class ChecklistTreeComponent {
     // advance the group until we find one.
     // If in the future we allow selection of empty groups, we can change this.
     const delta = direction === 'down' ? 1 : -1;
-    while (!this._file.groups[groupIdx].checklists.length) {
+    while (!file.groups[groupIdx].checklists.length) {
       groupIdx += delta;
-      if (groupIdx === this._file.groups.length || groupIdx === -1) {
+      if (groupIdx === file.groups.length || groupIdx === -1) {
         // Only found empty groups after the current one.
         return;
       }
     }
 
-    const group = this._file.groups[groupIdx];
+    const group = file.groups[groupIdx];
     const checklist = group.checklists[0];
 
     this._selectChecklist(checklist, group);
@@ -531,45 +529,42 @@ export class ChecklistTreeComponent {
     const newGroupIdx = this._findNextGroup(direction);
     if (newGroupIdx === undefined) return;
 
-    if (!this._file) return;
+    const file = this.file();
+    if (!file) return;
     const currentPos = this.selectedChecklistPosition();
     if (!currentPos) return;
     const currentGroupIdx = currentPos.groupIdx;
 
     // Swap the groups in the model.
-    [this._file.groups[currentGroupIdx], this._file.groups[newGroupIdx]] = [
-      this._file.groups[newGroupIdx],
-      this._file.groups[currentGroupIdx],
-    ];
+    [file.groups[currentGroupIdx], file.groups[newGroupIdx]] = [file.groups[newGroupIdx], file.groups[currentGroupIdx]];
 
     // Update the tree nodes.
     this.reloadFile(true);
 
     // The selected checklist/group themselves didn't change, but the fragment to represent them did.
-    this._selectChecklist(this.selectedChecklist, this.selectedChecklistGroup);
+    this._selectChecklist(this.selectedChecklist(), this.selectedChecklistGroup());
     this._scrollToSelectedChecklist();
   }
 
   private _selectChecklist(checklist?: Checklist, group?: ChecklistGroup) {
-    this._selectedChecklist = checklist;
-    this.selectedChecklistGroup = group;
-    this.selectedChecklistChange.emit(checklist);
+    this.selectedChecklist.set(checklist);
+    this.selectedChecklistGroup.set(group);
   }
 
   private _scrollToSelectedChecklist() {
-    if (!this._selectedChecklist) return;
+    if (!this.selectedChecklist()) return;
 
     let selectedNode, selectedGroupNode: ChecklistTreeNode | undefined;
     let firstChecklist = true;
     for (const groupNode of this.dataSource.data) {
-      if (groupNode.group === this.selectedChecklistGroup) {
+      if (groupNode.group === this.selectedChecklistGroup()) {
         selectedGroupNode = groupNode;
       }
 
       if (!groupNode.children) continue;
       firstChecklist = true;
       for (const checklistNode of groupNode.children) {
-        if (checklistNode.checklist === this._selectedChecklist) {
+        if (checklistNode.checklist === this.selectedChecklist()) {
           selectedNode = checklistNode;
           break;
         }
@@ -620,17 +615,18 @@ export class ChecklistTreeComponent {
   }
 
   selectedChecklistPosition(): ChecklistPosition | undefined {
-    if (!this._file || !this._selectedChecklist) return undefined;
+    const file = this.file();
+    if (!file || !this.selectedChecklist()) return undefined;
 
     // Find the currently selected checklist
-    const groups = this._file.groups;
+    const groups = file.groups;
     let currentGroupIdx: number;
     let currentChecklistIdx: number | undefined;
     findloop: for (currentGroupIdx = 0; currentGroupIdx < groups.length; currentGroupIdx++) {
       const checklists = groups[currentGroupIdx].checklists;
       for (currentChecklistIdx = 0; currentChecklistIdx < checklists.length; currentChecklistIdx++) {
         const checklist = checklists[currentChecklistIdx];
-        if (checklist === this._selectedChecklist) {
+        if (checklist === this.selectedChecklist()) {
           break findloop;
         }
       }
@@ -650,17 +646,18 @@ export class ChecklistTreeComponent {
 
   onChecklistDelete(node: ChecklistTreeNode) {
     // Update the default checklist index if needed.
+    const file = this.file();
     if (
-      this.file?.metadata &&
-      this.file.metadata.defaultGroupIndex === node.groupIdx &&
-      this.file.metadata.defaultChecklistIndex >= node.checklistIdx! &&
-      this.file.metadata.defaultChecklistIndex > 0
+      file?.metadata &&
+      file.metadata.defaultGroupIndex === node.groupIdx &&
+      file.metadata.defaultChecklistIndex >= node.checklistIdx! &&
+      file.metadata.defaultChecklistIndex > 0
     ) {
-      this.file.metadata.defaultChecklistIndex--;
+      file.metadata.defaultChecklistIndex--;
     }
 
     node.group!.checklists.splice(node.checklistIdx!, 1);
-    if (this._selectedChecklist === node.checklist!) {
+    if (this.selectedChecklist() === node.checklist!) {
       this._selectChecklist(undefined, node.group);
     }
     this.reloadFile(true);
@@ -674,19 +671,20 @@ export class ChecklistTreeComponent {
 
   onGroupDelete(node: ChecklistTreeNode) {
     // Update the default group index if needed.
-    if (this.file?.metadata) {
-      if (this.file.metadata.defaultGroupIndex === node.groupIdx) {
+    const file = this.file();
+    if (file?.metadata) {
+      if (file.metadata.defaultGroupIndex === node.groupIdx) {
         // The group containing the current default was deleted, reset.
-        this.file.metadata.defaultGroupIndex = 0;
-        this.file.metadata.defaultChecklistIndex = 0;
-      } else if (this.file.metadata.defaultGroupIndex > node.groupIdx!) {
+        file.metadata.defaultGroupIndex = 0;
+        file.metadata.defaultChecklistIndex = 0;
+      } else if (file.metadata.defaultGroupIndex > node.groupIdx!) {
         // The default comes after the deleted group, just shift it.
-        this.file.metadata.defaultGroupIndex--;
+        file.metadata.defaultGroupIndex--;
       }
     }
 
-    this._file!.groups.splice(node.groupIdx!, 1);
-    if (this.selectedChecklistGroup === node.group!) {
+    this.file()!.groups.splice(node.groupIdx!, 1);
+    if (this.selectedChecklistGroup() === node.group!) {
       this._selectChecklist(undefined, undefined);
     }
     this.reloadFile(true);

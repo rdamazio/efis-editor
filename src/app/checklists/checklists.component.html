@@ -34,14 +34,14 @@
     <checklist-tree
       #tree
       class="checklist-tree"
-      (fileChange)="onFileChanged($event)"
+      (fileModified)="onFileModified($event)"
       (selectedChecklistChange)="onChecklistSelected()"
     />
   </div>
   <checklist-items
     #items
     class="checklist-items"
-    [groupDropListIds]="tree.groupDropListsIds"
+    [groupDropListIds]="tree.groupDropListIds()"
     [(checklist)]="tree.selectedChecklist"
     (checklistChange)="onChecklistChanged()"
   />

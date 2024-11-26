@@ -404,7 +404,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
       checklist = group.checklists[parsed.checklistIdx];
     }
-    this.tree().selectedChecklist = checklist;
+    this.tree().selectedChecklist.set(checklist);
   }
 
   private _parseFragment(fragment: string | null): ParsedFragment {
@@ -441,7 +441,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const tree = this.tree();
-    if (!tree.selectedChecklist) {
+    if (!tree.selectedChecklist()) {
       return this.selectedFile.metadata.name;
     }
 
@@ -652,7 +652,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async _displayFile(file?: ChecklistFile) {
     this.selectedFile = file;
-    this.tree().file = file;
+    this.tree().file.set(file);
 
     if (file?.metadata) {
       this._snackBar.open(`Loaded checklist "${file.metadata.name}".`, '', { duration: 2000 });
@@ -663,7 +663,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     // TODO: Add filename to topbar, add rename pencil there
   }
 
-  async onFileChanged(file?: ChecklistFile) {
+  async onFileModified(file?: ChecklistFile) {
     if (file) {
       await this.store.saveChecklistFile(file);
     }
