@@ -58,6 +58,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.0.2",
+    "@angular-eslint/schematics": "^18.4.2",
     "@angular/cli": "^19.0.2",
     "@angular/compiler-cli": "^19.0.0",
     "@protobuf-ts/plugin": "^2.9.4",
