@@ -5,7 +5,9 @@
   EFIS Editor
   <span class="topbar-spacer"></span>
 
-  <gdrive-nav></gdrive-nav>
+  @defer (hydrate on idle) {
+    <gdrive-nav></gdrive-nav>
+  }
 
   @if (hotkeys.getHotkeys().length > 0) {
     <button
