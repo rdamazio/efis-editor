@@ -11,12 +11,12 @@ import {
   afterNextRender,
   Component,
   ElementRef,
-  EventEmitter,
   Injector,
   Input,
   Output,
+  output,
   QueryList,
-  ViewChild,
+  viewChild,
   ViewChildren,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -61,7 +61,7 @@ type MovementDirection = 'up' | 'down';
 export class ChecklistTreeComponent {
   @Output() selectedChecklistGroup: ChecklistGroup | undefined;
   @Output() groupDropListsIds: string[] = [];
-  @ViewChild(MatTree) tree: MatTree<ChecklistTreeNode> | undefined;
+  readonly tree = viewChild.required(MatTree);
   @ViewChildren(CdkDropList) allDropLists?: QueryList<CdkDropList<ChecklistTreeNode>>;
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
   private _file?: ChecklistFile;
@@ -74,7 +74,9 @@ export class ChecklistTreeComponent {
     private readonly _injector: Injector,
   ) {}
 
-  @Output() selectedChecklistChange = new EventEmitter<Checklist | undefined>();
+  readonly selectedChecklistChange = output<Checklist | undefined>();
+  // TODO: Skipped for migration because:
+  //  Accessor inputs cannot be migrated as they are too complex.
   @Input() get selectedChecklist(): Checklist | undefined {
     return this._selectedChecklist;
   }
@@ -83,7 +85,9 @@ export class ChecklistTreeComponent {
     this._scrollToSelectedChecklist();
   }
 
-  @Output() fileChange = new EventEmitter<ChecklistFile>();
+  readonly fileChange = output<ChecklistFile | undefined>();
+  // TODO: Skipped for migration because:
+  //  Accessor inputs cannot be migrated as they are too complex.
   @Input()
   get file(): ChecklistFile | undefined {
     return this._file;
@@ -110,7 +114,7 @@ export class ChecklistTreeComponent {
     }
 
     this.dataSource.data = data;
-    this.tree!.expandAll();
+    this.tree().expandAll();
 
     if (modified) {
       this.fileChange.emit(this._file);
@@ -578,8 +582,9 @@ export class ChecklistTreeComponent {
     }
 
     // Expand the tree to make the node visible.
-    if (!this.tree!.isExpanded(selectedGroupNode)) {
-      this.tree!.expand(selectedGroupNode);
+    const tree = this.tree();
+    if (!tree.isExpanded(selectedGroupNode)) {
+      tree.expand(selectedGroupNode);
     }
 
     let nodeClass = '.checklist-selected';
@@ -688,21 +693,21 @@ export class ChecklistTreeComponent {
   }
 
   isAllExpanded(): boolean {
-    return this.dataSource.data.every((node) => this.tree!.isExpanded(node));
+    return this.dataSource.data.every((node) => this.tree().isExpanded(node));
   }
 
   isAllCollapsed(): boolean {
     return !this.dataSource.data.some((node: ChecklistTreeNode) => {
-      return this.tree!.isExpanded(node);
+      return this.tree().isExpanded(node);
     });
   }
 
   expandAll() {
-    this.tree!.expandAll();
+    this.tree().expandAll();
   }
 
   collapseAll() {
-    this.tree!.collapseAll();
+    this.tree().collapseAll();
   }
 
   private async fillTitle(pb: Checklist | ChecklistGroup, promptType: string): Promise<boolean> {

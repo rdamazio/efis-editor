@@ -12,6 +12,9 @@ describe('ChecklistCommandBarComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistCommandBarComponent);
+    const componentRef = fixture.componentRef;
+    componentRef.setInput('hasFiles', false);
+    componentRef.setInput('fileIsOpen', false);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

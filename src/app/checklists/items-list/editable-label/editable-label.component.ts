@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, input, Output, output, viewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
@@ -29,14 +29,16 @@ export class EditableLabelComponent {
 
   control = new FormControl('');
   private _savedValue = '';
-  @ViewChild('promptInput') input!: ElementRef<HTMLElement>;
+  readonly input = viewChild.required<ElementRef<HTMLElement>>('promptInput');
 
-  @Output() cancelled = new EventEmitter<boolean>();
+  readonly cancelled = output<boolean>();
   @Output() editing = false;
-  @Input() label = '';
-  @Input() disallowEmpty = false;
+  readonly label = input('');
+  readonly disallowEmpty = input(false);
 
-  @Output() valueChange = new EventEmitter<string>();
+  readonly valueChange = output<string>();
+  // TODO: Skipped for migration because:
+  //  Accessor inputs cannot be migrated as they are too complex.
   @Input()
   get value(): string {
     return this._savedValue;
@@ -63,7 +65,7 @@ export class EditableLabelComponent {
     // See https://v17.angular.io/api/core/ViewChild for the details.
     setTimeout(() => {
       if (this.editing) {
-        this.input.nativeElement.focus();
+        this.input().nativeElement.focus();
       }
     });
   }

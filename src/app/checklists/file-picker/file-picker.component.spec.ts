@@ -13,6 +13,7 @@ describe('FilePickerComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistFilePickerComponent);
+    fixture.componentRef.setInput('fileNames', []);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,6 +1,6 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { NgIf } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, Input, input, output, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -28,11 +28,13 @@ import { ChecklistTreeNode } from './node';
   styleUrl: './node.component.scss',
 })
 export class ChecklistTreeNodeComponent {
+  // TODO: Skipped for migration because:
+  //  Your application code writes to the input. This prevents migration.
   @Input() node!: ChecklistTreeNode;
-  @Input() disableButtonHover = false;
-  @Output() nodeRename = new EventEmitter<ChecklistTreeNode>();
-  @Output() nodeDelete = new EventEmitter<ChecklistTreeNode>();
-  @ViewChild(CdkDragHandle) dragHandle?: CdkDragHandle;
+  readonly disableButtonHover = input(false);
+  readonly nodeRename = output<ChecklistTreeNode>();
+  readonly nodeDelete = output<ChecklistTreeNode>();
+  readonly dragHandle = viewChild(CdkDragHandle);
 
   hideButtons = true;
 

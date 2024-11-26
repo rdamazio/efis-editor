@@ -9,6 +9,7 @@ import {
   OnInit,
   PLATFORM_ID,
   ViewChild,
+  viewChild,
 } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -71,8 +72,8 @@ interface ParsedFragment {
 @UntilDestroy()
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedFile?: ChecklistFile;
-  @ViewChild('tree') tree?: ChecklistTreeComponent;
-  @ViewChild('items') items?: ChecklistItemsComponent;
+  readonly tree = viewChild.required<ChecklistTreeComponent>('tree');
+  readonly items = viewChild.required<ChecklistItemsComponent>('items');
 
   private _filePicker?: ChecklistFilePickerComponent;
 
@@ -147,7 +148,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Navigation',
       })
       .subscribe(() => {
-        this.items!.selectNextItem();
+        this.items().selectNextItem();
       });
     this._hotkeys
       .addShortcut({
@@ -157,7 +158,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Navigation',
       })
       .subscribe(() => {
-        this.items!.selectPreviousItem();
+        this.items().selectPreviousItem();
       });
     this._hotkeys
       .addShortcut({
@@ -167,7 +168,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Navigation',
       })
       .subscribe(() => {
-        this.tree!.selectNextChecklist();
+        this.tree().selectNextChecklist();
       });
     this._hotkeys
       .addShortcut({
@@ -177,7 +178,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Navigation',
       })
       .subscribe(() => {
-        this.tree!.selectPreviousChecklist();
+        this.tree().selectPreviousChecklist();
       });
 
     this._hotkeys
@@ -188,7 +189,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Navigation',
       })
       .subscribe(() => {
-        this.tree!.selectNextGroup();
+        this.tree().selectNextGroup();
       });
     this._hotkeys
       .addShortcut({
@@ -198,7 +199,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Navigation',
       })
       .subscribe(() => {
-        this.tree!.selectPreviousGroup();
+        this.tree().selectPreviousGroup();
       });
 
     this._hotkeys
@@ -210,7 +211,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items!.editCurrentItem();
+        this.items().editCurrentItem();
       });
     this._hotkeys
       .addShortcut({
@@ -221,7 +222,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items!.deleteCurrentItem();
+        this.items().deleteCurrentItem();
       });
     this._hotkeys
       .addShortcut({
@@ -231,7 +232,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items!.indentCurrentItem(1);
+        this.items().indentCurrentItem(1);
       });
     this._hotkeys
       .addShortcut({
@@ -241,7 +242,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items!.indentCurrentItem(-1);
+        this.items().indentCurrentItem(-1);
       });
     this._hotkeys
       .addShortcut({
@@ -251,7 +252,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items!.toggleCurrentItemCenter();
+        this.items().toggleCurrentItemCenter();
       });
     this._hotkeys
       .addShortcut({
@@ -261,7 +262,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.items!.moveCurrentItemUp();
+        this.items().moveCurrentItemUp();
       });
     this._hotkeys
       .addShortcut({
@@ -271,7 +272,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.items!.moveCurrentItemDown();
+        this.items().moveCurrentItemDown();
       });
     this._hotkeys
       .addShortcut({
@@ -281,7 +282,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.tree!.moveCurrentChecklistUp();
+        this.tree().moveCurrentChecklistUp();
       });
     this._hotkeys
       .addShortcut({
@@ -291,7 +292,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.tree!.moveCurrentChecklistDown();
+        this.tree().moveCurrentChecklistDown();
       });
     this._hotkeys
       .addShortcut({
@@ -301,7 +302,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.tree!.moveCurrentGroupUp();
+        this.tree().moveCurrentGroupUp();
       });
     this._hotkeys
       .addShortcut({
@@ -311,7 +312,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.tree!.moveCurrentGroupDown();
+        this.tree().moveCurrentGroupDown();
       });
 
     this._hotkeys
@@ -347,7 +348,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
           group: 'Adding',
         })
         .subscribe(() => {
-          this.items!.onNewItem(shortcut.type);
+          this.items().onNewItem(shortcut.type);
         });
     }
   }
@@ -418,7 +419,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
       checklist = group.checklists[parsed.checklistIdx];
     }
-    this.tree!.selectedChecklist = checklist;
+    this.tree().selectedChecklist = checklist;
   }
 
   private _parseFragment(fragment: string | null): ParsedFragment {
@@ -454,11 +455,12 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
       return '';
     }
 
-    if (!this.tree?.selectedChecklist) {
+    const tree = this.tree();
+    if (!tree.selectedChecklist) {
       return this.selectedFile.metadata.name;
     }
 
-    const selectedPos = this.tree.selectedChecklistPosition();
+    const selectedPos = tree.selectedChecklistPosition();
     if (selectedPos) {
       return `${this.selectedFile.metadata.name}/${selectedPos.groupIdx}/${selectedPos.checklistIdx}`;
     }
@@ -666,9 +668,8 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async _displayFile(file?: ChecklistFile) {
     this.selectedFile = file;
-    if (this.tree) {
-      this.tree.file = file;
-    }
+    this.tree().file = file;
+
     if (file?.metadata) {
       // Make the file selected the next time the picker gets displayed
       if (this._filePicker) {
@@ -682,8 +683,10 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     // TODO: Add filename to topbar, add rename pencil there
   }
 
-  async onFileChanged(file: ChecklistFile) {
-    await this.store.saveChecklistFile(file);
+  async onFileChanged(file?: ChecklistFile) {
+    if (file) {
+      await this.store.saveChecklistFile(file);
+    }
   }
 
   async onChecklistChanged() {

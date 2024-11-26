@@ -2,7 +2,7 @@
   {{ value | dynamicData }}
 } @else {
   <mat-form-field appearance="outline" class="editable-input-field">
-    <mat-label>{{ label }}</mat-label>
+    <mat-label>{{ label() }}</mat-label>
     <input
       #promptInput
       matInput
@@ -19,7 +19,7 @@
       mat-medium-icon-button
       matSuffix
       matTooltip="Save (⏎)"
-      [attr.aria-label]="'Save changes to ' + label"
+      [attr.aria-label]="'Save changes to ' + label()"
       [disabled]="!this.control.valid"
       (click)="value = promptInput.value; save()"
     >
@@ -30,7 +30,7 @@
       mat-medium-icon-button
       matSuffix
       matTooltip="Cancel (Esc)"
-      [attr.aria-label]="'Cancel changes to ' + label"
+      [attr.aria-label]="'Cancel changes to ' + label()"
       (click)="cancel()"
     >
       <mat-icon>cancel</mat-icon>

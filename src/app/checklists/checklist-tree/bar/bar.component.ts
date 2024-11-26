@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -12,5 +12,5 @@ import { ChecklistTreeComponent } from '../checklist-tree.component';
   styleUrl: './bar.component.scss',
 })
 export class ChecklistTreeBarComponent {
-  @Input() tree?: ChecklistTreeComponent;
+  readonly tree = input.required<ChecklistTreeComponent>();
 }

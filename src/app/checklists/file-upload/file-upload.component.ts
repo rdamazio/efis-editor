@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop';
@@ -18,7 +18,7 @@ import { JsonFormat } from '../../../model/formats/json-format';
   styleUrl: './file-upload.component.scss',
 })
 export class ChecklistFileUploadComponent {
-  @Output() fileUploaded = new EventEmitter<ChecklistFile>();
+  readonly fileUploaded = output<ChecklistFile>();
 
   constructor(private readonly _snackBar: MatSnackBar) {}
 

@@ -1,14 +1,5 @@
 import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import {
-  afterNextRender,
-  Component,
-  EventEmitter,
-  Injector,
-  Input,
-  Output,
-  QueryList,
-  ViewChildren,
-} from '@angular/core';
+import { afterNextRender, Component, Injector, Input, input, output, viewChildren } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
@@ -36,14 +27,16 @@ export class ChecklistItemsComponent {
   // TODO: Customize snackbar to allow multiple undos.
   readonly UNDO_LEVELS = 1;
 
-  @Input() groupDropListIds: string[] = [];
-  @ViewChildren(ChecklistItemComponent) items!: QueryList<ChecklistItemComponent>;
+  readonly groupDropListIds = input<string[]>([]);
+  readonly items = viewChildren(ChecklistItemComponent);
   _checklist?: Checklist;
   _selectedIdx: number | null = null;
   private _undoState: Checklist[] = [];
   private _undoSnackbar?: MatSnackBarRef<TextOnlySnackBar>;
 
-  @Output() checklistChange = new EventEmitter<Checklist>();
+  readonly checklistChange = output<Checklist | undefined>();
+  // TODO: Skipped for migration because:
+  //  Accessor inputs cannot be migrated as they are too complex.
   @Input()
   get checklist(): Checklist | undefined {
     return this._checklist;
@@ -192,7 +185,7 @@ export class ChecklistItemsComponent {
   }
 
   moveCurrentItemDown() {
-    if (!this._selectedItem() || this._selectedIdx === this.items.length - 1) {
+    if (!this._selectedItem() || this._selectedIdx === this.items().length - 1) {
       return;
     }
 
@@ -202,7 +195,7 @@ export class ChecklistItemsComponent {
   }
 
   private _selectedItem(): ChecklistItem | undefined {
-    if (!this._checklist || this._selectedIdx === null || this.items.length <= this._selectedIdx) {
+    if (!this._checklist || this._selectedIdx === null || this.items().length <= this._selectedIdx) {
       return undefined;
     }
 
@@ -210,11 +203,11 @@ export class ChecklistItemsComponent {
   }
 
   private _selectedItemComponent(): ChecklistItemComponent | undefined {
-    if (!this._checklist || this._selectedIdx === null || this.items.length <= this._selectedIdx) {
+    if (!this._checklist || this._selectedIdx === null || this.items().length <= this._selectedIdx) {
       return undefined;
     }
 
-    return this.items.get(this._selectedIdx);
+    return this.items().at(this._selectedIdx);
   }
 
   onItemFocused(idx: number) {
@@ -227,9 +220,10 @@ export class ChecklistItemsComponent {
 
   private _focusSelectedItem() {
     const item = this._selectedItemComponent();
-    if (item?.containerRef) {
+    const containerRef = item?.containerRef();
+    if (item && containerRef) {
       item.focus();
-      scrollIntoView(item.containerRef.nativeElement, {
+      scrollIntoView(containerRef.nativeElement, {
         scrollMode: 'if-needed',
         behavior: 'smooth',
         block: 'nearest',

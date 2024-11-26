@@ -1,5 +1,5 @@
 import { NgFor } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,15 +20,15 @@ export interface DownloadFormat {
   styleUrl: './command-bar.component.scss',
 })
 export class ChecklistCommandBarComponent {
-  @Input() hasFiles = false;
-  @Input() fileIsOpen = false;
-  @Input() downloadFormats: DownloadFormat[] = [];
-  @Output() newFile = new EventEmitter<string>(); // Emits filename
-  @Output() openFile = new EventEmitter<boolean>();
-  @Output() uploadFile = new EventEmitter<boolean>();
-  @Output() downloadFile = new EventEmitter<string>();
-  @Output() deleteFile = new EventEmitter<boolean>();
-  @Output() fileInfo = new EventEmitter<boolean>();
+  readonly hasFiles = input.required<boolean>();
+  readonly fileIsOpen = input.required<boolean>();
+  readonly downloadFormats = input<DownloadFormat[]>([]);
+  readonly newFile = output<string>(); // Emits filename
+  readonly openFile = output<boolean>();
+  readonly uploadFile = output<boolean>();
+  readonly downloadFile = output<string>();
+  readonly deleteFile = output<boolean>();
+  readonly fileInfo = output<boolean>();
 
   constructor(private readonly _dialog: MatDialog) {}
 

@@ -1,5 +1,5 @@
 import { NgFor } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 
@@ -10,7 +10,9 @@ import { MatSelectModule } from '@angular/material/select';
   styleUrl: './file-picker.component.scss',
 })
 export class ChecklistFilePickerComponent {
-  @Input() fileNames?: string[];
+  readonly fileNames = input.required<string[]>();
+  // TODO: Skipped for migration because:
+  //  Your application code writes to the input. This prevents migration.
   @Input() selectedFile = '';
-  @Output() selectedFileChange = new EventEmitter<string>();
+  readonly selectedFileChange = output<string>();
 }
