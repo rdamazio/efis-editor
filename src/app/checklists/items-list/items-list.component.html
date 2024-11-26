@@ -1,14 +1,16 @@
+@let chklist = checklist();
+
 <div class="container">
-  @if (_checklist) {
+  @if (chklist) {
     <div
       id="items-drop-list"
       cdkDropList
       class="list"
-      [cdkDropListData]="_checklist.items"
+      [cdkDropListData]="chklist.items"
       [cdkDropListConnectedTo]="groupDropListIds()"
       (cdkDropListDropped)="onDrop($event)"
     >
-      @for (item of _checklist.items; track item; let i = $index) {
+      @for (item of chklist.items; track item; let i = $index) {
         <div class="list-item" cdkDrag [cdkDragData]="item">
           <checklist-item
             #item

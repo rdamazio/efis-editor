@@ -1,5 +1,5 @@
 import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { afterNextRender, Component, Injector, Input, input, output, viewChildren } from '@angular/core';
+import { afterNextRender, Component, Injector, input, model, output, viewChildren } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
@@ -27,31 +27,28 @@ export class ChecklistItemsComponent {
   // TODO: Customize snackbar to allow multiple undos.
   readonly UNDO_LEVELS = 1;
 
+  readonly checklist = model<Checklist | undefined>();
+  // Angular's model uses reference equality to decide whether to emit, so we must use
+  // an explicit output to notify about deeper changes in the object.
+  readonly checklistChange = output<Checklist | undefined>();
+
   readonly groupDropListIds = input<string[]>([]);
   readonly items = viewChildren(ChecklistItemComponent);
-  _checklist?: Checklist;
   _selectedIdx: number | null = null;
   private _undoState: Checklist[] = [];
   private _undoSnackbar?: MatSnackBarRef<TextOnlySnackBar>;
 
-  readonly checklistChange = output<Checklist | undefined>();
-  // TODO: Skipped for migration because:
-  //  Accessor inputs cannot be migrated as they are too complex.
-  @Input()
-  get checklist(): Checklist | undefined {
-    return this._checklist;
-  }
-  set checklist(checklist: Checklist | undefined) {
-    this._checklist = checklist;
-    this._selectedIdx = null;
-    this._dismissUndoSnackbar();
-    this._undoState = [];
-  }
-
   constructor(
     private readonly _injector: Injector,
     private readonly _snackBar: MatSnackBar,
-  ) {}
+  ) {
+    this.checklist.subscribe(() => {
+      // When we open an entirely separate checklist, get rid of selection and undo history.
+      this._selectedIdx = null;
+      this._dismissUndoSnackbar();
+      this._undoState = [];
+    });
+  }
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
     moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
@@ -59,7 +56,7 @@ export class ChecklistItemsComponent {
   }
 
   onItemUpdated() {
-    this.checklistChange.emit(this._checklist);
+    this.checklistChange.emit(this.checklist());
     afterNextRender(
       () => {
         this._focusSelectedItem();
@@ -71,8 +68,13 @@ export class ChecklistItemsComponent {
   onItemDeleted(idx: number) {
     this._pushUndoState('Item deleted');
 
-    this._checklist!.items.splice(idx, 1);
-    this.checklistChange.emit(this._checklist);
+    const checklist = this.checklist();
+    checklist!.items.splice(idx, 1);
+    this.checklistChange.emit(checklist);
+
+    this.checklist.update((checklist?: Checklist): Checklist | undefined => {
+      return checklist;
+    });
   }
 
   onNewItem(type: ChecklistItem_Type) {
@@ -86,7 +88,7 @@ export class ChecklistItemsComponent {
     if (type === ChecklistItem_Type.ITEM_SPACE) {
       item.prompt = '';
     }
-    const items = this._checklist!.items;
+    const items = this.checklist()!.items;
 
     // Add after the selected item, or at the end if none selected.
     let newIdx: number;
@@ -110,25 +112,27 @@ export class ChecklistItemsComponent {
   }
 
   selectNextItem() {
-    if (!this._checklist) {
+    const checklist = this.checklist();
+    if (!checklist) {
       this._selectedIdx = null;
       return;
     }
     if (this._selectedIdx === null) {
       this._selectedIdx = 0;
-    } else if (this._selectedIdx < this._checklist.items.length - 1) {
+    } else if (this._selectedIdx < checklist.items.length - 1) {
       this._selectedIdx++;
     }
     this.onItemUpdated();
   }
 
   selectPreviousItem() {
-    if (!this._checklist) {
+    const checklist = this.checklist();
+    if (!checklist) {
       this._selectedIdx = null;
       return;
     }
     if (this._selectedIdx === null) {
-      this._selectedIdx = this._checklist.items.length - 1;
+      this._selectedIdx = checklist.items.length - 1;
     } else if (this._selectedIdx > 0) {
       this._selectedIdx--;
     }
@@ -142,7 +146,7 @@ export class ChecklistItemsComponent {
   deleteCurrentItem() {
     this._selectedItemComponent()?.onDelete();
 
-    if (this._selectedIdx === this._checklist!.items.length) {
+    if (this._selectedIdx === this.checklist()!.items.length) {
       this.selectPreviousItem();
     } else {
       this.onItemUpdated();
@@ -176,7 +180,7 @@ export class ChecklistItemsComponent {
       return;
     }
 
-    moveItemInArray(this._checklist!.items, this._selectedIdx! - 1, this._selectedIdx!);
+    moveItemInArray(this.checklist()!.items, this._selectedIdx! - 1, this._selectedIdx!);
     this._selectedIdx!--;
     this.onItemUpdated();
 
@@ -189,21 +193,22 @@ export class ChecklistItemsComponent {
       return;
     }
 
-    moveItemInArray(this._checklist!.items, this._selectedIdx! + 1, this._selectedIdx!);
+    moveItemInArray(this.checklist()!.items, this._selectedIdx! + 1, this._selectedIdx!);
     this._selectedIdx!++;
     this.onItemUpdated();
   }
 
   private _selectedItem(): ChecklistItem | undefined {
-    if (!this._checklist || this._selectedIdx === null || this.items().length <= this._selectedIdx) {
+    const checklist = this.checklist();
+    if (!checklist || this._selectedIdx === null || this.items().length <= this._selectedIdx) {
       return undefined;
     }
 
-    return this._checklist.items[this._selectedIdx];
+    return checklist.items[this._selectedIdx];
   }
 
   private _selectedItemComponent(): ChecklistItemComponent | undefined {
-    if (!this._checklist || this._selectedIdx === null || this.items().length <= this._selectedIdx) {
+    if (!this.checklist() || this._selectedIdx === null || this.items().length <= this._selectedIdx) {
       return undefined;
     }
 
@@ -237,7 +242,7 @@ export class ChecklistItemsComponent {
     if (this._undoState.length === this.UNDO_LEVELS) {
       this._undoState.splice(0, 1);
     }
-    this._undoState.push(Checklist.clone(this._checklist!));
+    this._undoState.push(Checklist.clone(this.checklist()!));
 
     // Show snackbar with option to undo.
     this._undoSnackbar = this._snackBar.open(txt, 'Undo', { duration: 5000 });
@@ -258,7 +263,7 @@ export class ChecklistItemsComponent {
       return;
     }
 
-    this._checklist = this._undoState.pop();
+    this.checklist.set(this._undoState.pop());
     this.onItemUpdated();
   }
 }
