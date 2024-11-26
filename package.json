@@ -35,7 +35,7 @@
     "@angular/platform-browser-dynamic": "^19.0.0",
     "@angular/platform-server": "^19.0.0",
     "@angular/router": "^19.0.0",
-    "@angular/ssr": "^19.0.1",
+    "@angular/ssr": "^19.0.2",
     "@ngneat/hotkeys": "^4.0.0",
     "@ngneat/until-destroy": "^10.0.0",
     "buffer": "^6.0.3",
@@ -56,8 +56,8 @@
     "zone.js": "^0.15.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.0.1",
-    "@angular/cli": "^19.0.1",
+    "@angular-devkit/build-angular": "^19.0.2",
+    "@angular/cli": "^19.0.2",
     "@angular/compiler-cli": "^19.0.0",
     "@protobuf-ts/plugin": "^2.9.4",
     "@types/express": "^5.0.0",
@@ -65,7 +65,7 @@
     "@types/gapi.client.drive-v3": "^0.0.5",
     "@types/google.accounts": "^0.0.15",
     "@types/jasmine": "~5.1.4",
-    "@types/node": "^22.9.0",
+    "@types/node": "^22.10.0",
     "@types/uuid": "^10.0.0",
     "angular-eslint": "18.4.2",
     "eslint": "^9.15.0",
@@ -84,7 +84,7 @@
     "pdfjs-dist": "^4.8.69",
     "prettier": "^3.4.0",
     "prettier-eslint": "^16.3.0",
-    "typescript": "~5.5.4",
+    "typescript": "~5.7.2",
     "typescript-eslint": "8.16.0"
   }
 }
