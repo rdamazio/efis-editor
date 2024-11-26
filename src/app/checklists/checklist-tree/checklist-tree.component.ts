@@ -280,7 +280,9 @@ export class ChecklistTreeComponent {
 
     transferArrayItem(previousItems, newItems, previousItemIdx, newItems.length);
 
-    // We didn't change the tree structure, no reason to reload the contents.
+    // We didn't change the tree structure, no reason to reload the tree, but we must
+    // still notify that the file was modified.
+    this.fileModified.emit(file);
   }
 
   private _onChecklistDrop(
