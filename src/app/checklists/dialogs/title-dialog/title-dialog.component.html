@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>Enter {{ data.promptType }} title</h2>
 
-<mat-dialog-content>
+<mat-dialog-content (keyup.enter)="okbutton._elementRef.nativeElement.click()">
   <mat-form-field>
     <mat-label>Title</mat-label>
     <input matInput cdkFocusInitial required placeholder="My {{ data.promptType }} title" [(ngModel)]="title" />
@@ -8,6 +8,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="title" [disabled]="!title">Ok</button>
+  <button #okbutton mat-button [mat-dialog-close]="title" [disabled]="!title">Ok</button>
   <button mat-button mat-dialog-close>Cancel</button>
 </mat-dialog-actions>

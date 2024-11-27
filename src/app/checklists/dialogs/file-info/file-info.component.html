@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>Checklist file metadata</h2>
-<mat-dialog-content>
+<mat-dialog-content (keyup.enter)="okbutton._elementRef.nativeElement.click()">
   <mat-form-field>
     <mat-label>File name</mat-label>
     <input
@@ -41,6 +41,6 @@
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="data" [disabled]="!filename.validity.valid">Ok</button>
+  <button #okbutton mat-button [mat-dialog-close]="data" [disabled]="!filename.validity.valid">Ok</button>
   <button mat-button mat-dialog-close>Cancel</button>
 </mat-dialog-actions>
