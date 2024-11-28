@@ -134,7 +134,7 @@ export class ChecklistTreeComponent {
     return node;
   }
 
-  hasChild = (_: number, node: ChecklistTreeNode) => node.children && node.children.length > 0;
+  hasChild = (unusedNum: number, node: ChecklistTreeNode) => node.children && node.children.length > 0;
   childrenAccessor = (node: ChecklistTreeNode) => node.children ?? [];
 
   async onNodeSelect(node: ChecklistTreeNode) {

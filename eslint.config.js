@@ -75,7 +75,7 @@ module.exports = tseslint.config(
         {
           selector: ['variableLike'],
           format: ['camelCase'],
-          leadingUnderscore: 'allow',
+          leadingUnderscore: 'forbid',
           trailingUnderscore: 'forbid',
         },
         {
@@ -94,7 +94,7 @@ module.exports = tseslint.config(
         {
           selector: ['typeLike'],
           format: ['PascalCase'],
-          leadingUnderscore: 'allow',
+          leadingUnderscore: 'forbid',
           trailingUnderscore: 'forbid',
         },
         {
