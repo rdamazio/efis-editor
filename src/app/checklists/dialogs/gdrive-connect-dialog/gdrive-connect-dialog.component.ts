@@ -7,7 +7,7 @@ import {
   MatDialogContent,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { filter, lastValueFrom, Observable, startWith } from 'rxjs';
+import { filter, lastValueFrom, Observable } from 'rxjs';
 
 @Component({
   selector: 'gdrive-connect-dialog',
@@ -21,12 +21,7 @@ export class GoogleDriveConnectDialogComponent {
       maxWidth: '800px',
     });
 
-    const afterClosed = dialogRef.afterClosed() as Observable<boolean | undefined>;
-    return lastValueFrom(
-      afterClosed.pipe(
-        startWith(false),
-        filter((x) => x !== undefined),
-      ),
-    );
+    const afterClosed$ = dialogRef.afterClosed() as Observable<boolean | undefined>;
+    return lastValueFrom(afterClosed$.pipe(filter((x) => x !== undefined)), { defaultValue: false });
   }
 }

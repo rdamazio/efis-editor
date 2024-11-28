@@ -9,8 +9,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { HotkeysService } from '@ngneat/hotkeys';
-import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { map, Observable, shareReplay } from 'rxjs';
 import { AboutComponent } from '../about/about.component';
 import { HelpComponent } from '../checklists/hotkeys/help/help.component';
 import { GoogleDriveComponent } from './gdrive.component';
@@ -37,7 +36,7 @@ export class NavComponent {
 
   isHandset$: Observable<boolean> = this._breakpointObserver.observe(Breakpoints.Handset).pipe(
     map((result) => result.matches),
-    shareReplay(),
+    shareReplay({ bufferSize: 1, refCount: false }),
   );
 
   constructor(

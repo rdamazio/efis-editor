@@ -65,7 +65,7 @@ describe('ChecklistsService', () => {
   });
 
   it('should be empty at the start', async () => {
-    expect(await firstValueFrom(store.listChecklistFiles())).toEqual(jasmine.empty());
+    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: [123] })).toEqual(jasmine.empty());
   });
 
   async function getChecklistFile(name: string): Promise<ChecklistFile | null> {
@@ -84,8 +84,8 @@ describe('ChecklistsService', () => {
 
       it('should save and read back a checklist', async () => {
         await store.saveChecklistFile(file);
-        const files = store.listChecklistFiles();
-        expect(await firstValueFrom(files)).toEqual([file.metadata!.name]);
+        const files$ = store.listChecklistFiles();
+        expect(await firstValueFrom(files$, { defaultValue: 'FAIL' })).toEqual([file.metadata!.name]);
         const checklist = await store.getChecklistFile(file.metadata!.name);
         expect(checklist).toBeTruthy();
         expect(checklist!.metadata?.modifiedTime).toBeGreaterThan(0);
@@ -93,7 +93,7 @@ describe('ChecklistsService', () => {
         expect(checklist).toEqual(file);
 
         await store.deleteChecklistFile(file.metadata!.name);
-        expect(await firstValueFrom(files)).toEqual([]);
+        expect(await firstValueFrom(files$, { defaultValue: ['FAIL'] })).toEqual([]);
         expect(await getChecklistFile(file.metadata!.name)).toBeNull();
       });
     });
@@ -103,7 +103,7 @@ describe('ChecklistsService', () => {
     await store.saveChecklistFile(A_CHECKLIST_FILE);
     await store.saveChecklistFile(ANOTHER_CHECKLIST_FILE);
     await store.saveChecklistFile(YET_ANOTHER_CHECKLIST_FILE);
-    expect(await firstValueFrom(store.listChecklistFiles())).toEqual(
+    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toEqual(
       jasmine.arrayWithExactContents([
         A_CHECKLIST_FILE.metadata!.name,
         ANOTHER_CHECKLIST_FILE.metadata!.name,
@@ -115,7 +115,7 @@ describe('ChecklistsService', () => {
     expect(await getChecklistFile(YET_ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(YET_ANOTHER_CHECKLIST_FILE);
 
     await store.deleteChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name);
-    expect(await firstValueFrom(store.listChecklistFiles())).toEqual(
+    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toEqual(
       jasmine.arrayWithExactContents([A_CHECKLIST_FILE.metadata!.name, YET_ANOTHER_CHECKLIST_FILE.metadata!.name]),
     );
     expect(await getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).toBeNull();

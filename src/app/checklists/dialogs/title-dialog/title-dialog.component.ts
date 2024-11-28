@@ -7,11 +7,12 @@ import {
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
+  MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { lastValueFrom, startWith } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 
 export interface TitleDialogData {
   promptType: string;
@@ -49,8 +50,8 @@ export class TitleDialogComponent {
    * @returns a promise that resolves to the title if confirmed, or undefined otherwise.
    */
   public static async promptForTitle(data: TitleDialogData, dialog: MatDialog): Promise<string | undefined> {
-    const dialogRef = dialog.open(TitleDialogComponent, { data: data });
+    const dialogRef: MatDialogRef<TitleDialogComponent, string> = dialog.open(TitleDialogComponent, { data: data });
 
-    return lastValueFrom(dialogRef.afterClosed().pipe(startWith(undefined)));
+    return lastValueFrom(dialogRef.afterClosed(), { defaultValue: undefined });
   }
 }

@@ -41,7 +41,7 @@ describe('GoogleDriveDisconnectDialogComponent', () => {
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
-    const returnValues = await firstValueFrom(dialogRef.afterClosed().pipe(toArray()));
+    const returnValues = await firstValueFrom(dialogRef.afterClosed().pipe(toArray()), { defaultValue: ['FAIL'] });
     expect(returnValues).toEqual(jasmine.arrayWithExactContents([]));
   });
 

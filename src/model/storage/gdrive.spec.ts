@@ -85,7 +85,7 @@ describe('ChecklistsService', () => {
   }));
 
   async function expectState(state: DriveSyncState) {
-    const currentState = await firstValueFrom(gdrive.getState());
+    const currentState = await firstValueFrom(gdrive.getState(), { defaultValue: DriveSyncState.FAILED });
     expect(currentState).toEqual(state);
   }
 
@@ -439,7 +439,7 @@ describe('ChecklistsService', () => {
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
 
     // Local storage should be untouched.
-    const localChecklists = await firstValueFrom(store.listChecklistFiles());
+    const localChecklists = await firstValueFrom(store.listChecklistFiles(), { defaultValue: [] });
     expect(localChecklists).toEqual(jasmine.arrayWithExactContents([FILE_NAME]));
     const checklist = await store.getChecklistFile(FILE_NAME);
     expect(checklist).toBeTruthy();

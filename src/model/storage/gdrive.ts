@@ -91,9 +91,9 @@ export class GoogleDriveStorage {
   private static readonly MAX_RETRIES = 3;
 
   private readonly _browserStorage: Promise<Storage>;
-  private readonly _stateSubject = new BehaviorSubject<DriveSyncState>(DriveSyncState.DISCONNECTED);
-  private readonly _downloadSubject = new Subject<string>();
-  private readonly _errorSubject = new Subject<string>();
+  private readonly _state$ = new BehaviorSubject(DriveSyncState.DISCONNECTED);
+  private readonly _downloads$ = new Subject<string>();
+  private readonly _errors$ = new Subject<string>();
   private readonly _destroyed = new EventEmitter<void>();
   private _retryCount = 0;
   private _needsSync = false;
@@ -108,7 +108,7 @@ export class GoogleDriveStorage {
   ) {
     this._browserStorage = lazyStorage.storage;
 
-    this._stateSubject
+    this._state$
       .asObservable()
       .pipe(takeUntil(this._destroyed))
       .subscribe((state: DriveSyncState) => {
@@ -137,7 +137,7 @@ export class GoogleDriveStorage {
               if (first) {
                 first = false;
                 if (token) {
-                  this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
+                  this._state$.next(DriveSyncState.NEEDS_SYNC);
                   await this.synchronize();
                 }
                 resolve(void 0);
@@ -159,12 +159,12 @@ export class GoogleDriveStorage {
     const apiAuth = this._api.authenticate().catch((error: google.accounts.oauth2.ClientConfigError) => {
       console.debug('SYNC: auth failed', error);
       if (error.type === 'popup_failed_to_open') {
-        this._errorSubject.next('Failed to open popup to refresh Google Drive auth token - are popups blocked?');
+        this._errors$.next('Failed to open popup to refresh Google Drive auth token - are popups blocked?');
       } else if (error.type === 'popup_closed') {
-        this._errorSubject.next('Google Drive authentication cancelled - synchronization disabled.');
+        this._errors$.next('Google Drive authentication cancelled - synchronization disabled.');
         void this.disableSync(false);
       } else {
-        this._errorSubject.next('Google Drive authentication failed: ' + error.message);
+        this._errors$.next('Google Drive authentication failed: ' + error.message);
       }
       return '';
     });
@@ -177,7 +177,7 @@ export class GoogleDriveStorage {
       store.setItem(GoogleDriveStorage.TOKEN_STORAGE_KEY, token);
 
       // Do a first synchronization with this token.
-      this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
+      this._state$.next(DriveSyncState.NEEDS_SYNC);
       return void 0;
     });
   }
@@ -192,16 +192,16 @@ export class GoogleDriveStorage {
       this._api.accessToken = undefined;
 
       if (this._retryCount < GoogleDriveStorage.MAX_RETRIES) {
-        this._stateSubject.next(DriveSyncState.DISCONNECTED);
+        this._state$.next(DriveSyncState.DISCONNECTED);
         return this._authenticate().then(retryFunc);
       } else {
-        this._stateSubject.next(DriveSyncState.FAILED);
+        this._state$.next(DriveSyncState.FAILED);
         const errorTxt = `Google Drive synchronization failed after ${this._retryCount} retries.`;
-        this._errorSubject.next(errorTxt);
+        this._errors$.next(errorTxt);
         throw new Error(errorTxt);
       }
     } else {
-      this._stateSubject.next(DriveSyncState.FAILED);
+      this._state$.next(DriveSyncState.FAILED);
       throw new Error('gDrive request failed with status ' + reason.status);
     }
   }
@@ -210,7 +210,9 @@ export class GoogleDriveStorage {
     this._stopBackgroundSync();
 
     // Wait until we're not syncing anymore.
-    await firstValueFrom(this._stateSubject.asObservable().pipe(filter((state) => state !== DriveSyncState.SYNCING)));
+    await firstValueFrom(this._state$.asObservable().pipe(filter((state) => state !== DriveSyncState.SYNCING)), {
+      defaultValue: DriveSyncState.DISCONNECTED,
+    });
 
     const existingFiles = await this._api.listFiles({
       mimeType: GoogleDriveStorage.CHECKLIST_MIME_TYPE,
@@ -246,22 +248,22 @@ export class GoogleDriveStorage {
 
     // Transition to disconnected only after the token is discarded above so
     // there's no chance it'll be used for another sync.
-    this._stateSubject.next(DriveSyncState.DISCONNECTED);
+    this._state$.next(DriveSyncState.DISCONNECTED);
   }
 
   public async synchronize() {
-    if (this._stateSubject.value === DriveSyncState.SYNCING) {
+    if (this._state$.value === DriveSyncState.SYNCING) {
       console.error('SYNC: overlapping syncs');
       return;
     }
-    if (this._stateSubject.value === DriveSyncState.DISCONNECTED) {
+    if (this._state$.value === DriveSyncState.DISCONNECTED) {
       return this._authenticate().then(async (): Promise<void> => {
         return this.synchronize();
       });
     }
 
     console.debug('SYNC START');
-    this._stateSubject.next(DriveSyncState.SYNCING);
+    this._state$.next(DriveSyncState.SYNCING);
     this._lastSync = new Date();
     this._stopBackgroundSync();
 
@@ -303,7 +305,7 @@ export class GoogleDriveStorage {
         return remoteFileMap;
       });
     // List local checklists.
-    const localChecklists = firstValueFrom(this._checklistStorage.listChecklistFiles());
+    const localChecklists = firstValueFrom(this._checklistStorage.listChecklistFiles(), { defaultValue: [] });
     const localDeletions = this._getLocalDeletions();
 
     // Actually perform synchronization.
@@ -355,7 +357,7 @@ export class GoogleDriveStorage {
         this._retryCount = 0;
 
         // It's possible that new changes came in while we were syncing - set the next state accordingly.
-        this._stateSubject.next(this._needsSync ? DriveSyncState.NEEDS_SYNC : DriveSyncState.IN_SYNC);
+        this._state$.next(this._needsSync ? DriveSyncState.NEEDS_SYNC : DriveSyncState.IN_SYNC);
 
         this._startBackgroundSync();
         console.debug('SYNC: Cleanup done');
@@ -467,7 +469,7 @@ export class GoogleDriveStorage {
       }
       return this._checklistStorage.saveChecklistFile(checklist, modifiedTime).then(() => {
         // Let the UI know that our local data has changed
-        this._downloadSubject.next(checklist.metadata!.name);
+        this._downloads$.next(checklist.metadata!.name);
         return void 0;
       });
     });
@@ -539,20 +541,20 @@ export class GoogleDriveStorage {
 
     console.debug(`SYNC: needed, deletions=${JSON.stringify(localDeletions)}`);
     this._needsSync = true;
-    if (this._stateSubject.value === DriveSyncState.IN_SYNC) {
-      this._stateSubject.next(DriveSyncState.NEEDS_SYNC);
+    if (this._state$.value === DriveSyncState.IN_SYNC) {
+      this._state$.next(DriveSyncState.NEEDS_SYNC);
     }
   }
 
   public getState(): Observable<DriveSyncState> {
-    return this._stateSubject.asObservable();
+    return this._state$.asObservable();
   }
 
   public onDownloads(): Observable<string> {
-    return this._downloadSubject.asObservable();
+    return this._downloads$.asObservable();
   }
 
   public onErrors(): Observable<string> {
-    return this._errorSubject.asObservable();
+    return this._errors$.asObservable();
   }
 }

@@ -7,12 +7,13 @@ import {
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
+  MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { lastValueFrom, startWith } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 
 export interface GoogleDriveDisconnectDialogReturnData {
   deleteAllData: boolean;
@@ -52,10 +53,11 @@ export class GoogleDriveDisconnectDialogComponent {
   public static async confirmDisconnection(
     dialog: MatDialog,
   ): Promise<GoogleDriveDisconnectDialogReturnData | undefined> {
-    const dialogRef = dialog.open(GoogleDriveDisconnectDialogComponent, {
-      maxWidth: '800px',
-    });
+    const dialogRef: MatDialogRef<GoogleDriveDisconnectDialogComponent, GoogleDriveDisconnectDialogReturnData> =
+      dialog.open(GoogleDriveDisconnectDialogComponent, {
+        maxWidth: '800px',
+      });
 
-    return lastValueFrom(dialogRef.afterClosed().pipe(startWith(undefined)));
+    return lastValueFrom(dialogRef.afterClosed(), { defaultValue: undefined });
   }
 }

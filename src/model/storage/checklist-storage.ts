@@ -21,9 +21,9 @@ export class ChecklistStorage {
       });
   }
 
-  private readonly _filesSubject = new BehaviorSubject<string[]>([]);
+  private readonly _filesSubject$ = new BehaviorSubject<string[]>([]);
   listChecklistFiles(): Observable<string[]> {
-    return this._filesSubject.asObservable();
+    return this._filesSubject$.asObservable();
   }
 
   private _publishList(store: Storage) {
@@ -34,7 +34,7 @@ export class ChecklistStorage {
         names.push(k.slice(CHECKLIST_PREFIX.length));
       }
     }
-    this._filesSubject.next(names);
+    this._filesSubject$.next(names);
   }
 
   async getChecklistFile(id: string): Promise<ChecklistFile | null> {
@@ -76,7 +76,7 @@ export class ChecklistStorage {
 
   async clear() {
     // Clear only checklist items.
-    const ids = this._filesSubject.value;
+    const ids = this._filesSubject$.value;
     const allDeletes: Promise<void>[] = [];
     for (const id of ids) {
       allDeletes.push(this.deleteChecklistFile(id));

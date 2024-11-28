@@ -6,6 +6,7 @@ const jasmine = require('eslint-plugin-jasmine');
 const nosecrets = require('eslint-plugin-no-secrets');
 const prettierRecommended = require('eslint-plugin-prettier/recommended');
 const promise = require('eslint-plugin-promise');
+const rxjsX = require('eslint-plugin-rxjs-x');
 const tseslint = require('typescript-eslint');
 
 module.exports = tseslint.config(
@@ -26,6 +27,7 @@ module.exports = tseslint.config(
       prettierRecommended,
       depend.configs['flat/recommended'],
       promise.configs['flat/recommended'],
+      rxjsX.configs.strict,
       jasmine.configs.recommended,
     ],
     plugins: {
@@ -73,6 +75,15 @@ module.exports = tseslint.config(
       'no-useless-assignment': 'error',
       'no-var': 'error',
       'require-atomic-updates': 'error',
+      'rxjs-x/finnish': [
+        'error',
+        {
+          functions: false,
+          methods: false,
+        },
+      ],
+      'rxjs-x/no-ignored-error': 'off',
+      'rxjs-x/no-ignored-subscribe': 'error',
     },
   },
   {

@@ -9,7 +9,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { filter, lastValueFrom, Observable, startWith } from 'rxjs';
+import { filter, lastValueFrom, Observable } from 'rxjs';
 
 export interface DeleteDialogData {
   entityType: string;
@@ -36,12 +36,7 @@ export class DeleteDialogComponent {
     const dialogRef = dialog.open(DeleteDialogComponent, { data: data });
 
     // If it completes without emitting anything, we return false.
-    const afterClosed = dialogRef.afterClosed() as Observable<boolean | undefined>;
-    return lastValueFrom(
-      afterClosed.pipe(
-        startWith(false),
-        filter((x) => x !== undefined),
-      ),
-    );
+    const afterClosed$ = dialogRef.afterClosed() as Observable<boolean | undefined>;
+    return lastValueFrom(afterClosed$.pipe(filter((x) => x !== undefined)), { defaultValue: false });
   }
 }

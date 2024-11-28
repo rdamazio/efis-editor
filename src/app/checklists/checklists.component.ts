@@ -132,6 +132,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Navigation',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().selectNextItem();
       });
@@ -142,6 +143,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Navigation',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().selectPreviousItem();
       });
@@ -152,6 +154,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Navigation',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().selectNextChecklist();
       });
@@ -162,6 +165,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Navigation',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().selectPreviousChecklist();
       });
@@ -173,6 +177,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Navigation',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().selectNextGroup();
       });
@@ -183,6 +188,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Navigation',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().selectPreviousGroup();
       });
@@ -195,6 +201,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         trigger: 'keyup',
         group: 'Editing',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().editCurrentItem();
       });
@@ -206,6 +213,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         trigger: 'keyup',
         group: 'Editing',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().deleteCurrentItem();
       });
@@ -216,6 +224,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Editing',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().indentCurrentItem(1);
       });
@@ -226,6 +235,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Editing',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().indentCurrentItem(-1);
       });
@@ -236,6 +246,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Editing',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().toggleCurrentItemCenter();
       });
@@ -246,6 +257,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Reordering',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().moveCurrentItemUp();
       });
@@ -256,6 +268,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Reordering',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().moveCurrentItemDown();
       });
@@ -266,6 +279,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Reordering',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().moveCurrentChecklistUp();
       });
@@ -276,6 +290,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Reordering',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().moveCurrentChecklistDown();
       });
@@ -286,6 +301,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Reordering',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().moveCurrentGroupUp();
       });
@@ -296,6 +312,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Reordering',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().moveCurrentGroupDown();
       });
@@ -307,6 +324,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         preventDefault: true,
         group: 'Editing',
       })
+      .pipe(untilDestroyed(this))
       .subscribe(() => {
         const fn = async () => {
           await this.onFileInfo();
@@ -332,6 +350,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
           preventDefault: true,
           group: 'Adding',
         })
+        .pipe(untilDestroyed(this))
         .subscribe(() => {
           this.items().onNewItem(shortcut.type);
         });
@@ -343,7 +362,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._route.fragment.subscribe((fragment) => {
+    this._route.fragment.pipe(untilDestroyed(this)).subscribe((fragment) => {
       const fn = async () => {
         // We use fragment-based navigation because of the routing limitations associated with GH Pages.
         // (yes, I could make 404.html point to index.html, but that's just horrible)
@@ -548,7 +567,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         role: 'dialog',
         ariaModal: true,
       });
-      const closePromise = firstValueFrom(pdfDialog.afterClosed());
+      const closePromise = firstValueFrom(pdfDialog.afterClosed(), { defaultValue: undefined });
       file = closePromise.then((options?: PdfWriterOptions): File => {
         if (options) {
           return PdfFormat.fromProto(this.selectedFile!, options);
@@ -615,7 +634,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
       ariaModal: true,
     });
 
-    await firstValueFrom(dialogRef.afterClosed())
+    await firstValueFrom(dialogRef.afterClosed(), { defaultValue: undefined })
       .then(async (updatedData?: FileInfoDialogData): Promise<unknown> => {
         if (!updatedData || !this.selectedFile) return;
 
