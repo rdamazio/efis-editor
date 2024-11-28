@@ -7,7 +7,6 @@ import { AceFormat } from '../../../model/formats/ace-format';
 import { DynonFormat } from '../../../model/formats/dynon-format';
 import { FormatError } from '../../../model/formats/error';
 import { ForeFlightFormat } from '../../../model/formats/foreflight-format';
-import { ForeFlightUtils } from '../../../model/formats/foreflight-utils';
 import { GrtFormat } from '../../../model/formats/grt-format';
 import { JsonFormat } from '../../../model/formats/json-format';
 
@@ -19,7 +18,6 @@ import { JsonFormat } from '../../../model/formats/json-format';
 })
 export class ChecklistFileUploadComponent {
   readonly fileUploaded = output<ChecklistFile>();
-  readonly ffUtils = ForeFlightUtils;
 
   constructor(private readonly _snackBar: MatSnackBar) {}
 

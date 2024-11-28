@@ -29,7 +29,6 @@ import { AceFormat } from '../../model/formats/ace-format';
 import { DynonFormat } from '../../model/formats/dynon-format';
 import { FormatError } from '../../model/formats/error';
 import { ForeFlightFormat } from '../../model/formats/foreflight-format';
-import { ForeFlightUtils } from '../../model/formats/foreflight-utils';
 import { GrtFormat } from '../../model/formats/grt-format';
 import { JsonFormat } from '../../model/formats/json-format';
 import { PdfFormat } from '../../model/formats/pdf-format';
@@ -81,7 +80,6 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     { secondKey: 'b', typeDescription: 'blank', type: ChecklistItem_Type.ITEM_SPACE },
   ];
   protected readonly _downloadSpinner = 'download-spinner';
-  protected readonly _ffUtils = ForeFlightUtils;
 
   selectedFile?: ChecklistFile;
   readonly tree = viewChild.required<ChecklistTreeComponent>('tree');
@@ -557,7 +555,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
       file = DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 40);
     } else if (formatId === 'grt') {
       file = GrtFormat.fromProto(this.selectedFile);
-    } else if (formatId === ForeFlightUtils.FILE_EXTENSION) {
+    } else if (formatId === 'fmd') {
       file = ForeFlightFormat.fromProto(this.selectedFile);
     } else if (formatId === 'pdf') {
       const pdfDialog = this._dialog.open(ExportDialogComponent, {
