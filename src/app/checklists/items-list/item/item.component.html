@@ -11,7 +11,7 @@
       class="action-icon"
       matTooltip="Edit this line"
       [attr.aria-label]="'Edit ' + it.prompt"
-      [disabled]="it.type === ChecklistItem_Type.ITEM_SPACE"
+      [disabled]="it.type === itemType.ITEM_SPACE"
       (click)="onEdit($event)"
     >
       <mat-icon>edit</mat-icon>
@@ -32,7 +32,7 @@
       class="action-icon"
       matTooltip="Indent left"
       [attr.aria-label]="'Indent ' + it.prompt + ' left'"
-      [disabled]="it.indent === 0 || it.centered || it.type === ChecklistItem_Type.ITEM_SPACE"
+      [disabled]="it.indent === 0 || it.centered || it.type === itemType.ITEM_SPACE"
       (click)="onIndent(it, -1)"
     >
       <mat-icon>format_indent_decrease</mat-icon>
@@ -43,7 +43,7 @@
       class="action-icon"
       matTooltip="Indent right"
       [attr.aria-label]="'Indent ' + it.prompt + ' right'"
-      [disabled]="it.indent === 4 || it.centered || it.type === ChecklistItem_Type.ITEM_SPACE"
+      [disabled]="it.indent === 4 || it.centered || it.type === itemType.ITEM_SPACE"
       (click)="onIndent(it, 1)"
     >
       <mat-icon>format_indent_increase</mat-icon>
@@ -54,7 +54,7 @@
       class="action-icon"
       [matTooltip]="(it.centered ? 'Left-justify' : 'Center') + ' this line'"
       [attr.aria-label]="'Center ' + it.prompt"
-      [disabled]="it.type === ChecklistItem_Type.ITEM_SPACE || it.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
+      [disabled]="it.type === itemType.ITEM_SPACE || it.type === itemType.ITEM_CHALLENGE_RESPONSE"
       (click)="onCenterToggle(it)"
     >
       <mat-icon>
@@ -69,13 +69,13 @@
   <div class="item" [class.item-centered]="it.centered" tabindex="0">
     <span
       class="prompt"
-      [class.prompt-challenge]="it.type === ChecklistItem_Type.ITEM_CHALLENGE"
-      [class.prompt-challenge-response]="it.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
-      [class.prompt-title]="it.type === ChecklistItem_Type.ITEM_TITLE"
-      [class.prompt-warning]="it.type === ChecklistItem_Type.ITEM_WARNING"
-      [class.prompt-caution]="it.type === ChecklistItem_Type.ITEM_CAUTION"
-      [class.prompt-note]="it.type === ChecklistItem_Type.ITEM_NOTE"
-      [class.prompt-space]="it.type === ChecklistItem_Type.ITEM_SPACE"
+      [class.prompt-challenge]="it.type === itemType.ITEM_CHALLENGE"
+      [class.prompt-challenge-response]="it.type === itemType.ITEM_CHALLENGE_RESPONSE"
+      [class.prompt-title]="it.type === itemType.ITEM_TITLE"
+      [class.prompt-warning]="it.type === itemType.ITEM_WARNING"
+      [class.prompt-caution]="it.type === itemType.ITEM_CAUTION"
+      [class.prompt-note]="it.type === itemType.ITEM_NOTE"
+      [class.prompt-space]="it.type === itemType.ITEM_SPACE"
       [style.padding-left]="it.centered ? '' : 10 + it.indent * 25 + 'px'"
     >
       <!-- TODO: Find a better solution than to save/cancel independent fields together -->
@@ -91,8 +91,8 @@
     </span>
     <!-- hidden doesn't work if display is set -->
     <span
-      [class.expectation-container]="it.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
-      [hidden]="it.type !== ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE"
+      [class.expectation-container]="it.type === itemType.ITEM_CHALLENGE_RESPONSE"
+      [hidden]="it.type !== itemType.ITEM_CHALLENGE_RESPONSE"
     >
       <span class="expectation-spacer"></span>
       <span class="expectation">

@@ -9,47 +9,47 @@ import {
 import { LazyBrowserStorage } from './browser-storage';
 import { ChecklistStorage } from './checklist-storage';
 
+const A_CHECKLIST_FILE: ChecklistFile = {
+  metadata: ChecklistFileMetadata.create({
+    name: 'N425RP',
+  }),
+  groups: [
+    {
+      category: ChecklistGroup_Category.normal,
+      title: 'Normal procedures',
+      checklists: [
+        {
+          title: 'Engine out on takeoff',
+          items: [
+            {
+              prompt: 'Mood',
+              expectation: 'Panic',
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              indent: 1,
+              centered: false,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+const ANOTHER_CHECKLIST_FILE: ChecklistFile = {
+  metadata: ChecklistFileMetadata.create({
+    name: 'Something with spaces',
+  }),
+  groups: [],
+};
+
+const YET_ANOTHER_CHECKLIST_FILE: ChecklistFile = {
+  metadata: ChecklistFileMetadata.create({
+    name: 'Somethingwithoutspaces',
+  }),
+  groups: [],
+};
+
 describe('ChecklistsService', () => {
   let store: ChecklistStorage;
-
-  const A_CHECKLIST_FILE: ChecklistFile = {
-    metadata: ChecklistFileMetadata.create({
-      name: 'N425RP',
-    }),
-    groups: [
-      {
-        category: ChecklistGroup_Category.normal,
-        title: 'Normal procedures',
-        checklists: [
-          {
-            title: 'Engine out on takeoff',
-            items: [
-              {
-                prompt: 'Mood',
-                expectation: 'Panic',
-                type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
-                indent: 1,
-                centered: false,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
-  const ANOTHER_CHECKLIST_FILE: ChecklistFile = {
-    metadata: ChecklistFileMetadata.create({
-      name: 'Something with spaces',
-    }),
-    groups: [],
-  };
-
-  const YET_ANOTHER_CHECKLIST_FILE: ChecklistFile = {
-    metadata: ChecklistFileMetadata.create({
-      name: 'Somethingwithoutspaces',
-    }),
-    groups: [],
-  };
 
   beforeEach(async () => {
     TestBed.configureTestingModule({});
@@ -77,7 +77,7 @@ describe('ChecklistsService', () => {
   }
 
   describe('should save and read each checklist', () => {
-    [A_CHECKLIST_FILE, ANOTHER_CHECKLIST_FILE, YET_ANOTHER_CHECKLIST_FILE].forEach((file) => {
+    [A_CHECKLIST_FILE, ANOTHER_CHECKLIST_FILE, YET_ANOTHER_CHECKLIST_FILE].forEach((file: ChecklistFile) => {
       beforeEach(async () => {
         await store.clear();
       });

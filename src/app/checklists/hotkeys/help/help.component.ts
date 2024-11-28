@@ -12,7 +12,7 @@ import { ShortcutPipe } from './shortcut.pipe';
   styleUrl: './help.component.scss',
 })
 export class HelpComponent {
-  DISPLAYED_COLUMNS = ['action', 'key'];
+  readonly columns = ['action', 'key'];
   hotkeys: HotkeyGroup[];
   private static _helpRef?: MatDialogRef<HelpComponent>;
 

@@ -31,7 +31,7 @@ export class ChecklistItemComponent {
   readonly expectationInput = viewChild.required<EditableLabelComponent>('expectationInput');
   private _shouldRestoreFocus = false;
 
-  readonly ChecklistItem_Type = ChecklistItem_Type;
+  readonly itemType = ChecklistItem_Type;
 
   onEdit(e?: Event) {
     this._shouldRestoreFocus = document.activeElement === this.containerRef().nativeElement;

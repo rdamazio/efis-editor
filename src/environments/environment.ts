@@ -1,6 +1,6 @@
 import { GDRIVE_CLIENT_ID } from './dev-keys';
 
-export const environment = {
+export const ENVIRONMENT = {
   production: false,
 
   // This client ID is defined in a gitignored file, and must be set by the developer locally.

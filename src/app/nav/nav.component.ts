@@ -40,7 +40,7 @@ export class NavComponent {
   );
 
   constructor(
-    protected hotkeys: HotkeysService,
+    protected _hotkeys: HotkeysService,
     private readonly _dialog: MatDialog,
   ) {}
 
@@ -53,7 +53,7 @@ export class NavComponent {
   }
 
   showKeyboardShortcuts() {
-    if (this.hotkeys.getHotkeys().length === 0) {
+    if (this._hotkeys.getHotkeys().length === 0) {
       return;
     }
 

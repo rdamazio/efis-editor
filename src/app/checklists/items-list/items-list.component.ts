@@ -14,7 +14,10 @@ import { ChecklistItemComponent } from './item/item.component';
   imports: [CdkDrag, CdkDragPlaceholder, CdkDropList, ChecklistItemComponent, MatButtonModule, MatIconModule],
 })
 export class ChecklistItemsComponent {
-  readonly ITEM_TYPES: { label: string; type: ChecklistItem_Type }[] = [
+  // TODO: Customize snackbar to allow multiple undos.
+  static readonly UNDO_LEVELS = 1;
+
+  readonly itemTypes: { label: string; type: ChecklistItem_Type }[] = [
     { label: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
     { label: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
     { label: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
@@ -24,8 +27,6 @@ export class ChecklistItemsComponent {
     { label: 'note', type: ChecklistItem_Type.ITEM_NOTE },
     { label: 'blank row', type: ChecklistItem_Type.ITEM_SPACE },
   ];
-  // TODO: Customize snackbar to allow multiple undos.
-  readonly UNDO_LEVELS = 1;
 
   readonly checklist = model<Checklist | undefined>();
   // Angular's model uses reference equality to decide whether to emit, so we must use
@@ -34,7 +35,7 @@ export class ChecklistItemsComponent {
 
   readonly groupDropListIds = input<string[]>([]);
   readonly items = viewChildren(ChecklistItemComponent);
-  _selectedIdx: number | null = null;
+  private _selectedIdx: number | null = null;
   private _undoState: Checklist[] = [];
   private _undoSnackbar?: MatSnackBarRef<TextOnlySnackBar>;
 
@@ -235,7 +236,7 @@ export class ChecklistItemsComponent {
 
   private _pushUndoState(txt: string) {
     // Save the full state for undoing, up to the max levels.
-    if (this._undoState.length === this.UNDO_LEVELS) {
+    if (this._undoState.length === ChecklistItemsComponent.UNDO_LEVELS) {
       this._undoState.splice(0, 1);
     }
     this._undoState.push(Checklist.clone(this.checklist()!));

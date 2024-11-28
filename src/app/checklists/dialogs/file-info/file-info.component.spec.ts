@@ -8,14 +8,15 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ChecklistFileMetadata } from '../../../../../gen/ts/checklist';
 import { ChecklistFileInfoComponent } from './file-info.component';
 
+const DATA = {
+  metadata: ChecklistFileMetadata.create(),
+  allGroups: [],
+};
+
 describe('ChecklistFileInfoComponent', () => {
   let fixture: ComponentFixture<ChecklistFileInfoComponent>;
   let loader: HarnessLoader;
   let dialog: MatDialog;
-  const DATA = {
-    metadata: ChecklistFileMetadata.create(),
-    allGroups: [],
-  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

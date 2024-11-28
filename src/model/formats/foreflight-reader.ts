@@ -38,7 +38,7 @@ export class ForeFlightReader {
     }
 
     return {
-      groups: ForeFlightReader.checklistGroupsToEFIS(container.payload.groups),
+      groups: ForeFlightReader._checklistGroupsToEFIS(container.payload.groups),
       metadata: ForeFlightReader.getChecklistMetadata(file, container.payload.metadata),
     };
   }
@@ -52,34 +52,36 @@ export class ForeFlightReader {
     });
   }
 
-  private static checklistGroupsToEFIS(groups: ForeFlightChecklistGroup[]): ChecklistGroup[] {
+  private static _checklistGroupsToEFIS(groups: ForeFlightChecklistGroup[]): ChecklistGroup[] {
     // We map FF subgroups to groups, so need to filter out possibly empty FF groups as they can't be represented
-    return groups.flatMap(ForeFlightReader.checklistGroupToEFIS);
+    return groups.flatMap(ForeFlightReader._checklistGroupToEFIS);
   }
 
-  private static checklistGroupToEFIS(checklistGroup: ForeFlightChecklistGroup): ChecklistGroup[] {
-    return checklistGroup.items.map((item) => ForeFlightReader.checklistSubgroupToEFIS(checklistGroup.groupType, item));
+  private static _checklistGroupToEFIS(checklistGroup: ForeFlightChecklistGroup): ChecklistGroup[] {
+    return checklistGroup.items.map((subgroup: ForeFlightChecklistSubgroup) =>
+      ForeFlightReader._checklistSubgroupToEFIS(checklistGroup.groupType, subgroup),
+    );
   }
 
-  private static checklistSubgroupToEFIS(
+  private static _checklistSubgroupToEFIS(
     category: ChecklistGroup_Category,
     checklistSubgroup: ForeFlightChecklistSubgroup,
   ): ChecklistGroup {
     return {
       category: category,
       title: checklistSubgroup.title,
-      checklists: checklistSubgroup.items.map(ForeFlightReader.checklistToEFIS),
+      checklists: checklistSubgroup.items.map(ForeFlightReader._checklistToEFIS),
     };
   }
 
-  private static checklistToEFIS(checkList: ForeFlightChecklist): Checklist {
+  private static _checklistToEFIS(checkList: ForeFlightChecklist): Checklist {
     return {
       title: checkList.title,
-      items: checkList.items.flatMap(ForeFlightReader.checklistItemToEFIS),
+      items: checkList.items.flatMap(ForeFlightReader._checklistItemToEFIS),
     };
   }
 
-  private static checklistItemToEFIS(checklistItem: ForeFlightChecklistItem): ChecklistItem[] {
+  private static _checklistItemToEFIS(checklistItem: ForeFlightChecklistItem): ChecklistItem[] {
     const result = [];
 
     if (checklistItem.type === ForeFlightUtils.ITEM_HEADER) {

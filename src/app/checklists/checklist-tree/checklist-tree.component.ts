@@ -82,18 +82,18 @@ export class ChecklistTreeComponent {
 
     this.file.subscribe(() => {
       // When a new file is loaded, drop the current checklist/group selection.
-      this.reloadFile(false);
+      this._reloadFile(false);
       if (this.selectedChecklist() || this.selectedChecklistGroup()) {
         this._selectChecklist(undefined, undefined);
       }
     });
   }
 
-  private reloadFile(modified: boolean) {
+  private _reloadFile(modified: boolean) {
     let data: ChecklistTreeNode[] = [];
     const file = this.file();
     if (file) {
-      data = file.groups.map(ChecklistTreeComponent.groupToNode);
+      data = file.groups.map(ChecklistTreeComponent._groupToNode);
       data.push({
         title: 'Add new checklist group',
         isAddNew: true,
@@ -111,12 +111,12 @@ export class ChecklistTreeComponent {
     }
   }
 
-  private static groupToNode(group: ChecklistGroup, groupIdx: number): ChecklistTreeNode {
+  private static _groupToNode(group: ChecklistGroup, groupIdx: number): ChecklistTreeNode {
     const node: ChecklistTreeNode = {
       title: group.title,
       group: group,
       groupIdx: groupIdx,
-      children: group.checklists.map((checklist, checklistIdx) => ({
+      children: group.checklists.map((checklist: Checklist, checklistIdx: number) => ({
         title: checklist.title,
         group: group,
         groupIdx: groupIdx,
@@ -147,7 +147,7 @@ export class ChecklistTreeComponent {
       if (node.group) {
         // Adding new checklist to a group.
         checklist = Checklist.create();
-        if (!(await this.fillTitle(checklist, 'checklist'))) {
+        if (!(await this._fillTitle(checklist, 'checklist'))) {
           return;
         }
         checklistGroup = node.group;
@@ -157,12 +157,12 @@ export class ChecklistTreeComponent {
         checklistGroup = ChecklistGroup.create({
           category: ChecklistGroup_Category.normal,
         });
-        if (!(await this.fillTitle(checklistGroup, 'checklist group'))) {
+        if (!(await this._fillTitle(checklistGroup, 'checklist group'))) {
           return;
         }
         this.file()!.groups.push(checklistGroup);
       }
-      this.reloadFile(true);
+      this._reloadFile(true);
       // Leave checklist unset
     }
     this._selectChecklist(checklist, checklistGroup);
@@ -184,7 +184,7 @@ export class ChecklistTreeComponent {
     moveItemInArray(groups, event.previousIndex, event.currentIndex);
 
     // Rebuild the nodes with updated data.
-    this.reloadFile(true);
+    this._reloadFile(true);
 
     // The selected checklist itself didn't change, but the fragment to represent may have.
     this._selectChecklist(this.selectedChecklist(), this.selectedChecklistGroup());
@@ -300,7 +300,7 @@ export class ChecklistTreeComponent {
     }
 
     // Rebuild the nodes with updated data.
-    this.reloadFile(true);
+    this._reloadFile(true);
 
     // The selected checklist itself didn't change, but the fragment to represent may have.
     this._selectChecklist(this.selectedChecklist(), newGroup);
@@ -471,7 +471,7 @@ export class ChecklistTreeComponent {
     this.selectedChecklistGroup.set(newGroup);
 
     // Update the tree nodes.
-    this.reloadFile(true);
+    this._reloadFile(true);
 
     // The selected checklist itself didn't change, but the fragment to represent it did.
     this._selectChecklist(this.selectedChecklist(), newGroup);
@@ -541,7 +541,7 @@ export class ChecklistTreeComponent {
     [file.groups[currentGroupIdx], file.groups[newGroupIdx]] = [file.groups[newGroupIdx], file.groups[currentGroupIdx]];
 
     // Update the tree nodes.
-    this.reloadFile(true);
+    this._reloadFile(true);
 
     // The selected checklist/group themselves didn't change, but the fragment to represent them did.
     this._selectChecklist(this.selectedChecklist(), this.selectedChecklistGroup());
@@ -641,8 +641,8 @@ export class ChecklistTreeComponent {
   }
 
   async onChecklistRename(node: ChecklistTreeNode) {
-    if (await this.fillTitle(node.checklist!, 'checklist')) {
-      this.reloadFile(true);
+    if (await this._fillTitle(node.checklist!, 'checklist')) {
+      this._reloadFile(true);
     }
   }
 
@@ -662,12 +662,12 @@ export class ChecklistTreeComponent {
     if (this.selectedChecklist() === node.checklist!) {
       this._selectChecklist(undefined, node.group);
     }
-    this.reloadFile(true);
+    this._reloadFile(true);
   }
 
   async onGroupRename(node: ChecklistTreeNode) {
-    if (await this.fillTitle(node.group!, 'checklist group')) {
-      this.reloadFile(true);
+    if (await this._fillTitle(node.group!, 'checklist group')) {
+      this._reloadFile(true);
     }
   }
 
@@ -689,11 +689,11 @@ export class ChecklistTreeComponent {
     if (this.selectedChecklistGroup() === node.group!) {
       this._selectChecklist(undefined, undefined);
     }
-    this.reloadFile(true);
+    this._reloadFile(true);
   }
 
   isAllExpanded(): boolean {
-    return this.dataSource.data.every((node) => this.tree().isExpanded(node));
+    return this.dataSource.data.every((node: ChecklistTreeNode) => this.tree().isExpanded(node));
   }
 
   isAllCollapsed(): boolean {
@@ -708,7 +708,7 @@ export class ChecklistTreeComponent {
     this.tree().collapseAll();
   }
 
-  private async fillTitle(pb: Checklist | ChecklistGroup, promptType: string): Promise<boolean> {
+  private async _fillTitle(pb: Checklist | ChecklistGroup, promptType: string): Promise<boolean> {
     const title = await TitleDialogComponent.promptForTitle(
       {
         promptType: promptType,

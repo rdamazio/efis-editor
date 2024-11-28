@@ -19,10 +19,9 @@ import { JsonFormat } from '../../../model/formats/json-format';
 })
 export class ChecklistFileUploadComponent {
   readonly fileUploaded = output<ChecklistFile>();
+  readonly ffUtils = ForeFlightUtils;
 
   constructor(private readonly _snackBar: MatSnackBar) {}
-
-  protected readonly ForeFlightUtils = ForeFlightUtils;
 
   async onDropped(files: NgxFileDropEntry[]) {
     const parsedFiles: Promise<void>[] = files

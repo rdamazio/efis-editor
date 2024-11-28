@@ -14,7 +14,7 @@ import {
 } from './text-format-options';
 
 export class TextWriter {
-  private readonly CRLF = '\r\n';
+  private static readonly CRLF = '\r\n';
   private readonly _titleSuffix: string;
   private readonly _parts: string[] = [];
   // Let tests override our date.
@@ -207,7 +207,7 @@ export class TextWriter {
     if (contents) {
       this._addPart(contents);
     }
-    this._parts.push(this.CRLF);
+    this._parts.push(TextWriter.CRLF);
   }
 
   private _properCase(str: string) {

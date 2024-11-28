@@ -2,8 +2,8 @@ import { v4 as uuidV4 } from 'uuid';
 import { ChecklistItem_Type } from '../../../gen/ts/checklist';
 
 enum KeyUsage {
-  Encrypt = 'encrypt',
-  Decrypt = 'decrypt',
+  ENCRYPT = 'encrypt',
+  DECRYPT = 'decrypt',
 }
 
 interface PartialChecklistItem {
@@ -24,12 +24,12 @@ export class ForeFlightUtils {
   public static readonly ITEM_HEADER = 'comment';
   public static readonly NOTE_INDENT = 1;
 
-  static readonly CIPHER_TYPE = 'AES-CBC';
-  static readonly CIPHER_BLOCK_SIZE = 16;
-  static readonly CIPHER_KEY = Buffer.from('81e06e41a93f3848', 'ascii');
+  private static readonly CIPHER_TYPE = 'AES-CBC';
+  private static readonly CIPHER_BLOCK_SIZE = 16;
+  private static readonly CIPHER_KEY = Buffer.from('81e06e41a93f3848', 'ascii');
 
-  static readonly encoder = new TextEncoder();
-  static readonly decoder = new TextDecoder();
+  private static readonly ENCODER = new TextEncoder();
+  private static readonly DECODER = new TextDecoder();
 
   public static readonly CHECKLIST_ITEM_PREFIXES = new Map([
     [ChecklistItem_Type.ITEM_PLAINTEXT, ''],
@@ -64,7 +64,7 @@ export class ForeFlightUtils {
         };
   }
 
-  private static async getKey(keyUsage: KeyUsage): Promise<CryptoKey> {
+  private static async _getKey(keyUsage: KeyUsage): Promise<CryptoKey> {
     return window.crypto.subtle.importKey(
       'raw',
       ForeFlightUtils.CIPHER_KEY,
@@ -80,10 +80,10 @@ export class ForeFlightUtils {
         name: ForeFlightUtils.CIPHER_TYPE,
         iv: new Uint8Array(stream.slice(0, ForeFlightUtils.CIPHER_BLOCK_SIZE)),
       },
-      await ForeFlightUtils.getKey(KeyUsage.Decrypt),
+      await ForeFlightUtils._getKey(KeyUsage.DECRYPT),
       new Uint8Array(stream.slice(ForeFlightUtils.CIPHER_BLOCK_SIZE)),
     );
-    return ForeFlightUtils.decoder.decode(new Uint8Array(decrypted));
+    return ForeFlightUtils.DECODER.decode(new Uint8Array(decrypted));
   }
 
   public static async encrypt(data: string): Promise<Blob> {
@@ -93,8 +93,8 @@ export class ForeFlightUtils {
         iv,
         await window.crypto.subtle.encrypt(
           { name: ForeFlightUtils.CIPHER_TYPE, iv: iv },
-          await ForeFlightUtils.getKey(KeyUsage.Encrypt),
-          ForeFlightUtils.encoder.encode(data),
+          await ForeFlightUtils._getKey(KeyUsage.ENCRYPT),
+          ForeFlightUtils.ENCODER.encode(data),
         ),
       ],
       { type: 'application/octet-stream' },

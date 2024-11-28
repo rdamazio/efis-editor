@@ -70,6 +70,19 @@ interface ParsedFragment {
 })
 @UntilDestroy()
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
+  private static readonly NEW_ITEM_SHORTCUTS = [
+    { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
+    { secondKey: 'c', typeDescription: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
+    { secondKey: 'x', typeDescription: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
+    { secondKey: 't', typeDescription: 'title', type: ChecklistItem_Type.ITEM_TITLE },
+    { secondKey: 'w', typeDescription: 'warning', type: ChecklistItem_Type.ITEM_WARNING },
+    { secondKey: 'a', typeDescription: 'caution', type: ChecklistItem_Type.ITEM_CAUTION },
+    { secondKey: 'n', typeDescription: 'note', type: ChecklistItem_Type.ITEM_NOTE },
+    { secondKey: 'b', typeDescription: 'blank', type: ChecklistItem_Type.ITEM_SPACE },
+  ];
+  protected readonly _downloadSpinner = 'download-spinner';
+  protected readonly _ffUtils = ForeFlightUtils;
+
   selectedFile?: ChecklistFile;
   readonly tree = viewChild.required<ChecklistTreeComponent>('tree');
   readonly items = viewChild.required<ChecklistItemsComponent>('items');
@@ -78,9 +91,6 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   showFileUpload = false;
 
   private _loadingFragment = false;
-
-  protected readonly ForeFlightUtils = ForeFlightUtils;
-  protected readonly DOWNLOAD_SPINNER = 'download-spinner';
 
   // eslint-disable-next-line @typescript-eslint/max-params
   constructor(
@@ -348,17 +358,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         fn().catch(console.error.bind(console));
       });
 
-    const NEW_ITEM_SHORTCUTS = [
-      { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
-      { secondKey: 'c', typeDescription: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
-      { secondKey: 'x', typeDescription: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
-      { secondKey: 't', typeDescription: 'title', type: ChecklistItem_Type.ITEM_TITLE },
-      { secondKey: 'w', typeDescription: 'warning', type: ChecklistItem_Type.ITEM_WARNING },
-      { secondKey: 'a', typeDescription: 'caution', type: ChecklistItem_Type.ITEM_CAUTION },
-      { secondKey: 'n', typeDescription: 'note', type: ChecklistItem_Type.ITEM_NOTE },
-      { secondKey: 'b', typeDescription: 'blank', type: ChecklistItem_Type.ITEM_SPACE },
-    ];
-    for (const shortcut of NEW_ITEM_SHORTCUTS) {
+    for (const shortcut of ChecklistsComponent.NEW_ITEM_SHORTCUTS) {
       this._hotkeys
         .addSequenceShortcut({
           keys: `n>${shortcut.secondKey}`,
@@ -581,7 +581,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Some format generations, notably PDF, can take a while - show a spinner.
     return this._spinner
-      .show(this.DOWNLOAD_SPINNER)
+      .show(this._downloadSpinner)
       .then(() =>
         afterNextRender(
           // Let the spinner be rendered while we generate the file.
@@ -591,7 +591,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
                 const f = await file;
                 saveAs(f, f.name);
               } finally {
-                await this._spinner.hide(this.DOWNLOAD_SPINNER);
+                await this._spinner.hide(this._downloadSpinner);
               }
             };
             // eslint-disable-next-line promise/no-nesting

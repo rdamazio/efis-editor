@@ -1,4 +1,4 @@
-export const environment = {
+export const ENVIRONMENT = {
   production: true,
   // This key only allows access from our GitHub pages URL.
   // eslint-disable-next-line no-secrets/no-secrets

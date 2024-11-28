@@ -1,7 +1,7 @@
 /// <reference types="@types/gapi.client.drive-v3" />
 /// <reference types="@types/google.accounts"/>
 import { afterNextRender, Injectable, Injector } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { ENVIRONMENT } from '../../environments/environment';
 import { MultipartEncoder } from './multipart';
 
 /**
@@ -78,7 +78,8 @@ export class GoogleDriveApi {
     // TODO: Do we need to switch to authorization code model so we don't get frequent refresh popups
     return new Promise((resolve, reject) => {
       const client = google.accounts.oauth2.initTokenClient({
-        client_id: environment.googleDriveClientId,
+        /* eslint-disable @typescript-eslint/naming-convention */
+        client_id: ENVIRONMENT.googleDriveClientId,
         scope: GoogleDriveApi.API_SCOPE,
         include_granted_scopes: true,
         prompt: '',
@@ -91,6 +92,7 @@ export class GoogleDriveApi {
           }
         },
         error_callback: reject,
+        /* eslint-enable @typescript-eslint/naming-convention */
       });
       client.requestAccessToken();
     });
@@ -99,7 +101,7 @@ export class GoogleDriveApi {
   public set accessToken(token: string | undefined) {
     if (token) {
       gapi.auth.setToken({
-        access_token: token,
+        access_token: token, // eslint-disable-line @typescript-eslint/naming-convention
       } as gapi.auth.GoogleApiOAuth2TokenObject);
     } else {
       gapi.auth.setToken(null as unknown as gapi.auth.GoogleApiOAuth2TokenObject);
@@ -206,7 +208,9 @@ export class GoogleDriveApi {
         path: GoogleDriveApi.UPLOAD_API_PATH + '/' + existingId!,
         method: 'PATCH',
         headers: {
+          /* eslint-disable @typescript-eslint/naming-convention */
           'Content-Type': multipart.contentType(),
+          /* eslint-enable @typescript-eslint/naming-convention */
         },
         params: {
           // We don't need any result fields.

@@ -36,7 +36,7 @@
         matTooltip="Checklist group category"
         panelWidth="12em"
       >
-        @for (category of GROUP_CATEGORIES; track category[0]) {
+        @for (category of _groupCategories; track category[0]) {
           <mat-option [value]="category[0]"
             ><span [class]="'checklist-tree-node-title-category-' + category[0]">{{ category[1] }}</span>
           </mat-option>

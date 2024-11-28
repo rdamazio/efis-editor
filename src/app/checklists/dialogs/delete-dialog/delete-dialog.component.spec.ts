@@ -6,14 +6,15 @@ import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DeleteDialogComponent, DeleteDialogData } from './delete-dialog.component';
 
+const DATA: DeleteDialogData = {
+  entityType: 'planet',
+  entityDescription: 'planet and all its inhabitants',
+};
+
 describe('DeleteDialogComponent', () => {
   let fixture: ComponentFixture<DeleteDialogComponent>;
   let loader: HarnessLoader;
   let dialog: MatDialog;
-  const DATA: DeleteDialogData = {
-    entityType: 'planet',
-    entityDescription: 'planet and all its inhabitants',
-  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

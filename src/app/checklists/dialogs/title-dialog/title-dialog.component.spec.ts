@@ -6,15 +6,15 @@ import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { TitleDialogComponent, TitleDialogData } from './title-dialog.component';
 
+const DATA: TitleDialogData = {
+  promptType: 'world',
+  initialTitle: 'Earth',
+};
+
 describe('TitleDialogComponent', () => {
   let fixture: ComponentFixture<TitleDialogComponent>;
   let loader: HarnessLoader;
   let dialog: MatDialog;
-
-  const DATA: TitleDialogData = {
-    promptType: 'world',
-    initialTitle: 'Earth',
-  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

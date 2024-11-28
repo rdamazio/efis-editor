@@ -37,7 +37,7 @@ export class ChecklistTreeNodeComponent {
 
   hideButtons = true;
 
-  protected readonly GROUP_CATEGORIES = new Map<ChecklistGroup_Category, string>([
+  protected readonly _groupCategories = new Map<ChecklistGroup_Category, string>([
     [ChecklistGroup_Category.normal, '🄽ormal'],
     [ChecklistGroup_Category.abnormal, '🄰bnormal'],
     [ChecklistGroup_Category.emergency, '🄴mergency'],

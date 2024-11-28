@@ -8,18 +8,23 @@ import { ChecklistStorage } from './checklist-storage';
 import { DriveSyncState, GoogleDriveStorage } from './gdrive';
 import { GoogleDriveApi } from './gdrive-api';
 
+// Note: timestamps get rounded to 1 second when saving,
+// so we use times that are already round.
+const NEWER_MTIME = new Date('2024-11-17T00:46:15Z');
+const NEWER_MTIME_UNIX = Math.floor(NEWER_MTIME.valueOf() / 1000);
+const OLDER_MTIME = new Date('2022-10-05T20:45:00Z');
+const OLDER_MTIME_UNIX = Math.floor(OLDER_MTIME.valueOf() / 1000);
+const FAKE_NOW = new Date('2023-11-18T02:33:44Z');
+const NOW_PLUS_10M = new Date(FAKE_NOW.valueOf() + 10 * 60 * 1000);
+const NOW_PLUS_10M_UNIX = Math.floor(NOW_PLUS_10M.valueOf() / 1000);
+const FILE_NAME = EXPECTED_CONTENTS.metadata!.name;
+const FILE_ID = fileIdForName(FILE_NAME);
+
+function fileIdForName(name: string) {
+  return `fileid_${name}`;
+}
+
 describe('ChecklistsService', () => {
-  // Note: timestamps get rounded to 1 second when saving,
-  // so we use times that are already round.
-  const NEWER_MTIME = new Date('2024-11-17T00:46:15Z');
-  const NEWER_MTIME_UNIX = Math.floor(NEWER_MTIME.valueOf() / 1000);
-  const OLDER_MTIME = new Date('2022-10-05T20:45:00Z');
-  const OLDER_MTIME_UNIX = Math.floor(OLDER_MTIME.valueOf() / 1000);
-  const FAKE_NOW = new Date('2023-11-18T02:33:44Z');
-  const NOW_PLUS_10M = new Date(FAKE_NOW.valueOf() + 10 * 60 * 1000);
-  const NOW_PLUS_10M_UNIX = Math.floor(NOW_PLUS_10M.valueOf() / 1000);
-  const FILE_NAME = EXPECTED_CONTENTS.metadata!.name;
-  const FILE_ID = fileIdForName(FILE_NAME);
   let clock: jasmine.Clock;
   let store: ChecklistStorage;
   let lazyBrowserStore: LazyBrowserStorage;
@@ -91,10 +96,6 @@ describe('ChecklistsService', () => {
 
   function expectStates(states: DriveSyncState[]) {
     expect(allStates).toEqual(jasmine.arrayWithExactContents(states));
-  }
-
-  function fileIdForName(name: string) {
-    return `fileid_${name}`;
   }
 
   function expectUpload(checklist: ChecklistFile, mtime: Date, existingFile?: boolean) {
