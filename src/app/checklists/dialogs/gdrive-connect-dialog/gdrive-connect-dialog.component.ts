@@ -22,6 +22,6 @@ export class GoogleDriveConnectDialogComponent {
     });
 
     const afterClosed$ = dialogRef.afterClosed() as Observable<boolean | undefined>;
-    return lastValueFrom(afterClosed$.pipe(filter((x) => x !== undefined)), { defaultValue: false });
+    return lastValueFrom(afterClosed$.pipe(filter((x?: boolean) => x !== undefined)), { defaultValue: false });
   }
 }

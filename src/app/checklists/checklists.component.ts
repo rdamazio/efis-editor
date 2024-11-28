@@ -13,7 +13,7 @@ import {
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HotkeysService } from '@ngneat/hotkeys';
+import { Hotkey, HotkeysService } from '@ngneat/hotkeys';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { saveAs } from 'file-saver';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
@@ -82,6 +82,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   protected readonly ForeFlightUtils = ForeFlightUtils;
   protected readonly DOWNLOAD_SPINNER = 'download-spinner';
 
+  // eslint-disable-next-line @typescript-eslint/max-params
   constructor(
     public store: ChecklistStorage,
     private readonly _gdrive: GoogleDriveStorage,
@@ -94,6 +95,17 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly _injector: Injector,
     @Inject(PLATFORM_ID) private readonly _platformId: object,
   ) {}
+
+  ngOnInit() {
+    this._route.fragment.pipe(untilDestroyed(this)).subscribe((fragment: string | null) => {
+      const fn = async () => {
+        // We use fragment-based navigation because of the routing limitations associated with GH Pages.
+        // (yes, I could make 404.html point to index.html, but that's just horrible)
+        await this._onFragmentChange(fragment);
+      };
+      fn().catch(console.error.bind(console));
+    });
+  }
 
   ngAfterViewInit() {
     // Shortcut registration affects global state which then changes the parent NavComponent.
@@ -113,6 +125,10 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
           this._snackBar.open(`The currently-loaded file was replaced by a newer version.`, '', { duration: 5000 });
         }
       });
+  }
+
+  ngOnDestroy() {
+    this._unregisterKeyboardShortcuts();
   }
 
   private _registerKeyboardShortcuts() {
@@ -358,22 +374,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private _unregisterKeyboardShortcuts() {
-    this._hotkeys.removeShortcuts(this._hotkeys.getHotkeys().map((hk) => hk.keys));
-  }
-
-  ngOnInit() {
-    this._route.fragment.pipe(untilDestroyed(this)).subscribe((fragment) => {
-      const fn = async () => {
-        // We use fragment-based navigation because of the routing limitations associated with GH Pages.
-        // (yes, I could make 404.html point to index.html, but that's just horrible)
-        await this._onFragmentChange(fragment);
-      };
-      fn().catch(console.error.bind(console));
-    });
-  }
-
-  ngOnDestroy() {
-    this._unregisterKeyboardShortcuts();
+    this._hotkeys.removeShortcuts(this._hotkeys.getHotkeys().map((hk: Hotkey) => hk.keys));
   }
 
   private async _onFragmentChange(fragment: string | null) {
@@ -396,7 +397,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     this._loadingFragment = false;
   }
 
-  _loadFragmentChecklist(parsed: ParsedFragment) {
+  private _loadFragmentChecklist(parsed: ParsedFragment) {
     if (!this.selectedFile) {
       this._snackBar.open(`Failed to load file "${parsed.fileName}".`, '', { duration: 5000 });
       return;
@@ -439,13 +440,13 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const checklistIdxStr = fragment.substring(checklistSepIdx + 1);
-    const checklistIdx = parseInt(checklistIdxStr);
+    const checklistIdx = parseInt(checklistIdxStr, 10);
     if (isNaN(checklistIdx)) {
       return { fileName: fragment };
     }
     const groupSepIdx = fragment.lastIndexOf('/', checklistSepIdx - 1);
     const groupIdxStr = fragment.substring(groupSepIdx + 1, checklistSepIdx);
-    const groupIdx = parseInt(groupIdxStr);
+    const groupIdx = parseInt(groupIdxStr, 10);
     if (isNaN(groupIdx)) {
       return { fileName: fragment };
     }
@@ -581,9 +582,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     // Some format generations, notably PDF, can take a while - show a spinner.
     return this._spinner
       .show(this.DOWNLOAD_SPINNER)
-      .then(() => {
-        // Let the spinner be rendered while we generate the file.
-        return afterNextRender(
+      .then(() =>
+        afterNextRender(
+          // Let the spinner be rendered while we generate the file.
           () => {
             const fn = async () => {
               try {
@@ -597,8 +598,8 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
             fn().catch(console.error.bind(console));
           },
           { injector: this._injector },
-        );
-      })
+        ),
+      )
       .catch(console.error.bind(console));
   }
 

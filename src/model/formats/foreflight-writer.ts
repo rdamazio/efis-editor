@@ -48,11 +48,11 @@ export class ForeFlightWriter {
 
   private static checklistGroupsToFFGroup(groupsEFIS: ChecklistGroup[]): ForeFlightChecklistGroup[] {
     return [ChecklistGroup_Category.normal, ChecklistGroup_Category.abnormal, ChecklistGroup_Category.emergency].map(
-      (checklistGroupCategory) => ({
+      (category: ChecklistGroup_Category) => ({
         objectId: ForeFlightUtils.getObjectId(),
-        groupType: checklistGroupCategory,
+        groupType: category,
         items: groupsEFIS
-          .filter((checklistGroupEFIS) => checklistGroupEFIS.category === checklistGroupCategory)
+          .filter((group: ChecklistGroup) => group.category === category)
           .map(ForeFlightWriter.checklistGroupToFFSubgroup),
       }),
     );
@@ -72,7 +72,7 @@ export class ForeFlightWriter {
 
   private static checklistItemsToFF(itemsEFIS: ChecklistItem[]): ForeFlightChecklistItem[] {
     return itemsEFIS
-      .reduce<[ForeFlightChecklistItem, ChecklistItem][]>((accumulator, itemEFIS) => {
+      .reduce<[ForeFlightChecklistItem, ChecklistItem][]>((accumulator, itemEFIS: ChecklistItem) => {
         switch (itemEFIS.type) {
           case ChecklistItem_Type.ITEM_UNKNOWN:
             throw new Error(`Unknown item type for "${itemEFIS.prompt}"`);
@@ -109,13 +109,15 @@ export class ForeFlightWriter {
           case ChecklistItem_Type.ITEM_NOTE:
           case ChecklistItem_Type.ITEM_CAUTION:
           case ChecklistItem_Type.ITEM_WARNING: {
-            const text = ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.get(itemEFIS.type) + itemEFIS.prompt;
+            const text = ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.get(itemEFIS.type)! + itemEFIS.prompt;
             const [lastItemFF, lastItemEFIS] = accumulator[accumulator.length - 1] || [];
             if (accumulator.length && lastItemEFIS.indent < itemEFIS.indent) {
               // If this is an indented text item, then...
-              const appendNote = (field: string, text: string) => {
+              const appendNote = (field: string, appendText: string) => {
                 const typedField = field as keyof typeof lastItemFF;
-                lastItemFF[typedField] = lastItemFF[typedField] ? lastItemFF[typedField] + '\n' + text : text;
+                lastItemFF[typedField] = lastItemFF[typedField]
+                  ? lastItemFF[typedField] + '\n' + appendText
+                  : appendText;
               };
               appendNote(
                 lastItemFF.type !== ForeFlightUtils.ITEM_HEADER
@@ -146,6 +148,6 @@ export class ForeFlightWriter {
         }
         return accumulator;
       }, [])
-      .map((tuple) => tuple[0]);
+      .map((tuple: [ForeFlightChecklistItem, ChecklistItem]) => tuple[0]);
   }
 }

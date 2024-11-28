@@ -134,7 +134,7 @@ export class TextReader {
         currentChecklistNum++;
 
         if (checklistMatch.groups && 'checklistNum' in checklistMatch.groups) {
-          const checklistNum = parseInt(checklistMatch.groups['checklistNum']);
+          const checklistNum = parseInt(checklistMatch.groups['checklistNum'], 10);
           const expectedNum = currentChecklistNum - 1 + this._checklistNumOffset;
           if (checklistNum !== expectedNum) {
             throw new FormatError(
@@ -174,7 +174,7 @@ export class TextReader {
 
         if (itemMatch.groups) {
           if ('checklistNum' in itemMatch.groups) {
-            const checklistNum = parseInt(itemMatch.groups['checklistNum']);
+            const checklistNum = parseInt(itemMatch.groups['checklistNum'], 10);
             const expectedNum = currentChecklistNum - 1 + this._checklistNumOffset;
             if (checklistNum !== expectedNum) {
               throw new FormatError(
@@ -183,7 +183,7 @@ export class TextReader {
             }
           }
           if ('itemNum' in itemMatch.groups) {
-            const itemNum = parseInt(itemMatch.groups['itemNum']);
+            const itemNum = parseInt(itemMatch.groups['itemNum'], 10);
             const expectedNum = currentItemLineNum + this._itemNumOffset;
             if (itemNum !== expectedNum) {
               throw new FormatError(`Unexpected item number ${itemNum} in "${prefix}" (expected ${expectedNum})`);

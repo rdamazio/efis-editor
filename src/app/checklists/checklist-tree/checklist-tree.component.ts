@@ -697,9 +697,7 @@ export class ChecklistTreeComponent {
   }
 
   isAllCollapsed(): boolean {
-    return !this.dataSource.data.some((node: ChecklistTreeNode) => {
-      return this.tree().isExpanded(node);
-    });
+    return !this.dataSource.data.some((node: ChecklistTreeNode) => this.tree().isExpanded(node));
   }
 
   expandAll() {

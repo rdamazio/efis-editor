@@ -46,7 +46,7 @@ export class ForeFlightUtils {
     return text.split(/\r?\n/);
   }
   public static splitByColon(text: string): [string, string] {
-    const matches = /^([^:]+: )?(.*)$/.exec(text);
+    const matches = /^([^:]+: )?(.*)$/.exec(text); // eslint-disable-line prefer-named-capture-group
     return matches !== null ? [matches[1] || '', matches[2]] : ['', text];
   }
 

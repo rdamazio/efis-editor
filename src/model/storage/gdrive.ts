@@ -257,9 +257,7 @@ export class GoogleDriveStorage {
       return;
     }
     if (this._state$.value === DriveSyncState.DISCONNECTED) {
-      return this._authenticate().then(async (): Promise<void> => {
-        return this.synchronize();
-      });
+      return this._authenticate().then(async (): Promise<void> => this.synchronize());
     }
 
     console.debug('SYNC START');
@@ -306,10 +304,10 @@ export class GoogleDriveStorage {
       });
     // List local checklists.
     const localChecklists = firstValueFrom(this._checklistStorage.listChecklistFiles(), { defaultValue: [] });
-    const localDeletions = this._getLocalDeletions();
+    const localDeletionPromise = this._getLocalDeletions();
 
     // Actually perform synchronization.
-    const syncOps = Promise.all([remoteFiles, localChecklists, localDeletions]).then(
+    const syncOps = Promise.all([remoteFiles, localChecklists, localDeletionPromise]).then(
       async ([remoteFileMap, localChecklistNames, localDeletions]: [
         Map<string, gapi.client.drive.File>,
         string[],
@@ -443,7 +441,6 @@ export class GoogleDriveStorage {
 
     // The remote existed but had the same mtime as the local version - do nothing.
     console.debug(`SYNC: File '${name}' was already in sync.`);
-    return;
   }
 
   private async _downloadFile(remoteFile: gapi.client.drive.File): Promise<void> {
@@ -462,7 +459,7 @@ export class GoogleDriveStorage {
 
     return this._api.downloadFile(fileId).then(async (fileContents: string): Promise<void> => {
       const checklist = ChecklistFile.fromJsonString(fileContents);
-      if (checklist.metadata?.name + GoogleDriveStorage.CHECKLIST_EXTENSION !== remoteFile.name) {
+      if ((checklist.metadata?.name ?? 'MISSING_NAME') + GoogleDriveStorage.CHECKLIST_EXTENSION !== remoteFile.name) {
         console.warn(
           `SYNC: potential name mismatch '${remoteFile.name}' vs '${checklist.metadata?.name}' (file ID '${fileId}')`,
         );
@@ -506,12 +503,12 @@ export class GoogleDriveStorage {
 
     // While JSON.stringify below properly serializes dates, JSON.parse does not parse them back.
     const parsedDeletions = JSON.parse(deletionsJson) as LocalDeletionJson[];
-    return parsedDeletions.map((d: LocalDeletionJson): LocalDeletion => {
-      return {
+    return parsedDeletions.map(
+      (d: LocalDeletionJson): LocalDeletion => ({
         fileName: d.fileName,
         deletionTime: new Date(d.deletionTime),
-      };
-    });
+      }),
+    );
   }
 
   private async _setLocalDeletions(deletions: LocalDeletion[]) {
@@ -521,7 +518,7 @@ export class GoogleDriveStorage {
 
   private async _onChecklistsUpdated(checklists: string[]) {
     // Detect newly deleted checklists.
-    const newlyDeletedNames = this._lastChecklistList.filter((x) => !checklists.includes(x));
+    const newlyDeletedNames = this._lastChecklistList.filter((x: string) => !checklists.includes(x));
     const localDeletions: LocalDeletion[] = newlyDeletedNames.map((name: string): LocalDeletion => {
       console.debug(`SYNC: Detected deletion of '${name}'`);
       return { fileName: name, deletionTime: new Date() };
@@ -532,10 +529,10 @@ export class GoogleDriveStorage {
     // Merge it with previously-known deletions.
     const previousDeletions = await this._getLocalDeletions();
     console.debug(`SYNC: Previous deletions: '${JSON.stringify(previousDeletions)}'`);
-    const previousDeletionsToKeep = previousDeletions.filter((deletion: LocalDeletion) => {
+    const previousDeletionsToKeep = previousDeletions.filter(
       // If it was also deleted again just now, keep the newer one.
-      return !newlyDeletedNames.includes(deletion.fileName);
-    });
+      (deletion: LocalDeletion) => !newlyDeletedNames.includes(deletion.fileName),
+    );
     localDeletions.push(...previousDeletionsToKeep);
     await this._setLocalDeletions(localDeletions);
 

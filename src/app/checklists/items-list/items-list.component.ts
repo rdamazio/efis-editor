@@ -71,10 +71,6 @@ export class ChecklistItemsComponent {
     const checklist = this.checklist();
     checklist!.items.splice(idx, 1);
     this.checklistChange.emit(checklist);
-
-    this.checklist.update((checklist?: Checklist): Checklist | undefined => {
-      return checklist;
-    });
   }
 
   onNewItem(type: ChecklistItem_Type) {

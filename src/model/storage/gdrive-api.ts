@@ -40,13 +40,14 @@ export class GoogleDriveApi {
       this._loadScript('https://accounts.google.com/gsi/client'),
       this._loadScript('https://apis.google.com/js/api.js'),
     ])
-      .then(async () => {
-        return new Promise<void>((resolve) => {
-          gapi.load('client', () => {
-            resolve();
-          });
-        });
-      })
+      .then(
+        async () =>
+          new Promise<void>((resolve) => {
+            gapi.load('client', () => {
+              resolve();
+            });
+          }),
+      )
       .then(async () => {
         const authInit = new Promise<void>((resolve) => {
           gapi.auth.init(resolve);
@@ -61,7 +62,7 @@ export class GoogleDriveApi {
   }
 
   private async _loadScript(src: string): Promise<void> {
-    return new Promise<void>(function (resolve, reject) {
+    return new Promise<void>((resolve, reject) => {
       const s = document.createElement('script');
       s.src = src;
       s.onload = () => {
@@ -104,6 +105,9 @@ export class GoogleDriveApi {
       gapi.auth.setToken(null as unknown as gapi.auth.GoogleApiOAuth2TokenObject);
     }
   }
+  public get accessToken(): string | undefined {
+    return gapi.auth.getToken().access_token;
+  }
 
   public async revokeAccessToken() {
     const token = gapi.auth.getToken();
@@ -138,6 +142,7 @@ export class GoogleDriveApi {
           orderBy: req.orderBy,
           pageToken: nextPageToken,
         })
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
         .then((resp: gapi.client.Response<gapi.client.drive.FileList>) => {
           nextPageToken = resp.result.nextPageToken;
           return resp.result.files;
@@ -156,9 +161,7 @@ export class GoogleDriveApi {
         fileId: fileId,
         alt: 'media',
       })
-      .then((response: gapi.client.Response<gapi.client.drive.File>) => {
-        return response.body;
-      });
+      .then((response: gapi.client.Response<gapi.client.drive.File>) => response.body);
   }
 
   public async uploadFile(
@@ -200,7 +203,7 @@ export class GoogleDriveApi {
 
     return gapi.client
       .request({
-        path: GoogleDriveApi.UPLOAD_API_PATH + '/' + existingId,
+        path: GoogleDriveApi.UPLOAD_API_PATH + '/' + existingId!,
         method: 'PATCH',
         headers: {
           'Content-Type': multipart.contentType(),

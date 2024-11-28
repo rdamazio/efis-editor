@@ -16,7 +16,7 @@ import {
 export class TextWriter {
   private readonly CRLF = '\r\n';
   private readonly _titleSuffix: string;
-  private readonly _parts: string[] = new Array<string>();
+  private readonly _parts: string[] = [];
   // Let tests override our date.
   public static testingTime: Date | undefined;
 
@@ -137,7 +137,7 @@ export class TextWriter {
         case ChecklistItem_Type.ITEM_SPACE:
           break;
         default:
-          throw new FormatError('Unexpected item type: ' + item.type);
+          throw new FormatError('Unexpected item type: ' + item.type.valueOf());
       }
 
       let fullLine = prefix + item.prompt;

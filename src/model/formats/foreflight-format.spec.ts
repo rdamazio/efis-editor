@@ -15,7 +15,7 @@ describe('ForeFlightFormat', () => {
       const groupSizes = [8, 4, 4, 4, 12];
       const groupOctets: string[] = [];
 
-      groupSizes.reduce((previousValue, currentValue) => {
+      groupSizes.reduce((previousValue: number, currentValue: number) => {
         groupOctets.push(objectId.slice(previousValue, previousValue + currentValue));
         return previousValue + currentValue;
       }, 0);

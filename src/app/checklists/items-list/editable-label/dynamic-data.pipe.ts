@@ -5,15 +5,15 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: 'dynamicData',
   standalone: true,
-  pure: false,
+  pure: false, // eslint-disable-line @angular-eslint/no-pipe-impure
 })
 export class DynamicDataPipe implements PipeTransform {
-  private static readonly GRT_FIELD = /%(\d{1,3})%/;
+  private static readonly GRT_FIELD = /%(?<fieldnum>\d{1,3})%/;
 
   transform(value: string): string {
     let match = value.match(DynamicDataPipe.GRT_FIELD);
-    while (match) {
-      const fieldNum = parseInt(match[1], 10);
+    while (match?.groups) {
+      const fieldNum = parseInt(match.groups['fieldnum'], 10);
       const replaceWith = this._replacementFor(fieldNum);
       if (!replaceWith) {
         // Unknown field - stop processing this value.
@@ -231,6 +231,7 @@ export class DynamicDataPipe implements PipeTransform {
     return undefined;
   }
 
+  // eslint-disable-next-line @typescript-eslint/typedef
   private _randomRange(min: number, max: number, decimals = 0): string {
     const val = min + Math.random() * (max - min);
     return val.toFixed(decimals);

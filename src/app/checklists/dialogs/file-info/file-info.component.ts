@@ -19,6 +19,7 @@ export interface FileInfoDialogData {
 }
 
 @Component({
+  selector: 'checklist-info-dialog',
   imports: [
     FormsModule,
     MatButtonModule,
@@ -46,7 +47,7 @@ export class ChecklistFileInfoComponent {
       throw new Error(`Invalid checklist value "${val}"`);
     }
 
-    this.data.metadata.defaultGroupIndex = parseInt(val.slice(0, dotIdx));
-    this.data.metadata.defaultChecklistIndex = parseInt(val.slice(dotIdx + 1));
+    this.data.metadata.defaultGroupIndex = parseInt(val.slice(0, dotIdx), 10);
+    this.data.metadata.defaultChecklistIndex = parseInt(val.slice(dotIdx + 1), 10);
   }
 }

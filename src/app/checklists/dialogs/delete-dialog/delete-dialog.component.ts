@@ -17,7 +17,7 @@ export interface DeleteDialogData {
 }
 
 @Component({
-  selector: 'app-delete-dialog',
+  selector: 'checklist-delete-dialog',
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatIconModule],
   templateUrl: './delete-dialog.component.html',
   styleUrl: './delete-dialog.component.scss',
@@ -37,6 +37,6 @@ export class DeleteDialogComponent {
 
     // If it completes without emitting anything, we return false.
     const afterClosed$ = dialogRef.afterClosed() as Observable<boolean | undefined>;
-    return lastValueFrom(afterClosed$.pipe(filter((x) => x !== undefined)), { defaultValue: false });
+    return lastValueFrom(afterClosed$.pipe(filter((x?: boolean) => x !== undefined)), { defaultValue: false });
   }
 }

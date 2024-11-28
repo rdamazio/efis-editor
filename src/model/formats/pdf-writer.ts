@@ -281,9 +281,7 @@ export class PdfWriter {
   }
 
   private _checklistTableBody(checklist: Checklist): RowInput[] {
-    return checklist.items.map((item: ChecklistItem) => {
-      return this._itemToCells(item);
-    });
+    return checklist.items.map((item: ChecklistItem) => this._itemToCells(item));
   }
 
   private _itemToCells(item: ChecklistItem): CellDef[] {

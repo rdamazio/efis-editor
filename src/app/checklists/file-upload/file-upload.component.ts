@@ -25,7 +25,7 @@ export class ChecklistFileUploadComponent {
   protected readonly ForeFlightUtils = ForeFlightUtils;
 
   async onDropped(files: NgxFileDropEntry[]) {
-    const parsedFiles: Promise<ChecklistFile | void>[] = files
+    const parsedFiles: Promise<void>[] = files
       .map(async (entry: NgxFileDropEntry): Promise<File> => {
         const fsEntry = entry.fileEntry as FileSystemFileEntry;
 
@@ -33,21 +33,20 @@ export class ChecklistFileUploadComponent {
           fsEntry.file(resolve, reject);
         });
       })
-      .map(async (filePromise: Promise<File>): Promise<ChecklistFile | void> => {
-        return filePromise
-          .then(async (file: File): Promise<ChecklistFile> => {
-            return this._parseFile(file);
-          })
-          .then((checklistFile: ChecklistFile): ChecklistFile => {
-            this.fileUploaded.emit(checklistFile);
-            return checklistFile;
-          })
-          .catch((reason: unknown) => {
-            console.error('Failed to parse file: ', reason);
-            this._snackBar.open(`Failed to parse uploaded file.`, '', { duration: 5000 });
-          });
-      });
-    await Promise.all(parsedFiles);
+      .map(
+        async (filePromise: Promise<File>): Promise<void> =>
+          filePromise
+            .then(async (file: File): Promise<ChecklistFile> => this._parseFile(file))
+            .then((checklistFile: ChecklistFile) => {
+              this.fileUploaded.emit(checklistFile);
+              return void 0;
+            })
+            .catch((reason: unknown) => {
+              console.error('Failed to parse file: ', reason);
+              this._snackBar.open(`Failed to parse uploaded file.`, '', { duration: 5000 });
+            }),
+      );
+    return Promise.all(parsedFiles);
   }
 
   private async _parseFile(file: File): Promise<ChecklistFile> {

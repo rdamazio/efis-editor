@@ -34,7 +34,7 @@ describe('AceWriter', () => {
           name: '',
         }),
       }),
-    ].forEach((file) => {
+    ].forEach((file: ChecklistFile) => {
       it('write nameless file', async () => {
         await expectAsync(new AceWriter().write(file)).toBeRejectedWithError(FormatError);
       });

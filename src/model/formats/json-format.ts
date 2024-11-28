@@ -1,10 +1,10 @@
-import { ChecklistFile, ChecklistGroup_Category } from '../../../gen/ts/checklist';
+import { ChecklistFile, ChecklistGroup, ChecklistGroup_Category } from '../../../gen/ts/checklist';
 
 export class JsonFormat {
   public static async toProto(file: File): Promise<ChecklistFile> {
     const contents = await file.text();
     const checklist = ChecklistFile.fromJsonString(contents);
-    checklist.groups.forEach((group) => {
+    checklist.groups.forEach((group: ChecklistGroup) => {
       if (group.category === ChecklistGroup_Category.unknown) {
         group.category = ChecklistGroup_Category.normal;
       }

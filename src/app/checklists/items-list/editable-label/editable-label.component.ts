@@ -25,8 +25,6 @@ import { DynamicDataPipe } from './dynamic-data.pipe';
   styleUrl: './editable-label.component.scss',
 })
 export class EditableLabelComponent {
-  private readonly RESTRICTED_CHARS = ['~'];
-
   control = new FormControl('');
   readonly input = viewChild.required<ElementRef<HTMLElement>>('promptInput');
 

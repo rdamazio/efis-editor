@@ -7,7 +7,7 @@ import { ChecklistTreeComponent } from '../checklist-tree.component';
 
 @Component({
   selector: 'checklist-tree-bar',
-  imports: [MatButtonModule, MatIconButtonSizesModule, MatIconButtonSizesModule, MatIconModule, MatTooltipModule],
+  imports: [MatButtonModule, MatIconButtonSizesModule, MatIconModule, MatTooltipModule],
   templateUrl: './bar.component.html',
   styleUrl: './bar.component.scss',
 })

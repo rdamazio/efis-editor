@@ -10,7 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { PdfWriterOptions } from '../../../../model/formats/pdf-writer';
 
 @Component({
-  selector: 'app-export-dialog',
+  selector: 'checklist-export-dialog',
   imports: [
     FormsModule,
     MatButtonModule,
