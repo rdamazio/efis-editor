@@ -214,6 +214,7 @@ module.exports = tseslint.config(
       // jasmine spy expectations are expressed unbound
       '@typescript-eslint/unbound-method': 'off',
       'no-await-in-loop': 'off',
+      'no-restricted-imports': ['error', '@testing-library/dom'],
     },
   },
   {
