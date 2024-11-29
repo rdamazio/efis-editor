@@ -44,10 +44,6 @@ module.exports = tseslint.config(
           style: 'camelCase',
         },
       ],
-      // Does not support Angular 19 yet.
-      '@angular-eslint/prefer-standalone': 'off',
-      // Deprecated but not removed?
-      '@angular-eslint/prefer-standalone-component': 'off',
       // TODO: Move to OnPush
       '@angular-eslint/prefer-on-push-component-change-detection': 'off',
       '@typescript-eslint/consistent-type-exports': 'error',
