@@ -3,8 +3,8 @@
   <div class="leftbar">
     @defer (hydrate on idle) {
       <checklist-command-bar
-        [hasFiles]="(store.listChecklistFiles() | async)?.length === 0"
-        [fileIsOpen]="!!!selectedFile"
+        [hasFiles]="(store.listChecklistFiles() | async)?.length !== 0"
+        [fileIsOpen]="selectedFile !== undefined"
         (newFile)="onNewFile($event)"
         (openFile)="onOpenFile()"
         (uploadFile)="onUploadFile()"

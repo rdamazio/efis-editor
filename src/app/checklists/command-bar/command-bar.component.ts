@@ -22,7 +22,7 @@ export interface DownloadFormat {
 export class ChecklistCommandBarComponent {
   readonly hasFiles = input.required<boolean>();
   readonly fileIsOpen = input.required<boolean>();
-  readonly downloadFormats = input<DownloadFormat[]>([]);
+  readonly downloadFormats = input.required<DownloadFormat[]>();
   readonly newFile = output<string>(); // Emits filename
   readonly openFile = output<boolean>();
   readonly uploadFile = output<boolean>();

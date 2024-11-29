@@ -6,7 +6,7 @@
     mat-icon-button
     matTooltip="Open file"
     aria-label="Open file"
-    [disabled]="hasFiles()"
+    [disabled]="!hasFiles()"
     (click)="openFile.emit(true)"
   >
     <mat-icon>folder_open</mat-icon>
@@ -18,13 +18,18 @@
     mat-icon-button
     matTooltip="Download file"
     aria-label="Download file"
-    [disabled]="fileIsOpen()"
+    [disabled]="!fileIsOpen()"
     [matMenuTriggerFor]="downloadMenu"
   >
     <mat-icon>download</mat-icon>
   </button>
   <mat-menu #downloadMenu>
-    <button mat-menu-item *ngFor="let format of downloadFormats()" (click)="downloadFile.emit(format.id)">
+    <button
+      mat-menu-item
+      *ngFor="let format of downloadFormats()"
+      [attr.aria-label]="'Download as ' + format.name"
+      (click)="downloadFile.emit(format.id)"
+    >
       {{ format.name }}
     </button>
   </mat-menu>
@@ -32,7 +37,7 @@
     mat-icon-button
     matTooltip="Print file"
     aria-label="Print file"
-    [disabled]="fileIsOpen()"
+    [disabled]="!fileIsOpen()"
     (click)="downloadFile.emit('pdf')"
   >
     <mat-icon>print</mat-icon>
@@ -41,7 +46,7 @@
     mat-icon-button
     matTooltip="Delete file"
     aria-label="Delete file"
-    [disabled]="fileIsOpen()"
+    [disabled]="!fileIsOpen()"
     (click)="onDeleteFile()"
   >
     <mat-icon>delete</mat-icon>
@@ -50,7 +55,7 @@
     mat-icon-button
     matTooltip="File information"
     aria-label="Open file information dialog"
-    [disabled]="fileIsOpen()"
+    [disabled]="!fileIsOpen()"
     (click)="fileInfo.emit(true)"
   >
     <mat-icon>info</mat-icon>

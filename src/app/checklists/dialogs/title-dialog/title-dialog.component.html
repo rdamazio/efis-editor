@@ -2,8 +2,15 @@
 
 <mat-dialog-content (keyup.enter)="okbutton._elementRef.nativeElement.click()">
   <mat-form-field>
-    <mat-label>Title</mat-label>
-    <input matInput cdkFocusInitial required placeholder="My {{ data.promptType }} title" [(ngModel)]="title" />
+    <mat-label id="title-label">Title</mat-label>
+    <input
+      matInput
+      cdkFocusInitial
+      required
+      aria-labelledby="title-label"
+      placeholder="My {{ data.promptType }} title"
+      [(ngModel)]="title"
+    />
   </mat-form-field>
 </mat-dialog-content>
 
