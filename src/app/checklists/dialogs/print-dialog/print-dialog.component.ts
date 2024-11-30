@@ -14,7 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { lastValueFrom, Observable } from 'rxjs';
-import { PdfWriterOptions } from '../../../../model/formats/pdf-writer';
+import { DEFAULT_OPTIONS, PdfWriterOptions } from '../../../../model/formats/pdf-writer';
 
 @Component({
   selector: 'checklist-print-dialog',
@@ -36,13 +36,7 @@ import { PdfWriterOptions } from '../../../../model/formats/pdf-writer';
   styleUrl: './print-dialog.component.scss',
 })
 export class PrintDialogComponent {
-  options: PdfWriterOptions = {
-    format: 'letter',
-    orientation: 'portrait',
-    outputCoverPage: true,
-    outputCoverPageFooter: false,
-    outputPageNumbers: true,
-  };
+  options: PdfWriterOptions = DEFAULT_OPTIONS;
 
   public static async show(dialog: MatDialog): Promise<PdfWriterOptions | undefined> {
     const pdfDialog = dialog.open(PrintDialogComponent, {
