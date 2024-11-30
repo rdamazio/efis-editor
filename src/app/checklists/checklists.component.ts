@@ -17,7 +17,6 @@ import { Hotkey, HotkeysService } from '@ngneat/hotkeys';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { saveAs } from 'file-saver';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
-import { firstValueFrom } from 'rxjs';
 import {
   Checklist,
   ChecklistFile,
@@ -38,7 +37,7 @@ import { GoogleDriveStorage } from '../../model/storage/gdrive';
 import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
-import { ChecklistFileInfoComponent, FileInfoDialogData } from './dialogs/file-info/file-info.component';
+import { ChecklistFileInfoComponent } from './dialogs/file-info/file-info.component';
 import { PrintDialogComponent } from './dialogs/print-dialog/print-dialog.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
@@ -558,16 +557,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (formatId === 'fmd') {
       file = ForeFlightFormat.fromProto(this.selectedFile);
     } else if (formatId === 'pdf') {
-      const pdfDialog = this._dialog.open(PrintDialogComponent, {
-        hasBackdrop: true,
-        closeOnNavigation: true,
-        enterAnimationDuration: 200,
-        exitAnimationDuration: 200,
-        role: 'dialog',
-        ariaModal: true,
-      });
-      const closePromise = firstValueFrom(pdfDialog.afterClosed(), { defaultValue: undefined });
-      file = closePromise.then((options?: PdfWriterOptions): File => {
+      file = PrintDialogComponent.show(this._dialog).then((options?: PdfWriterOptions): File => {
         if (options) {
           return PdfFormat.fromProto(this.selectedFile!, options);
         }
@@ -619,27 +609,13 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (!this.selectedFile) return;
 
-    const dialogData = {
-      metadata: ChecklistFileMetadata.clone(this.selectedFile.metadata!),
-      allGroups: this.selectedFile.groups,
-    };
-    const dialogRef = this._dialog.open(ChecklistFileInfoComponent, {
-      data: dialogData,
-      hasBackdrop: true,
-      closeOnNavigation: true,
-      enterAnimationDuration: 200,
-      exitAnimationDuration: 200,
-      role: 'dialog',
-      ariaModal: true,
-    });
-
-    await firstValueFrom(dialogRef.afterClosed(), { defaultValue: undefined })
-      .then(async (updatedData?: FileInfoDialogData): Promise<unknown> => {
-        if (!updatedData || !this.selectedFile) return;
+    return ChecklistFileInfoComponent.showFileInfo(this.selectedFile.metadata!, this.selectedFile.groups, this._dialog)
+      .then(async (updatedMetadata?: ChecklistFileMetadata): Promise<unknown> => {
+        if (!updatedMetadata || !this.selectedFile) return;
 
         const oldName = this.selectedFile.metadata!.name;
-        const newName = updatedData.metadata.name;
-        this.selectedFile.metadata = updatedData.metadata;
+        const newName = updatedMetadata.name;
+        this.selectedFile.metadata = updatedMetadata;
         const promises = [this.store.saveChecklistFile(this.selectedFile)];
         if (oldName !== newName) {
           // File was renamed, delete old one from storage.

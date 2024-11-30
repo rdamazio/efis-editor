@@ -3,6 +3,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
+  MatDialog,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
@@ -11,6 +12,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { lastValueFrom, Observable } from 'rxjs';
 import { ChecklistFileMetadata, ChecklistGroup } from '../../../../../gen/ts/checklist';
 
 export interface FileInfoDialogData {
@@ -49,5 +51,29 @@ export class ChecklistFileInfoComponent {
 
     this.data.metadata.defaultGroupIndex = parseInt(val.slice(0, dotIdx), 10);
     this.data.metadata.defaultChecklistIndex = parseInt(val.slice(dotIdx + 1), 10);
+  }
+
+  public static async showFileInfo(
+    metadata: ChecklistFileMetadata,
+    groups: ChecklistGroup[],
+    dialog: MatDialog,
+  ): Promise<ChecklistFileMetadata | undefined> {
+    const dialogData = {
+      metadata: ChecklistFileMetadata.clone(metadata),
+      allGroups: groups,
+    };
+
+    const dialogRef = dialog.open(ChecklistFileInfoComponent, {
+      data: dialogData,
+      hasBackdrop: true,
+      closeOnNavigation: true,
+      enterAnimationDuration: 200,
+      exitAnimationDuration: 200,
+      role: 'dialog',
+      ariaModal: true,
+    });
+
+    const afterClosed$ = dialogRef.afterClosed() as Observable<ChecklistFileMetadata | undefined>;
+    return lastValueFrom(afterClosed$, { defaultValue: undefined });
   }
 }

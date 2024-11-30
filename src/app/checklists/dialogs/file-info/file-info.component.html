@@ -41,6 +41,6 @@
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button #okbutton mat-button [mat-dialog-close]="data" [disabled]="!filename.validity.valid">Ok</button>
-  <button mat-button mat-dialog-close>Cancel</button>
+  <button #okbutton mat-button [mat-dialog-close]="data.metadata" [disabled]="!filename.validity.valid">Ok</button>
+  <button mat-button [mat-dialog-close]="undefined">Cancel</button>
 </mat-dialog-actions>
