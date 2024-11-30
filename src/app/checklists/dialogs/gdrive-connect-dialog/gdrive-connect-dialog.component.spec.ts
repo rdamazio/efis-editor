@@ -4,7 +4,8 @@ import { ComponentFixture, TestBed, inject } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { firstValueFrom, toArray } from 'rxjs';
+import { screen } from '@testing-library/angular';
+import userEvent from '@testing-library/user-event';
 import { GoogleDriveConnectDialogComponent } from './gdrive-connect-dialog.component';
 
 describe('GoogleDriveConnectDialogComponent', () => {
@@ -32,18 +33,32 @@ describe('GoogleDriveConnectDialogComponent', () => {
   });
 
   it('should open and cancel the dialog', async () => {
-    const dialogRef = dialog.open(GoogleDriveConnectDialogComponent);
+    const confirmPromise = GoogleDriveConnectDialogComponent.confirmConnection(dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(1);
 
-    await dialogs[0].close();
+    const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
+    await userEvent.click(cancelButton);
+
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
-    const returnValues = await firstValueFrom(dialogRef.afterClosed().pipe(toArray()), { defaultValue: ['FAIL'] });
-    expect(returnValues).toEqual(jasmine.arrayWithExactContents([]));
+    expect(await confirmPromise).toBeFalse();
   });
 
-  // TODO: Add tests for return value when user confirms.
+  it('should open and confirm the dialog', async () => {
+    const confirmPromise = GoogleDriveConnectDialogComponent.confirmConnection(dialog);
+
+    let dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs.length).toBe(1);
+
+    const syncButton = await screen.findByRole('button', { name: 'Synchronize' });
+    await userEvent.click(syncButton);
+
+    dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs.length).toBe(0);
+
+    expect(await confirmPromise).toBeTrue();
+  });
 });

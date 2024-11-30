@@ -4,6 +4,8 @@ import { ComponentFixture, inject, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { screen } from '@testing-library/angular';
+import userEvent from '@testing-library/user-event';
 import { DeleteDialogComponent, DeleteDialogData } from './delete-dialog.component';
 
 const DATA: DeleteDialogData = {
@@ -44,15 +46,28 @@ describe('DeleteDialogComponent', () => {
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(1);
 
-    await dialogs[0].close();
+    const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
+    await userEvent.click(cancelButton);
+
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
     expect(await confirmPromise).toBeFalse();
   });
 
-  // TODO: Add tests for return value when user confirms.
-  // Start with something like this:
-  // const button = await loader.getHarness(MatButtonHarness.with({ text: 'Delete!' }));
-  //  await button.click();
+  it('should open and confirm the dialog', async () => {
+    const confirmPromise = DeleteDialogComponent.confirmDeletion(DATA, dialog);
+
+    let dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs.length).toBe(1);
+
+    const deleteButton = await screen.findByRole('button', { name: 'Delete!' });
+
+    await userEvent.click(deleteButton);
+
+    dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs.length).toBe(0);
+
+    expect(await confirmPromise).toBeTrue();
+  });
 });

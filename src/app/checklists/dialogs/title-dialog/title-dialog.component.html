@@ -16,5 +16,5 @@
 
 <mat-dialog-actions>
   <button #okbutton mat-button [mat-dialog-close]="title" [disabled]="!title">Ok</button>
-  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="undefined">Cancel</button>
 </mat-dialog-actions>

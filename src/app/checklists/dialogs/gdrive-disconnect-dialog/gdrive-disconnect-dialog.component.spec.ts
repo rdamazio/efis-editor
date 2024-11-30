@@ -4,8 +4,9 @@ import { ComponentFixture, TestBed, inject } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { screen } from '@testing-library/angular';
+import userEvent from '@testing-library/user-event';
 import { GoogleDriveDisconnectDialogComponent } from './gdrive-disconnect-dialog.component';
-import { firstValueFrom, toArray } from 'rxjs';
 
 describe('GoogleDriveDisconnectDialogComponent', () => {
   let fixture: ComponentFixture<GoogleDriveDisconnectDialogComponent>;
@@ -32,18 +33,55 @@ describe('GoogleDriveDisconnectDialogComponent', () => {
   });
 
   it('should open and cancel the dialog', async () => {
-    const dialogRef = dialog.open(GoogleDriveDisconnectDialogComponent);
+    const confirmPromise = GoogleDriveDisconnectDialogComponent.confirmDisconnection(dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(1);
 
-    await dialogs[0].close();
+    const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
+    await userEvent.click(cancelButton);
+
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
-    const returnValues = await firstValueFrom(dialogRef.afterClosed().pipe(toArray()), { defaultValue: ['FAIL'] });
-    expect(returnValues).toEqual(jasmine.arrayWithExactContents([]));
+    expect(await confirmPromise).toBeUndefined();
   });
 
-  // TODO: Add tests for return value when user confirms.
+  it('should open and confirm the dialog', async () => {
+    const confirmPromise = GoogleDriveDisconnectDialogComponent.confirmDisconnection(dialog);
+
+    let dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs.length).toBe(1);
+
+    const deleteAll = await screen.findByRole('checkbox', { name: 'Delete all EFIS Editor data from Google Drive' });
+    expect(deleteAll).not.toBeChecked();
+
+    const stopButton = await screen.findByRole('button', { name: 'Stop synchronization' });
+    await userEvent.click(stopButton);
+
+    dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs.length).toBe(0);
+
+    expect(await confirmPromise).toEqual({ deleteAllData: false });
+  });
+
+  it('should open and confirm the dialog with data deletion', async () => {
+    const confirmPromise = GoogleDriveDisconnectDialogComponent.confirmDisconnection(dialog);
+
+    let dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs.length).toBe(1);
+
+    const deleteAll = await screen.findByRole('checkbox', { name: 'Delete all EFIS Editor data from Google Drive' });
+    expect(deleteAll).not.toBeChecked();
+    await userEvent.click(deleteAll);
+    expect(deleteAll).toBeChecked();
+
+    const stopButton = await screen.findByRole('button', { name: 'Stop synchronization' });
+    await userEvent.click(stopButton);
+
+    dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs.length).toBe(0);
+
+    expect(await confirmPromise).toEqual({ deleteAllData: true });
+  });
 });
