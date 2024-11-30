@@ -4,20 +4,20 @@ import { ComponentFixture, TestBed, inject } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { ExportDialogComponent } from './export-dialog.component';
+import { PrintDialogComponent } from './print-dialog.component';
 
-describe('ExportDialogComponent', () => {
-  let fixture: ComponentFixture<ExportDialogComponent>;
+describe('PrintDialogComponent', () => {
+  let fixture: ComponentFixture<PrintDialogComponent>;
   let loader: HarnessLoader;
   let dialog: MatDialog;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ExportDialogComponent, MatDialogModule, NoopAnimationsModule],
+      imports: [PrintDialogComponent, MatDialogModule, NoopAnimationsModule],
       providers: [{ provide: MatDialogRef, useValue: {} }],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ExportDialogComponent);
+    fixture = TestBed.createComponent(PrintDialogComponent);
     fixture.detectChanges();
     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
   });
@@ -31,7 +31,7 @@ describe('ExportDialogComponent', () => {
   });
 
   it('should open and cancel the dialog', async () => {
-    dialog.open(ExportDialogComponent);
+    dialog.open(PrintDialogComponent);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(1);

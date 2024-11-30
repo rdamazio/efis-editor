@@ -10,7 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { PdfWriterOptions } from '../../../../model/formats/pdf-writer';
 
 @Component({
-  selector: 'checklist-export-dialog',
+  selector: 'checklist-print-dialog',
   imports: [
     FormsModule,
     MatButtonModule,
@@ -25,10 +25,10 @@ import { PdfWriterOptions } from '../../../../model/formats/pdf-writer';
     MatSelectModule,
     ReactiveFormsModule,
   ],
-  templateUrl: './export-dialog.component.html',
-  styleUrl: './export-dialog.component.scss',
+  templateUrl: './print-dialog.component.html',
+  styleUrl: './print-dialog.component.scss',
 })
-export class ExportDialogComponent {
+export class PrintDialogComponent {
   options: PdfWriterOptions = {
     format: 'letter',
     orientation: 'portrait',

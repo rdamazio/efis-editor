@@ -38,8 +38,8 @@ import { GoogleDriveStorage } from '../../model/storage/gdrive';
 import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
-import { ExportDialogComponent } from './dialogs/export-dialog/export-dialog.component';
 import { ChecklistFileInfoComponent, FileInfoDialogData } from './dialogs/file-info/file-info.component';
+import { PrintDialogComponent } from './dialogs/print-dialog/print-dialog.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { HelpComponent } from './hotkeys/help/help.component';
@@ -558,7 +558,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (formatId === 'fmd') {
       file = ForeFlightFormat.fromProto(this.selectedFile);
     } else if (formatId === 'pdf') {
-      const pdfDialog = this._dialog.open(ExportDialogComponent, {
+      const pdfDialog = this._dialog.open(PrintDialogComponent, {
         hasBackdrop: true,
         closeOnNavigation: true,
         enterAnimationDuration: 200,
