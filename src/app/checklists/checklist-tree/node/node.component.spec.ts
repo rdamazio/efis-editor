@@ -1,7 +1,7 @@
 import { fireEvent, render, RenderResult, screen } from '@testing-library/angular';
+import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node';
 import { ChecklistTreeNodeComponent } from './node.component';
-import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
 
 describe('NodeComponent', () => {
   let node: ChecklistTreeNode;

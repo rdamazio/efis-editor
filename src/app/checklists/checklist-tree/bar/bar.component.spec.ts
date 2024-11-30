@@ -1,7 +1,7 @@
 import { render, RenderResult, screen } from '@testing-library/angular';
+import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistTreeComponent } from '../checklist-tree.component';
 import { ChecklistTreeBarComponent } from './bar.component';
-import userEvent, { UserEvent } from '@testing-library/user-event';
 
 describe('ChecklistTreeBarComponent', () => {
   let tree: jasmine.SpyObj<ChecklistTreeComponent>;
