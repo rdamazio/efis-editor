@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { ChecklistFile, ChecklistGroup } from '../../../gen/ts/checklist';

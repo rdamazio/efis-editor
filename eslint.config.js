@@ -209,6 +209,14 @@ module.exports = tseslint.config(
     },
   },
   {
+    files: ['**/*.spec.ts'],
+    rules: {
+      // jasmine spy expectations are expressed unbound
+      '@typescript-eslint/unbound-method': 'off',
+      'no-await-in-loop': 'off',
+    },
+  },
+  {
     files: ['**/*.html'],
     extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility, prettierRecommended],
     rules: {

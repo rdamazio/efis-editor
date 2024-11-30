@@ -100,8 +100,8 @@ describe('PdfWriter', () => {
     // Concatenate all the text from the PDF.
     let allText = '';
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum); // eslint-disable-line no-await-in-loop
-      const content = await page.getTextContent(); // eslint-disable-line no-await-in-loop
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
       for (const item of content.items) {
         allText += (item as TextItem).str;
         allText += ' ';
