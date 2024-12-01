@@ -37,7 +37,9 @@ export class ChecklistItemComponent {
     this._shouldRestoreFocus = document.activeElement === this.containerRef().nativeElement;
     e?.stopPropagation();
     this.promptInput().edit();
-    this.expectationInput().edit();
+    if (this.item().type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
+      this.expectationInput().edit();
+    }
     this.promptInput().focus();
   }
 
@@ -52,15 +54,17 @@ export class ChecklistItemComponent {
     this.onItemUpdated();
   }
 
-  onSavePrompt() {
-    this.item().prompt = this.promptInput().value();
+  onSavePrompt(prompt: string) {
+    this.item().prompt = prompt;
     this.onItemUpdated();
-    this.expectationInput().save();
+    if (this.item().type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
+      this.expectationInput().save();
+    }
     this._restoreFocus();
   }
 
-  onSaveExpectation() {
-    this.item().expectation = this.expectationInput().value();
+  onSaveExpectation(expectation: string) {
+    this.item().expectation = expectation;
     this.onItemUpdated();
     this.promptInput().save();
     this._restoreFocus();
@@ -68,7 +72,9 @@ export class ChecklistItemComponent {
 
   onCancelEdit() {
     this.promptInput().cancel();
-    this.expectationInput().cancel();
+    if (this.item().type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
+      this.expectationInput().cancel();
+    }
     this._restoreFocus();
   }
 

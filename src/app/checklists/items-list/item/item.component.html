@@ -85,7 +85,7 @@
         [class.prompt-input-editing]="promptInput.editing()"
         label="Prompt text"
         [value]="it.prompt"
-        (valueChange)="onSavePrompt()"
+        (saved)="onSavePrompt($event)"
         (cancelled)="onCancelEdit()"
       />
     </span>
@@ -102,7 +102,7 @@
           [class.expectation-input-editing]="expectationInput.editing()"
           label="Expectation text"
           [value]="it.expectation"
-          (valueChange)="onSaveExpectation()"
+          (saved)="onSaveExpectation($event)"
           (cancelled)="onCancelEdit()"
         />
       </span>

@@ -28,7 +28,10 @@ export class EditableLabelComponent {
   control = new FormControl('');
   readonly input = viewChild.required<ElementRef<HTMLElement>>('promptInput');
 
-  readonly cancelled = output<boolean>();
+  // Must have a separate output from value's so we can output even when no change is made.
+  // ('cause maybe the other editable label had changes).
+  readonly saved = output<string>();
+  readonly cancelled = output();
   readonly editing = model<boolean>();
   readonly value = model('');
   readonly label = input('');
@@ -42,6 +45,7 @@ export class EditableLabelComponent {
     if (this.editing()) {
       this.editing.set(false);
       this.value.set(this.control.value!);
+      this.saved.emit(this.control.value!);
     }
   }
 
@@ -64,7 +68,7 @@ export class EditableLabelComponent {
     if (this.editing()) {
       this.editing.set(false);
       this.control.setValue(this.value());
-      this.cancelled.emit(true);
+      this.cancelled.emit();
     }
   }
 
