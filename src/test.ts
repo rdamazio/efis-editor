@@ -9,6 +9,5 @@ getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDyn
 
 // Install custom matchers from jasmine-dom
 beforeAll(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   jasmine.addMatchers(JasmineDOM);
 });
