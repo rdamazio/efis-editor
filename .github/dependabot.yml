@@ -23,12 +23,15 @@ updates:
           - 'karma*'
           - '*protobuf*'
           - 'rxjs'
-          - 'tslib'
-          - 'typescript'
           - 'zone.js'
         exclude-patterns:
           - '*eslint*'
           - '*prettier*'
+      typescript:
+        applies-to: version-updates
+        patterns:
+          - 'tslib'
+          - 'typescript'
       minor-and-patch:
         applies-to: security-updates
         patterns:
