@@ -658,6 +658,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async onFileModified(file?: ChecklistFile) {
+    // If the change involved moving the selected checklist/group, we may need to update the fragment
+    await this._updateFragment();
+
     if (file) {
       await this.store.saveChecklistFile(file);
     }
