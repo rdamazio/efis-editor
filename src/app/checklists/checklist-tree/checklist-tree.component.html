@@ -13,6 +13,7 @@
        This padding value depends on the mat-icon-button width. -->
   <mat-tree-node
     *matTreeNodeDef="let node"
+    [attr.aria-label]="(node.isAddNew ? '' : 'Checklist: ') + node.title"
     matTreeNodePadding
     matTreeNodePaddingIndent="12px"
     [class.checklist-selected]="node.checklist && selectedChecklist === node.checklist"
@@ -38,6 +39,7 @@
   <mat-nested-tree-node
     *matTreeNodeDef="let node; when: hasChild"
     id="group_{{ node.groupIdx }}"
+    [attr.aria-label]="(node.isAddNew ? '' : 'Group: ') + node.title"
     checklistDrag
     [checklistDragNode]="group"
     cdkDragLockAxis="y"
@@ -53,7 +55,7 @@
     (cdkDropListExited)="onLeafExited($event)"
   >
     <div class="mat-tree-node" [class.group-selected]="node.group && selectedChecklistGroup === node.group">
-      <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.title">
+      <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle group ' + node.title">
         <mat-icon class="mat-icon-rtl-mirror">
           {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
         </mat-icon>

@@ -9,10 +9,12 @@ import {
 } from '@angular/cdk/drag-drop';
 import {
   afterNextRender,
+  AfterViewInit,
   Component,
   ElementRef,
   Injector,
   model,
+  OnInit,
   output,
   QueryList,
   viewChild,
@@ -57,7 +59,7 @@ type MovementDirection = 'up' | 'down';
   templateUrl: './checklist-tree.component.html',
   styleUrl: './checklist-tree.component.scss',
 })
-export class ChecklistTreeComponent {
+export class ChecklistTreeComponent implements OnInit, AfterViewInit {
   readonly file = model<ChecklistFile>();
   readonly fileModified = output<ChecklistFile>();
   readonly selectedChecklist = model<Checklist>();
@@ -73,20 +75,24 @@ export class ChecklistTreeComponent {
     private readonly _element: ElementRef<Element>,
     private readonly _dialog: MatDialog,
     private readonly _injector: Injector,
-  ) {
-    this.selectedChecklist.subscribe((checklist?: Checklist) => {
-      if (checklist) {
-        this._scrollToSelectedChecklist();
-      }
-    });
+  ) {}
 
-    this.file.subscribe(() => {
-      // When a new file is loaded, drop the current checklist/group selection.
-      this._reloadFile(false);
-      if (this.selectedChecklist() || this.selectedChecklistGroup()) {
-        this._selectChecklist(undefined, undefined);
-      }
-    });
+  ngOnInit() {
+    this.file.subscribe(this._onFileChanged.bind(this));
+    this.selectedChecklist.subscribe(this._scrollToSelectedChecklist.bind(this));
+  }
+
+  ngAfterViewInit() {
+    this._onFileChanged();
+    this._scrollToSelectedChecklist();
+  }
+
+  private _onFileChanged() {
+    // When a new file is loaded, drop the current checklist/group selection.
+    this._reloadFile(false);
+    if (this.selectedChecklist() || this.selectedChecklistGroup()) {
+      this._selectChecklist(undefined, undefined);
+    }
   }
 
   private _reloadFile(modified: boolean) {
@@ -141,8 +147,8 @@ export class ChecklistTreeComponent {
     let checklist: Checklist | undefined;
     let checklistGroup: ChecklistGroup | undefined;
     if (!node.isAddNew) {
-      checklist = node.checklist!;
-      checklistGroup = node.group!;
+      checklist = node.checklist;
+      checklistGroup = node.group;
     } else {
       if (node.group) {
         // Adding new checklist to a group.
