@@ -16,6 +16,7 @@ updates:
         applies-to: version-updates
         patterns:
           - '@angular*'
+          - '@testing-library/*'
           - '@types/node'
           - '*express*'
           - '*jasmine*'
