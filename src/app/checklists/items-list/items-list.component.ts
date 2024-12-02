@@ -263,4 +263,11 @@ export class ChecklistItemsComponent {
     this.checklist.set(this._undoState.pop());
     this.onItemUpdated();
   }
+
+  itemLabel(item: ChecklistItem): string {
+    if (item.type === ChecklistItem_Type.ITEM_SPACE) {
+      return 'Blank item';
+    }
+    return `Item: ${item.prompt}`;
+  }
 }

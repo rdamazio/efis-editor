@@ -1,17 +1,18 @@
 @let chklist = checklist();
 
-<div class="container">
+<div class="container" data-testid="items-list">
   @if (chklist) {
     <div
       id="items-drop-list"
       cdkDropList
       class="list"
+      role="list"
       [cdkDropListData]="chklist.items"
       [cdkDropListConnectedTo]="groupDropListIds()"
       (cdkDropListDropped)="onDrop($event)"
     >
       @for (item of chklist.items; track item; let i = $index) {
-        <div class="list-item" cdkDrag [cdkDragData]="item">
+        <div class="list-item" cdkDrag [cdkDragData]="item" role="listitem" [attr.aria-label]="itemLabel(item)">
           <checklist-item
             #item
             [item]="item"
