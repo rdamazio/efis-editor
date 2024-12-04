@@ -657,18 +657,13 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     // TODO: Add filename to topbar, add rename pencil there
   }
 
-  async onFileModified(file?: ChecklistFile) {
+  async onChecklistChanged() {
     // If the change involved moving the selected checklist/group, we may need to update the fragment
     await this._updateFragment();
 
+    const file = this.selectedFile;
     if (file) {
       await this.store.saveChecklistFile(file);
-    }
-  }
-
-  async onChecklistChanged() {
-    if (this.selectedFile) {
-      await this.store.saveChecklistFile(this.selectedFile);
     }
   }
 }
