@@ -3,7 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationExtras, Router } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
-import { ChecklistFile, ChecklistGroup_Category, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import { ChecklistFile, ChecklistGroup_Category, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../../model/formats/test-data';
 import { LazyBrowserStorage } from '../../model/storage/browser-storage';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
@@ -448,5 +448,413 @@ describe('ChecklistsComponent', () => {
     expect(await screen.findByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
   });
 
-  // TODO: Add keyboard shortcut tests.
+  describe('keyboard shortcuts', () => {
+    async function debounce() {
+      return new Promise((resolve) => {
+        setTimeout(resolve, 550);
+      });
+    }
+
+    it('should add new items', async () => {
+      await newFile('My file');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+
+      // Delete the initially-added item.
+      const item = screen.getByRole('listitem', { name: 'Item: Checklist created' });
+      await user.click(within(item).getByRole('button', { name: /Delete.*/ }));
+      expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
+
+      // Exercise all the keyboard shortcuts.
+      for (const shortcut of ChecklistsComponent.NEW_ITEM_SHORTCUTS) {
+        await debounce();
+        await user.keyboard('n');
+        await user.keyboard(shortcut.secondKey);
+      }
+      await debounce();
+
+      // Create the expected resulting checklist data structure.
+      const expectedItems = ChecklistsComponent.NEW_ITEM_SHORTCUTS.map((s) =>
+        ChecklistItem.create({
+          type: s.type,
+          prompt: s.type === ChecklistItem_Type.ITEM_SPACE ? '' : 'New item',
+          expectation: s.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE ? 'New expectation' : '',
+        }),
+      );
+
+      // Check that all the items were rendered.
+      expect(await screen.findByRole('listitem', { name: 'Blank item' })).toBeVisible();
+      expect(screen.getAllByRole('listitem', { name: 'Item: New item' })).toHaveSize(
+        ChecklistsComponent.NEW_ITEM_SHORTCUTS.length - 1,
+      );
+
+      // Check that all the items were added to the file.
+      const expectedFile = ChecklistFile.clone(NEW_FILE);
+      expectedFile.groups[0].checklists[0].items = expectedItems;
+
+      await expectFile('My file', expectedFile);
+    });
+
+    it('should edit items', async () => {
+      await newFile('My file');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+
+      await user.keyboard('[ArrowDown]');
+      await user.keyboard('[Enter]');
+
+      const promptBox1 = await screen.findByRole('textbox', { name: 'Prompt text' });
+      const expectationBox = await screen.findByRole('textbox', { name: 'Expectation text' });
+      await retype(promptBox1, 'New prompt');
+      await retype(expectationBox, 'New expectation[Enter]');
+
+      await debounce();
+      await user.keyboard('nw');
+      await debounce();
+      await user.keyboard('[ArrowDown]');
+      await user.keyboard('[Enter]');
+
+      const promptBox2 = await screen.findByRole('textbox', { name: 'Prompt text' });
+      await retype(promptBox2, 'Other prompt[Enter]');
+
+      // Check that all the items were added to the file.
+      const expectedFile = ChecklistFile.clone(NEW_FILE);
+      const items = expectedFile.groups[0].checklists[0].items;
+      items[0].prompt = 'New prompt';
+      items[0].expectation = 'New expectation';
+      items.push(
+        ChecklistItem.create({
+          type: ChecklistItem_Type.ITEM_WARNING,
+          prompt: 'Other prompt',
+        }),
+      );
+
+      await expectFile('My file', expectedFile);
+
+      // Move back up and modify the first item again.
+      await user.keyboard('[ArrowUp]');
+      await user.keyboard('[Enter]');
+
+      const promptBox3 = await screen.findByRole('textbox', { name: 'Prompt text' });
+      await retype(promptBox3, 'Third prompt[Enter]');
+
+      expectedFile.groups[0].checklists[0].items[0].prompt = 'Third prompt';
+      await expectFile('My file', expectedFile);
+    });
+
+    it('should indent an item', async () => {
+      await newFile('My file');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+
+      // Select and shift the item.
+      await user.keyboard('[ArrowDown]');
+      await user.keyboard('[ShiftLeft>][ArrowRight][/ShiftLeft]');
+
+      // Verify that it was indented in storage.
+      const expectedFile = ChecklistFile.clone(NEW_FILE);
+      expectedFile.groups[0].checklists[0].items[0].indent = 1;
+      await expectFile('My file', expectedFile);
+
+      // Shift it back.
+      await user.keyboard('[ShiftLeft>][ArrowLeft][/ShiftLeft]');
+
+      // Verify that it was indented in storage.
+      expectedFile.groups[0].checklists[0].items[0].indent = 0;
+      await expectFile('My file', expectedFile);
+    });
+
+    it('should center an item', async () => {
+      await newFile('My file');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+      // We can't use the built-in item because challenge/response doesn't support centering.
+      await addItem('caution', 'Center me');
+
+      // Select and shift the item.
+      await user.keyboard('[ArrowUp]');
+      await debounce();
+      await user.keyboard('[ShiftLeft>]c[/ShiftLeft]');
+      await debounce();
+
+      // Verify that it was centered in storage.
+      const expectedFile = ChecklistFile.clone(NEW_FILE);
+      expectedFile.groups[0].checklists[0].items.push(
+        ChecklistItem.create({
+          type: ChecklistItem_Type.ITEM_CAUTION,
+          prompt: 'Center me',
+          centered: true,
+        }),
+      );
+      await expectFile('My file', expectedFile);
+
+      // Uncenter it.
+      // await debounce();
+      await user.keyboard('[ShiftLeft>]c[/ShiftLeft]');
+      // await debounce();
+
+      // Verify that it was indented in storage.
+      expectedFile.groups[0].checklists[0].items[1].centered = false;
+      await expectFile('My file', expectedFile);
+    });
+
+    it('should delete an item', async () => {
+      await newFile('My file');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+
+      // Add an item.
+      await debounce();
+      await user.keyboard('nw');
+      await debounce();
+
+      expect(await screen.findByRole('listitem', { name: 'Item: New item' })).toBeInTheDocument();
+
+      // Delete it.
+      await user.keyboard('[Delete]');
+      expect(screen.queryByRole('listitem', { name: 'Item: New item' })).not.toBeInTheDocument();
+
+      // Verify that it's gone from storage.
+      await expectFile('My file', NEW_FILE);
+
+      // Also delete the other that was already there (it should have been selected after the other was deleted).
+      expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
+      await user.keyboard('[Delete]');
+      expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
+
+      // Verify that it's also gone from storage.
+      const expectedFile = ChecklistFile.clone(NEW_FILE);
+      expectedFile.groups[0].checklists[0].items = [];
+      await expectFile('My file', expectedFile);
+    });
+
+    it('should navigate between checklists and groups', async () => {
+      await newFile('My file');
+      expectFragment('My file');
+
+      await addChecklist('First checklist group', 'Second checklist');
+      expectFragment('My file/0/1');
+      await addGroup('Second checklist group');
+      await addChecklist('Second checklist group', 'Third checklist');
+      expectFragment('My file/1/0');
+
+      // Test navigation between checklists.
+      await user.keyboard('[MetaLeft>][ArrowUp][/MetaLeft]');
+      expectFragment('My file/0/1');
+      await user.keyboard('[MetaLeft>][ArrowUp][/MetaLeft]');
+      expectFragment('My file/0/0');
+      await user.keyboard('[MetaLeft>][ArrowUp][/MetaLeft]');
+      expectFragment('My file/0/0');
+      await user.keyboard('[MetaLeft>][ArrowDown][/MetaLeft]');
+      expectFragment('My file/0/1');
+      await user.keyboard('[MetaLeft>][ArrowDown][/MetaLeft]');
+      expectFragment('My file/1/0');
+      await user.keyboard('[MetaLeft>][ArrowDown][/MetaLeft]');
+      expectFragment('My file/1/0');
+
+      // Test navigation without an initial selection.
+      await setFragment('My file');
+      await user.keyboard('[MetaLeft>][ArrowDown][/MetaLeft]');
+      expectFragment('My file/0/0');
+
+      await setFragment('My file');
+      await user.keyboard('[MetaLeft>][ArrowUp][/MetaLeft]');
+      expectFragment('My file/1/0');
+
+      // Test navigation between groups.
+      await setFragment('My file/0/0');
+      await user.keyboard('[AltLeft>][ArrowDown][/AltLeft]');
+      expectFragment('My file/1/0');
+      await user.keyboard('[AltLeft>][ArrowDown][/AltLeft]');
+      expectFragment('My file/1/0');
+      await user.keyboard('[AltLeft>][ArrowUp][/AltLeft]');
+      expectFragment('My file/0/0');
+      await user.keyboard('[AltLeft>][ArrowUp][/AltLeft]');
+      expectFragment('My file/0/0');
+
+      // Test navigation between groups without an initial selection.
+      await setFragment('My file');
+      await user.keyboard('[AltLeft>][ArrowDown][/AltLeft]');
+      expectFragment('My file/0/0');
+
+      await setFragment('My file');
+      await user.keyboard('[AltLeft>][ArrowUp][/AltLeft]');
+      expectFragment('My file/1/0');
+    });
+
+    it('should reorder items', async () => {
+      await newFile('My file');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+      await addItem('caution', 'Second item');
+      await addItem('title', 'Third item');
+
+      const item1 = ChecklistItem.clone(NEW_FILE.groups[0].checklists[0].items[0]);
+      const item2 = ChecklistItem.create({
+        type: ChecklistItem_Type.ITEM_CAUTION,
+        prompt: 'Second item',
+      });
+      const item3 = ChecklistItem.create({
+        type: ChecklistItem_Type.ITEM_TITLE,
+        prompt: 'Third item',
+      });
+
+      // Shift first item down
+      await user.keyboard('[ArrowDown]');
+      await debounce();
+      await user.keyboard('[ShiftLeft>][ArrowDown][/ShiftLeft]');
+      await debounce();
+
+      const expectedFile = ChecklistFile.clone(NEW_FILE);
+      const checklist = expectedFile.groups[0].checklists[0];
+      checklist.items = [item2, item1, item3];
+      await expectFile('My file', expectedFile);
+
+      // Shift it again
+      await user.keyboard('[ShiftLeft>][ArrowDown][/ShiftLeft]');
+      await debounce();
+
+      checklist.items = [item2, item3, item1];
+      await expectFile('My file', expectedFile);
+
+      // Shift it again, even though it's already at the bottom
+      await user.keyboard('[ShiftLeft>][ArrowDown][/ShiftLeft]');
+      await debounce();
+      await expectFile('My file', expectedFile);
+
+      // Shift it up
+      await user.keyboard('[ShiftLeft>][ArrowUp][/ShiftLeft]');
+      await debounce();
+
+      checklist.items = [item2, item1, item3];
+      await expectFile('My file', expectedFile);
+
+      // Shift it up again
+      await user.keyboard('[ShiftLeft>][ArrowUp][/ShiftLeft]');
+      await debounce();
+
+      checklist.items = [item1, item2, item3];
+      await expectFile('My file', expectedFile);
+
+      // Shift it up again, even though it's already at the top
+      await user.keyboard('[ShiftLeft>][ArrowUp][/ShiftLeft]');
+      await debounce();
+      await expectFile('My file', expectedFile);
+    });
+
+    it('should reorder checklists', async () => {
+      await newFile('My file');
+      expectFragment('My file');
+
+      // Create two more checklists, the last in a separate group.
+      // Add an item to each checklist so they're not interchangeable.
+      await addChecklist('First checklist group', 'Second checklist');
+      expectFragment('My file/0/1');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: Second checklist' }));
+      await addItem('title', 'Checklist 2');
+
+      await addGroup('Second checklist group');
+      await addChecklist('Second checklist group', 'Third checklist');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: Third checklist' }));
+      await addItem('text', 'Checklist III');
+      expectFragment('My file/1/0');
+
+      const expectedFile = (await getChecklistFile('My file'))!;
+      expectedFile.metadata!.modifiedTime = 0;
+      const checklist1 = expectedFile.groups[0].checklists[0];
+      const checklist2 = expectedFile.groups[0].checklists[1];
+      const checklist3 = expectedFile.groups[1].checklists[0];
+
+      // Move the last checklist up.
+      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowUp][/MetaLeft][/ShiftLeft]');
+      expectFragment('My file/0/2');
+      expectedFile.groups[0].checklists = [checklist1, checklist2, checklist3];
+      expectedFile.groups[1].checklists = [];
+      await expectFile('My file', expectedFile);
+
+      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowUp][/MetaLeft][/ShiftLeft]');
+      expectFragment('My file/0/1');
+      expectedFile.groups[0].checklists = [checklist1, checklist3, checklist2];
+      await expectFile('My file', expectedFile);
+
+      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowUp][/MetaLeft][/ShiftLeft]');
+      expectFragment('My file/0/0');
+      expectedFile.groups[0].checklists = [checklist3, checklist1, checklist2];
+      await expectFile('My file', expectedFile);
+
+      // Move it past the top and assert no change.
+      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowUp][/MetaLeft][/ShiftLeft]');
+      expectFragment('My file/0/0');
+      await expectFile('My file', expectedFile);
+
+      // Move it back down.
+      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowDown][/MetaLeft][/ShiftLeft]');
+      expectFragment('My file/0/1');
+      expectedFile.groups[0].checklists = [checklist1, checklist3, checklist2];
+      await expectFile('My file', expectedFile);
+
+      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowDown][/MetaLeft][/ShiftLeft]');
+      expectFragment('My file/0/2');
+      expectedFile.groups[0].checklists = [checklist1, checklist2, checklist3];
+      await expectFile('My file', expectedFile);
+
+      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowDown][/MetaLeft][/ShiftLeft]');
+      expectFragment('My file/1/0');
+      expectedFile.groups[0].checklists = [checklist1, checklist2];
+      expectedFile.groups[1].checklists = [checklist3];
+      await expectFile('My file', expectedFile);
+
+      // Move it past the bottom and assert no change.
+      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowDown][/MetaLeft][/ShiftLeft]');
+      expectFragment('My file/1/0');
+      await expectFile('My file', expectedFile);
+    });
+
+    it('should reorder groups', async () => {
+      await newFile('My file');
+      expectFragment('My file');
+
+      // Create two more groups.
+      await addChecklist('First checklist group', 'Second checklist');
+      await addGroup('Second checklist group');
+      await addChecklist('Second checklist group', 'Third checklist');
+      await addGroup('Third checklist group');
+      await addChecklist('Third checklist group', 'Fourth checklist');
+
+      const expectedFile = (await getChecklistFile('My file'))!;
+      expectedFile.metadata!.modifiedTime = 0;
+      const group1 = expectedFile.groups[0];
+      const group2 = expectedFile.groups[1];
+      const group3 = expectedFile.groups[2];
+
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: Second checklist' }));
+      expectFragment('My file/0/1');
+
+      // Move the first group down.
+      await user.keyboard('[ShiftLeft>][AltLeft>][ArrowDown][/AltLeft][/ShiftLeft]');
+      expectFragment('My file/1/1');
+      expectedFile.groups = [group2, group1, group3];
+      await expectFile('My file', expectedFile);
+
+      await user.keyboard('[ShiftLeft>][AltLeft>][ArrowDown][/AltLeft][/ShiftLeft]');
+      expectFragment('My file/2/1');
+      expectedFile.groups = [group2, group3, group1];
+      await expectFile('My file', expectedFile);
+
+      // Move it past the bottom and assert no change.
+      await user.keyboard('[ShiftLeft>][AltLeft>][ArrowDown][/AltLeft][/ShiftLeft]');
+      expectFragment('My file/2/1');
+      await expectFile('My file', expectedFile);
+
+      // Move it back up.
+      await user.keyboard('[ShiftLeft>][AltLeft>][ArrowUp][/AltLeft][/ShiftLeft]');
+      expectFragment('My file/1/1');
+      expectedFile.groups = [group2, group1, group3];
+      await expectFile('My file', expectedFile);
+
+      await user.keyboard('[ShiftLeft>][AltLeft>][ArrowUp][/AltLeft][/ShiftLeft]');
+      expectFragment('My file/0/1');
+      expectedFile.groups = [group1, group2, group3];
+      await expectFile('My file', expectedFile);
+
+      // Move it past the top and assert no change.
+      await user.keyboard('[ShiftLeft>][AltLeft>][ArrowUp][/AltLeft][/ShiftLeft]');
+      expectFragment('My file/0/1');
+      await expectFile('My file', expectedFile);
+    });
+  });
 });
