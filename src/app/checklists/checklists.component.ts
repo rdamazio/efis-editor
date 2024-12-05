@@ -68,7 +68,7 @@ interface ParsedFragment {
 })
 @UntilDestroy()
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
-  private static readonly NEW_ITEM_SHORTCUTS = [
+  static readonly NEW_ITEM_SHORTCUTS = [
     { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
     { secondKey: 'c', typeDescription: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
     { secondKey: 'x', typeDescription: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
@@ -76,7 +76,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     { secondKey: 'w', typeDescription: 'warning', type: ChecklistItem_Type.ITEM_WARNING },
     { secondKey: 'a', typeDescription: 'caution', type: ChecklistItem_Type.ITEM_CAUTION },
     { secondKey: 'n', typeDescription: 'note', type: ChecklistItem_Type.ITEM_NOTE },
-    { secondKey: 'b', typeDescription: 'blank', type: ChecklistItem_Type.ITEM_SPACE },
+    { secondKey: 'b', typeDescription: 'blank row', type: ChecklistItem_Type.ITEM_SPACE },
   ];
   protected readonly _downloadSpinner = 'download-spinner';
 

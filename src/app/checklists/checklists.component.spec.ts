@@ -3,9 +3,9 @@ import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistFile, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../../model/formats/test-data';
+import { LazyBrowserStorage } from '../../model/storage/browser-storage';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { ChecklistsComponent } from './checklists.component';
-import { LazyBrowserStorage } from '../../model/storage/browser-storage';
 
 describe('ChecklistsComponent', () => {
   let user: UserEvent;
@@ -72,52 +72,107 @@ describe('ChecklistsComponent', () => {
   async function addItem(type: string, prompt?: string, expectation?: string) {
     const newButton = screen.getByRole('button', { name: `Add a new checklist ${type}` });
     await user.click(newButton);
-    const item = screen.getByRole('listitem', { name: 'Item: New item' });
-    await user.click(within(item).getByRole('button', { name: 'Edit New item' }));
+
     if (prompt) {
+      const item = screen.getByRole('listitem', { name: 'Item: New item' });
+      await user.click(within(item).getByRole('button', { name: 'Edit New item' }));
       const itemPromptBox = await within(item).findByRole('textbox', { name: 'Prompt text' });
-      await user.clear(itemPromptBox);
-      await user.type(itemPromptBox, prompt);
+      await retype(itemPromptBox, prompt);
+
+      if (expectation) {
+        const itemExpectationBox = await within(item).findByRole('textbox', { name: 'Expectation text' });
+        await retype(itemExpectationBox, expectation);
+      }
+      await user.click(within(item).getByRole('button', { name: 'Save changes to Prompt text' }));
     }
-    if (expectation) {
-      const itemExpectationBox = await within(item).findByRole('textbox', { name: 'Expectation text' });
-      await user.clear(itemExpectationBox);
-      await user.type(itemExpectationBox, expectation);
-    }
-    await user.click(within(item).getByRole('button', { name: 'Save changes to Prompt text' }));
+  }
+
+  async function retype(element: HTMLElement, text: string) {
+    await user.clear(element);
+    await user.type(element, text);
   }
 
   it('should create a new checklist and populate it', async () => {
     const file = ChecklistFile.clone(EXPECTED_CONTENTS);
-    const fileName = file.metadata!.name;
-    const group1 = file.groups[0].title;
-    const group1checklist1 = file.groups[0].checklists[0].title;
-    const checklist1 = file.groups[0].checklists[0];
-    const checklist1item1 = checklist1.items[0].prompt;
-    const checklist1item2 = checklist1.items[1].prompt;
-    const checklist1item2resp = checklist1.items[1].expectation;
+    const metadata = file.metadata!;
+    const fileName = metadata.name;
+
+    const typeMap = new Map<ChecklistItem_Type, string>();
+    for (const type of ChecklistsComponent.NEW_ITEM_SHORTCUTS) {
+      typeMap.set(type.type, type.typeDescription);
+    }
 
     await newEmptyFile(fileName);
-    await addGroup(group1);
-    await addChecklist(group1, group1checklist1);
 
-    await user.click(screen.getByRole('treeitem', { name: `Checklist: ${group1checklist1}` }));
+    // Add every item on the test file.
+    let numBlanks = 0;
+    for (const group of file.groups) {
+      await addGroup(group.title);
 
-    await addItem('challenge', checklist1item1);
-    await addItem('challenge/response', checklist1item2, checklist1item2resp);
+      for (const checklist of group.checklists) {
+        await addChecklist(group.title, checklist.title);
+        await user.click(screen.getByRole('treeitem', { name: `Checklist: ${checklist.title}` }));
 
-    // TODO: Populate all of file (that'll comprehensively test the UI), then compare to it.
+        for (const item of checklist.items) {
+          const type = typeMap.get(item.type);
+          await addItem(type!, item.prompt, item.expectation);
+
+          // Perform formatting if needed.
+          if (item.centered || item.indent) {
+            let itemEl: HTMLElement;
+            if (item.type === ChecklistItem_Type.ITEM_SPACE) {
+              // Spaces don't have a unique name to look for - find the last one instead.
+              const allBlanks = await screen.findAllByRole('listitem', { name: 'Blank item' });
+              numBlanks++;
+              expect(allBlanks).toHaveSize(numBlanks);
+              itemEl = allBlanks[numBlanks - 1];
+            } else {
+              itemEl = await screen.findByRole('listitem', { name: `Item: ${item.prompt}` });
+            }
+
+            if (item.centered) {
+              await user.click(within(itemEl).getByRole('button', { name: `Center ${item.prompt}` }));
+            }
+            if (item.indent) {
+              const indentButton = within(itemEl).getByRole('button', { name: `Indent ${item.prompt} right` });
+              for (let i = 0; i < item.indent; i++) {
+                await user.click(indentButton);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Populate the metadata.
+    await user.click(screen.getByRole('button', { name: 'Open file information dialog' }));
+    const aircraftMakeModelBox = await screen.findByRole('textbox', { name: 'Aircraft make and model' });
+    const aircraftInfoBox = await screen.findByRole('textbox', { name: 'Aircraft information' });
+    const manufacturerBox = await screen.findByRole('textbox', { name: 'Manufacturer information' });
+    const copyrightBox = await screen.findByRole('textbox', { name: 'Copyright information' });
+    const defaultChecklistBox = await screen.findByRole('combobox', { name: /Default checklist.*/ });
+    await retype(aircraftMakeModelBox, metadata.makeAndModel);
+    await retype(aircraftInfoBox, metadata.aircraftInfo);
+    await retype(manufacturerBox, metadata.manufacturerInfo);
+    await retype(copyrightBox, metadata.copyrightInfo);
+    await user.click(defaultChecklistBox);
+
+    const defaultChecklistTitle =
+      file.groups[metadata.defaultGroupIndex].checklists[metadata.defaultChecklistIndex].title;
+    const option = await screen.findByRole('option', { name: defaultChecklistTitle });
+    await user.click(option);
+
+    const okButton = await screen.findByRole('button', { name: 'Ok' });
+    await user.click(okButton);
+
     const checklist = await storage.getChecklistFile(file.metadata!.name);
     expect(checklist).not.toBeNull();
-    expect(checklist!.groups).toHaveSize(1);
-    expect(checklist!.groups[0].checklists[0].title).toEqual(group1checklist1);
-    expect(checklist!.groups[0].checklists[0].items).toHaveSize(2);
-    expect(checklist!.groups[0].checklists[0].items[0].type).toEqual(ChecklistItem_Type.ITEM_CHALLENGE);
-    expect(checklist!.groups[0].checklists[0].items[0].prompt).toEqual(checklist1item1);
-    expect(checklist!.groups[0].checklists[0].items[1].type).toEqual(ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE);
-    expect(checklist!.groups[0].checklists[0].items[1].prompt).toEqual(checklist1item2);
-    expect(checklist!.groups[0].checklists[0].items[1].expectation).toEqual(checklist1item2resp);
-  });
+
+    // Don't compare mtimes.
+    checklist!.metadata!.modifiedTime = 0;
+
+    expect(checklist).toEqual(EXPECTED_CONTENTS);
+  }, 20000); // Longer timeout for this large test.
 
   // TODO: Test renaming a checklist and group.
   // await user.hover(screen.getByText('First checklist'));
