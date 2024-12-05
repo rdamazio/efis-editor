@@ -620,7 +620,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         if (oldName !== newName) {
           // File was renamed, delete old one from storage.
           promises.push(this.store.deleteChecklistFile(oldName));
-          // TODO: Update fragment
+          promises.push(this._updateFragment());
         }
         return Promise.all(promises);
       })

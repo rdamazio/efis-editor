@@ -280,8 +280,7 @@ describe('ChecklistsComponent', () => {
     expect(await getChecklistFile('My file')).toBeNull();
     expect(await getChecklistFile('Renamed file')).not.toBeNull();
 
-    // TODO: Actual bug - fix.
-    // expectFragment('Renamed file');
+    expectFragment('Renamed file');
   });
 
   it('should rename groups, checklists and items', async () => {
