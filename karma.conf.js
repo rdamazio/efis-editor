@@ -9,6 +9,8 @@ module.exports = function (config) {
       require('karma-jasmine'),
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
+      require('karma-jasmine-order-reporter'),
+      require('karma-spec-reporter'),
       require('karma-coverage'),
       require('@angular-devkit/build-angular/plugins/karma'),
     ],
@@ -33,7 +35,13 @@ module.exports = function (config) {
     },
     files: [{ pattern: './src/assets/**', included: false, served: true }],
     proxies: { '/assets': '/base/src/assets' },
-    reporters: ['progress', 'kjhtml'],
+    reporters: ['spec', 'kjhtml', 'jasmine-order'],
+    // Prevents jasmine-order from also logging all the output
+    disableJasmineOrderStandardLogging: true,
+    specReporter: {
+      suppressSkipped: false,
+      showSpecTiming: true,
+    },
     browsers: ['ChromeWithoutNagScreen'],
     customLaunchers: {
       ChromeWithoutNagScreen: {
