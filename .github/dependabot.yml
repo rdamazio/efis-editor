@@ -10,6 +10,9 @@ updates:
     directory: '/' # Location of package manifests
     schedule:
       interval: 'weekly'
+      day: 'friday'
+      time: '17:00'
+      timezone: 'America/Los_Angeles'
     open-pull-requests-limit: 100
     groups:
       infra:
