@@ -1,5 +1,5 @@
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
-import { AfterViewInit, Directive, EventEmitter, Input, OnDestroy, QueryList, input } from '@angular/core';
+import { AfterViewInit, Directive, EventEmitter, OnDestroy, computed, effect, input } from '@angular/core';
 import { takeUntil } from 'rxjs';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
@@ -9,16 +9,16 @@ import { ChecklistTreeNodeComponent } from './node/node.component';
   standalone: true,
 })
 export class ChecklistDragDirective extends CdkDrag<ChecklistTreeNode> implements AfterViewInit, OnDestroy {
-  @Input() allDropLists?: QueryList<CdkDropList<ChecklistTreeNode>>;
+  readonly allDropLists = input<readonly CdkDropList<ChecklistTreeNode>[]>();
   readonly checklistDragNode = input<ChecklistTreeNodeComponent>();
 
+  private readonly _dropList = computed(() => this._findContainer());
   private readonly _destroyed2 = new EventEmitter<boolean>();
-
-  override ngAfterViewInit() {
+  private readonly _updateContainerEffect =
     // We have to dynamically detect drop lists because they're not bound at injection time,
     // due to the cdkDrag being outside of the cdkDropList on the template.
-    this.allDropLists?.changes.pipe(takeUntil(this._destroyed2)).subscribe(() => {
-      const dropList = this._findContainer();
+    effect(() => {
+      const dropList = this._dropList();
       if (dropList) {
         setTimeout(() => {
           this._updateContainer(dropList);
@@ -26,6 +26,7 @@ export class ChecklistDragDirective extends CdkDrag<ChecklistTreeNode> implement
       }
     });
 
+  override ngAfterViewInit() {
     // Also dynamically register drag handles that were passed in to us.
     // This must be done before the parent's ngAfterViewInit, which uses them.
     const handle = this.checklistDragNode()?.dragHandle();
@@ -42,12 +43,13 @@ export class ChecklistDragDirective extends CdkDrag<ChecklistTreeNode> implement
   }
 
   private _findContainer(): CdkDropList<ChecklistTreeNode> | undefined {
-    if (!this.allDropLists) return undefined;
+    const dropLists = this.allDropLists();
+    if (!dropLists) return undefined;
 
     // Finds the CdkDropList that's actually been assigned as our parent after
     // view setup, since the association doesn't exist in the template.
     const containerEl = this.element.nativeElement.closest('.cdk-drop-list');
-    for (const dropList of this.allDropLists) {
+    for (const dropList of dropLists) {
       if (dropList.element.nativeElement === containerEl) {
         return dropList;
       }

@@ -28,8 +28,7 @@ import { ChecklistTreeNode } from './node';
   styleUrl: './node.component.scss',
 })
 export class ChecklistTreeNodeComponent {
-  node = input.required<ChecklistTreeNode>();
-
+  readonly node = input.required<ChecklistTreeNode>();
   readonly disableButtonHover = input(false);
   readonly nodeRename = output<ChecklistTreeNode>();
   readonly nodeDelete = output<ChecklistTreeNode>();

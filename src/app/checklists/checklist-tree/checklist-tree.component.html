@@ -19,7 +19,7 @@
     [class.checklist-selected]="node.checklist && selectedChecklist === node.checklist"
     (click)="onNodeSelect(node)"
     checklistDrag
-    [allDropLists]="allDropLists"
+    [allDropLists]="allDropLists()"
     [checklistDragNode]="item"
     cdkDragLockAxis="y"
     [cdkDragData]="node"

@@ -16,9 +16,8 @@ import {
   model,
   OnInit,
   output,
-  QueryList,
   viewChild,
-  ViewChildren,
+  viewChildren,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -66,7 +65,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
   readonly selectedChecklistGroup = model<ChecklistGroup>();
   readonly groupDropListIds = model<string[]>([]);
   readonly tree = viewChild.required(MatTree);
-  @ViewChildren(CdkDropList) allDropLists?: QueryList<CdkDropList<ChecklistTreeNode>>;
+  readonly allDropLists = viewChildren(CdkDropList<ChecklistTreeNode>);
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
 
   dragging = false;
