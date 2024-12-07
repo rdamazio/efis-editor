@@ -24,10 +24,19 @@ describe('ChecklistsComponent', () => {
     }
   });
 
-  beforeEach(inject([ChecklistStorage, LazyBrowserStorage], (s: ChecklistStorage, browserStore: LazyBrowserStorage) => {
-    storage = s;
-    browserStore.forceBrowserStorage();
-  }));
+  beforeEach(inject(
+    [ChecklistStorage, LazyBrowserStorage],
+    async (s: ChecklistStorage, browserStore: LazyBrowserStorage) => {
+      storage = s;
+      browserStore.forceBrowserStorage();
+
+      await storage.clear();
+    },
+  ));
+
+  afterEach(async () => {
+    await storage.clear();
+  });
 
   async function newEmptyFile(fileName: string) {
     // Create new file

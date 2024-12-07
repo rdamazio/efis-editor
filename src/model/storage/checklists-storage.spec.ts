@@ -60,6 +60,10 @@ describe('ChecklistsService', () => {
     await store.clear();
   });
 
+  afterEach(async () => {
+    await store.clear();
+  });
+
   it('should be created', () => {
     expect(store).toBeTruthy();
   });
