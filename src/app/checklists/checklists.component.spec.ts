@@ -288,6 +288,27 @@ describe('ChecklistsComponent', () => {
     expectFragment('Renamed file');
   });
 
+  it('should not overwrite an existing file', async () => {
+    await newFile('My file');
+    await user.click(await screen.findByRole('treeitem', { name: 'Checklist: First checklist' }));
+    await addItem('caution', 'Second item');
+    expect(screen.getByRole('listitem', { name: 'Item: Second item' })).toBeInTheDocument();
+
+    // Try to create the same file again - this should fail, keeping the original file.
+    await newFile('My file');
+
+    expect(screen.getByRole('listitem', { name: 'Item: Second item' })).toBeInTheDocument();
+
+    const expectedFile = ChecklistFile.clone(NEW_FILE);
+    expectedFile.groups[0].checklists[0].items.push(
+      ChecklistItem.create({
+        type: ChecklistItem_Type.ITEM_CAUTION,
+        prompt: 'Second item',
+      }),
+    );
+    await expectFile('My file', expectedFile);
+  });
+
   it('should rename groups, checklists and items', async () => {
     await newFile('My file');
 
