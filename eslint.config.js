@@ -7,6 +7,7 @@ const nosecrets = require('eslint-plugin-no-secrets');
 const prettierRecommended = require('eslint-plugin-prettier/recommended');
 const promise = require('eslint-plugin-promise');
 const rxjsX = require('eslint-plugin-rxjs-x');
+const testing = require('eslint-plugin-testing-library');
 const tseslint = require('typescript-eslint');
 
 module.exports = tseslint.config(
@@ -210,11 +211,15 @@ module.exports = tseslint.config(
   },
   {
     files: ['**/*.spec.ts'],
+    extends: [testing.configs['flat/angular']],
     rules: {
       // jasmine spy expectations are expressed unbound
       '@typescript-eslint/unbound-method': 'off',
       'no-await-in-loop': 'off',
       'no-restricted-imports': ['error', '@testing-library/dom'],
+      'testing-library/no-render-in-lifecycle': 'off',
+      'testing-library/prefer-explicit-assert': 'error',
+      'testing-library/prefer-user-event': 'error',
     },
   },
   {

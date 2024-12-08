@@ -1,15 +1,19 @@
-import { fireEvent, render, RenderResult, screen } from '@testing-library/angular';
+import { render, RenderResult, screen } from '@testing-library/angular';
 import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node';
 import { ChecklistTreeNodeComponent } from './node.component';
+import userEvent, { UserEvent } from '@testing-library/user-event';
 
 describe('NodeComponent', () => {
+  let user: UserEvent;
   let node: ChecklistTreeNode;
   let disableButtonHover: boolean;
   let nodeRename: jasmine.Spy;
   let nodeDelete: jasmine.Spy;
 
   beforeEach(() => {
+    user = userEvent.setup();
+
     node = {
       isAddNew: false,
       title: 'Node title',
@@ -29,8 +33,8 @@ describe('NodeComponent', () => {
   it('should render', async () => {
     await renderComponent();
 
-    expect(screen.queryByText(node.title)).toBeInTheDocument();
-    expect(screen.queryByText('drag_handle')).toBeInTheDocument();
+    expect(screen.getByText(node.title)).toBeInTheDocument();
+    expect(screen.getByText('drag_handle')).toBeInTheDocument();
   });
 
   it('should render buttons on hover', async () => {
@@ -41,7 +45,7 @@ describe('NodeComponent', () => {
 
     const title = screen.queryByText(node.title);
     expect(title).toBeInTheDocument();
-    fireEvent.mouseOver(title!);
+    await user.hover(title!);
 
     expect(await screen.findByTestId('rename-button')).toBeVisible();
     expect(await screen.findByTestId('delete-button')).toBeVisible();
@@ -53,7 +57,7 @@ describe('NodeComponent', () => {
 
     const title = screen.queryByText(node.title);
     expect(title).toBeInTheDocument();
-    fireEvent.mouseOver(title!);
+    await user.hover(title!);
 
     expect(await screen.findByTestId('rename-button')).not.toBeVisible();
     expect(await screen.findByTestId('delete-button')).not.toBeVisible();
@@ -74,7 +78,7 @@ describe('NodeComponent', () => {
 
     const renameButton = await screen.findByTestId('rename-button');
     expect(renameButton).toBeInTheDocument();
-    fireEvent.click(renameButton);
+    await user.click(renameButton);
 
     expect(nodeRename).toHaveBeenCalledOnceWith(node);
   });
@@ -84,13 +88,13 @@ describe('NodeComponent', () => {
 
     const deleteButton = await screen.findByTestId('delete-button');
     expect(deleteButton).toBeInTheDocument();
-    fireEvent.click(deleteButton);
+    await user.click(deleteButton);
 
     const confirmButton = await screen.findByRole('button', { name: 'Delete!' });
     expect(confirmButton).toBeInTheDocument();
-    fireEvent.click(confirmButton);
+    await user.click(confirmButton);
 
-    expect(await screen.findByRole('button', { name: 'Delete!' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Delete!' })).not.toBeInTheDocument();
     expect(nodeDelete).toHaveBeenCalledOnceWith(node);
   });
 
@@ -99,13 +103,13 @@ describe('NodeComponent', () => {
 
     const deleteButton = await screen.findByTestId('delete-button');
     expect(deleteButton).toBeInTheDocument();
-    fireEvent.click(deleteButton);
+    await user.click(deleteButton);
 
     const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
     expect(cancelButton).toBeInTheDocument();
-    fireEvent.click(cancelButton);
+    await user.click(cancelButton);
 
-    expect(await screen.findByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
     expect(nodeDelete).not.toHaveBeenCalled();
   });
 
@@ -122,12 +126,12 @@ describe('NodeComponent', () => {
     expect(categoryIcon).toBeVisible();
 
     // Change to normal category.
-    fireEvent.click(categoryIcon);
+    await user.click(categoryIcon);
     const normalOption = await screen.findByText('🄽ormal');
     expect(normalOption).toBeVisible();
-    fireEvent.click(normalOption);
+    await user.click(normalOption);
 
-    expect(await screen.findByText(/🄰.*/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/🄰.*/)).not.toBeInTheDocument();
 
     // Verify that model was changed.
     expect(node.group.category).toEqual(ChecklistGroup_Category.normal);

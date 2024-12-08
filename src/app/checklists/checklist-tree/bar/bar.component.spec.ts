@@ -30,7 +30,7 @@ describe('ChecklistTreeBarComponent', () => {
   });
 
   it('should render', () => {
-    expect(screen.queryByText('Checklist groups:')).toBeInTheDocument();
+    expect(screen.getByText('Checklist groups:')).toBeInTheDocument();
   });
 
   it('should disable expand button when all expanded', () => {

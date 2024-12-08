@@ -49,11 +49,11 @@ describe('ChecklistTreeComponent', () => {
   });
 
   it('should change files', async () => {
-    const rendered = await renderComponent();
+    const { fixture } = await renderComponent();
 
     expect(screen.getByRole('treeitem', { name: 'Checklist: Test group 1 checklist 1' })).toBeVisible();
 
-    rendered.fixture.componentInstance.file.set(EXPECTED_FOREFLIGHT_CONTENTS);
+    fixture.componentInstance.file.set(EXPECTED_FOREFLIGHT_CONTENTS);
 
     expect(await screen.findByRole('treeitem', { name: 'Group: Test empty abnormal subgroup' })).toBeVisible();
     expect(screen.queryByRole('treeitem', { name: 'Checklist: Test group 1 checklist 1' })).not.toBeInTheDocument();

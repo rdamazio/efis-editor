@@ -1,4 +1,4 @@
-import { render, RenderResult, screen } from '@testing-library/angular';
+import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistItem, ChecklistItem_Type } from '../../../../../gen/ts/checklist';
 import { ChecklistItemComponent } from './item.component';
@@ -25,8 +25,8 @@ describe('ChecklistItemComponent', () => {
     });
   });
 
-  async function renderComponent(): Promise<RenderResult<ChecklistItemComponent>> {
-    const rendered = await render(ChecklistItemComponent, {
+  async function renderComponent() {
+    await render(ChecklistItemComponent, {
       inputs: {
         item: item,
       },
@@ -41,8 +41,6 @@ describe('ChecklistItemComponent', () => {
     indentLeftButton = screen.queryByRole('button', { name: /Indent.*left/ })!;
     indentRightButton = screen.queryByRole('button', { name: /Indent.*right/ })!;
     centerButton = screen.queryByRole('button', { name: /Center.*/ })!;
-
-    return rendered;
   }
 
   it('should render', async () => {

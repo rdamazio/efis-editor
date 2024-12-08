@@ -57,7 +57,7 @@ describe('ChecklistFileInfoComponent', () => {
   });
 
   async function openDialog() {
-    const rendered = await render(DialogTestComponent, {
+    const { fixture } = await render(DialogTestComponent, {
       inputs: { metadataIn: metadata, groupsIn: groups },
       on: { dataOut },
     });
@@ -65,7 +65,7 @@ describe('ChecklistFileInfoComponent', () => {
     const openDialogButton = await screen.findByRole('button', { name: /open dialog/i });
     await user.click(openDialogButton);
 
-    loader = TestbedHarnessEnvironment.documentRootLoader(rendered.fixture);
+    loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(1);
 
@@ -77,8 +77,6 @@ describe('ChecklistFileInfoComponent', () => {
     manufacturerBox = await screen.findByRole('textbox', { name: 'Manufacturer information' });
     copyrightBox = await screen.findByRole('textbox', { name: 'Copyright information' });
     defaultChecklistBox = await screen.findByRole('combobox', { name: /Default checklist.*/ });
-
-    return rendered;
   }
 
   it('should open and cancel the dialog', async () => {

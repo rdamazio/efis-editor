@@ -2,7 +2,7 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatMenuHarness } from '@angular/material/menu/testing';
-import { render, RenderResult, screen } from '@testing-library/angular';
+import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistCommandBarComponent, DownloadFormat } from './command-bar.component';
 
@@ -39,11 +39,8 @@ describe('ChecklistCommandBarComponent', () => {
     user = userEvent.setup();
   });
 
-  async function renderComponent(
-    hasFiles: boolean,
-    fileIsOpen: boolean,
-  ): Promise<RenderResult<ChecklistCommandBarComponent>> {
-    const rendered = await render(ChecklistCommandBarComponent, {
+  async function renderComponent(hasFiles: boolean, fileIsOpen: boolean) {
+    const { fixture } = await render(ChecklistCommandBarComponent, {
       inputs: {
         hasFiles: hasFiles,
         fileIsOpen: fileIsOpen,
@@ -75,9 +72,7 @@ describe('ChecklistCommandBarComponent', () => {
     expect(deleteButton).toBeInTheDocument();
     expect(infoButton).toBeInTheDocument();
 
-    loader = TestbedHarnessEnvironment.documentRootLoader(rendered.fixture);
-
-    return rendered;
+    loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
   }
 
   it('should render in initial app state', async () => {

@@ -44,14 +44,14 @@ describe('PrintDialogComponent', () => {
   });
 
   async function openDialog() {
-    const rendered = await render(DialogTestComponent, {
+    const { fixture } = await render(DialogTestComponent, {
       on: { dataOut },
     });
 
     const openDialogButton = await screen.findByRole('button', { name: /open dialog/i });
     await user.click(openDialogButton);
 
-    loader = TestbedHarnessEnvironment.documentRootLoader(rendered.fixture);
+    loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(1);
 
@@ -60,8 +60,6 @@ describe('PrintDialogComponent', () => {
     paperSize = await screen.findByRole('combobox', { name: /.*paper size.*/ });
     landscape = await screen.findByRole('radio', { name: 'Landscape' });
     pageNumbers = await screen.findByRole('checkbox', { name: 'Output page numbers' });
-
-    return rendered;
   }
 
   it('should open and cancel the dialog', async () => {
