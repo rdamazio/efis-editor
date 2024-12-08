@@ -488,6 +488,12 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showFilePicker = false;
     this.showFileUpload = false;
 
+    const existingFile = await this.store.getChecklistFile(fileName);
+    if (existingFile !== null) {
+      this._snackBar.open(`A file named "${fileName}" already exists.`, '', { duration: 5000 });
+      return;
+    }
+
     // Save an empty file with that name.
     const file: ChecklistFile = {
       groups: [
