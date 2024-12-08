@@ -600,7 +600,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     const name = this.selectedFile.metadata!.name;
 
     await Promise.all([this.store.deleteChecklistFile(name), this._displayFile(undefined)]);
-    this._snackBar.open(`Deleted checklist "${name}".`, '', { duration: 2000 });
+    this._snackBar.open(`Deleted file "${name}".`, '', { duration: 2000 });
   }
 
   async onFileInfo() {
