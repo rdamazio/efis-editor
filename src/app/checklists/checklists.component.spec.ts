@@ -1,18 +1,46 @@
 import { DeferBlockState, inject } from '@angular/core/testing';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
-import { ChecklistFile, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import { ChecklistFile, ChecklistGroup_Category, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../../model/formats/test-data';
 import { LazyBrowserStorage } from '../../model/storage/browser-storage';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { ChecklistsComponent } from './checklists.component';
 
+const NEW_FILE = ChecklistFile.create({
+  metadata: { name: 'My file' },
+  groups: [
+    {
+      title: 'First checklist group',
+      category: ChecklistGroup_Category.normal,
+      checklists: [
+        {
+          title: 'First checklist',
+          items: [
+            {
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Checklist created',
+              expectation: 'CHECK',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+});
+
 describe('ChecklistsComponent', () => {
+  let originalTimeout: number;
   let user: UserEvent;
   let rendered: RenderResult<ChecklistsComponent>;
   let storage: ChecklistStorage;
 
   beforeEach(async () => {
+    // We have a lot of large tests in this file, override the timeout.
+    // (for one, MatSnackBar delays play out in realtime).
+    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+
     user = userEvent.setup();
 
     rendered = await render(ChecklistsComponent);
@@ -36,13 +64,18 @@ describe('ChecklistsComponent', () => {
 
   afterEach(async () => {
     await storage.clear();
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
   });
 
-  async function newEmptyFile(fileName: string) {
-    // Create new file
+  async function newFile(fileName: string) {
     await user.click(screen.getByRole('button', { name: 'New file' }));
     const checklistTitleBox = await screen.findByRole('textbox', { name: 'Title' });
     await user.type(checklistTitleBox, `${fileName}[Enter]`);
+  }
+
+  async function newEmptyFile(fileName: string) {
+    // Create new file
+    await newFile(fileName);
 
     // Delete its default group
     await user.hover(screen.getByText('First checklist group'));
@@ -90,6 +123,20 @@ describe('ChecklistsComponent', () => {
   async function retype(element: HTMLElement, text: string) {
     await user.clear(element);
     await user.type(element, text);
+  }
+
+  async function getChecklistFile(name: string): Promise<ChecklistFile | null> {
+    rendered.detectChanges();
+    await rendered.fixture.whenStable();
+
+    return storage.getChecklistFile(name);
+  }
+
+  async function expectFile(name: string, expectedFile: ChecklistFile) {
+    const storedFile = await getChecklistFile(name);
+    expect(storedFile).not.toBeNull();
+    storedFile!.metadata!.modifiedTime = 0;
+    expect(storedFile).toEqual(expectedFile);
   }
 
   it('should create a new checklist and populate it', async () => {
@@ -165,28 +212,131 @@ describe('ChecklistsComponent', () => {
     const okButton = await screen.findByRole('button', { name: 'Ok' });
     await user.click(okButton);
 
-    const checklist = await storage.getChecklistFile(file.metadata!.name);
-    expect(checklist).not.toBeNull();
+    await expectFile(file.metadata!.name, EXPECTED_CONTENTS);
+  });
 
-    // Don't compare mtimes.
-    checklist!.metadata!.modifiedTime = 0;
+  it('should create and delete a file', async () => {
+    await newFile('My file');
+    expect(await getChecklistFile('My file')).not.toBeNull();
+    expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
 
-    expect(checklist).toEqual(EXPECTED_CONTENTS);
-  }, 20000); // Longer timeout for this large test.
+    await user.click(screen.getByRole('button', { name: 'Delete file' }));
+    const confirmButton = await screen.findByRole('button', { name: 'Delete!' });
+    expect(confirmButton).toBeVisible();
+    await user.click(confirmButton);
 
-  // TODO: Test renaming a checklist and group.
-  // await user.hover(screen.getByText('First checklist'));
-  // const checklist1 = screen.getByRole('treeitem', { name: 'Checklist: First checklist' });
-  // await user.click(within(checklist1).getByRole('button', { name: 'Rename First checklist' }));
+    expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
+    expect(await getChecklistFile('My file')).toBeNull();
+  });
 
-  // const titleBox = await screen.findByRole('textbox', { name: 'Title' });
-  // await user.clear(titleBox);
-  // await user.type(titleBox, 'Renamed checklist[Enter]');
+  it('should create and rename a file', async () => {
+    await newFile('My file');
+    expect(await getChecklistFile('My file')).not.toBeNull();
 
-  // TODO: Test deleting an item, checklist and group.
-  // await user.hover(screen.getByText('First checklist'));
-  // const checklist1 = screen.getByRole('treeitem', { name: 'Checklist: First checklist' });
-  // await user.click(within(checklist1).getByRole('button', { name: 'Delete First checklist' }));
-  // const checklistConfirmButton = await screen.findByRole('button', { name: 'Delete!' });
-  // user.click(checklistConfirmButton);
+    await user.click(screen.getByRole('button', { name: 'Open file information dialog' }));
+    const nameBox = await screen.findByRole('textbox', { name: 'File name' });
+    await retype(nameBox, 'Renamed file');
+
+    const okButton = await screen.findByRole('button', { name: 'Ok' });
+    await user.click(okButton);
+
+    expect(await getChecklistFile('My file')).toBeNull();
+    expect(await getChecklistFile('Renamed file')).not.toBeNull();
+  });
+
+  it('should rename groups, checklists and items', async () => {
+    await newFile('My file');
+
+    // Select the checklist.
+    const checklist = screen.getByRole('treeitem', { name: 'Checklist: First checklist' });
+    await user.click(checklist);
+
+    // Modify the item.
+    const item = screen.getByRole('listitem', { name: 'Item: Checklist created' });
+    await user.click(within(item).getByRole('button', { name: /Edit.*/ }));
+
+    const promptBox = await screen.findByRole('textbox', { name: 'Prompt text' });
+    const expectationBox = await screen.findByRole('textbox', { name: 'Expectation text' });
+    await retype(promptBox, 'New prompt');
+    await retype(expectationBox, 'New expectation[Enter]');
+
+    // Rename the checklist.
+    await user.hover(screen.getByText('First checklist'));
+    await user.click(await within(checklist).findByRole('button', { name: 'Rename First checklist' }));
+
+    const checklistTitleBox = await screen.findByRole('textbox', { name: 'Title' });
+    await retype(checklistTitleBox, 'Renamed checklist[Enter]');
+
+    // Rename the group.
+    const group = screen.getByRole('treeitem', { name: 'Group: First checklist group' });
+    await user.hover(screen.getByText('First checklist group'));
+    await user.click(await within(group).findByRole('button', { name: 'Rename First checklist group' }));
+
+    const groupTitleBox = await screen.findByRole('textbox', { name: 'Title' });
+    await retype(groupTitleBox, 'Renamed group[Enter]');
+
+    // Verify the stored contents.
+    await expectFile(
+      'My file',
+      ChecklistFile.create({
+        metadata: { name: 'My file' },
+        groups: [
+          {
+            title: 'Renamed group',
+            category: ChecklistGroup_Category.normal,
+            checklists: [
+              {
+                title: 'Renamed checklist',
+                items: [
+                  {
+                    type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+                    prompt: 'New prompt',
+                    expectation: 'New expectation',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      }),
+    );
+  });
+
+  it('should delete items', async () => {
+    await newFile('My file');
+
+    // Select the checklist.
+    const checklist = screen.getByRole('treeitem', { name: 'Checklist: First checklist' });
+    await user.click(checklist);
+
+    // Delete the item.
+    const item = screen.getByRole('listitem', { name: 'Item: Checklist created' });
+    await user.click(within(item).getByRole('button', { name: /Delete.*/ }));
+    expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
+
+    // Verify the stored contents.
+    const expectedFile = ChecklistFile.clone(NEW_FILE);
+    expectedFile.groups[0].checklists[0].items = [];
+    await expectFile('My file', expectedFile);
+  });
+
+  it('should delete checklists', async () => {
+    await newFile('My file');
+
+    // Delete the checklist.
+    await user.hover(screen.getByText('First checklist'));
+    const checklist = screen.getByRole('treeitem', { name: 'Checklist: First checklist' });
+    await user.click(await within(checklist).findByRole('button', { name: 'Delete First checklist' }));
+
+    const confirmButton = await screen.findByRole('button', { name: 'Delete!' });
+    await user.click(confirmButton);
+
+    // Verify the stored contents.
+    const expectedFile = ChecklistFile.clone(NEW_FILE);
+    expectedFile.groups[0].checklists = [];
+    await expectFile('My file', expectedFile);
+  });
+
+  // TODO: Add URL fragment tests.
+  // TODO: Add keyboard shortcut tests.
 });
