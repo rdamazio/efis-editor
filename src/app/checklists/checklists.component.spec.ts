@@ -1,4 +1,6 @@
 import { DeferBlockState, inject } from '@angular/core/testing';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { NavigationExtras, Router } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistFile, ChecklistGroup_Category, ChecklistItem_Type } from '../../../gen/ts/checklist';
@@ -34,6 +36,10 @@ describe('ChecklistsComponent', () => {
   let user: UserEvent;
   let rendered: RenderResult<ChecklistsComponent>;
   let storage: ChecklistStorage;
+  let navigate: jasmine.Spy;
+  let showSnack: jasmine.Spy;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let realNavigate: (commands: any[], extras?: NavigationExtras) => Promise<boolean>;
 
   beforeEach(async () => {
     // We have a lot of large tests in this file, override the timeout.
@@ -53,8 +59,17 @@ describe('ChecklistsComponent', () => {
   });
 
   beforeEach(inject(
-    [ChecklistStorage, LazyBrowserStorage],
-    async (s: ChecklistStorage, browserStore: LazyBrowserStorage) => {
+    [ChecklistStorage, LazyBrowserStorage, MatSnackBar, Router],
+    async (s: ChecklistStorage, browserStore: LazyBrowserStorage, snack: MatSnackBar, router: Router) => {
+      realNavigate = router.navigate.bind(router);
+      navigate = spyOn(router, 'navigate');
+      navigate.and.callThrough();
+
+      // Verifying snackbars with durations doesn't work with MatSnackBarHarness, so use a spy instead.
+      // https://github.com/angular/components/issues/19290
+      showSnack = spyOn(snack, 'open');
+      showSnack.and.callThrough();
+
       storage = s;
       browserStore.forceBrowserStorage();
 
@@ -125,6 +140,18 @@ describe('ChecklistsComponent', () => {
     await user.type(element, text);
   }
 
+  async function setFragment(fragment: string) {
+    await realNavigate([], { fragment: fragment });
+
+    rendered.detectChanges();
+    await rendered.fixture.whenStable();
+  }
+
+  function expectFragment(fragment: string) {
+    const extras = navigate.calls.mostRecent().args[1] as NavigationExtras;
+    expect(extras.fragment).toEqual(fragment);
+  }
+
   async function getChecklistFile(name: string): Promise<ChecklistFile | null> {
     rendered.detectChanges();
     await rendered.fixture.whenStable();
@@ -139,6 +166,10 @@ describe('ChecklistsComponent', () => {
     expect(storedFile).toEqual(expectedFile);
   }
 
+  function lastSnackMessage(): string {
+    return showSnack.calls.mostRecent().args[0] as string;
+  }
+
   it('should create a new checklist and populate it', async () => {
     const file = ChecklistFile.clone(EXPECTED_CONTENTS);
     const metadata = file.metadata!;
@@ -150,15 +181,18 @@ describe('ChecklistsComponent', () => {
     }
 
     await newEmptyFile(fileName);
+    expectFragment(fileName);
 
     // Add every item on the test file.
     let numBlanks = 0;
-    for (const group of file.groups) {
+    for (const [groupIdx, group] of file.groups.entries()) {
       await addGroup(group.title);
 
-      for (const checklist of group.checklists) {
+      for (const [checklistIdx, checklist] of group.checklists.entries()) {
         await addChecklist(group.title, checklist.title);
         await user.click(screen.getByRole('treeitem', { name: `Checklist: ${checklist.title}` }));
+
+        expectFragment(`${fileName}/${groupIdx}/${checklistIdx}`);
 
         for (const item of checklist.items) {
           const type = typeMap.get(item.type);
@@ -218,6 +252,7 @@ describe('ChecklistsComponent', () => {
   it('should create and delete a file', async () => {
     await newFile('My file');
     expect(await getChecklistFile('My file')).not.toBeNull();
+    expectFragment('My file');
     expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Delete file' }));
@@ -227,11 +262,13 @@ describe('ChecklistsComponent', () => {
 
     expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
     expect(await getChecklistFile('My file')).toBeNull();
+    expectFragment('');
   });
 
   it('should create and rename a file', async () => {
     await newFile('My file');
     expect(await getChecklistFile('My file')).not.toBeNull();
+    expectFragment('My file');
 
     await user.click(screen.getByRole('button', { name: 'Open file information dialog' }));
     const nameBox = await screen.findByRole('textbox', { name: 'File name' });
@@ -242,6 +279,9 @@ describe('ChecklistsComponent', () => {
 
     expect(await getChecklistFile('My file')).toBeNull();
     expect(await getChecklistFile('Renamed file')).not.toBeNull();
+
+    // TODO: Actual bug - fix.
+    // expectFragment('Renamed file');
   });
 
   it('should rename groups, checklists and items', async () => {
@@ -337,6 +377,77 @@ describe('ChecklistsComponent', () => {
     await expectFile('My file', expectedFile);
   });
 
-  // TODO: Add URL fragment tests.
+  it('should load an existing checklist by URL', async () => {
+    await newFile('My file');
+    expectFragment('My file');
+    expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
+
+    await setFragment('');
+    expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
+
+    await setFragment('My file');
+    expect(await screen.findByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
+  });
+
+  it('should handle a URL fragment with a bad filename', async () => {
+    await setFragment('Non-existing file');
+
+    expect(screen.queryByRole('treeitem', { name: /Checklist:/ })).not.toBeInTheDocument();
+    expect(lastSnackMessage()).toMatch(/Failed to load.*/);
+  });
+
+  it('should handle a URL fragment with a bad group number', async () => {
+    await newFile('My file');
+    expectFragment('My file');
+
+    await setFragment('My file/1/0');
+    expect(lastSnackMessage()).toMatch(/.*does not have group 1.*/);
+
+    await addGroup('Second checklist group');
+    await addChecklist('Second checklist group', 'Second checklist');
+    expectFragment('My file/1/0');
+    expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
+
+    await setFragment('My file/2/0');
+    expect(lastSnackMessage()).toMatch(/.*does not have group 2.*/);
+
+    // Switching back to a correct URL still works.
+    await setFragment('My file/0/0');
+    expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
+  });
+
+  it('should handle a URL fragment with a bad checklist number', async () => {
+    await newFile('My file');
+    expectFragment('My file');
+
+    await setFragment('My file/0/2');
+    expect(lastSnackMessage()).toMatch(/.*has no checklist 2.*/);
+
+    // Switching back to a correct URL still works.
+    await setFragment('My file/0/0');
+    expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
+  });
+
+  it('should handle a URL fragment with the wrong format', async () => {
+    await newFile('My file');
+    expectFragment('My file');
+
+    await setFragment('My file/0/0');
+    expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
+
+    await setFragment('My file/0');
+    expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
+
+    await setFragment('My file/abc');
+    expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
+
+    await setFragment('My file/0x0/0x0');
+    expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
+
+    // Switching back to a correct URL still works.
+    await setFragment('My file/0/0');
+    expect(await screen.findByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
+  });
+
   // TODO: Add keyboard shortcut tests.
 });
