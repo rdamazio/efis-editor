@@ -11,11 +11,13 @@
   <!-- This is the tree node template for leaf nodes -->
   <!-- There is inline padding applied to this node using styles.
        This padding value depends on the mat-icon-button width. -->
-  <mat-tree-node
+  <mat-nested-tree-node
     *matTreeNodeDef="let node"
     [attr.aria-label]="(node.isAddNew ? '' : 'Checklist: ') + node.title"
     matTreeNodePadding
-    matTreeNodePaddingIndent="12px"
+    matTreeNodePaddingIndent="12"
+    level="1"
+    class="checklist-node"
     [class.checklist-selected]="node.checklist && selectedChecklist() === node.checklist"
     (click)="onNodeSelect(node)"
     checklistDrag
@@ -32,7 +34,7 @@
       (nodeDelete)="onChecklistDelete(node)"
       [disableButtonHover]="dragging"
     />
-  </mat-tree-node>
+  </mat-nested-tree-node>
 
   <!-- This is the tree node template for expandable nodes -->
   <!-- TODO: Dragging of groups could use a better preview and placeholder -->
@@ -40,6 +42,7 @@
     *matTreeNodeDef="let node; when: hasChild"
     id="group_{{ node.groupIdx }}"
     [attr.aria-label]="(node.isAddNew ? '' : 'Group: ') + node.title"
+    level="0"
     checklistDrag
     [checklistDragNode]="group"
     cdkDragLockAxis="y"

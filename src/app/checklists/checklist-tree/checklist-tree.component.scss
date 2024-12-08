@@ -8,23 +8,11 @@
   display: none;
 }
 
-.checklist-tree ul,
-.checklist-tree li {
-  margin-top: 0;
-  margin-bottom: 0;
-  list-style-type: none;
+.checklist-tree .checklist-node {
+  display: block;
 }
 
-/*
- * Padding for leaf nodes.
- * Leaf nodes need to have padding so as to align with other non-leaf nodes
- * under the same parent.
- */
-.checklist-tree div[role='group'] > .mat-tree-node {
-  padding-left: 20px;
-}
-
-.checklist-tree .mat-tree-node:hover {
+.checklist-tree .checklist-node:hover {
   background-color: gray;
 }
 
