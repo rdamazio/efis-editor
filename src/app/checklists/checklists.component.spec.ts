@@ -40,12 +40,17 @@ describe('ChecklistsComponent', () => {
   let showSnack: jasmine.Spy;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let realNavigate: (commands: any[], extras?: NavigationExtras) => Promise<boolean>;
+  let metaKey: string;
 
   beforeEach(async () => {
     // We have a lot of large tests in this file, override the timeout.
     // (for one, MatSnackBar delays play out in realtime).
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+
+    // ngneat/hotkeys uses different keys for Meta on PC vs Mac - detect where we're running tests.
+    const isPC = !navigator.userAgent.includes('Macintosh');
+    metaKey = isPC ? 'ControlLeft' : 'MetaLeft';
 
     user = userEvent.setup();
 
@@ -634,26 +639,26 @@ describe('ChecklistsComponent', () => {
       expectFragment('My file/1/0');
 
       // Test navigation between checklists.
-      await user.keyboard('[MetaLeft>][ArrowUp][/MetaLeft]');
+      await user.keyboard(`[${metaKey}>][ArrowUp][/${metaKey}]`);
       expectFragment('My file/0/1');
-      await user.keyboard('[MetaLeft>][ArrowUp][/MetaLeft]');
+      await user.keyboard(`[${metaKey}>][ArrowUp][/${metaKey}]`);
       expectFragment('My file/0/0');
-      await user.keyboard('[MetaLeft>][ArrowUp][/MetaLeft]');
+      await user.keyboard(`[${metaKey}>][ArrowUp][/${metaKey}]`);
       expectFragment('My file/0/0');
-      await user.keyboard('[MetaLeft>][ArrowDown][/MetaLeft]');
+      await user.keyboard(`[${metaKey}>][ArrowDown][/${metaKey}]`);
       expectFragment('My file/0/1');
-      await user.keyboard('[MetaLeft>][ArrowDown][/MetaLeft]');
+      await user.keyboard(`[${metaKey}>][ArrowDown][/${metaKey}]`);
       expectFragment('My file/1/0');
-      await user.keyboard('[MetaLeft>][ArrowDown][/MetaLeft]');
+      await user.keyboard(`[${metaKey}>][ArrowDown][/${metaKey}]`);
       expectFragment('My file/1/0');
 
       // Test navigation without an initial selection.
       await setFragment('My file');
-      await user.keyboard('[MetaLeft>][ArrowDown][/MetaLeft]');
+      await user.keyboard(`[${metaKey}>][ArrowDown][/${metaKey}]`);
       expectFragment('My file/0/0');
 
       await setFragment('My file');
-      await user.keyboard('[MetaLeft>][ArrowUp][/MetaLeft]');
+      await user.keyboard(`[${metaKey}>][ArrowUp][/${metaKey}]`);
       expectFragment('My file/1/0');
 
       // Test navigation between groups.
@@ -760,46 +765,46 @@ describe('ChecklistsComponent', () => {
       const checklist3 = expectedFile.groups[1].checklists[0];
 
       // Move the last checklist up.
-      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowUp][/MetaLeft][/ShiftLeft]');
+      await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowUp][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/2');
       expectedFile.groups[0].checklists = [checklist1, checklist2, checklist3];
       expectedFile.groups[1].checklists = [];
       await expectFile('My file', expectedFile);
 
-      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowUp][/MetaLeft][/ShiftLeft]');
+      await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowUp][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/1');
       expectedFile.groups[0].checklists = [checklist1, checklist3, checklist2];
       await expectFile('My file', expectedFile);
 
-      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowUp][/MetaLeft][/ShiftLeft]');
+      await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowUp][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/0');
       expectedFile.groups[0].checklists = [checklist3, checklist1, checklist2];
       await expectFile('My file', expectedFile);
 
       // Move it past the top and assert no change.
-      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowUp][/MetaLeft][/ShiftLeft]');
+      await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowUp][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/0');
       await expectFile('My file', expectedFile);
 
       // Move it back down.
-      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowDown][/MetaLeft][/ShiftLeft]');
+      await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowDown][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/1');
       expectedFile.groups[0].checklists = [checklist1, checklist3, checklist2];
       await expectFile('My file', expectedFile);
 
-      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowDown][/MetaLeft][/ShiftLeft]');
+      await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowDown][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/2');
       expectedFile.groups[0].checklists = [checklist1, checklist2, checklist3];
       await expectFile('My file', expectedFile);
 
-      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowDown][/MetaLeft][/ShiftLeft]');
+      await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowDown][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/1/0');
       expectedFile.groups[0].checklists = [checklist1, checklist2];
       expectedFile.groups[1].checklists = [checklist3];
       await expectFile('My file', expectedFile);
 
       // Move it past the bottom and assert no change.
-      await user.keyboard('[ShiftLeft>][MetaLeft>][ArrowDown][/MetaLeft][/ShiftLeft]');
+      await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowDown][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/1/0');
       await expectFile('My file', expectedFile);
     });
