@@ -48,7 +48,7 @@ const YET_ANOTHER_CHECKLIST_FILE: ChecklistFile = {
   groups: [],
 };
 
-describe('ChecklistsService', () => {
+describe('ChecklistStorage', () => {
   let store: ChecklistStorage;
 
   beforeEach(async () => {

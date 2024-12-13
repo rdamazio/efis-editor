@@ -4,7 +4,7 @@ import { Checklist, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../../../model/formats/test-data';
 import { ChecklistItemsComponent } from './items-list.component';
 
-describe('ChecklistTreeComponent', () => {
+describe('ChecklistItemsComponent', () => {
   let user: UserEvent;
   let checklist: Checklist;
   let checklistChange: jasmine.Spy;

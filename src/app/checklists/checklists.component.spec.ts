@@ -611,9 +611,7 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile);
 
       // Uncenter it.
-      // await debounce();
       await user.keyboard('[ShiftLeft>]c[/ShiftLeft]');
-      // await debounce();
 
       // Verify that it was indented in storage.
       expectedFile.groups[0].checklists[0].items[1].centered = false;

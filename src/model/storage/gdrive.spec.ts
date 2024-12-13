@@ -23,7 +23,7 @@ function fileIdForName(name: string) {
   return `fileid_${name}`;
 }
 
-describe('ChecklistsService', () => {
+describe('GoogleDriveApi', () => {
   let clock: jasmine.Clock;
   let store: ChecklistStorage;
   let lazyBrowserStore: LazyBrowserStorage;
