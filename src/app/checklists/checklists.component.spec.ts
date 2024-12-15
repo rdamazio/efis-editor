@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
+import { firstValueFrom, Subject, take } from 'rxjs';
 import { ChecklistFile, ChecklistGroup_Category, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../../model/formats/test-data';
 import { LazyBrowserStorage } from '../../model/storage/browser-storage';
@@ -312,6 +313,27 @@ describe('ChecklistsComponent', () => {
 
     expectFragment('Renamed file');
     expectNavData('Renamed file');
+  });
+
+  it('should rename a file through navigation', async () => {
+    await newFile('My file');
+    expect(await getChecklistFile('My file')).not.toBeNull();
+    expectFragment('My file');
+    expectNavData('My file');
+
+    // There's no good way to wait for the danling promise that the effect starts, so inject a way.
+    const component = rendered.fixture.componentInstance;
+    component.renameCompleted$ = new Subject<boolean>();
+    const completed = firstValueFrom(component.renameCompleted$.pipe(take(1)), { defaultValue: false });
+
+    navData.fileName.set('Renamed file');
+
+    rendered.detectChanges();
+    expect(await completed).toBeTrue();
+
+    expectFragment('Renamed file');
+    expect(await getChecklistFile('My file')).toBeNull();
+    expect(await getChecklistFile('Renamed file')).not.toBeNull();
   });
 
   it('should not overwrite an existing file', async () => {

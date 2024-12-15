@@ -14,15 +14,19 @@ import { AboutComponent } from '../about/about.component';
 import { HelpComponent } from '../checklists/hotkeys/help/help.component';
 import { GoogleDriveComponent } from './gdrive.component';
 import { NavData } from './nav-data';
+import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
+import { EditableLabelComponent } from '../checklists/items-list/editable-label/editable-label.component';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrl: './nav.component.scss',
   imports: [
+    EditableLabelComponent,
     GoogleDriveComponent,
     MatButtonModule,
     MatDialogModule,
+    MatIconButtonSizesModule,
     MatIconModule,
     MatListModule,
     MatSidenavModule,

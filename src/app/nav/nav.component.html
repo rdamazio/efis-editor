@@ -8,7 +8,28 @@
       <span class="route-title"> &gt; {{ navData.routeTitle() }}</span>
     }
     @if (navData.fileName()) {
-      <span class="file-name">: {{ navData.fileName() }}</span>
+      <span class="file-name">
+        :
+        <editable-label
+          #fileNameInput
+          class="filename-input"
+          label="File name"
+          [value]="navData.fileName()!"
+          (saved)="navData.fileName.set($event)"
+        />
+
+        <button
+          class="rename-button"
+          mat-icon-button
+          mat-medium-icon-button
+          matTooltip="Rename file"
+          aria-label="Rename file"
+          [style.visibility]="fileNameInput.editing() ? 'hidden' : 'visible'"
+          (click)="fileNameInput.edit()"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+      </span>
     }
   </div>
   <span class="topbar-spacer"></span>

@@ -3,6 +3,7 @@ import {
   afterNextRender,
   AfterViewInit,
   Component,
+  effect,
   Inject,
   Injector,
   OnDestroy,
@@ -18,6 +19,7 @@ import { Hotkey, HotkeysService } from '@ngneat/hotkeys';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { saveAs } from 'file-saver';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { Subject } from 'rxjs';
 import {
   Checklist,
   ChecklistFile,
@@ -91,6 +93,10 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private _loadingFragment = false;
 
+  // For testing only.
+  // eslint-disable-next-line rxjs-x/no-exposed-subjects
+  renameCompleted$?: Subject<boolean>;
+
   // eslint-disable-next-line @typescript-eslint/max-params
   constructor(
     public store: ChecklistStorage,
@@ -108,6 +114,16 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this._navData().routeTitle.set('Checklists');
+
+    effect(
+      () => {
+        const fileName = this._navData().fileName();
+        if (!fileName) return;
+        void this.onFileRename(fileName);
+      },
+      { injector: this._injector },
+    );
+
     this._route.fragment.pipe(untilDestroyed(this)).subscribe((fragment: string | null) => {
       const fn = async () => {
         // We use fragment-based navigation because of the routing limitations associated with GH Pages.
@@ -624,21 +640,40 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.selectedFile) return;
 
     return ChecklistFileInfoComponent.showFileInfo(this.selectedFile.metadata!, this.selectedFile.groups, this._dialog)
-      .then(async (updatedMetadata?: ChecklistFileMetadata): Promise<unknown> => {
-        if (!updatedMetadata || !this.selectedFile) return;
-
-        const oldName = this.selectedFile.metadata!.name;
-        const newName = updatedMetadata.name;
-        this.selectedFile.metadata = updatedMetadata;
-        const promises = [this.store.saveChecklistFile(this.selectedFile)];
-        if (oldName !== newName) {
-          // File was renamed, delete old one from storage.
-          promises.push(this.store.deleteChecklistFile(oldName));
-          promises.push(this._updateNavigation());
-        }
-        return Promise.all(promises);
-      })
+      .then(this.onMetadataUpdate.bind(this))
       .catch(console.error.bind(console));
+  }
+
+  async onFileRename(fileName: string) {
+    if (!this.selectedFile) return;
+
+    // If the file was renamed by the navigation, update the name everywhere else.
+    const oldMeta = this.selectedFile.metadata!;
+    if (fileName !== oldMeta.name) {
+      const newMeta = ChecklistFileMetadata.clone(oldMeta);
+      newMeta.name = fileName;
+      await this.onMetadataUpdate(newMeta);
+    }
+
+    // Signal completion, for testing.
+    if (this.renameCompleted$) {
+      this.renameCompleted$.next(true);
+    }
+  }
+
+  async onMetadataUpdate(updatedMetadata?: ChecklistFileMetadata): Promise<unknown> {
+    if (!updatedMetadata || !this.selectedFile) return;
+
+    const oldName = this.selectedFile.metadata!.name;
+    const newName = updatedMetadata.name;
+    this.selectedFile.metadata = updatedMetadata;
+    const promises = [this.store.saveChecklistFile(this.selectedFile)];
+    if (oldName !== newName) {
+      // File was renamed, delete old one from storage.
+      promises.push(this.store.deleteChecklistFile(oldName));
+      promises.push(this._updateNavigation());
+    }
+    return Promise.all(promises);
   }
 
   async onFileSelected(id?: string) {
