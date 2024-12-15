@@ -1,12 +1,14 @@
+import { signal } from '@angular/core';
 import { DeferBlockState, inject } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { NavigationExtras, Router } from '@angular/router';
+import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistFile, ChecklistGroup_Category, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../../model/formats/test-data';
 import { LazyBrowserStorage } from '../../model/storage/browser-storage';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
+import { NavData } from '../nav/nav-data';
 import { ChecklistsComponent } from './checklists.component';
 
 const NEW_FILE = ChecklistFile.create({
@@ -38,6 +40,8 @@ describe('ChecklistsComponent', () => {
   let storage: ChecklistStorage;
   let navigate: jasmine.Spy;
   let showSnack: jasmine.Spy;
+  let navData: NavData;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let realNavigate: (commands: any[], extras?: NavigationExtras) => Promise<boolean>;
   let metaKey: string;
@@ -54,7 +58,18 @@ describe('ChecklistsComponent', () => {
 
     user = userEvent.setup();
 
-    rendered = await render(ChecklistsComponent);
+    navData = {
+      routeTitle: signal(undefined),
+      fileName: signal(undefined),
+    };
+    rendered = await render(ChecklistsComponent, {
+      providers: [
+        {
+          provide: ROUTER_OUTLET_DATA,
+          useValue: signal(navData),
+        },
+      ],
+    });
 
     // Force rendering of all deferred blocks before we start interacting.
     const deferredBlocks = await rendered.fixture.getDeferBlocks();
@@ -157,6 +172,11 @@ describe('ChecklistsComponent', () => {
     expect(extras.fragment).toEqual(fragment);
   }
 
+  function expectNavData(fileName?: string) {
+    expect(navData.routeTitle()).toEqual('Checklists');
+    expect(navData.fileName()).toEqual(fileName);
+  }
+
   async function getChecklistFile(name: string): Promise<ChecklistFile | null> {
     rendered.detectChanges();
     await rendered.fixture.whenStable();
@@ -187,6 +207,7 @@ describe('ChecklistsComponent', () => {
 
     await newEmptyFile(fileName);
     expectFragment(fileName);
+    expectNavData(fileName);
 
     // Add every item on the test file.
     let numBlanks = 0;
@@ -198,6 +219,7 @@ describe('ChecklistsComponent', () => {
         await user.click(screen.getByRole('treeitem', { name: `Checklist: ${checklist.title}` }));
 
         expectFragment(`${fileName}/${groupIdx}/${checklistIdx}`);
+        expectNavData(fileName);
 
         for (const item of checklist.items) {
           const type = typeMap.get(item.type);
@@ -258,6 +280,7 @@ describe('ChecklistsComponent', () => {
     await newFile('My file');
     expect(await getChecklistFile('My file')).not.toBeNull();
     expectFragment('My file');
+    expectNavData('My file');
     expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Delete file' }));
@@ -268,12 +291,14 @@ describe('ChecklistsComponent', () => {
     expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
     expect(await getChecklistFile('My file')).toBeNull();
     expectFragment('');
+    expectNavData(undefined);
   });
 
   it('should create and rename a file', async () => {
     await newFile('My file');
     expect(await getChecklistFile('My file')).not.toBeNull();
     expectFragment('My file');
+    expectNavData('My file');
 
     await user.click(screen.getByRole('button', { name: 'Open file information dialog' }));
     const nameBox = await screen.findByRole('textbox', { name: 'File name' });
@@ -286,6 +311,7 @@ describe('ChecklistsComponent', () => {
     expect(await getChecklistFile('Renamed file')).not.toBeNull();
 
     expectFragment('Renamed file');
+    expectNavData('Renamed file');
   });
 
   it('should not overwrite an existing file', async () => {
@@ -405,17 +431,21 @@ describe('ChecklistsComponent', () => {
   it('should load an existing checklist by URL', async () => {
     await newFile('My file');
     expectFragment('My file');
+    expectNavData('My file');
     expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
 
     await setFragment('');
     expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
+    expectNavData(undefined);
 
     await setFragment('My file');
     expect(await screen.findByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
+    expectNavData('My file');
   });
 
   it('should handle a URL fragment with a bad filename', async () => {
     await setFragment('Non-existing file');
+    expectNavData(undefined);
 
     expect(screen.queryByRole('treeitem', { name: /Checklist:/ })).not.toBeInTheDocument();
     expect(lastSnackMessage()).toMatch(/Failed to load.*/);
@@ -424,6 +454,7 @@ describe('ChecklistsComponent', () => {
   it('should handle a URL fragment with a bad group number', async () => {
     await newFile('My file');
     expectFragment('My file');
+    expectNavData('My file');
 
     await setFragment('My file/1/0');
     expect(lastSnackMessage()).toMatch(/.*does not have group 1.*/);
@@ -444,6 +475,7 @@ describe('ChecklistsComponent', () => {
   it('should handle a URL fragment with a bad checklist number', async () => {
     await newFile('My file');
     expectFragment('My file');
+    expectNavData('My file');
 
     await setFragment('My file/0/2');
     expect(lastSnackMessage()).toMatch(/.*has no checklist 2.*/);
@@ -456,6 +488,7 @@ describe('ChecklistsComponent', () => {
   it('should handle a URL fragment with the wrong format', async () => {
     await newFile('My file');
     expectFragment('My file');
+    expectNavData('My file');
 
     await setFragment('My file/0/0');
     expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();

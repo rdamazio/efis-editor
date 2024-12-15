@@ -8,11 +8,12 @@ import {
   OnDestroy,
   OnInit,
   PLATFORM_ID,
+  Signal,
   viewChild,
 } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { Hotkey, HotkeysService } from '@ngneat/hotkeys';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { saveAs } from 'file-saver';
@@ -34,6 +35,7 @@ import { PdfFormat } from '../../model/formats/pdf-format';
 import { PdfWriterOptions } from '../../model/formats/pdf-writer';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { GoogleDriveStorage } from '../../model/storage/gdrive';
+import { NavData } from '../nav/nav-data';
 import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
@@ -101,9 +103,11 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly _hotkeys: HotkeysService,
     private readonly _injector: Injector,
     @Inject(PLATFORM_ID) private readonly _platformId: object,
+    @Inject(ROUTER_OUTLET_DATA) private readonly _navData: Signal<NavData>,
   ) {}
 
   ngOnInit() {
+    this._navData().routeTitle.set('Checklists');
     this._route.fragment.pipe(untilDestroyed(this)).subscribe((fragment: string | null) => {
       const fn = async () => {
         // We use fragment-based navigation because of the routing limitations associated with GH Pages.
@@ -135,6 +139,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this._navData().routeTitle.set(undefined);
     this._unregisterKeyboardShortcuts();
   }
 
@@ -469,10 +474,13 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.selectedFile.metadata.name;
   }
 
-  private async _updateFragment() {
+  private async _updateNavigation() {
+    const name = this.selectedFile?.metadata?.name;
+    this._navData().fileName.set(name);
+
     if (this._loadingFragment) {
       // We're in the middle of setting a fragment - that triggers loading
-      // the file, which then triggers an _updateFragment call (and even
+      // the file, which then triggers an _updateNavigation call (and even
       // worse, before a checklist is selected, which would result in a
       // different fragment) - avoid the loop.
       return;
@@ -626,7 +634,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         if (oldName !== newName) {
           // File was renamed, delete old one from storage.
           promises.push(this.store.deleteChecklistFile(oldName));
-          promises.push(this._updateFragment());
+          promises.push(this._updateNavigation());
         }
         return Promise.all(promises);
       })
@@ -647,7 +655,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async onChecklistSelected() {
-    await this._updateFragment();
+    await this._updateNavigation();
   }
 
   private async _displayFile(file?: ChecklistFile) {
@@ -658,14 +666,12 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
       this._snackBar.open(`Loaded checklist "${file.metadata.name}".`, '', { duration: 2000 });
     }
 
-    await this._updateFragment();
-
-    // TODO: Add filename to topbar, add rename pencil there
+    await this._updateNavigation();
   }
 
   async onChecklistChanged() {
     // If the change involved moving the selected checklist/group, we may need to update the fragment
-    await this._updateFragment();
+    await this._updateNavigation();
 
     const file = this.selectedFile;
     if (file) {

@@ -1,26 +1,40 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ComponentFixture } from '@angular/core/testing';
 
-import { RouterModule } from '@angular/router';
+import { render, screen } from '@testing-library/angular';
+import { NavData } from './nav-data';
 import { NavComponent } from './nav.component';
 
 describe('NavComponent', () => {
-  let component: NavComponent;
   let fixture: ComponentFixture<NavComponent>;
+  let navData: NavData;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [NoopAnimationsModule, RouterModule.forRoot([])],
-    }).compileComponents();
+    ({ fixture } = await render(NavComponent));
+    navData = fixture.componentInstance.navData;
   });
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(NavComponent);
-    component = fixture.componentInstance;
+  it('should render', () => {
+    const heading = screen.getByRole('heading');
+    expect(heading).toBeVisible();
+    expect(heading).toHaveTextContent(/EFIS Editor/);
+  });
+
+  it('should display title if set', async () => {
+    navData.routeTitle.set('My route title');
     fixture.detectChanges();
+    await fixture.whenStable();
+
+    const heading = screen.getByRole('heading');
+    expect(heading).toHaveTextContent(/EFIS Editor.*My route title/);
   });
 
-  it('should compile', () => {
-    expect(component).toBeTruthy();
+  it('should display filename and title if set', async () => {
+    navData.routeTitle.set('My route title');
+    navData.fileName.set('My filename');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const heading = screen.getByRole('heading');
+    expect(heading).toHaveTextContent(/EFIS Editor.*My route title.*My filename/);
   });
 });

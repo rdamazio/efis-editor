@@ -1,8 +1,16 @@
-<mat-toolbar class="topbar" color="primary">
+<mat-toolbar class="topbar" color="primary" role="toolbar">
   <button mat-icon-button aria-label="Toggle sidenav" (click)="sidenav.toggle()">
     <mat-icon>menu</mat-icon>
   </button>
-  EFIS Editor
+  <div class="title" role="heading" aria-level="1">
+    <span class="main-title">EFIS Editor</span>
+    @if (navData.routeTitle()) {
+      <span class="route-title"> &gt; {{ navData.routeTitle() }}</span>
+    }
+    @if (navData.fileName()) {
+      <span class="file-name">: {{ navData.fileName() }}</span>
+    }
+  </div>
   <span class="topbar-spacer"></span>
 
   @defer (hydrate on idle) {
@@ -32,6 +40,6 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <router-outlet />
+    <router-outlet [routerOutletData]="navData" />
   </mat-sidenav-content>
 </mat-sidenav-container>

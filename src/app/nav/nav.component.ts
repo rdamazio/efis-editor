@@ -1,5 +1,5 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,6 +13,7 @@ import { map, Observable, shareReplay } from 'rxjs';
 import { AboutComponent } from '../about/about.component';
 import { HelpComponent } from '../checklists/hotkeys/help/help.component';
 import { GoogleDriveComponent } from './gdrive.component';
+import { NavData } from './nav-data';
 
 @Component({
   selector: 'app-nav',
@@ -33,6 +34,10 @@ import { GoogleDriveComponent } from './gdrive.component';
 })
 export class NavComponent {
   private readonly _breakpointObserver = inject(BreakpointObserver);
+  readonly navData: NavData = {
+    routeTitle: signal(undefined),
+    fileName: signal(undefined),
+  };
 
   isHandset$: Observable<boolean> = this._breakpointObserver.observe(Breakpoints.Handset).pipe(
     map((result) => result.matches),
