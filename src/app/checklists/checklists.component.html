@@ -1,39 +1,42 @@
 <ngx-spinner type="ball-fussion" [name]="_downloadSpinner" [fullScreen]="true">Generating...</ngx-spinner>
 <div class="container">
   <div class="leftbar">
-    @defer (hydrate on idle) {
-      <checklist-command-bar
-        [hasFiles]="(store.listChecklistFiles() | async)?.length !== 0"
-        [fileIsOpen]="selectedFile !== undefined"
-        (newFile)="onNewFile($event)"
-        (openFile)="onOpenFile()"
-        (uploadFile)="onUploadFile()"
-        (downloadFile)="onDownloadFile($event)"
-        (deleteFile)="onDeleteFile()"
-        (fileInfo)="onFileInfo()"
-        [downloadFormats]="[
-          { id: 'ace', name: 'Garmin G3X/GTN [.ace]' },
-          { id: 'dynon', name: 'Dynon - no wrapping [.txt]' },
-          { id: 'dynon31', name: 'Dynon - 40% / 31 columns [.txt]' },
-          { id: 'dynon40', name: 'Dynon - 50% / 40 columns [.txt]' },
-          { id: 'afs', name: 'Advanced Flight Systems [.afd]' },
-          { id: 'grt', name: 'GRT [.txt]' },
-          { id: 'fmd', name: 'ForeFlight [.fmd]' },
-          { id: 'json', name: 'Raw data [.json]' },
-        ]"
-      />
-      <checklist-file-picker
-        [selectedFile]="selectedFile?.metadata?.name ?? ''"
-        (fileSelected)="onFileSelected($event)"
-        [fileNames]="(store.listChecklistFiles() | async) || []"
-        [style.display]="showFilePicker ? '' : 'none'"
-      />
-      <checklist-file-upload [style.display]="showFileUpload ? '' : 'none'" (fileUploaded)="onFileUploaded($event)" />
-    }
-    <checklist-tree-bar [tree]="tree" />
+    <div role="menubar">
+      @defer (hydrate on idle) {
+        <checklist-command-bar
+          [hasFiles]="(store.listChecklistFiles() | async)?.length !== 0"
+          [fileIsOpen]="selectedFile !== undefined"
+          (newFile)="onNewFile($event)"
+          (openFile)="onOpenFile()"
+          (uploadFile)="onUploadFile()"
+          (downloadFile)="onDownloadFile($event)"
+          (deleteFile)="onDeleteFile()"
+          (fileInfo)="onFileInfo()"
+          [downloadFormats]="[
+            { id: 'ace', name: 'Garmin G3X/GTN [.ace]' },
+            { id: 'dynon', name: 'Dynon - no wrapping [.txt]' },
+            { id: 'dynon31', name: 'Dynon - 40% / 31 columns [.txt]' },
+            { id: 'dynon40', name: 'Dynon - 50% / 40 columns [.txt]' },
+            { id: 'afs', name: 'Advanced Flight Systems [.afd]' },
+            { id: 'grt', name: 'GRT [.txt]' },
+            { id: 'fmd', name: 'ForeFlight [.fmd]' },
+            { id: 'json', name: 'Raw data [.json]' },
+          ]"
+        />
+        <checklist-file-picker
+          [selectedFile]="selectedFile?.metadata?.name ?? ''"
+          (fileSelected)="onFileSelected($event)"
+          [fileNames]="(store.listChecklistFiles() | async) || []"
+          [style.display]="showFilePicker ? '' : 'none'"
+        />
+        <checklist-file-upload [style.display]="showFileUpload ? '' : 'none'" (fileUploaded)="onFileUploaded($event)" />
+      }
+      <checklist-tree-bar [tree]="tree" />
+    </div>
     <checklist-tree
       #tree
       class="checklist-tree"
+      role="navigation"
       (fileModified)="onChecklistChanged()"
       (selectedChecklistChange)="onChecklistSelected()"
     />
@@ -41,6 +44,7 @@
   <checklist-items
     #items
     class="checklist-items"
+    role="main"
     [groupDropListIds]="tree.groupDropListIds()"
     [(checklist)]="tree.selectedChecklist"
     (checklistChange)="onChecklistChanged()"
