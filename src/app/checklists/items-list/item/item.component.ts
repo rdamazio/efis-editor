@@ -43,12 +43,14 @@ export class ChecklistItemComponent {
     this.promptInput().focus();
   }
 
-  onIndent(item: ChecklistItem, delta: number) {
+  onIndent(delta: number) {
+    const item = this.item();
     item.indent += delta;
     this.onItemUpdated();
   }
 
-  onCenterToggle(item: ChecklistItem) {
+  onCenterToggle() {
+    const item = this.item();
     item.indent = 0;
     item.centered = !item.centered;
     this.onItemUpdated();

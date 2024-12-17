@@ -33,7 +33,7 @@
       matTooltip="Indent left"
       [attr.aria-label]="'Indent ' + it.prompt + ' left'"
       [disabled]="it.indent === 0 || it.centered || it.type === itemType.ITEM_SPACE"
-      (click)="onIndent(it, -1)"
+      (click)="onIndent(-1)"
     >
       <mat-icon>format_indent_decrease</mat-icon>
     </button>
@@ -44,7 +44,7 @@
       matTooltip="Indent right"
       [attr.aria-label]="'Indent ' + it.prompt + ' right'"
       [disabled]="it.indent === 4 || it.centered || it.type === itemType.ITEM_SPACE"
-      (click)="onIndent(it, 1)"
+      (click)="onIndent(1)"
     >
       <mat-icon>format_indent_increase</mat-icon>
     </button>
@@ -55,7 +55,7 @@
       [matTooltip]="(it.centered ? 'Left-justify' : 'Center') + ' this line'"
       [attr.aria-label]="'Center ' + it.prompt"
       [disabled]="it.type === itemType.ITEM_SPACE || it.type === itemType.ITEM_CHALLENGE_RESPONSE"
-      (click)="onCenterToggle(it)"
+      (click)="onCenterToggle()"
     >
       <mat-icon>
         @if (it.centered) {

@@ -53,10 +53,10 @@ export class ChecklistItemsComponent {
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
     moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    this.onItemUpdated();
+    this.onItemsUpdated();
   }
 
-  onItemUpdated() {
+  onItemsUpdated() {
     this.checklistChange.emit(this.checklist());
     afterNextRender(
       () => {
@@ -96,7 +96,7 @@ export class ChecklistItemsComponent {
     }
     items.splice(newIdx, 0, item);
 
-    this.onItemUpdated();
+    this.onItemsUpdated();
 
     // Set focus to the newly added item.
     afterNextRender(
@@ -119,7 +119,7 @@ export class ChecklistItemsComponent {
     } else if (this._selectedIdx < checklist.items.length - 1) {
       this._selectedIdx++;
     }
-    this.onItemUpdated();
+    this.onItemsUpdated();
   }
 
   selectPreviousItem() {
@@ -133,7 +133,7 @@ export class ChecklistItemsComponent {
     } else if (this._selectedIdx > 0) {
       this._selectedIdx--;
     }
-    this.onItemUpdated();
+    this.onItemsUpdated();
   }
 
   editCurrentItem() {
@@ -146,7 +146,7 @@ export class ChecklistItemsComponent {
     if (this._selectedIdx === this.checklist()!.items.length) {
       this.selectPreviousItem();
     } else {
-      this.onItemUpdated();
+      this.onItemsUpdated();
     }
   }
 
@@ -156,7 +156,7 @@ export class ChecklistItemsComponent {
       const indent = item.indent + delta;
       if (indent >= 0 && indent <= 4) {
         item.indent = indent;
-        this.onItemUpdated();
+        this.onItemsUpdated();
       }
     }
   }
@@ -167,7 +167,7 @@ export class ChecklistItemsComponent {
       if (item.type !== ChecklistItem_Type.ITEM_SPACE && item.type !== ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
         item.centered = !item.centered;
         item.indent = 0;
-        this.onItemUpdated();
+        this.onItemsUpdated();
       }
     }
   }
@@ -179,7 +179,7 @@ export class ChecklistItemsComponent {
 
     moveItemInArray(this.checklist()!.items, this._selectedIdx! - 1, this._selectedIdx!);
     this._selectedIdx!--;
-    this.onItemUpdated();
+    this.onItemsUpdated();
 
     // HACK: I don't really understand why it works IFF this is done both before and after render on move up (but not down).
     this._focusSelectedItem();
@@ -192,7 +192,7 @@ export class ChecklistItemsComponent {
 
     moveItemInArray(this.checklist()!.items, this._selectedIdx! + 1, this._selectedIdx!);
     this._selectedIdx!++;
-    this.onItemUpdated();
+    this.onItemsUpdated();
   }
 
   private _selectedItem(): ChecklistItem | undefined {
@@ -261,7 +261,7 @@ export class ChecklistItemsComponent {
     }
 
     this.checklist.set(this._undoState.pop());
-    this.onItemUpdated();
+    this.onItemsUpdated();
   }
 
   itemLabel(item: ChecklistItem): string {
