@@ -35,6 +35,7 @@ export class EditableLabelComponent {
   readonly editing = model<boolean>();
   readonly value = model('');
   readonly label = input('');
+  readonly disableSave = input(false);
   readonly disallowEmpty = input(false);
 
   constructor() {
@@ -42,7 +43,7 @@ export class EditableLabelComponent {
   }
 
   save() {
-    if (this.editing()) {
+    if (this.editing() && !this.saveDisabled()) {
       this.editing.set(false);
       this.value.set(this.control.value!);
       this.saved.emit(this.control.value!);
@@ -70,6 +71,14 @@ export class EditableLabelComponent {
       this.control.setValue(this.value());
       this.cancelled.emit();
     }
+  }
+
+  isValid(): boolean {
+    return this.control.valid;
+  }
+
+  saveDisabled(): boolean {
+    return !this.isValid() || this.disableSave();
   }
 
   onBeforeInput(event: InputEvent) {

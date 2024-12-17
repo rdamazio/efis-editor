@@ -20,7 +20,7 @@
       matSuffix
       matTooltip="Save (⏎)"
       [attr.aria-label]="'Save changes to ' + label()"
-      [disabled]="!this.control.valid"
+      [disabled]="saveDisabled()"
       (click)="save()"
     >
       <mat-icon>save</mat-icon>

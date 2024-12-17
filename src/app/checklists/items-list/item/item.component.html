@@ -85,6 +85,7 @@
         [class.prompt-input-editing]="promptInput.editing()"
         label="Prompt text"
         [value]="it.prompt"
+        [disableSave]="it.type === itemType.ITEM_CHALLENGE_RESPONSE && !expectationInput.isValid()"
         (saved)="onSavePrompt($event)"
         (cancelled)="onCancelEdit()"
       />
@@ -102,6 +103,7 @@
           [class.expectation-input-editing]="expectationInput.editing()"
           label="Expectation text"
           [value]="it.expectation"
+          [disableSave]="!promptInput.isValid()"
           (saved)="onSaveExpectation($event)"
           (cancelled)="onCancelEdit()"
         />
