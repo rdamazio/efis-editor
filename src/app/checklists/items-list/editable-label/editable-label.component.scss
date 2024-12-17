@@ -13,3 +13,20 @@
   // Keep the input also centered on the row
   position: relative;
 }
+
+mat-form-field {
+  @include mat.form-field-overrides(
+    (
+      outlined-caret-color: white,
+
+      outlined-label-text-color: --sys-on-surface-variant,
+      outlined-hover-label-text-color: --sys-on-surface,
+      outlined-focus-label-text-color: white,
+
+      outlined-focus-outline-color: white,
+      outlined-focus-outline-width: 2px,
+
+      outlined-error-hover-outline-color: orange,
+    )
+  );
+}
