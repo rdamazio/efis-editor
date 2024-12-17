@@ -34,8 +34,12 @@ export class ChecklistItemComponent {
   readonly itemType = ChecklistItem_Type;
 
   onEdit(e?: Event) {
-    this._shouldRestoreFocus = document.activeElement === this.containerRef().nativeElement;
     e?.stopPropagation();
+    if (this.item().type === ChecklistItem_Type.ITEM_SPACE) {
+      return;
+    }
+
+    this._shouldRestoreFocus = document.activeElement === this.containerRef().nativeElement;
     this.promptInput().edit();
     if (this.item().type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
       this.expectationInput().edit();
@@ -45,6 +49,10 @@ export class ChecklistItemComponent {
 
   onIndent(delta: number) {
     const item = this.item();
+    if (item.type === ChecklistItem_Type.ITEM_SPACE) {
+      return;
+    }
+
     const indent = item.indent + delta;
     if (indent >= 0 && indent <= 4) {
       item.indent = indent;
@@ -54,6 +62,10 @@ export class ChecklistItemComponent {
 
   onCenterToggle() {
     const item = this.item();
+    if (item.type === ChecklistItem_Type.ITEM_SPACE || item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
+      return;
+    }
+
     item.indent = 0;
     item.centered = !item.centered;
     this.onItemUpdated();
