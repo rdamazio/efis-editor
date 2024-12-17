@@ -151,25 +151,11 @@ export class ChecklistItemsComponent {
   }
 
   indentCurrentItem(delta: number) {
-    const item = this._selectedItem();
-    if (item && !item.centered) {
-      const indent = item.indent + delta;
-      if (indent >= 0 && indent <= 4) {
-        item.indent = indent;
-        this.onItemsUpdated();
-      }
-    }
+    this._selectedItemComponent()?.onIndent(delta);
   }
 
   toggleCurrentItemCenter() {
-    const item = this._selectedItem();
-    if (item) {
-      if (item.type !== ChecklistItem_Type.ITEM_SPACE && item.type !== ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
-        item.centered = !item.centered;
-        item.indent = 0;
-        this.onItemsUpdated();
-      }
-    }
+    this._selectedItemComponent()?.onCenterToggle();
   }
 
   moveCurrentItemUp() {

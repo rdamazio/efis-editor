@@ -45,8 +45,11 @@ export class ChecklistItemComponent {
 
   onIndent(delta: number) {
     const item = this.item();
-    item.indent += delta;
-    this.onItemUpdated();
+    const indent = item.indent + delta;
+    if (indent >= 0 && indent <= 4) {
+      item.indent = indent;
+      this.onItemUpdated();
+    }
   }
 
   onCenterToggle() {
