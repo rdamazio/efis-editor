@@ -45,7 +45,7 @@ import { ChecklistFileInfoComponent } from './dialogs/file-info/file-info.compon
 import { PrintDialogComponent } from './dialogs/print-dialog/print-dialog.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
-import { HelpComponent } from './hotkeys/help/help.component';
+import { HelpComponent } from '../shared/hotkeys/help/help.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
 
 interface ParsedFragment {

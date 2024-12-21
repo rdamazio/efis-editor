@@ -6,9 +6,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
-import { GoogleDriveConnectDialogComponent } from '../checklists/dialogs/gdrive-connect-dialog/gdrive-connect-dialog.component';
-import { GoogleDriveDisconnectDialogComponent } from '../checklists/dialogs/gdrive-disconnect-dialog/gdrive-disconnect-dialog.component';
+import { DriveSyncState, GoogleDriveStorage } from '../../../model/storage/gdrive';
+import { GoogleDriveConnectDialogComponent } from './connect-dialog/gdrive-connect-dialog.component';
+import { GoogleDriveDisconnectDialogComponent } from './disconnect-dialog/gdrive-disconnect-dialog.component';
 
 @Component({
   selector: 'gdrive-nav',

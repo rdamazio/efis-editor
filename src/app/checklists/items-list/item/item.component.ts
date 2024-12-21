@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { ChecklistItem, ChecklistItem_Type } from '../../../../../gen/ts/checklist';
-import { EditableLabelComponent } from '../editable-label/editable-label.component';
+import { EditableLabelComponent } from '../../../shared/editable-label/editable-label.component';
 
 @Component({
   selector: 'checklist-item',

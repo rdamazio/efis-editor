@@ -11,11 +11,11 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { HotkeysService } from '@ngneat/hotkeys';
 import { map, Observable, shareReplay } from 'rxjs';
 import { AboutComponent } from '../about/about.component';
-import { HelpComponent } from '../checklists/hotkeys/help/help.component';
-import { GoogleDriveComponent } from './gdrive.component';
+import { HelpComponent } from '../shared/hotkeys/help/help.component';
+import { GoogleDriveComponent } from '../shared/gdrive/gdrive.component';
 import { NavData } from './nav-data';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
-import { EditableLabelComponent } from '../checklists/items-list/editable-label/editable-label.component';
+import { EditableLabelComponent } from '../shared/editable-label/editable-label.component';
 
 @Component({
   selector: 'app-nav',
