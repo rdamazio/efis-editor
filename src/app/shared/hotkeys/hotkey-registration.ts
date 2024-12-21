@@ -5,26 +5,33 @@ import { Hotkey, HotkeysService } from '@ngneat/hotkeys';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { HelpComponent } from './help/help.component';
 
+const HELP_KEYS = 'shift.?';
+
 export interface HotkeyRegistree {
   registerHotkeys(service: HotkeyRegistar): void;
 }
 
 export class HotkeyRegistar {
+  private readonly _keys: string[] = [];
   private readonly _destroy$ = new Subject<void>();
 
   constructor(private readonly _hotkeys: HotkeysService) {}
 
   addShortcut(options: Hotkey): Observable<KeyboardEvent> {
+    this._keys.push(options.keys);
     return this._hotkeys.addShortcut(options).pipe(takeUntil(this._destroy$));
   }
 
   addSequenceShortcut(options: Hotkey): Observable<Hotkey> {
+    this._keys.push(options.keys);
     return this._hotkeys.addSequenceShortcut(options).pipe(takeUntil(this._destroy$));
   }
 
   onDestroy() {
     this._destroy$.next();
     this._destroy$.complete();
+
+    this._hotkeys.removeShortcuts(this._keys);
   }
 }
 
@@ -33,6 +40,7 @@ export class HotkeyRegistar {
 })
 export class HotkeyRegistry {
   private readonly _hotkeyRegistrars = new Map<HotkeyRegistree, HotkeyRegistar>();
+  private _helpRegistered = false;
 
   constructor(
     private readonly _dialog: MatDialog,
@@ -56,9 +64,12 @@ export class HotkeyRegistry {
 
     // Shortcut registration affects global state which then changes the parent NavComponent, so do it off-cycle.
     setTimeout(() => {
-      this._hotkeys.registerHelpModal(() => {
-        HelpComponent.toggleHelp(this._dialog);
-      });
+      if (!this._helpRegistered) {
+        this._hotkeys.registerHelpModal(() => {
+          HelpComponent.toggleHelp(this._dialog);
+        }, HELP_KEYS);
+        this._helpRegistered = true;
+      }
 
       registree.registerHotkeys(registar);
     });
@@ -76,8 +87,11 @@ export class HotkeyRegistry {
     registrar.onDestroy();
     this._hotkeyRegistrars.delete(registree);
 
-    // TODO: unregister only the shortcuts registered by that specific registree (maybe move to annotating the
-    // methods like @HostListener does?).
-    this._hotkeys.removeShortcuts(this._hotkeys.getHotkeys().map((hk: Hotkey) => hk.keys));
+    // If only the help screen shortcut is left, remove that too.
+    const allHotkeys = this._hotkeys.getHotkeys();
+    if (allHotkeys.length === 1 && allHotkeys[0].keys === HELP_KEYS) {
+      this._hotkeys.removeShortcuts(HELP_KEYS);
+      this._helpRegistered = false;
+    }
   }
 }
