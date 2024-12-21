@@ -1,4 +1,4 @@
-import { AsyncPipe, isPlatformServer } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {
   afterNextRender,
   AfterViewInit,
@@ -8,14 +8,12 @@ import {
   Injector,
   OnDestroy,
   OnInit,
-  PLATFORM_ID,
   Signal,
   viewChild,
 } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, ROUTER_OUTLET_DATA } from '@angular/router';
-import { Hotkey, HotkeysService } from '@ngneat/hotkeys';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { saveAs } from 'file-saver';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
@@ -38,6 +36,7 @@ import { PdfWriterOptions } from '../../model/formats/pdf-writer';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { GoogleDriveStorage } from '../../model/storage/gdrive';
 import { NavData } from '../nav/nav-data';
+import { HotkeyRegistar, HotkeyRegistree, HotkeyRegistry } from '../shared/hotkeys/hotkey-registration';
 import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
@@ -45,7 +44,6 @@ import { ChecklistFileInfoComponent } from './dialogs/file-info/file-info.compon
 import { PrintDialogComponent } from './dialogs/print-dialog/print-dialog.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
-import { HelpComponent } from '../shared/hotkeys/help/help.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
 
 interface ParsedFragment {
@@ -71,7 +69,7 @@ interface ParsedFragment {
   styleUrl: './checklists.component.scss',
 })
 @UntilDestroy()
-export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, HotkeyRegistree {
   static readonly NEW_ITEM_SHORTCUTS = [
     { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
     { secondKey: 'c', typeDescription: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
@@ -106,9 +104,8 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly _spinner: NgxSpinnerService,
     private readonly _route: ActivatedRoute,
     private readonly _router: Router,
-    private readonly _hotkeys: HotkeysService,
+    private readonly _hotkeys: HotkeyRegistry,
     private readonly _injector: Injector,
-    @Inject(PLATFORM_ID) private readonly _platformId: object,
     @Inject(ROUTER_OUTLET_DATA) private readonly _navData: Signal<NavData>,
   ) {}
 
@@ -135,10 +132,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // Shortcut registration affects global state which then changes the parent NavComponent.
-    setTimeout(() => {
-      this._registerKeyboardShortcuts();
-    });
+    this._hotkeys.registerShortcuts(this);
 
     this._gdrive
       .onDownloads()
@@ -156,88 +150,73 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this._navData().routeTitle.set(undefined);
-    this._unregisterKeyboardShortcuts();
+    this._hotkeys.unregisterShortcuts(this);
   }
 
-  private _registerKeyboardShortcuts() {
-    // Hotkey registration needs navigator.
-    if (isPlatformServer(this._platformId)) return;
-
-    this._hotkeys.setSequenceDebounce(500);
-
-    this._hotkeys.registerHelpModal(() => {
-      HelpComponent.toggleHelp(this._dialog);
-    });
-
-    this._hotkeys
+  registerHotkeys(hotkeys: HotkeyRegistar) {
+    hotkeys
       .addShortcut({
         keys: 'down',
         description: 'Select next checklist item',
         preventDefault: true,
         group: 'Navigation',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().selectNextItem();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'up',
         description: 'Select previous checklist item',
         preventDefault: true,
         group: 'Navigation',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().selectPreviousItem();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'meta.down',
         description: 'Select next checklist',
         preventDefault: true,
         group: 'Navigation',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().selectNextChecklist();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'meta.up',
         description: 'Select next checklist',
         preventDefault: true,
         group: 'Navigation',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().selectPreviousChecklist();
       });
 
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'alt.down',
         description: 'Select next checklist group',
         preventDefault: true,
         group: 'Navigation',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().selectNextGroup();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'alt.up',
         description: 'Select next checklist group',
         preventDefault: true,
         group: 'Navigation',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().selectPreviousGroup();
       });
 
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'enter',
         description: 'Edit checklist item',
@@ -245,11 +224,10 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         trigger: 'keyup',
         group: 'Editing',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().editCurrentItem();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'delete',
         description: 'Delete checklist item',
@@ -257,118 +235,107 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
         trigger: 'keyup',
         group: 'Editing',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().deleteCurrentItem();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'shift.right',
         description: 'Indent checklist item',
         preventDefault: true,
         group: 'Editing',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().indentCurrentItem(1);
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'shift.left',
         description: 'Unident checklist item',
         preventDefault: true,
         group: 'Editing',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().indentCurrentItem(-1);
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'shift.C',
         description: 'Toggle checklist item centering',
         preventDefault: true,
         group: 'Editing',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().toggleCurrentItemCenter();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'shift.up',
         description: 'Move checklist item up',
         preventDefault: true,
         group: 'Reordering',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().moveCurrentItemUp();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'shift.down',
         description: 'Move checklist item down',
         preventDefault: true,
         group: 'Reordering',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.items().moveCurrentItemDown();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'shift.meta.up',
         description: 'Move checklist up',
         preventDefault: true,
         group: 'Reordering',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().moveCurrentChecklistUp();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'shift.meta.down',
         description: 'Move checklist down',
         preventDefault: true,
         group: 'Reordering',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().moveCurrentChecklistDown();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'shift.alt.up',
         description: 'Move checklist group up',
         preventDefault: true,
         group: 'Reordering',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().moveCurrentGroupUp();
       });
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'shift.alt.down',
         description: 'Move checklist group down',
         preventDefault: true,
         group: 'Reordering',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         this.tree().moveCurrentGroupDown();
       });
 
-    this._hotkeys
+    hotkeys
       .addShortcut({
         keys: 'meta.i',
         description: 'Edit file information',
         preventDefault: true,
         group: 'Editing',
       })
-      .pipe(untilDestroyed(this))
       .subscribe(() => {
         const fn = async () => {
           await this.onFileInfo();
@@ -377,22 +344,17 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
     for (const shortcut of ChecklistsComponent.NEW_ITEM_SHORTCUTS) {
-      this._hotkeys
+      hotkeys
         .addSequenceShortcut({
           keys: `n>${shortcut.secondKey}`,
           description: `Add new ${shortcut.typeDescription} item`,
           preventDefault: true,
           group: 'Adding',
         })
-        .pipe(untilDestroyed(this))
         .subscribe(() => {
           this.items().onNewItem(shortcut.type);
         });
     }
-  }
-
-  private _unregisterKeyboardShortcuts() {
-    this._hotkeys.removeShortcuts(this._hotkeys.getHotkeys().map((hk: Hotkey) => hk.keys));
   }
 
   private async _onFragmentChange(fragment: string | null) {
