@@ -10,13 +10,13 @@ import { DriveSyncState, GoogleDriveStorage } from '../../../model/storage/gdriv
 import { GoogleDriveConnectDialogComponent } from './connect-dialog/gdrive-connect-dialog.component';
 import { GoogleDriveDisconnectDialogComponent } from './disconnect-dialog/gdrive-disconnect-dialog.component';
 
+@UntilDestroy()
 @Component({
   selector: 'gdrive-nav',
   imports: [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatSnackBarModule, MatTooltipModule],
   templateUrl: './gdrive.component.html',
   styleUrl: './gdrive.component.scss',
 })
-@UntilDestroy()
 export class GoogleDriveComponent implements OnInit, OnDestroy {
   cloudIconDisabled = false;
   disconnectCloudDisabled = true;

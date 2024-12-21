@@ -52,6 +52,7 @@ interface ParsedFragment {
   checklistIdx?: number;
 }
 
+@UntilDestroy()
 @Component({
   selector: 'app-checklists',
   imports: [
@@ -68,7 +69,6 @@ interface ParsedFragment {
   templateUrl: './checklists.component.html',
   styleUrl: './checklists.component.scss',
 })
-@UntilDestroy()
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, HotkeyRegistree {
   static readonly NEW_ITEM_SHORTCUTS = [
     { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
