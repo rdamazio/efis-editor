@@ -549,7 +549,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     } else if (formatId === 'fmd') {
       file = ForeFlightFormat.fromProto(this.selectedFile);
     } else if (formatId === 'pdf') {
-      file = PrintDialogComponent.show(this._dialog).then((options?: PdfWriterOptions): File => {
+      file = PrintDialogComponent.show(this._dialog).then(async (options?: PdfWriterOptions): Promise<File> => {
         if (options) {
           return PdfFormat.fromProto(this.selectedFile!, options);
         }

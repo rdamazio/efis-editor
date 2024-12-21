@@ -79,7 +79,7 @@ describe('PdfWriter', () => {
 
   async function writeAndParsePdf(options: PdfWriterOptions): Promise<pdfjs.PDFDocumentProxy> {
     const writer = new PdfWriter(options);
-    const writtenFile = writer.write(EXPECTED_CONTENTS);
+    const writtenFile = await writer.write(EXPECTED_CONTENTS);
     const writtenData = await writtenFile.arrayBuffer();
     expect(writtenData.byteLength).toBeGreaterThan(1000);
     return parsePdf(writtenData);

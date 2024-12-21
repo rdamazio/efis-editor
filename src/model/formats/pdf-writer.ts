@@ -10,6 +10,7 @@ import {
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
 import { FormatError } from './error';
+import 'svg2pdf.js';
 
 type OrientationType = jsPDFOptions['orientation'];
 type FormatType = jsPDFOptions['format'];
@@ -37,6 +38,13 @@ export const DEFAULT_OPTIONS: PdfWriterOptions = {
   outputPageNumbers: true,
 };
 
+interface IconToDraw {
+  name: string;
+  page: number;
+  x: number;
+  y: number;
+}
+
 export class PdfWriter {
   private static readonly DEBUG_LAYOUT = false;
   private static readonly TABLE_MARGIN_FRACTION = 0.07;
@@ -61,6 +69,12 @@ export class PdfWriter {
   private static readonly NOTE_PREFIX = 'NOTE: ';
   private static readonly PREFIX_CELL_WIDTH = 5.6;
 
+  private static readonly ICON_SIZE = 1.5;
+  private static readonly ICON_MARGIN = 0.3;
+  private static readonly WARNING_ICON = 'assets/warning-icon.svg';
+  private static readonly CAUTION_ICON = 'assets/caution-icon.svg';
+  private static readonly ALL_ICONS = [this.WARNING_ICON, this.CAUTION_ICON];
+
   private static readonly SPACER_CELL: CellDef = {
     content: '. '.repeat(100),
     styles: {
@@ -78,11 +92,19 @@ export class PdfWriter {
   private _defaultPadding = 0;
   private _defaultCellPadding?: CellPaddingInputStructured;
 
+  // Persistent cache so icons are only fetched once.
+  private static readonly ICON_CACHE = new Map<string, Element>();
+  // Per-instance promise of icons being fetched.
+  private readonly _allIcons: Promise<Map<string, Element>>;
+  private readonly _icons: IconToDraw[] = [];
+
   private _currentY = 0;
 
-  constructor(private readonly _options: PdfWriterOptions = DEFAULT_OPTIONS) {}
+  constructor(private readonly _options: PdfWriterOptions = DEFAULT_OPTIONS) {
+    this._allIcons = this._fetchIcons();
+  }
 
-  public write(file: ChecklistFile): Blob {
+  public async write(file: ChecklistFile): Promise<Blob> {
     const doc = new jsPDF({
       format: this._options.format,
       orientation: this._options.orientation,
@@ -121,6 +143,8 @@ export class PdfWriter {
     if (this._options.outputPageNumbers) {
       this._addPageFooters();
     }
+
+    await this._addIcons();
 
     return this._doc.output('blob');
   }
@@ -317,11 +341,9 @@ export class PdfWriter {
         prompt.styles!.minCellHeight = this._doc.getLineHeight() / this._scaleFactor;
         break;
       case ChecklistItem_Type.ITEM_WARNING:
-        // TODO: Icon
         prefix = PdfWriter.WARNING_PREFIX;
         break;
       case ChecklistItem_Type.ITEM_CAUTION:
-        // TODO: Icon
         prefix = PdfWriter.CAUTION_PREFIX;
         break;
       case ChecklistItem_Type.ITEM_NOTE:
@@ -376,14 +398,17 @@ export class PdfWriter {
     // Caveat: If we had a plaintext field where the text starts with these prefixes,
     // we'd also format that - that's probably OK.
     const firstLine = data.cell.text[0];
+    let icon: string | undefined;
     let prefix: string | undefined;
     let prefixFontStyle: FontStyle = PdfWriter.NORMAL_FONT_STYLE;
     let prefixColor = 'black';
     if (firstLine.startsWith(PdfWriter.WARNING_PREFIX)) {
+      icon = PdfWriter.WARNING_ICON;
       prefix = PdfWriter.WARNING_PREFIX;
       prefixFontStyle = PdfWriter.BOLD_FONT_STYLE;
       prefixColor = 'red';
     } else if (firstLine.startsWith(PdfWriter.CAUTION_PREFIX)) {
+      icon = PdfWriter.CAUTION_ICON;
       prefix = PdfWriter.CAUTION_PREFIX;
       prefixFontStyle = PdfWriter.BOLD_FONT_STYLE;
       prefixColor = 'orange';
@@ -462,7 +487,87 @@ export class PdfWriter {
       tableWidth: tableWidth,
     });
 
+    if (icon) {
+      // Icon drawing is asynchronous, and we're in a synchronous autotable callback, so just collect what needs to be
+      // drawn, for now.
+      this._icons.push({
+        name: icon,
+        page: data.pageNumber,
+        // Position to the left of the text.
+        // TODO: Displace text to fit icon.
+        x: this._tableMargin - PdfWriter.ICON_SIZE + leftPadding - PdfWriter.ICON_MARGIN,
+        // Center vertically in cell.
+        y: data.cell.y + (data.cell.height - PdfWriter.ICON_SIZE) / 2,
+      });
+    }
+
     data.cell.text = [];
+  }
+
+  private async _addIcons() {
+    if (!this._doc) return;
+
+    console.debug('PDF: Icons=', this._icons);
+    const allIcons = await this._allIcons;
+    for (const icon of this._icons) {
+      const iconEl = allIcons.get(icon.name);
+      if (!iconEl) continue;
+
+      this._doc.setPage(icon.page + 1);
+
+      // jsPDF's addSvgAsImage is broken (wrong signature, rasterizes the SVG, etc.), so we use svg2pdf instead.
+      // svg2pdf relies on jspdf's state machine, so we have to await for each one instead of
+      // letting them work in parallel.
+      // eslint-disable-next-line no-await-in-loop
+      await this._doc.svg(iconEl, {
+        x: icon.x,
+        y: icon.y,
+        width: PdfWriter.ICON_SIZE,
+        height: PdfWriter.ICON_SIZE,
+      });
+    }
+  }
+
+  private async _fetchIcons(): Promise<Map<string, Element>> {
+    const cache = PdfWriter.ICON_CACHE;
+
+    const parser = new DOMParser();
+    const allFetches: Promise<[string, Element]>[] = [];
+    for (const icon of PdfWriter.ALL_ICONS) {
+      if (cache.has(icon)) continue;
+
+      allFetches.push(
+        fetch(icon)
+          .then(async (resp: Response) => {
+            if (!resp.ok) {
+              throw new Error(`Failed to fetch icon '${icon}'`);
+            }
+            return resp.text();
+          })
+          .then((iconData: string) => {
+            console.debug(`PDF: Fetched icon '${icon}', size ${iconData.length}`);
+            const iconElement = parser.parseFromString(iconData, 'image/svg+xml').firstElementChild;
+            if (!iconElement) {
+              throw new Error(`Failed to parse icon '${icon}'`);
+            }
+            return [icon, iconElement];
+          }),
+      );
+    }
+
+    return Promise.allSettled(allFetches).then((fetches) => {
+      for (const result of fetches) {
+        if (result.status !== 'fulfilled') {
+          console.warn('PDF: ', result.reason);
+          continue;
+        }
+
+        const [icon, iconEl] = result.value;
+        cache.set(icon, iconEl);
+      }
+
+      return cache;
+    });
   }
 
   private _indentPadding(indent: number) {
