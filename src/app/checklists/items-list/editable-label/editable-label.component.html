@@ -1,5 +1,9 @@
 @if (!editing()) {
-  {{ value() | dynamicData }}
+  @if (dynamicData()) {
+    {{ value() | dynamicData }}
+  } @else {
+    {{ value() }}
+  }
 } @else {
   <mat-form-field appearance="outline" class="editable-input-field">
     <mat-label>{{ label() }}</mat-label>
