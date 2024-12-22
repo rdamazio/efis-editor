@@ -406,12 +406,12 @@ export class PdfWriter {
       icon = PdfWriter.WARNING_ICON;
       prefix = PdfWriter.WARNING_PREFIX;
       prefixFontStyle = PdfWriter.BOLD_FONT_STYLE;
-      prefixColor = 'red';
+      prefixColor = 'orange';
     } else if (firstLine.startsWith(PdfWriter.CAUTION_PREFIX)) {
       icon = PdfWriter.CAUTION_ICON;
       prefix = PdfWriter.CAUTION_PREFIX;
       prefixFontStyle = PdfWriter.BOLD_FONT_STYLE;
-      prefixColor = 'orange';
+      prefixColor = 'red';
     } else if (firstLine.startsWith(PdfWriter.NOTE_PREFIX)) {
       prefix = PdfWriter.NOTE_PREFIX;
     }
