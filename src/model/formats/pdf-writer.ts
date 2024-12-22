@@ -280,6 +280,7 @@ export class PdfWriter {
       }
       first = false;
 
+      const firstPageNumber = this._doc.getCurrentPageInfo().pageNumber;
       autoTable(this._doc, {
         // Actual columns are: prompt, spacer, expectation
         head: [
@@ -306,7 +307,7 @@ export class PdfWriter {
           valign: 'top',
         },
         didDrawCell: (data: CellHookData) => {
-          this._drawPrefixedCell(data);
+          this._drawPrefixedCell(data, firstPageNumber);
         },
       });
     }
@@ -390,7 +391,7 @@ export class PdfWriter {
     return cells;
   }
 
-  private _drawPrefixedCell(data: CellHookData) {
+  private _drawPrefixedCell(data: CellHookData, firstPageNumber: number) {
     if (data.section !== 'body') return;
     if (data.column.index !== 0) return;
 
@@ -492,7 +493,7 @@ export class PdfWriter {
       // drawn, for now.
       this._icons.push({
         name: icon,
-        page: data.pageNumber,
+        page: firstPageNumber + data.pageNumber - 1,
         // Position to the left of the text.
         // TODO: Displace text to fit icon.
         x: this._tableMargin - PdfWriter.ICON_SIZE + leftPadding - PdfWriter.ICON_MARGIN,
@@ -513,7 +514,7 @@ export class PdfWriter {
       const iconEl = allIcons.get(icon.name);
       if (!iconEl) continue;
 
-      this._doc.setPage(icon.page + 1);
+      this._doc.setPage(icon.page);
 
       // jsPDF's addSvgAsImage is broken (wrong signature, rasterizes the SVG, etc.), so we use svg2pdf instead.
       // svg2pdf relies on jspdf's state machine, so we have to await for each one instead of
