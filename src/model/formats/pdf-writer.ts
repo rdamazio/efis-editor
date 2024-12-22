@@ -496,7 +496,7 @@ export class PdfWriter {
         page: firstPageNumber + data.pageNumber - 1,
         // Position to the left of the text.
         // TODO: Displace text to fit icon.
-        x: this._tableMargin - PdfWriter.ICON_SIZE + leftPadding - PdfWriter.ICON_MARGIN,
+        x: margin - PdfWriter.ICON_SIZE + leftPadding - PdfWriter.ICON_MARGIN,
         // Center vertically in cell.
         y: data.cell.y + (data.cell.height - PdfWriter.ICON_SIZE) / 2,
       });
