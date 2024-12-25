@@ -11,6 +11,7 @@ import { LazyBrowserStorage } from '../../model/storage/browser-storage';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { NavData } from '../nav/nav-data';
 import { ChecklistsComponent } from './checklists.component';
+import { HOTKEY_DEBOUNCE_TIME } from '../shared/hotkeys/hotkey-registration';
 
 const NEW_FILE = ChecklistFile.create({
   metadata: { name: 'My file' },
@@ -69,6 +70,7 @@ describe('ChecklistsComponent', () => {
           useValue: signal(navData),
         },
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 1 } },
+        { provide: HOTKEY_DEBOUNCE_TIME, useValue: 50 },
       ],
     });
 

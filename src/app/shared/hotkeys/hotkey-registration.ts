@@ -1,11 +1,13 @@
 import { isPlatformServer } from '@angular/common';
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, InjectionToken, Optional, PLATFORM_ID } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Hotkey, HotkeysService } from '@ngneat/hotkeys';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { HelpComponent } from './help/help.component';
 
 const HELP_KEYS = 'shift.?';
+
+export const HOTKEY_DEBOUNCE_TIME = new InjectionToken<number>('Hotkey sequence debounce time in ms');
 
 export interface HotkeyRegistree {
   registerHotkeys(service: HotkeyRegistar): void;
@@ -46,8 +48,9 @@ export class HotkeyRegistry {
     private readonly _dialog: MatDialog,
     private readonly _hotkeys: HotkeysService,
     @Inject(PLATFORM_ID) private readonly _platformId: object,
+    @Inject(HOTKEY_DEBOUNCE_TIME) @Optional() readonly debounceTime?: number,
   ) {
-    this._hotkeys.setSequenceDebounce(500);
+    this._hotkeys.setSequenceDebounce(debounceTime ?? 500);
   }
 
   registerShortcuts(registree: HotkeyRegistree) {
