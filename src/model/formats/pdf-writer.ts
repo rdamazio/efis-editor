@@ -64,16 +64,17 @@ export class PdfWriter {
   private static readonly BOLD_FONT_STYLE = 'bold';
   private static readonly RECT_FILL_STYLE = 'F';
 
-  private static readonly WARNING_PREFIX = 'WARNING: ';
-  private static readonly CAUTION_PREFIX = 'CAUTION: ';
-  private static readonly NOTE_PREFIX = 'NOTE: ';
-  private static readonly PREFIX_CELL_WIDTH = 5.6;
-
   private static readonly ICON_SIZE = 1.5;
   private static readonly ICON_MARGIN = 0.3;
+  private static readonly ICON_TOTAL_SIZE = this.ICON_SIZE + this.ICON_MARGIN;
   private static readonly WARNING_ICON = 'assets/warning-icon.svg';
   private static readonly CAUTION_ICON = 'assets/caution-icon.svg';
   private static readonly ALL_ICONS = [this.WARNING_ICON, this.CAUTION_ICON];
+
+  private static readonly WARNING_PREFIX = 'WARNING: ';
+  private static readonly CAUTION_PREFIX = 'CAUTION: ';
+  private static readonly NOTE_PREFIX = 'NOTE: ';
+  private static readonly PREFIX_CELL_WIDTH = 5.6 + this.ICON_TOTAL_SIZE;
 
   private static readonly SPACER_CELL: CellDef = {
     content: '. '.repeat(100),
@@ -427,6 +428,7 @@ export class PdfWriter {
     let leftPadding = data.cell.padding('left');
     let tableWidth = data.cell.width;
     let margin = this._tableMargin;
+
     if (data.cell.styles.halign === 'center') {
       // We'll center the entire table instead of the content cell.
       data.cell.styles.halign = 'left';
@@ -459,8 +461,7 @@ export class PdfWriter {
               cellWidth: PdfWriter.PREFIX_CELL_WIDTH,
               cellPadding: {
                 ...this._defaultCellPadding,
-                // Already accounted for in the indentation cell.
-                left: 0,
+                left: PdfWriter.ICON_TOTAL_SIZE,
               },
               fontStyle: prefixFontStyle,
               textColor: prefixColor,
@@ -495,10 +496,9 @@ export class PdfWriter {
         name: icon,
         page: firstPageNumber + data.pageNumber - 1,
         // Position to the left of the text.
-        // TODO: Displace text to fit icon.
-        x: margin - PdfWriter.ICON_SIZE + leftPadding - PdfWriter.ICON_MARGIN,
-        // Center vertically in cell.
-        y: data.cell.y + (data.cell.height - PdfWriter.ICON_SIZE) / 2,
+        x: margin + leftPadding,
+        // Position at the top of the cell.
+        y: data.cell.y + PdfWriter.ICON_MARGIN / 2,
       });
     }
 
