@@ -1,0 +1,11 @@
+{
+  "name": "EFIS Editor",
+  "short_name": "efis-editor",
+  "icons": [
+    { "src": "/assets/favicon-48.png", "sizes": "48x48", "type": "image/png" },
+    { "src": "/assets/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "theme_color": "#7b1fa2",
+  "background_color": "#212121",
+  "display": "standalone"
+}
