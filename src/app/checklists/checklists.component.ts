@@ -143,7 +143,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
           // Unfortunately, if the user is in the middle of typing something when this happens,
           // they may lose that unsaved edit.
           void this.onFileSelected(name);
-          this._snackBar.open(`The currently-loaded file was replaced by a newer version.`, '', { duration: 5000 });
+          this._snackBar.open(`The currently-loaded file was replaced by a newer version.`, '');
         }
       });
   }
@@ -379,16 +379,14 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
 
   private _loadFragmentChecklist(parsed: ParsedFragment) {
     if (!this.selectedFile) {
-      this._snackBar.open(`Failed to load file "${parsed.fileName}".`, '', { duration: 5000 });
+      this._snackBar.open(`Failed to load file "${parsed.fileName}".`, '');
       return;
     }
 
     let checklist: Checklist | undefined;
     if (parsed.checklistIdx !== undefined && parsed.groupIdx !== undefined) {
       if (this.selectedFile.groups.length <= parsed.groupIdx) {
-        this._snackBar.open(`File ${parsed.fileName} does not have group ${parsed.groupIdx} - check your URL.`, '', {
-          duration: 5000,
-        });
+        this._snackBar.open(`File ${parsed.fileName} does not have group ${parsed.groupIdx} - check your URL.`, '');
         return;
       }
 
@@ -397,7 +395,6 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         this._snackBar.open(
           `Group ${parsed.groupIdx} in file ${parsed.fileName} has no checklist ${parsed.checklistIdx} - check your URL.`,
           '',
-          { duration: 5000 },
         );
         return;
       }
@@ -476,7 +473,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
 
     const existingFile = await this.store.getChecklistFile(fileName);
     if (existingFile !== null) {
-      this._snackBar.open(`A file named "${fileName}" already exists.`, '', { duration: 5000 });
+      this._snackBar.open(`A file named "${fileName}" already exists.`, '');
       return;
     }
 
@@ -592,7 +589,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     const name = this.selectedFile.metadata!.name;
 
     await Promise.all([this.store.deleteChecklistFile(name), this._displayFile(undefined)]);
-    this._snackBar.open(`Deleted file "${name}".`, '', { duration: 2000 });
+    this._snackBar.open(`Deleted file "${name}".`, '');
   }
 
   async onFileInfo() {
@@ -660,7 +657,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     this.tree().file.set(file);
 
     if (file?.metadata) {
-      this._snackBar.open(`Loaded checklist "${file.metadata.name}".`, '', { duration: 2000 });
+      this._snackBar.open(`Loaded checklist "${file.metadata.name}".`, '');
     }
 
     await this._updateNavigation();

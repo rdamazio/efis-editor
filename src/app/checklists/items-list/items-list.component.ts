@@ -228,7 +228,7 @@ export class ChecklistItemsComponent {
     this._undoState.push(Checklist.clone(this.checklist()!));
 
     // Show snackbar with option to undo.
-    this._undoSnackbar = this._snackBar.open(txt, 'Undo', { duration: 5000 });
+    this._undoSnackbar = this._snackBar.open(txt, 'Undo');
     this._undoSnackbar.onAction().subscribe(() => {
       this._popUndoState();
     });

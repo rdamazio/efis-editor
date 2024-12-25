@@ -40,7 +40,7 @@ export class ChecklistFileUploadComponent {
             })
             .catch((reason: unknown) => {
               console.error('Failed to parse file: ', reason);
-              this._snackBar.open(`Failed to parse uploaded file.`, '', { duration: 5000 });
+              this._snackBar.open(`Failed to parse uploaded file.`, '');
             }),
       );
     return Promise.all(parsedFiles);

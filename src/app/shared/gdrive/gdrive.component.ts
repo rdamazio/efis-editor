@@ -102,9 +102,7 @@ export class GoogleDriveComponent implements OnInit, OnDestroy {
   }
 
   private _onSyncError(error: string) {
-    const snack = this._snackBar.open(error, 'Retry sync', {
-      duration: 5000,
-    });
+    const snack = this._snackBar.open(error, 'Retry sync');
     snack.onAction().subscribe(() => {
       void this._gdrive.synchronize();
     });

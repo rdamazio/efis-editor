@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { DeferBlockState, inject } from '@angular/core/testing';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
@@ -49,7 +49,6 @@ describe('ChecklistsComponent', () => {
 
   beforeEach(async () => {
     // We have a lot of large tests in this file, override the timeout.
-    // (for one, MatSnackBar delays play out in realtime).
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
 
@@ -69,6 +68,7 @@ describe('ChecklistsComponent', () => {
           provide: ROUTER_OUTLET_DATA,
           useValue: signal(navData),
         },
+        { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 1 } },
       ],
     });
 
