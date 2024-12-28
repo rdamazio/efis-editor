@@ -93,7 +93,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
 
   // For testing only.
   // eslint-disable-next-line rxjs-x/no-exposed-subjects
-  renameCompleted$?: Subject<boolean>;
+  storageCompleted$?: Subject<boolean>;
 
   // eslint-disable-next-line @typescript-eslint/max-params
   constructor(
@@ -504,6 +504,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       }),
     };
     await Promise.all([this.store.saveChecklistFile(file), this._displayFile(file)]);
+    this._notifyComplete();
   }
 
   onOpenFile() {
@@ -520,6 +521,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     this.showFileUpload = false;
 
     await Promise.all([this.store.saveChecklistFile(file), this._displayFile(file)]);
+    this._notifyComplete();
   }
 
   async onDownloadFile(formatId: string) {
@@ -590,6 +592,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
 
     await Promise.all([this.store.deleteChecklistFile(name), this._displayFile(undefined)]);
     this._snackBar.open(`Deleted file "${name}".`, '');
+    this._notifyComplete();
   }
 
   async onFileInfo() {
@@ -612,15 +615,11 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       const newMeta = ChecklistFileMetadata.clone(oldMeta);
       newMeta.name = fileName;
       await this.onMetadataUpdate(newMeta);
-    }
-
-    // Signal completion, for testing.
-    if (this.renameCompleted$) {
-      this.renameCompleted$.next(true);
+      this._notifyComplete();
     }
   }
 
-  async onMetadataUpdate(updatedMetadata?: ChecklistFileMetadata): Promise<unknown> {
+  async onMetadataUpdate(updatedMetadata?: ChecklistFileMetadata): Promise<void> {
     if (!updatedMetadata || !this.selectedFile) return;
 
     const oldName = this.selectedFile.metadata!.name;
@@ -632,7 +631,8 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       promises.push(this.store.deleteChecklistFile(oldName));
       promises.push(this._updateNavigation());
     }
-    return Promise.all(promises);
+    await Promise.all(promises);
+    this._notifyComplete();
   }
 
   async onFileSelected(id?: string) {
@@ -670,6 +670,15 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     const file = this.selectedFile;
     if (file) {
       await this.store.saveChecklistFile(file);
+    }
+
+    this._notifyComplete();
+  }
+
+  private _notifyComplete() {
+    // Signal completion, for testing.
+    if (this.storageCompleted$) {
+      this.storageCompleted$.next(true);
     }
   }
 }
