@@ -615,7 +615,6 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       const newMeta = ChecklistFileMetadata.clone(oldMeta);
       newMeta.name = fileName;
       await this.onMetadataUpdate(newMeta);
-      this._notifyComplete();
     }
   }
 

@@ -1,5 +1,5 @@
 import { signal } from '@angular/core';
-import { DeferBlockState, inject } from '@angular/core/testing';
+import { DeferBlockState, inject, TestBed } from '@angular/core/testing';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
@@ -345,6 +345,8 @@ describe('ChecklistsComponent', () => {
     navData.fileName.set('Renamed file');
 
     rendered.detectChanges();
+    TestBed.flushEffects();
+    await rendered.fixture.whenStable();
     expect(await completed).toBeTrue();
 
     expectFragment('Renamed file');
