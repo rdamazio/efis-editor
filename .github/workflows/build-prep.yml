@@ -22,7 +22,7 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
       - name: Install ProtoC
-        uses: arduino/setup-protoc@v3
+        uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
       - name: Generate protos
         run: npm run genproto
       - name: Generate dev keys
