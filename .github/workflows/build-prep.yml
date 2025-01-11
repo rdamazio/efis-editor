@@ -5,6 +5,9 @@ name: Build preparation
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   buildprep:
     runs-on: ubuntu-latest
