@@ -1,6 +1,6 @@
 import { isPlatformServer } from '@angular/common';
 import { Inject, Injectable, InjectionToken, Optional, PLATFORM_ID } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Hotkey, HotkeysService } from '@ngneat/hotkeys';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { HelpComponent } from './help/help.component';
@@ -17,7 +17,24 @@ export class HotkeyRegistar {
   private readonly _keys: string[] = [];
   private readonly _destroy$ = new Subject<void>();
 
-  constructor(private readonly _hotkeys: HotkeysService) {}
+  constructor(
+    private readonly _hotkeys: HotkeysService,
+    dialog: MatDialog,
+  ) {
+    // Prevent hotkey processing while a modal dialog is open.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dialog.afterOpened.pipe(takeUntil(this._destroy$)).subscribe((dialogRef: MatDialogRef<any>) => {
+      // Make an exception for the hotkey help dialog, which we want to be able to toggle with a hotkey.
+      if (dialogRef.componentInstance instanceof HelpComponent) {
+        return;
+      }
+
+      this._hotkeys.pause();
+    });
+    dialog.afterAllClosed.pipe(takeUntil(this._destroy$)).subscribe(() => {
+      this._hotkeys.resume();
+    });
+  }
 
   addShortcut(options: Hotkey): Observable<KeyboardEvent> {
     this._keys.push(options.keys);
@@ -62,7 +79,7 @@ export class HotkeyRegistry {
       return;
     }
 
-    const registar = new HotkeyRegistar(this._hotkeys);
+    const registar = new HotkeyRegistar(this._hotkeys, this._dialog);
     this._hotkeyRegistrars.set(registree, registar);
 
     // Shortcut registration affects global state which then changes the parent NavComponent, so do it off-cycle.
