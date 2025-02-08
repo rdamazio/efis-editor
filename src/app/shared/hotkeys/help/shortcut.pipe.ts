@@ -13,8 +13,10 @@ export class ShortcutPipe implements PipeTransform {
       // Work around a bug where altleft is not recognized, but alt is not rendered correctly on OSX.
       .replaceAll('alt.', 'altleft.');
     const builtinPipe = new HotkeysShortcutPipe();
-    const transformedValue = builtinPipe.transform(fixedValue) as string;
-    // Work around another bug where the built-in Pipe uses the wrong symbol for enter.
-    return transformedValue.replaceAll('&#8996;', '&#8629;');
+    return builtinPipe.transform(fixedValue, undefined, undefined, {
+      // Work around another bug where the built-in Pipe uses the wrong symbol for enter.
+      // https://github.com/ngneat/hotkeys/issues/65 supposedly fixed this, but I like this symbol better.
+      enter: '&#8629;',
+    }) as string;
   }
 }
