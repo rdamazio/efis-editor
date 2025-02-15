@@ -1,4 +1,4 @@
-# CHECKLIST EXPORTED FROM https://rdamazio.github.io/efis-editor/checklists/
+# CHECKLIST EXPORTED FROM https://github.com/rdamazio/efis-editor/
 
 LIST Test group 1 checklist 1
 ITEM Challenge item
