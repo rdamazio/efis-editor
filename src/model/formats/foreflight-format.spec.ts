@@ -56,11 +56,7 @@ describe('ForeFlightFormat', () => {
       });
       const actualMetadata = ForeFlightReader.getChecklistMetadata(mockFile, mockMetadata);
       expect(actualMetadata).toEqual(
-        ChecklistFileMetadata.create({
-          name: 'foo',
-          aircraftInfo: 'TAIL NUMBER',
-          makeAndModel: 'Wright Model B',
-        }),
+        ChecklistFileMetadata.create({ name: 'foo', aircraftInfo: 'TAIL NUMBER', makeAndModel: 'Wright Model B' }),
       );
     });
   });

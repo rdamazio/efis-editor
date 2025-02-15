@@ -99,10 +99,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
     const file = this.file();
     if (file) {
       data = file.groups.map(ChecklistTreeComponent._groupToNode);
-      data.push({
-        title: 'Add new checklist group',
-        isAddNew: true,
-      });
+      data.push({ title: 'Add new checklist group', isAddNew: true });
       this.groupDropListIds.set(file.groups.map((v: ChecklistGroup, idx: number) => `group_${idx}`));
     } else {
       this.groupDropListIds.set([]);
@@ -131,11 +128,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
       })),
       isAddNew: false,
     };
-    node.children?.push({
-      title: 'Add new checklist',
-      group: group,
-      isAddNew: true,
-    });
+    node.children?.push({ title: 'Add new checklist', group: group, isAddNew: true });
     return node;
   }
 
@@ -159,9 +152,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
         node.group.checklists.push(checklist);
       } else {
         // Adding new group to the file.
-        checklistGroup = ChecklistGroup.create({
-          category: ChecklistGroup_Category.normal,
-        });
+        checklistGroup = ChecklistGroup.create({ category: ChecklistGroup_Category.normal });
         if (!(await this._fillTitle(checklistGroup, 'checklist group'))) {
           return;
         }
@@ -450,10 +441,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
 
     if (!newPos || Math.abs(newPos.groupIdx - currentPos.groupIdx) > 1) {
       // There's an empty group right after this one - move into that.
-      newPos = {
-        checklistIdx: 0,
-        groupIdx: currentPos.groupIdx + delta,
-      };
+      newPos = { checklistIdx: 0, groupIdx: currentPos.groupIdx + delta };
     }
 
     const currentGroup = file.groups[currentPos.groupIdx];
@@ -609,12 +597,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
         // we'll correctly scroll into the checklist and the group will become visible, but when
         // scrolling up the group will not come into view.
         selectedElements.forEach((el: Element) => {
-          scrollIntoView(el, {
-            scrollMode: 'if-needed',
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'nearest',
-          });
+          scrollIntoView(el, { scrollMode: 'if-needed', behavior: 'smooth', block: 'nearest', inline: 'nearest' });
         });
       },
       { injector: this._injector },
@@ -715,10 +698,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
 
   private async _fillTitle(pb: Checklist | ChecklistGroup, promptType: string): Promise<boolean> {
     const title = await TitleDialogComponent.promptForTitle(
-      {
-        promptType: promptType,
-        initialTitle: pb.title,
-      },
+      { promptType: promptType, initialTitle: pb.title },
       this._dialog,
     );
 

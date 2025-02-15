@@ -17,13 +17,8 @@ describe('FilePickerComponent', () => {
     selectedFile?: string,
   ): Promise<ComponentFixture<ChecklistFilePickerComponent>> {
     const { fixture } = await render(ChecklistFilePickerComponent, {
-      inputs: {
-        fileNames: fileNames,
-        selectedFile: selectedFile,
-      },
-      on: {
-        fileSelected,
-      },
+      inputs: { fileNames: fileNames, selectedFile: selectedFile },
+      on: { fileSelected },
     });
     return fixture;
   }

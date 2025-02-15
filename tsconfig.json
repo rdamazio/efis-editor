@@ -27,8 +27,6 @@
     "strictStandalone": true,
     "strictTemplates": true,
     "useUnknownInCatchVariables": true,
-    "extendedDiagnostics": {
-      "defaultCategory": "error"
-    }
+    "extendedDiagnostics": { "defaultCategory": "error" }
   }
 }

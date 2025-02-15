@@ -10,9 +10,7 @@ import { LazyBrowserStorage } from './browser-storage';
 import { ChecklistStorage } from './checklist-storage';
 
 const A_CHECKLIST_FILE: ChecklistFile = {
-  metadata: ChecklistFileMetadata.create({
-    name: 'N425RP',
-  }),
+  metadata: ChecklistFileMetadata.create({ name: 'N425RP' }),
   groups: [
     {
       category: ChecklistGroup_Category.normal,
@@ -35,16 +33,12 @@ const A_CHECKLIST_FILE: ChecklistFile = {
   ],
 };
 const ANOTHER_CHECKLIST_FILE: ChecklistFile = {
-  metadata: ChecklistFileMetadata.create({
-    name: 'Something with spaces',
-  }),
+  metadata: ChecklistFileMetadata.create({ name: 'Something with spaces' }),
   groups: [],
 };
 
 const YET_ANOTHER_CHECKLIST_FILE: ChecklistFile = {
-  metadata: ChecklistFileMetadata.create({
-    name: 'Somethingwithoutspaces',
-  }),
+  metadata: ChecklistFileMetadata.create({ name: 'Somethingwithoutspaces' }),
   groups: [],
 };
 

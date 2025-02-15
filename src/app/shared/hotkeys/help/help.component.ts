@@ -29,10 +29,7 @@ export class HelpComponent {
       return;
     }
 
-    this._helpRef = dialog.open(HelpComponent, {
-      hasBackdrop: true,
-      width: '500px',
-    });
+    this._helpRef = dialog.open(HelpComponent, { hasBackdrop: true, width: '500px' });
 
     this._helpRef.afterClosed().subscribe(() => {
       this._helpRef = undefined;

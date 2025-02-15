@@ -7,19 +7,21 @@ option optimize_for = CODE_SIZE;
 import "checklist.proto";
 
 message ForeFlightChecklistContainer {
-  string type = 1; // Always "checklist"
+  string type = 1;  // Always "checklist"
   ForeFlightChecklistPayload payload = 2;
 }
 
 /*
-All objects in the checklist payload have object_id's that are UUID V4 lowercase and without dashes. Presumably these
-are used for checklist synchronization between devices.
+All objects in the checklist payload have object_id's that are UUID V4 lowercase
+and without dashes. Presumably these are used for checklist synchronization
+between devices.
 */
 message ForeFlightChecklistPayload {
   string object_id = 1;
-  string schema_version = 2; // Always "1.0"
+  string schema_version = 2;  // Always "1.0"
   ForeFlightChecklistMetadata metadata = 3;
-  repeated ForeFlightChecklistGroup groups = 4; // Luckily always present and has 3 elements
+  repeated ForeFlightChecklistGroup groups =
+      4;  // Luckily always present and has 3 elements
 }
 
 /*
@@ -29,13 +31,15 @@ ForeFlight has 3 metadata fields for checklists:
   2. Name (not file name!)
   3. Detail (make and model)
 
-All 3 fields can be empty. If so, the checklist will be displayed as `No name` and exported as `No name.fmd`.
+All 3 fields can be empty. If so, the checklist will be displayed as `No name`
+and exported as `No name.fmd`.
 
-If **only one** of these fields (tail number or name or detail) is present, it will be used as identifier **and**
-as filename.
+If **only one** of these fields (tail number or name or detail) is present, it
+will be used as identifier **and** as filename.
 
-If **multiple** fields are present, then the filename can be either "tail number, name" or "tail number" or "name".
-The detail always appears below the identifier and is never part of the filename.
+If **multiple** fields are present, then the filename can be either "tail
+number, name" or "tail number" or "name". The detail always appears below the
+identifier and is never part of the filename.
 */
 message ForeFlightChecklistMetadata {
   optional string name = 1;
@@ -46,27 +50,34 @@ message ForeFlightChecklistMetadata {
 message ForeFlightChecklistGroup {
   string object_id = 1;
   efis.ChecklistGroup.Category group_type = 2;
-  repeated ForeFlightChecklistSubgroup items = 3; // This key might be missing altogether
+  repeated ForeFlightChecklistSubgroup items =
+      3;  // This key might be missing altogether
 }
 
 message ForeFlightChecklistSubgroup {
   string object_id = 1;
   string title = 2;
-  repeated ForeFlightChecklist items = 3; // This key might be missing altogether
+  repeated ForeFlightChecklist items =
+      3;  // This key might be missing altogether
 }
 
 message ForeFlightChecklist {
   string object_id = 1;
   string title = 2;
-  repeated ForeFlightChecklistItem items = 3; // This key might be missing altogether
+  repeated ForeFlightChecklistItem items =
+      3;  // This key might be missing altogether
 }
 
-// This would have been better modelled by inheritance, or better still using oneOf.
-// Unfortunately, inheritance is not supported and oneOf cannot be used with repeated fields.
+// This would have been better modelled by inheritance, or better still using
+// oneOf. Unfortunately, inheritance is not supported and oneOf cannot be used
+// with repeated fields.
 message ForeFlightChecklistItem {
   string object_id = 1;
-  optional string type = 2; // Not present for items, "comment" for section headings
+  optional string type =
+      2;  // Not present for items, "comment" for section headings
   optional string title = 3;
-  optional string detail = 4; // Might be present both for section headings and normal items
-  optional string note = 5; // Not present for section headings, optional for normal items
+  optional string detail =
+      4;  // Might be present both for section headings and normal items
+  optional string note =
+      5;  // Not present for section headings, optional for normal items
 }

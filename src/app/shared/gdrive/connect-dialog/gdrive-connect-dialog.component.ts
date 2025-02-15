@@ -17,9 +17,7 @@ import { filter, lastValueFrom, Observable } from 'rxjs';
 })
 export class GoogleDriveConnectDialogComponent {
   public static async confirmConnection(dialog: MatDialog): Promise<boolean> {
-    const dialogRef = dialog.open(GoogleDriveConnectDialogComponent, {
-      maxWidth: '800px',
-    });
+    const dialogRef = dialog.open(GoogleDriveConnectDialogComponent, { maxWidth: '800px' });
 
     const afterClosed$ = dialogRef.afterClosed() as Observable<boolean | undefined>;
     return lastValueFrom(afterClosed$.pipe(filter((x?: boolean) => x !== undefined)), { defaultValue: false });

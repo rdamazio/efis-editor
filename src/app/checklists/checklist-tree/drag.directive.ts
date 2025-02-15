@@ -4,10 +4,7 @@ import { takeUntil } from 'rxjs';
 import { ChecklistTreeNode } from './node/node';
 import { ChecklistTreeNodeComponent } from './node/node.component';
 
-@Directive({
-  selector: '[checklistDrag]',
-  standalone: true,
-})
+@Directive({ selector: '[checklistDrag]', standalone: true })
 export class ChecklistDragDirective extends CdkDrag<ChecklistTreeNode> implements AfterViewInit, OnDestroy {
   readonly allDropLists = input<readonly CdkDropList<ChecklistTreeNode>[]>();
   readonly checklistDragNode = input<ChecklistTreeNodeComponent>();

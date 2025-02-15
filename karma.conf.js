@@ -38,21 +38,10 @@ module.exports = function (config) {
     reporters: ['spec', 'kjhtml', 'jasmine-order'],
     // Prevents jasmine-order from also logging all the output
     disableJasmineOrderStandardLogging: true,
-    specReporter: {
-      suppressSkipped: false,
-      showSpecTiming: true,
-    },
+    specReporter: { suppressSkipped: false, showSpecTiming: true },
     browsers: ['ChromeWithoutNagScreen'],
-    customLaunchers: {
-      ChromeWithoutNagScreen: {
-        base: 'Chrome',
-        flags: ['--disable-search-engine-choice-screen'],
-      },
-    },
+    customLaunchers: { ChromeWithoutNagScreen: { base: 'Chrome', flags: ['--disable-search-engine-choice-screen'] } },
     restartOnFileChange: true,
-    browserConsoleLogOptions: {
-      level: 'info',
-      terminal: true,
-    },
+    browserConsoleLogOptions: { level: 'info', terminal: true },
   });
 };

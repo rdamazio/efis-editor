@@ -75,10 +75,7 @@ export class ForeFlightReader {
   }
 
   private static _checklistToEFIS(checkList: ForeFlightChecklist): Checklist {
-    return {
-      title: checkList.title,
-      items: checkList.items.flatMap(ForeFlightReader._checklistItemToEFIS),
-    };
+    return { title: checkList.title, items: checkList.items.flatMap(ForeFlightReader._checklistItemToEFIS) };
   }
 
   private static _checklistItemToEFIS(checklistItem: ForeFlightChecklistItem): ChecklistItem[] {
@@ -112,12 +109,7 @@ export class ForeFlightReader {
         );
       } else {
         // Detail not set - interpret as prompt-only
-        result.push(
-          ChecklistItem.create({
-            type: ChecklistItem_Type.ITEM_CHALLENGE,
-            prompt: checklistItem.title,
-          }),
-        );
+        result.push(ChecklistItem.create({ type: ChecklistItem_Type.ITEM_CHALLENGE, prompt: checklistItem.title }));
       }
     }
 

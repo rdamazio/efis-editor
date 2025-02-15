@@ -16,10 +16,7 @@ describe('ChecklistItemsComponent', () => {
       checklist = newChecklist;
     });
 
-    await render(ChecklistItemsComponent, {
-      inputs: { checklist },
-      on: { checklistChange },
-    });
+    await render(ChecklistItemsComponent, { inputs: { checklist }, on: { checklistChange } });
   });
 
   it('should render', async () => {

@@ -7,9 +7,7 @@ describe('GoogleDriveComponent', () => {
   let fixture: ComponentFixture<GoogleDriveComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GoogleDriveComponent],
-    }).compileComponents();
+    await TestBed.configureTestingModule({ imports: [GoogleDriveComponent] }).compileComponents();
 
     fixture = TestBed.createComponent(GoogleDriveComponent);
     component = fixture.componentInstance;

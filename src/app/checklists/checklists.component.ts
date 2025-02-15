@@ -185,12 +185,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         this.tree().selectNextChecklist();
       });
     hotkeys
-      .addShortcut({
-        keys: 'meta.up',
-        description: 'Select next checklist',
-        preventDefault: true,
-        group: 'Navigation',
-      })
+      .addShortcut({ keys: 'meta.up', description: 'Select next checklist', preventDefault: true, group: 'Navigation' })
       .subscribe(() => {
         this.tree().selectPreviousChecklist();
       });
@@ -330,12 +325,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       });
 
     hotkeys
-      .addShortcut({
-        keys: 'meta.i',
-        description: 'Edit file information',
-        preventDefault: true,
-        group: 'Editing',
-      })
+      .addShortcut({ keys: 'meta.i', description: 'Edit file information', preventDefault: true, group: 'Editing' })
       .subscribe(() => {
         const fn = async () => {
           await this.onFileInfo();
@@ -461,10 +451,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       return;
     }
 
-    await this._router.navigate([], {
-      fragment: this._buildFragment(),
-      onSameUrlNavigation: 'ignore',
-    });
+    await this._router.navigate([], { fragment: this._buildFragment(), onSameUrlNavigation: 'ignore' });
   }
 
   async onNewFile(fileName: string) {
@@ -499,9 +486,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
           category: ChecklistGroup_Category.normal,
         },
       ],
-      metadata: ChecklistFileMetadata.create({
-        name: fileName,
-      }),
+      metadata: ChecklistFileMetadata.create({ name: fileName }),
     };
     await Promise.all([this.store.saveChecklistFile(file), this._displayFile(file)]);
     this._notifyComplete();

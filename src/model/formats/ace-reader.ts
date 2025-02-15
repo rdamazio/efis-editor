@@ -86,11 +86,7 @@ export class AceReader {
       throw new FormatError('Bad checklist group header: ' + this._peekLine());
     }
 
-    const group: ChecklistGroup = {
-      title: this._readLine(),
-      checklists: [],
-      category: ChecklistGroup_Category.normal,
-    };
+    const group: ChecklistGroup = { title: this._readLine(), checklists: [], category: ChecklistGroup_Category.normal };
 
     while (!this._consumeLine(AceConstants.GROUP_END_HEADER)) {
       group.checklists.push(this._readChecklist());
@@ -103,10 +99,7 @@ export class AceReader {
       throw new FormatError('Bad checklist header: ' + this._peekLine());
     }
 
-    const checklist: Checklist = {
-      title: this._readLine(),
-      items: [],
-    };
+    const checklist: Checklist = { title: this._readLine(), items: [] };
 
     while (!this._consumeLine(AceConstants.CHECKLIST_END_HEADER)) {
       checklist.items.push(this._readItem());
@@ -142,13 +135,7 @@ export class AceReader {
       }
     }
 
-    return {
-      type: type,
-      prompt: prompt,
-      expectation: expectation,
-      indent: indent,
-      centered: centered,
-    };
+    return { type: type, prompt: prompt, expectation: expectation, indent: indent, centered: centered };
   }
 
   private _consumeBytes(expected: Uint8Array): boolean {

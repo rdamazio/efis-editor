@@ -14,7 +14,8 @@ message ChecklistFileMetadata {
   string manufacturer_info = 6;
   string copyright_info = 7;
 
-  // Last modified time in UNIX seconds since the epoch (Jan 1st, 1970 00:00 UTC).
+  // Last modified time in UNIX seconds since the epoch (Jan 1st, 1970 00:00
+  // UTC).
   int32 modified_time = 8;
 }
 

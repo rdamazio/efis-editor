@@ -53,12 +53,7 @@ export class TextReader {
 
     const groupSep = this._options.groupNameSeparator;
 
-    const outFile: ChecklistFile = {
-      metadata: ChecklistFileMetadata.create({
-        name: name,
-      }),
-      groups: [],
-    };
+    const outFile: ChecklistFile = { metadata: ChecklistFileMetadata.create({ name: name }), groups: [] };
     const text = await this._file.text();
     const lines = text.split(/\r?\n/);
     let currentGroup: ChecklistGroup | undefined;
@@ -117,18 +112,11 @@ export class TextReader {
           }
         }
         if (!currentGroup || currentGroup.title !== groupTitle) {
-          currentGroup = {
-            title: groupTitle,
-            checklists: [],
-            category: ChecklistGroup_Category.normal,
-          };
+          currentGroup = { title: groupTitle, checklists: [], category: ChecklistGroup_Category.normal };
           outFile.groups.push(currentGroup);
         }
 
-        currentChecklist = {
-          title: checklistTitle,
-          items: [],
-        };
+        currentChecklist = { title: checklistTitle, items: [] };
         currentGroup.checklists.push(currentChecklist);
         currentItemLineNum = 0;
         currentChecklistNum++;
@@ -249,13 +237,7 @@ export class TextReader {
       }
     }
 
-    return {
-      prompt: prompt,
-      expectation: expectation,
-      type: itemType,
-      indent: indent,
-      centered: centered,
-    };
+    return { prompt: prompt, expectation: expectation, type: itemType, indent: indent, centered: centered };
   }
 
   private _extractMetadata(checklist: Checklist): ChecklistFileMetadata {

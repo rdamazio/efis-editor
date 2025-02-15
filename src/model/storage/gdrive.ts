@@ -78,9 +78,7 @@ interface LocalDeletionJson {
  * such as the fact that trashed file names disappear after 30 days, are documented
  * throughout the code.
  */
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class GoogleDriveStorage {
   public static readonly CHECKLIST_MIME_TYPE = 'application/vnd.damazio.efis-editor.checklist';
   public static readonly CHECKLIST_EXTENSION = '.checklist';
@@ -214,9 +212,7 @@ export class GoogleDriveStorage {
       defaultValue: DriveSyncState.DISCONNECTED,
     });
 
-    const existingFiles = await this._api.listFiles({
-      mimeType: GoogleDriveStorage.CHECKLIST_MIME_TYPE,
-    });
+    const existingFiles = await this._api.listFiles({ mimeType: GoogleDriveStorage.CHECKLIST_MIME_TYPE });
 
     const ops: Promise<void>[] = [];
     // TODO: Consider using batching: https://developers.google.com/drive/api/guides/performance#batch-requests
@@ -504,10 +500,7 @@ export class GoogleDriveStorage {
     // While JSON.stringify below properly serializes dates, JSON.parse does not parse them back.
     const parsedDeletions = JSON.parse(deletionsJson) as LocalDeletionJson[];
     return parsedDeletions.map(
-      (d: LocalDeletionJson): LocalDeletion => ({
-        fileName: d.fileName,
-        deletionTime: new Date(d.deletionTime),
-      }),
+      (d: LocalDeletionJson): LocalDeletion => ({ fileName: d.fileName, deletionTime: new Date(d.deletionTime) }),
     );
   }
 

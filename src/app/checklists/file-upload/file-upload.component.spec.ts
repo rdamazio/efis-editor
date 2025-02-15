@@ -7,9 +7,7 @@ describe('ChecklistFileUploadComponent', () => {
   let fixture: ComponentFixture<ChecklistFileUploadComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ChecklistFileUploadComponent],
-    }).compileComponents();
+    await TestBed.configureTestingModule({ imports: [ChecklistFileUploadComponent] }).compileComponents();
 
     fixture = TestBed.createComponent(ChecklistFileUploadComponent);
     component = fixture.componentInstance;

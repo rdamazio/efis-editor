@@ -21,19 +21,9 @@ describe('AceWriter', () => {
 
   describe('try writing files without a name', () => {
     [
-      ChecklistFile.create({
-        metadata: undefined,
-      }),
-      ChecklistFile.create({
-        metadata: ChecklistFileMetadata.create({
-          name: undefined,
-        }),
-      }),
-      ChecklistFile.create({
-        metadata: ChecklistFileMetadata.create({
-          name: '',
-        }),
-      }),
+      ChecklistFile.create({ metadata: undefined }),
+      ChecklistFile.create({ metadata: ChecklistFileMetadata.create({ name: undefined }) }),
+      ChecklistFile.create({ metadata: ChecklistFileMetadata.create({ name: '' }) }),
     ].forEach((file: ChecklistFile) => {
       it('write nameless file', async () => {
         await expectAsync(new AceWriter().write(file)).toBeRejectedWithError(FormatError);

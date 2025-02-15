@@ -9,5 +9,6 @@
       "--plugin=protoc-gen-ts=${workspaceRoot}/node_modules/@protobuf-ts/plugin/bin/protoc-gen-ts",
       "--ts_out=${workspaceRoot}/gen/ts"
     ]
-  }
+  },
+  "formatFiles.excludePattern": "src/model/formats/test-foreflight.fmd,src/model/formats/test.json,src/model/formats/test.ace"
 }

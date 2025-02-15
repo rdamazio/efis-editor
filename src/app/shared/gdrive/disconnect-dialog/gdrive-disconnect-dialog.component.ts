@@ -40,23 +40,17 @@ export interface GoogleDriveDisconnectDialogReturnData {
 export class GoogleDriveDisconnectDialogComponent {
   private readonly _formBuilder = inject(FormBuilder);
 
-  readonly formData = this._formBuilder.group({
-    deleteAllData: false,
-  });
+  readonly formData = this._formBuilder.group({ deleteAllData: false });
 
   getReturnData(): GoogleDriveDisconnectDialogReturnData {
-    return {
-      deleteAllData: this.formData.value.deleteAllData!.valueOf(),
-    };
+    return { deleteAllData: this.formData.value.deleteAllData!.valueOf() };
   }
 
   public static async confirmDisconnection(
     dialog: MatDialog,
   ): Promise<GoogleDriveDisconnectDialogReturnData | undefined> {
     const dialogRef: MatDialogRef<GoogleDriveDisconnectDialogComponent, GoogleDriveDisconnectDialogReturnData> =
-      dialog.open(GoogleDriveDisconnectDialogComponent, {
-        maxWidth: '800px',
-      });
+      dialog.open(GoogleDriveDisconnectDialogComponent, { maxWidth: '800px' });
 
     return lastValueFrom(dialogRef.afterClosed(), { defaultValue: undefined });
   }

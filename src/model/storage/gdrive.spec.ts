@@ -48,14 +48,7 @@ describe('GoogleDriveApi', () => {
       'deleteFile',
     ]);
 
-    TestBed.configureTestingModule({
-      providers: [
-        {
-          provide: GoogleDriveApi,
-          useValue: gdriveApi,
-        },
-      ],
-    });
+    TestBed.configureTestingModule({ providers: [{ provide: GoogleDriveApi, useValue: gdriveApi }] });
 
     lazyBrowserStore = TestBed.inject(LazyBrowserStorage);
     lazyBrowserStore.forceBrowserStorage();
@@ -117,12 +110,7 @@ describe('GoogleDriveApi', () => {
       mimeType = GoogleDriveStorage.CHECKLIST_MIME_TYPE;
       name += GoogleDriveStorage.CHECKLIST_EXTENSION;
     }
-    return {
-      name: name,
-      id: fileId,
-      modifiedTime: modifiedTime.toISOString(),
-      mimeType: mimeType,
-    };
+    return { name: name, id: fileId, modifiedTime: modifiedTime.toISOString(), mimeType: mimeType };
   }
 
   it('should be created', () => {
@@ -255,11 +243,7 @@ describe('GoogleDriveApi', () => {
     // Save locally with differences so we can verify that the download overrode it.
     const localChecklist = ChecklistFile.clone(EXPECTED_CONTENTS);
     localChecklist.metadata!.aircraftInfo = 'Diamond DA-62';
-    localChecklist.groups.push(
-      ChecklistGroup.create({
-        title: 'Old group that got deleted',
-      }),
-    );
+    localChecklist.groups.push(ChecklistGroup.create({ title: 'Old group that got deleted' }));
     await store.saveChecklistFile(localChecklist, OLDER_MTIME);
 
     // Verify that the download happened.

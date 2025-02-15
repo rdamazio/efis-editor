@@ -19,22 +19,11 @@ describe('ChecklistItemComponent', () => {
     itemChange = jasmine.createSpy('itemChange');
     itemDeleted = jasmine.createSpy('itemDeleted');
 
-    item = ChecklistItem.create({
-      prompt: 'My prompt',
-      type: ChecklistItem_Type.ITEM_PLAINTEXT,
-    });
+    item = ChecklistItem.create({ prompt: 'My prompt', type: ChecklistItem_Type.ITEM_PLAINTEXT });
   });
 
   async function renderComponent() {
-    await render(ChecklistItemComponent, {
-      inputs: {
-        item: item,
-      },
-      on: {
-        itemChange,
-        itemDeleted,
-      },
-    });
+    await render(ChecklistItemComponent, { inputs: { item: item }, on: { itemChange, itemDeleted } });
 
     editButton = screen.queryByRole('button', { name: /Edit.*/ })!;
     deleteButton = screen.queryByRole('button', { name: /Delete.*/ })!;

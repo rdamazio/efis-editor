@@ -1,10 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { HotkeysShortcutPipe } from '@ngneat/hotkeys';
 
-@Pipe({
-  name: 'shortcut',
-  standalone: true,
-})
+@Pipe({ name: 'shortcut', standalone: true })
 export class ShortcutPipe implements PipeTransform {
   transform(value: string): string {
     const fixedValue = value

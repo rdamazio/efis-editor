@@ -41,19 +41,8 @@ describe('ChecklistCommandBarComponent', () => {
 
   async function renderComponent(hasFiles: boolean, fileIsOpen: boolean) {
     const { fixture } = await render(ChecklistCommandBarComponent, {
-      inputs: {
-        hasFiles: hasFiles,
-        fileIsOpen: fileIsOpen,
-        downloadFormats: DOWNLOAD_FORMATS,
-      },
-      on: {
-        newFile,
-        openFile,
-        uploadFile,
-        downloadFile,
-        deleteFile,
-        fileInfo,
-      },
+      inputs: { hasFiles: hasFiles, fileIsOpen: fileIsOpen, downloadFormats: DOWNLOAD_FORMATS },
+      on: { newFile, openFile, uploadFile, downloadFile, deleteFile, fileInfo },
     });
 
     newButton = screen.queryByRole('button', { name: 'New file' })!;

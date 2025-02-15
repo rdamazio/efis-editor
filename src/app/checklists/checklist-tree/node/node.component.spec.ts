@@ -1,8 +1,8 @@
 import { render, RenderResult, screen } from '@testing-library/angular';
+import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node';
 import { ChecklistTreeNodeComponent } from './node.component';
-import userEvent, { UserEvent } from '@testing-library/user-event';
 
 describe('NodeComponent', () => {
   let user: UserEvent;
@@ -14,10 +14,7 @@ describe('NodeComponent', () => {
   beforeEach(() => {
     user = userEvent.setup();
 
-    node = {
-      isAddNew: false,
-      title: 'Node title',
-    };
+    node = { isAddNew: false, title: 'Node title' };
     disableButtonHover = false;
     nodeRename = jasmine.createSpy('nodeRename');
     nodeDelete = jasmine.createSpy('nodeDelete');
@@ -114,11 +111,7 @@ describe('NodeComponent', () => {
   });
 
   it('should render and change categories for group nodes', async () => {
-    node.group = {
-      title: 'Group name',
-      checklists: [],
-      category: ChecklistGroup_Category.abnormal,
-    };
+    node.group = { title: 'Group name', checklists: [], category: ChecklistGroup_Category.abnormal };
     await renderComponent();
 
     // Current category should show.

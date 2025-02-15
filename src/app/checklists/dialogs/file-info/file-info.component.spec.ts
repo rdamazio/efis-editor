@@ -50,9 +50,7 @@ describe('ChecklistFileInfoComponent', () => {
     user = userEvent.setup();
     dataOut = jasmine.createSpy('dataOut');
 
-    metadata = ChecklistFileMetadata.create({
-      name: 'Name',
-    });
+    metadata = ChecklistFileMetadata.create({ name: 'Name' });
     groups = [];
   });
 

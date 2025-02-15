@@ -8,9 +8,7 @@ describe('WelcomeComponent', () => {
   let fixture: ComponentFixture<WelcomeComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [RouterModule.forRoot([]), WelcomeComponent],
-    }).compileComponents();
+    await TestBed.configureTestingModule({ imports: [RouterModule.forRoot([]), WelcomeComponent] }).compileComponents();
 
     fixture = TestBed.createComponent(WelcomeComponent);
     component = fixture.componentInstance;

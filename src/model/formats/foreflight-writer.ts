@@ -88,21 +88,11 @@ export class ForeFlightWriter {
             ]);
             break;
           case ChecklistItem_Type.ITEM_CHALLENGE:
-            accumulator.push([
-              {
-                objectId: ForeFlightUtils.getObjectId(),
-                title: itemEFIS.prompt,
-              },
-              itemEFIS,
-            ]);
+            accumulator.push([{ objectId: ForeFlightUtils.getObjectId(), title: itemEFIS.prompt }, itemEFIS]);
             break;
           case ChecklistItem_Type.ITEM_TITLE:
             accumulator.push([
-              {
-                objectId: ForeFlightUtils.getObjectId(),
-                type: ForeFlightUtils.ITEM_HEADER,
-                title: itemEFIS.prompt,
-              },
+              { objectId: ForeFlightUtils.getObjectId(), type: ForeFlightUtils.ITEM_HEADER, title: itemEFIS.prompt },
               itemEFIS,
             ]);
             break;
@@ -131,11 +121,7 @@ export class ForeFlightWriter {
             } else {
               // ...otherwise, create a Detail Item without title, but with a note
               accumulator.push([
-                {
-                  objectId: ForeFlightUtils.getObjectId(),
-                  type: ForeFlightUtils.ITEM_HEADER,
-                  detail: text,
-                },
+                { objectId: ForeFlightUtils.getObjectId(), type: ForeFlightUtils.ITEM_HEADER, detail: text },
                 itemEFIS,
               ]);
             }

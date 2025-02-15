@@ -54,14 +54,8 @@ export class ForeFlightUtils {
     const [prefix, rest] = ForeFlightUtils.splitByColon(prompt);
     const itemType = ForeFlightUtils.CHECKLIST_ITEM_TYPES.get(prefix);
     return itemType !== undefined
-      ? {
-          type: itemType,
-          prompt: rest,
-        }
-      : {
-          type: ChecklistItem_Type.ITEM_PLAINTEXT,
-          prompt: prompt,
-        };
+      ? { type: itemType, prompt: rest }
+      : { type: ChecklistItem_Type.ITEM_PLAINTEXT, prompt: prompt };
   }
 
   private static async _getKey(keyUsage: KeyUsage): Promise<CryptoKey> {
@@ -76,10 +70,7 @@ export class ForeFlightUtils {
 
   public static async decrypt(stream: ArrayBuffer): Promise<string> {
     const decrypted = await window.crypto.subtle.decrypt(
-      {
-        name: ForeFlightUtils.CIPHER_TYPE,
-        iv: new Uint8Array(stream.slice(0, ForeFlightUtils.CIPHER_BLOCK_SIZE)),
-      },
+      { name: ForeFlightUtils.CIPHER_TYPE, iv: new Uint8Array(stream.slice(0, ForeFlightUtils.CIPHER_BLOCK_SIZE)) },
       await ForeFlightUtils._getKey(KeyUsage.DECRYPT),
       new Uint8Array(stream.slice(ForeFlightUtils.CIPHER_BLOCK_SIZE)),
     );

@@ -1,5 +1,6 @@
 import { jsPDF, jsPDFOptions } from 'jspdf';
 import autoTable, { CellDef, CellHookData, FontStyle, RowInput } from 'jspdf-autotable';
+import 'svg2pdf.js';
 import {
   Checklist,
   ChecklistFile,
@@ -10,7 +11,6 @@ import {
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
 import { FormatError } from './error';
-import 'svg2pdf.js';
 
 type OrientationType = jsPDFOptions['orientation'];
 type FormatType = jsPDFOptions['format'];
@@ -78,10 +78,7 @@ export class PdfWriter {
 
   private static readonly SPACER_CELL: CellDef = {
     content: '. '.repeat(100),
-    styles: {
-      overflow: 'hidden',
-      halign: 'center',
-    },
+    styles: { overflow: 'hidden', halign: 'center' },
   };
 
   private _doc?: AutoTabledPDF;
@@ -299,14 +296,9 @@ export class PdfWriter {
         startY: startY,
         rowPageBreak: 'avoid',
         styles: PdfWriter.DEBUG_LAYOUT // eslint-disable-line @typescript-eslint/no-unnecessary-condition
-          ? {
-              lineWidth: 0.1,
-            }
+          ? { lineWidth: 0.1 }
           : undefined,
-        bodyStyles: {
-          fontSize: PdfWriter.CONTENT_FONT_SIZE,
-          valign: 'top',
-        },
+        bodyStyles: { fontSize: PdfWriter.CONTENT_FONT_SIZE, valign: 'top' },
         didDrawCell: (data: CellHookData) => {
           this._drawPrefixedCell(data, firstPageNumber);
         },
@@ -322,13 +314,7 @@ export class PdfWriter {
     if (!this._doc) return [];
 
     const cells: CellDef[] = [];
-    const prompt: CellDef = {
-      content: item.prompt,
-      styles: {
-        halign: 'left',
-        minCellWidth: 10,
-      },
-    };
+    const prompt: CellDef = { content: item.prompt, styles: { halign: 'left', minCellWidth: 10 } };
 
     // We should be able to have the prefix in its own cell and have non-prefixed rows use a colSpan=2 for the prompt,
     // but unfortunately a bug in jspdf-autotable prevents that:
@@ -367,12 +353,7 @@ export class PdfWriter {
     }
 
     if (item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
-      const expectation: CellDef = {
-        content: item.expectation,
-        styles: {
-          halign: 'left',
-        },
-      };
+      const expectation: CellDef = { content: item.expectation, styles: { halign: 'left' } };
       cells.push(prompt, PdfWriter.SPACER_CELL, expectation);
     } else {
       prompt.colSpan = 3;
@@ -450,29 +431,18 @@ export class PdfWriter {
             // Use a separate cell for indentation with varying padding
             // so we can use a fixed-width left-aligned prefix cell below.
             content: '',
-            styles: {
-              cellWidth: leftPadding,
-              cellPadding: 0,
-            },
+            styles: { cellWidth: leftPadding, cellPadding: 0 },
           },
           {
             content: prefix.trim(),
             styles: {
               cellWidth: PdfWriter.PREFIX_CELL_WIDTH,
-              cellPadding: {
-                ...this._defaultCellPadding,
-                left: PdfWriter.ICON_TOTAL_SIZE,
-              },
+              cellPadding: { ...this._defaultCellPadding, left: PdfWriter.ICON_TOTAL_SIZE },
               fontStyle: prefixFontStyle,
               textColor: prefixColor,
             },
           },
-          {
-            content: contents.trim(),
-            styles: {
-              cellPadding: this._defaultCellPadding,
-            },
-          },
+          { content: contents.trim(), styles: { cellPadding: this._defaultCellPadding } },
         ],
       ],
       startY: data.cell.y,
@@ -520,12 +490,7 @@ export class PdfWriter {
       // svg2pdf relies on jspdf's state machine, so we have to await for each one instead of
       // letting them work in parallel.
       // eslint-disable-next-line no-await-in-loop
-      await this._doc.svg(iconEl, {
-        x: icon.x,
-        y: icon.y,
-        width: PdfWriter.ICON_SIZE,
-        height: PdfWriter.ICON_SIZE,
-      });
+      await this._doc.svg(iconEl, { x: icon.x, y: icon.y, width: PdfWriter.ICON_SIZE, height: PdfWriter.ICON_SIZE });
     }
   }
 
@@ -595,10 +560,7 @@ export class PdfWriter {
 
     console.debug(`PDF: Text "${text}": numLines=${numLines}; cellHeight=${cellHeight}`);
 
-    return {
-      lines: splitText,
-      height: cellHeight,
-    };
+    return { lines: splitText, height: cellHeight };
   }
 
   private _calculatePrefixedContentWidth(indent: number): number {

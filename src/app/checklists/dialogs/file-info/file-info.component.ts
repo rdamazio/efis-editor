@@ -58,10 +58,7 @@ export class ChecklistFileInfoComponent {
     groups: ChecklistGroup[],
     dialog: MatDialog,
   ): Promise<ChecklistFileMetadata | undefined> {
-    const dialogData = {
-      metadata: ChecklistFileMetadata.clone(metadata),
-      allGroups: groups,
-    };
+    const dialogData = { metadata: ChecklistFileMetadata.clone(metadata), allGroups: groups };
 
     const dialogRef = dialog.open(ChecklistFileInfoComponent, {
       data: dialogData,

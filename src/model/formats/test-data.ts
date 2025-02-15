@@ -118,11 +118,7 @@ export const EXPECTED_FOREFLIGHT_CONTENTS = ChecklistFile.create({
               expectation: 'RESPONSE',
               type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
             }),
-            ChecklistItem.create({
-              prompt: 'Notes',
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              indent: 1,
-            }),
+            ChecklistItem.create({ prompt: 'Notes', type: ChecklistItem_Type.ITEM_PLAINTEXT, indent: 1 }),
             ChecklistItem.create({ prompt: 'Challenge w/o response', type: ChecklistItem_Type.ITEM_CHALLENGE }),
             ChecklistItem.create({
               prompt: 'Challenge without note',
@@ -135,11 +131,7 @@ export const EXPECTED_FOREFLIGHT_CONTENTS = ChecklistFile.create({
               expectation: 'RESPONSE',
               type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
             }),
-            ChecklistItem.create({
-              prompt: 'scary multiline note!',
-              type: ChecklistItem_Type.ITEM_WARNING,
-              indent: 1,
-            }),
+            ChecklistItem.create({ prompt: 'scary multiline note!', type: ChecklistItem_Type.ITEM_WARNING, indent: 1 }),
             ChecklistItem.create({ type: ChecklistItem_Type.ITEM_PLAINTEXT, indent: 1 }),
             ChecklistItem.create({ prompt: 'line after line break.', type: ChecklistItem_Type.ITEM_NOTE, indent: 1 }),
             ChecklistItem.create({ prompt: 'Adjacent text.', type: ChecklistItem_Type.ITEM_PLAINTEXT, indent: 1 }),
@@ -152,11 +144,7 @@ export const EXPECTED_FOREFLIGHT_CONTENTS = ChecklistFile.create({
             ChecklistItem.create({ type: ChecklistItem_Type.ITEM_CHALLENGE }),
             ChecklistItem.create({ type: ChecklistItem_Type.ITEM_SPACE }),
             ChecklistItem.create({ prompt: 'Detail2', type: ChecklistItem_Type.ITEM_TITLE }),
-            ChecklistItem.create({
-              prompt: 'With note',
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              indent: 1,
-            }),
+            ChecklistItem.create({ prompt: 'With note', type: ChecklistItem_Type.ITEM_PLAINTEXT, indent: 1 }),
             ChecklistItem.create({ prompt: 'Detail w/o title', type: ChecklistItem_Type.ITEM_PLAINTEXT }),
             ChecklistItem.create({ prompt: 'Detail3', type: ChecklistItem_Type.ITEM_TITLE }),
           ],

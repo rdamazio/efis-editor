@@ -40,12 +40,7 @@ export class ChecklistCommandBarComponent {
   }
 
   async onNewFile() {
-    const title = await TitleDialogComponent.promptForTitle(
-      {
-        promptType: 'file',
-      },
-      this._dialog,
-    );
+    const title = await TitleDialogComponent.promptForTitle({ promptType: 'file' }, this._dialog);
     if (title) {
       this.newFile.emit(title);
     }
@@ -53,10 +48,7 @@ export class ChecklistCommandBarComponent {
 
   async onDeleteFile() {
     const confirmed = await DeleteDialogComponent.confirmDeletion(
-      {
-        entityType: 'file',
-        entityDescription: 'this file and all checklists within',
-      },
+      { entityType: 'file', entityDescription: 'this file and all checklists within' },
       this._dialog,
     );
 

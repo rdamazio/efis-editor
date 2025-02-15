@@ -14,12 +14,7 @@ module.exports = tseslint.config(
   {
     files: ['**/*.ts'],
     ignores: ['src/environments/dev-keys.ts'],
-    languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        projectService: true,
-      },
-    },
+    languageOptions: { parser: tseslint.parser, parserOptions: { projectService: true } },
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.strictTypeChecked,
@@ -31,19 +26,12 @@ module.exports = tseslint.config(
       rxjsX.configs.strict,
       jasmine.configs.recommended,
     ],
-    plugins: {
-      jasmine: jasmine,
-      'no-secrets': nosecrets,
-    },
+    plugins: { jasmine: jasmine, 'no-secrets': nosecrets },
     processor: angular.processInlineTemplates,
     rules: {
       '@angular-eslint/directive-selector': [
         'error',
-        {
-          type: 'attribute',
-          prefix: ['app', 'checklist'],
-          style: 'camelCase',
-        },
+        { type: 'attribute', prefix: ['app', 'checklist'], style: 'camelCase' },
       ],
       // TODO: Move to OnPush
       '@angular-eslint/prefer-on-push-component-change-detection': 'off',
@@ -88,18 +76,8 @@ module.exports = tseslint.config(
           leadingUnderscore: 'require',
           trailingUnderscore: 'forbid',
         },
-        {
-          selector: ['typeLike'],
-          format: ['PascalCase'],
-          leadingUnderscore: 'forbid',
-          trailingUnderscore: 'forbid',
-        },
-        {
-          selector: 'enumMember',
-          format: ['UPPER_CASE'],
-          leadingUnderscore: 'forbid',
-          trailingUnderscore: 'forbid',
-        },
+        { selector: ['typeLike'], format: ['PascalCase'], leadingUnderscore: 'forbid', trailingUnderscore: 'forbid' },
+        { selector: 'enumMember', format: ['UPPER_CASE'], leadingUnderscore: 'forbid', trailingUnderscore: 'forbid' },
       ],
       '@typescript-eslint/no-loop-func': 'error',
       '@typescript-eslint/no-meaningless-void-operator': 'error',
@@ -114,13 +92,7 @@ module.exports = tseslint.config(
       '@typescript-eslint/restrict-plus-operands': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
       '@typescript-eslint/switch-exhaustiveness-check': ['error', { considerDefaultExhaustiveForUnions: true }],
-      '@typescript-eslint/typedef': [
-        'error',
-        {
-          parameter: true,
-          propertyDeclaration: true,
-        },
-      ],
+      '@typescript-eslint/typedef': ['error', { parameter: true, propertyDeclaration: true }],
       '@typescript-eslint/unbound-method': ['error', { ignoreStatic: true }],
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
       'accessor-pairs': 'error',
@@ -198,13 +170,7 @@ module.exports = tseslint.config(
       'prefer-spread': 'error',
       radix: 'error',
       'require-atomic-updates': 'error',
-      'rxjs-x/finnish': [
-        'error',
-        {
-          functions: false,
-          methods: false,
-        },
-      ],
+      'rxjs-x/finnish': ['error', { functions: false, methods: false }],
       'rxjs-x/no-ignored-error': 'off',
       'rxjs-x/no-ignored-subscribe': 'error',
     },
@@ -225,13 +191,6 @@ module.exports = tseslint.config(
   {
     files: ['**/*.html'],
     extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility, prettierRecommended],
-    rules: {
-      'prettier/prettier': [
-        'error',
-        {
-          parser: 'angular',
-        },
-      ],
-    },
+    rules: { 'prettier/prettier': ['error', { parser: 'angular' }] },
   },
 );

@@ -8,10 +8,7 @@ import { screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
 import { DeleteDialogComponent, DeleteDialogData } from './delete-dialog.component';
 
-const DATA: DeleteDialogData = {
-  entityType: 'planet',
-  entityDescription: 'planet and all its inhabitants',
-};
+const DATA: DeleteDialogData = { entityType: 'planet', entityDescription: 'planet and all its inhabitants' };
 
 describe('DeleteDialogComponent', () => {
   let fixture: ComponentFixture<DeleteDialogComponent>;

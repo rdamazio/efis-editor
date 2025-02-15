@@ -10,8 +10,8 @@ import { EXPECTED_CONTENTS } from '../../model/formats/test-data';
 import { LazyBrowserStorage } from '../../model/storage/browser-storage';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { NavData } from '../nav/nav-data';
-import { ChecklistsComponent } from './checklists.component';
 import { HOTKEY_DEBOUNCE_TIME } from '../shared/hotkeys/hotkey-registration';
+import { ChecklistsComponent } from './checklists.component';
 
 const NEW_FILE = ChecklistFile.create({
   metadata: { name: 'My file' },
@@ -23,11 +23,7 @@ const NEW_FILE = ChecklistFile.create({
         {
           title: 'First checklist',
           items: [
-            {
-              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
-              prompt: 'Checklist created',
-              expectation: 'CHECK',
-            },
+            { type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE, prompt: 'Checklist created', expectation: 'CHECK' },
           ],
         },
       ],
@@ -59,16 +55,10 @@ describe('ChecklistsComponent', () => {
 
     user = userEvent.setup();
 
-    navData = {
-      routeTitle: signal(undefined),
-      fileName: signal(undefined),
-    };
+    navData = { routeTitle: signal(undefined), fileName: signal(undefined) };
     rendered = await render(ChecklistsComponent, {
       providers: [
-        {
-          provide: ROUTER_OUTLET_DATA,
-          useValue: signal(navData),
-        },
+        { provide: ROUTER_OUTLET_DATA, useValue: signal(navData) },
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 1 } },
         { provide: HOTKEY_DEBOUNCE_TIME, useValue: 50 },
       ],
@@ -367,10 +357,7 @@ describe('ChecklistsComponent', () => {
 
     const expectedFile = ChecklistFile.clone(NEW_FILE);
     expectedFile.groups[0].checklists[0].items.push(
-      ChecklistItem.create({
-        type: ChecklistItem_Type.ITEM_CAUTION,
-        prompt: 'Second item',
-      }),
+      ChecklistItem.create({ type: ChecklistItem_Type.ITEM_CAUTION, prompt: 'Second item' }),
     );
     await expectFile('My file', expectedFile);
   });
@@ -624,12 +611,7 @@ describe('ChecklistsComponent', () => {
       const items = expectedFile.groups[0].checklists[0].items;
       items[0].prompt = 'New prompt';
       items[0].expectation = 'New expectation';
-      items.push(
-        ChecklistItem.create({
-          type: ChecklistItem_Type.ITEM_WARNING,
-          prompt: 'Other prompt',
-        }),
-      );
+      items.push(ChecklistItem.create({ type: ChecklistItem_Type.ITEM_WARNING, prompt: 'Other prompt' }));
 
       await expectFile('My file', expectedFile, completed);
 
@@ -684,11 +666,7 @@ describe('ChecklistsComponent', () => {
       // Verify that it was centered in storage.
       const expectedFile = ChecklistFile.clone(NEW_FILE);
       expectedFile.groups[0].checklists[0].items.push(
-        ChecklistItem.create({
-          type: ChecklistItem_Type.ITEM_CAUTION,
-          prompt: 'Center me',
-          centered: true,
-        }),
+        ChecklistItem.create({ type: ChecklistItem_Type.ITEM_CAUTION, prompt: 'Center me', centered: true }),
       );
       await expectFile('My file', expectedFile, completed);
 
@@ -793,14 +771,8 @@ describe('ChecklistsComponent', () => {
       await addItem('title', 'Third item');
 
       const item1 = ChecklistItem.clone(NEW_FILE.groups[0].checklists[0].items[0]);
-      const item2 = ChecklistItem.create({
-        type: ChecklistItem_Type.ITEM_CAUTION,
-        prompt: 'Second item',
-      });
-      const item3 = ChecklistItem.create({
-        type: ChecklistItem_Type.ITEM_TITLE,
-        prompt: 'Third item',
-      });
+      const item2 = ChecklistItem.create({ type: ChecklistItem_Type.ITEM_CAUTION, prompt: 'Second item' });
+      const item3 = ChecklistItem.create({ type: ChecklistItem_Type.ITEM_TITLE, prompt: 'Third item' });
 
       // Shift first item down
       const completed = storageCompleted();

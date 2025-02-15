@@ -44,9 +44,7 @@ describe('PrintDialogComponent', () => {
   });
 
   async function openDialog() {
-    const { fixture } = await render(DialogTestComponent, {
-      on: { dataOut },
-    });
+    const { fixture } = await render(DialogTestComponent, { on: { dataOut } });
 
     const openDialogButton = await screen.findByRole('button', { name: /open dialog/i });
     await user.click(openDialogButton);

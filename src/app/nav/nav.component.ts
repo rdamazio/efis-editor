@@ -9,13 +9,13 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { HotkeysService } from '@ngneat/hotkeys';
+import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { map, Observable, shareReplay } from 'rxjs';
 import { AboutComponent } from '../about/about.component';
-import { HelpComponent } from '../shared/hotkeys/help/help.component';
-import { GoogleDriveComponent } from '../shared/gdrive/gdrive.component';
-import { NavData } from './nav-data';
-import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { EditableLabelComponent } from '../shared/editable-label/editable-label.component';
+import { GoogleDriveComponent } from '../shared/gdrive/gdrive.component';
+import { HelpComponent } from '../shared/hotkeys/help/help.component';
+import { NavData } from './nav-data';
 
 @Component({
   selector: 'app-nav',
@@ -38,10 +38,7 @@ import { EditableLabelComponent } from '../shared/editable-label/editable-label.
 })
 export class NavComponent {
   private readonly _breakpointObserver = inject(BreakpointObserver);
-  readonly navData: NavData = {
-    routeTitle: signal(undefined),
-    fileName: signal(undefined),
-  };
+  readonly navData: NavData = { routeTitle: signal(undefined), fileName: signal(undefined) };
 
   isHandset$: Observable<boolean> = this._breakpointObserver.observe(Breakpoints.Handset).pipe(
     map((result) => result.matches),
@@ -54,11 +51,7 @@ export class NavComponent {
   ) {}
 
   showAbout() {
-    this._dialog.open(AboutComponent, {
-      hasBackdrop: true,
-      enterAnimationDuration: 200,
-      exitAnimationDuration: 200,
-    });
+    this._dialog.open(AboutComponent, { hasBackdrop: true, enterAnimationDuration: 200, exitAnimationDuration: 200 });
   }
 
   showKeyboardShortcuts() {

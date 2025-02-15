@@ -54,9 +54,7 @@ export class HotkeyRegistar {
   }
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class HotkeyRegistry {
   private readonly _hotkeyRegistrars = new Map<HotkeyRegistree, HotkeyRegistar>();
   private _helpRegistered = false;

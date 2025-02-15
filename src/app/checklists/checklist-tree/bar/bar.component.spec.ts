@@ -20,11 +20,7 @@ describe('ChecklistTreeBarComponent', () => {
       'collapseAll',
     ]);
 
-    rendered = await render(ChecklistTreeBarComponent, {
-      inputs: {
-        tree: tree,
-      },
-    });
+    rendered = await render(ChecklistTreeBarComponent, { inputs: { tree: tree } });
     expandButton = screen.queryByRole('button', { name: 'Expand all checklist groups' })!;
     collapseButton = screen.queryByRole('button', { name: 'Collapse all checklist groups' })!;
   });

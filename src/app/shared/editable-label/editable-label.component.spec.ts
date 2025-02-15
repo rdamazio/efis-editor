@@ -7,9 +7,7 @@ describe('EditableLabelComponent', () => {
   let fixture: ComponentFixture<EditableLabelComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [EditableLabelComponent],
-    }).compileComponents();
+    await TestBed.configureTestingModule({ imports: [EditableLabelComponent] }).compileComponents();
 
     fixture = TestBed.createComponent(EditableLabelComponent);
     component = fixture.componentInstance;

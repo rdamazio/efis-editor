@@ -8,10 +8,7 @@ import { screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { TitleDialogComponent, TitleDialogData } from './title-dialog.component';
 
-const DATA: TitleDialogData = {
-  promptType: 'world',
-  initialTitle: 'Earth',
-};
+const DATA: TitleDialogData = { promptType: 'world', initialTitle: 'Earth' };
 
 describe('TitleDialogComponent', () => {
   let user: UserEvent;

@@ -7,9 +7,7 @@ import { MultipartEncoder } from './multipart';
 /**
  * High-level wrapper for the Google Drive API, with a consistent Promise interface.
  */
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class GoogleDriveApi {
   private static readonly UPLOAD_API_PATH = '/upload/drive/v3/files';
   private static readonly API_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
@@ -159,10 +157,7 @@ export class GoogleDriveApi {
 
   public async downloadFile(fileId: string): Promise<string> {
     return gapi.client.drive.files
-      .get({
-        fileId: fileId,
-        alt: 'media',
-      })
+      .get({ fileId: fileId, alt: 'media' })
       .then((response: gapi.client.Response<gapi.client.drive.File>) => response.body);
   }
 
@@ -226,12 +221,7 @@ export class GoogleDriveApi {
   }
 
   public async trashFile(fileId: string): Promise<void> {
-    await gapi.client.drive.files.update({
-      fileId: fileId,
-      resource: {
-        trashed: true,
-      },
-    });
+    await gapi.client.drive.files.update({ fileId: fileId, resource: { trashed: true } });
   }
   public async deleteFile(fileId: string): Promise<void> {
     return gapi.client.drive.files.delete({ fileId: fileId }).then(() => void 0);

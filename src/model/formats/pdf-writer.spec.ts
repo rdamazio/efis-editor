@@ -10,9 +10,7 @@ describe('PdfWriter', () => {
   });
 
   it('generates a valid PDF', async () => {
-    const pdf = await writeAndParsePdf({
-      outputPageNumbers: true,
-    });
+    const pdf = await writeAndParsePdf({ outputPageNumbers: true });
     expect(pdf.numPages).toBeGreaterThan(1);
     const allText = await pdfToText(pdf);
 
@@ -88,12 +86,8 @@ describe('PdfWriter', () => {
   async function parsePdf(data: ArrayBuffer): Promise<pdfjs.PDFDocumentProxy> {
     pdfjs.GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.js';
 
-    return pdfjs.getDocument({
-      data: data,
-      useWorkerFetch: false,
-      isEvalSupported: false,
-      useSystemFonts: true,
-    }).promise;
+    return pdfjs.getDocument({ data: data, useWorkerFetch: false, isEvalSupported: false, useSystemFonts: true })
+      .promise;
   }
 
   async function pdfToText(pdf: pdfjs.PDFDocumentProxy): Promise<string> {

@@ -24,15 +24,8 @@ describe('ChecklistTreeComponent', () => {
 
   async function renderComponent(): Promise<RenderResult<ChecklistTreeComponent>> {
     return render(ChecklistTreeComponent, {
-      inputs: {
-        file: file,
-        selectedChecklist: selectedChecklistInput,
-      },
-      on: {
-        fileModified,
-        selectedChecklist,
-        selectedChecklistGroup,
-      },
+      inputs: { file: file, selectedChecklist: selectedChecklistInput },
+      on: { fileModified, selectedChecklist, selectedChecklistGroup },
     });
   }
 

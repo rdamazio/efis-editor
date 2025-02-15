@@ -6,9 +6,7 @@ import { LazyBrowserStorage } from './browser-storage';
 
 const CHECKLIST_PREFIX = 'checklists:';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class ChecklistStorage {
   constructor(private readonly _browserStorage: LazyBrowserStorage) {
     _browserStorage.storage
