@@ -266,8 +266,11 @@ export class PdfWriter {
       console.debug(`PDF: Checklist ${checklist.title}`);
 
       // Calculate where to start the next table.
-      let startY = PdfWriter.GROUP_TITLE_HEIGHT * 2;
-      if (!first) {
+      let startY = this._tableMargin;
+      if (first) {
+        startY = PdfWriter.GROUP_TITLE_HEIGHT * 2;
+        first = false;
+      } else {
         const lastY = this._doc.lastAutoTable.finalY;
         if (lastY > this._pageHeight / 2) {
           // More than half the page is already used, start on the next page.
@@ -276,7 +279,6 @@ export class PdfWriter {
           startY = lastY + 2;
         }
       }
-      first = false;
 
       const firstPageNumber = this._doc.getCurrentPageInfo().pageNumber;
       autoTable(this._doc, {
