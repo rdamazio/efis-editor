@@ -140,7 +140,13 @@ module.exports = tseslint.config(
       'no-proto': 'error',
       'no-return-assign': 'error',
       'no-script-url': 'error',
-      'no-secrets/no-secrets': 'error',
+      'no-secrets/no-secrets': [
+        'error',
+        {
+          // Commit hashes that may exist on GitHub URLs are OK.
+          ignoreContent: ['https?://github.com/[^ ]+'],
+        },
+      ],
       'no-self-compare': 'error',
       'no-sequences': 'error',
       'no-template-curly-in-string': 'error',
