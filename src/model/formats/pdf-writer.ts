@@ -24,15 +24,23 @@ interface CellPaddingInputStructured {
 
 export interface PdfWriterOptions {
   orientation?: OrientationType;
+
+  // Must be a valid page size string, or 'custom'.
   pageSize?: string;
+  // Custom page sizes are specified in inches.
+  customPageWidth?: number;
+  customPageHeight?: number;
+
   outputCoverPage?: boolean;
   outputCoverPageFooter?: boolean;
   outputPageNumbers?: boolean;
 }
 
 export const DEFAULT_OPTIONS: PdfWriterOptions = {
-  pageSize: 'letter',
   orientation: 'portrait',
+  pageSize: 'letter',
+  customPageWidth: 8.5,
+  customPageHeight: 11,
   outputCoverPage: true,
   outputCoverPageFooter: false,
   outputPageNumbers: true,
@@ -103,12 +111,7 @@ export class PdfWriter {
   }
 
   public async write(file: ChecklistFile): Promise<Blob> {
-    const doc = new jsPDF({
-      format: this._options.pageSize,
-      orientation: this._options.orientation,
-      unit: 'em',
-      putOnlyUsedFonts: true,
-    });
+    const doc = new jsPDF(this._pdfOptions());
     this._doc = doc as AutoTabledPDF;
 
     // Letter gives 51x66, A4 gives 49.6077x70.1575
@@ -145,6 +148,33 @@ export class PdfWriter {
     await this._addIcons();
 
     return this._doc.output('blob');
+  }
+
+  private _pdfOptions(): jsPDFOptions {
+    let format: FormatType;
+    let orientation: OrientationType;
+    if (this._options.pageSize === 'custom') {
+      const width = this._options.customPageWidth;
+      const height = this._options.customPageHeight;
+      if (!width || !height) {
+        throw new FormatError(`Invalid custom page size specified: ${width} x ${height}`);
+      }
+
+      // Custom page size was specified in inches, convert to em.
+      format = [width * 6, height * 6];
+      orientation = height > width ? 'portrait' : 'landscape';
+      console.debug(`Custom page size: [${format}], ${orientation}`);
+    } else {
+      format = this._options.pageSize;
+      orientation = this._options.orientation;
+    }
+
+    return {
+      format: format,
+      orientation: orientation,
+      unit: 'em',
+      putOnlyUsedFonts: true,
+    };
   }
 
   private _addCover(metadata: ChecklistFileMetadata) {

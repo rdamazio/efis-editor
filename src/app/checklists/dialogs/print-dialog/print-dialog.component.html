@@ -19,16 +19,46 @@
         <mat-option value="a1">A1</mat-option>
         <mat-option value="a0">A0</mat-option>
       </mat-optgroup>
+      <mat-option value="custom">Custom...</mat-option>
     </mat-select>
   </mat-form-field>
 
-  <div>
-    <mat-label>Orientation:</mat-label>
-    <mat-radio-group required [(ngModel)]="options.orientation" aria-label="Select the paper orientation">
-      <mat-radio-button value="portrait">Portrait</mat-radio-button>
-      <mat-radio-button value="landscape">Landscape</mat-radio-button>
-    </mat-radio-group>
-  </div>
+  @if (options.pageSize === 'custom') {
+    <div>
+      <mat-label>Custom page size:</mat-label><br />
+      <mat-form-field class="pagesize-input">
+        <mat-label id="width-label">Width (in)</mat-label>
+        <input
+          matInput
+          cdkFocusInitial
+          required
+          aria-labelledby="width-label"
+          placeholder="8.5"
+          [(ngModel)]="options.customPageWidth"
+        />
+      </mat-form-field>
+
+      <mat-form-field class="pagesize-input">
+        <mat-label id="height-label">Height (in)</mat-label>
+        <input
+          matInput
+          cdkFocusInitial
+          required
+          aria-labelledby="height-label"
+          placeholder="11"
+          [(ngModel)]="options.customPageHeight"
+        />
+      </mat-form-field>
+    </div>
+  } @else {
+    <div>
+      <mat-label>Orientation:</mat-label>
+      <mat-radio-group required [(ngModel)]="options.orientation" aria-label="Select the paper orientation">
+        <mat-radio-button value="portrait">Portrait</mat-radio-button>
+        <mat-radio-button value="landscape">Landscape</mat-radio-button>
+      </mat-radio-group>
+    </div>
+  }
 
   <mat-checkbox [(ngModel)]="options.outputCoverPage">Output cover page</mat-checkbox>
   <mat-checkbox [(ngModel)]="options.outputPageNumbers">Output page numbers</mat-checkbox>
