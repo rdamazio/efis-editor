@@ -1,5 +1,5 @@
 import { jsPDF, jsPDFOptions } from 'jspdf';
-import autoTable, { CellDef, CellHookData, FontStyle, RowInput } from 'jspdf-autotable';
+import autoTable, { CellDef, CellHookData, FontStyle, RowInput, UserOptions } from 'jspdf-autotable';
 import 'svg2pdf.js';
 import {
   Checklist,
@@ -424,7 +424,7 @@ export class PdfWriter {
 
     // Draw a nested table for the prefixed item.
     // This draws over the existing cell but does not replace it.
-    autoTable(this._doc, {
+    const options: UserOptions = {
       body: [
         [
           {
@@ -457,7 +457,9 @@ export class PdfWriter {
         halign: 'left',
       },
       tableWidth: tableWidth,
-    });
+    };
+    console.debug('Drawing prefixed cell: ', options);
+    autoTable(this._doc, options);
 
     if (icon) {
       // Icon drawing is asynchronous, and we're in a synchronous autotable callback, so just collect what needs to be
@@ -558,7 +560,7 @@ export class PdfWriter {
     const textHeight = numLines * lineHeight;
     const cellHeight = textHeight + 2 * this._defaultPadding;
 
-    console.debug(`PDF: Text "${text}": numLines=${numLines}; cellHeight=${cellHeight}`);
+    console.debug(`PDF: Text "${text}": numLines=${numLines}; cellHeight=${cellHeight}; maxWidth=${maxContentWidth}`);
 
     return { lines: splitText, height: cellHeight };
   }
@@ -567,8 +569,13 @@ export class PdfWriter {
     const indentWidth = this._indentPadding(indent);
     const roundWidth = 1.0 / this._scaleFactor;
 
+    console.debug(
+      `Prefixed width: page=${this._pageWidth}; margin=${this._tableMargin}; indent=${indentWidth}; prefix=${PdfWriter.PREFIX_CELL_WIDTH}; padding=${this._defaultPadding}`,
+    );
+
     // Calculate the cell width that's available for the text contents
     return (
+      // The whole page:
       this._pageWidth -
       // The whole table:
       2 * this._tableMargin -
