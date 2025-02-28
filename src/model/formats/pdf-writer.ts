@@ -24,14 +24,14 @@ interface CellPaddingInputStructured {
 
 export interface PdfWriterOptions {
   orientation?: OrientationType;
-  format?: FormatType;
+  pageSize?: string;
   outputCoverPage?: boolean;
   outputCoverPageFooter?: boolean;
   outputPageNumbers?: boolean;
 }
 
 export const DEFAULT_OPTIONS: PdfWriterOptions = {
-  format: 'letter',
+  pageSize: 'letter',
   orientation: 'portrait',
   outputCoverPage: true,
   outputCoverPageFooter: false,
@@ -104,7 +104,7 @@ export class PdfWriter {
 
   public async write(file: ChecklistFile): Promise<Blob> {
     const doc = new jsPDF({
-      format: this._options.format,
+      format: this._options.pageSize,
       orientation: this._options.orientation,
       unit: 'em',
       putOnlyUsedFonts: true,

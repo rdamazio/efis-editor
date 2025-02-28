@@ -95,7 +95,7 @@ describe('PrintDialogComponent', () => {
     await user.click(okButton);
 
     expect(dataOut).toHaveBeenCalledOnceWith({
-      format: 'a1',
+      pageSize: 'a1',
       orientation: 'landscape',
       outputCoverPage: true,
       outputCoverPageFooter: false,
