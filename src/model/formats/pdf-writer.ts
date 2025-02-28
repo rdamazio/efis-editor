@@ -567,7 +567,6 @@ export class PdfWriter {
 
   private _calculatePrefixedContentWidth(indent: number): number {
     const indentWidth = this._indentPadding(indent);
-    const roundWidth = 1.0 / this._scaleFactor;
 
     console.debug(
       `Prefixed width: page=${this._pageWidth}; margin=${this._tableMargin}; indent=${indentWidth}; prefix=${PdfWriter.PREFIX_CELL_WIDTH}; padding=${this._defaultPadding}`,
@@ -584,9 +583,12 @@ export class PdfWriter {
       // The content (with padding):
       PdfWriter.PREFIX_CELL_WIDTH -
       // The content (no padding):
-      2 * this._defaultPadding +
-      // autotable adds +1 to the allowed wrapping width to account for rounding.
-      roundWidth
+      2 * this._defaultPadding
+      // autotable adds +1 to the allowed wrapping width to account for rounding:
+      // https://github.com/simonbengtsson/jsPDF-AutoTable/blob/cd107726591d01a315d158bb827191928e1964b5/src/widthCalculator.ts#L302
+      // however, due to those same rounding errors, it can happen that we calculate for
+      // less wrapping here and later it ends up actually wrapping and exceeding our calculated
+      // height - so we're conservative and let it wrap earlier here.
     );
   }
 
