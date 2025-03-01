@@ -438,6 +438,7 @@ export class PdfWriter {
             styles: {
               cellWidth: PdfWriter.PREFIX_CELL_WIDTH,
               cellPadding: { ...this._defaultCellPadding, left: PdfWriter.ICON_TOTAL_SIZE },
+              halign: 'right',
               fontStyle: prefixFontStyle,
               textColor: prefixColor,
             },
