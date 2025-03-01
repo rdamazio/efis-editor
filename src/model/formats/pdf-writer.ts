@@ -107,6 +107,7 @@ export class PdfWriter {
   private readonly _icons: IconToDraw[] = [];
 
   private _currentY = 0;
+  private readonly _darkBackgroundPages: number[] = [];
 
   constructor(private readonly _options: PdfWriterOptions = DEFAULT_OPTIONS) {
     this._allIcons = this._fetchIcons();
@@ -260,16 +261,19 @@ export class PdfWriter {
     this._doc.deletePage(this._doc.internal.pages.length - 1);
   }
 
-  private _addGroupTitle(group: ChecklistGroup, height: number) {
-    if (!this._doc) return;
+  private _addGroupTitle(group: ChecklistGroup, height: number): { usedDarkBackground: boolean } {
+    if (!this._doc) return { usedDarkBackground: false };
+
     console.debug(`PDF: Group ${group.title}`);
 
     this._doc.saveGraphicsState();
+    let darkBackground = true;
     let rectColor = 'blue';
     let textColor = 'white';
     if (group.category === ChecklistGroup_Category.abnormal) {
       rectColor = 'orange';
       textColor = 'black';
+      darkBackground = false;
     } else if (group.category === ChecklistGroup_Category.emergency) {
       rectColor = 'red';
     }
@@ -286,6 +290,7 @@ export class PdfWriter {
     );
 
     this._doc.restoreGraphicsState();
+    return { usedDarkBackground: darkBackground };
   }
 
   private _addGroup(group: ChecklistGroup) {
@@ -293,7 +298,10 @@ export class PdfWriter {
 
     let titleOffset = 0;
     if (this._options.outputGroupCoverPages) {
-      this._addGroupTitle(group, this._pageHeight);
+      const { usedDarkBackground } = this._addGroupTitle(group, this._pageHeight);
+      if (usedDarkBackground) {
+        this._darkBackgroundPages.push(this._doc.getCurrentPageInfo().pageNumber);
+      }
       this._newPage();
     } else {
       titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2;
@@ -653,7 +661,12 @@ export class PdfWriter {
     for (let i = firstNumberedPage; i <= pageCount; i++) {
       this._doc.setPage(i);
       this._setCurrentY(this._footNoteY);
+      this._doc.saveGraphicsState();
+      if (this._darkBackgroundPages.includes(i)) {
+        this._doc.setTextColor('white');
+      }
       this._addCenteredText(`Page ${i} of ${pageCount}`, PdfWriter.FOOTNOTE_HEIGHT, PdfWriter.FOOTNOTE_FONT_SIZE);
+      this._doc.restoreGraphicsState();
     }
   }
 
