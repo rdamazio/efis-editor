@@ -45,6 +45,7 @@ import { PrintDialogComponent } from './dialogs/print-dialog/print-dialog.compon
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
+import { PreferenceStorage } from '../../model/storage/preference-storage';
 
 interface ParsedFragment {
   fileName?: string;
@@ -99,6 +100,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   constructor(
     public store: ChecklistStorage,
     private readonly _gdrive: GoogleDriveStorage,
+    private readonly _prefs: PreferenceStorage,
     private readonly _dialog: MatDialog,
     private readonly _snackBar: MatSnackBar,
     private readonly _spinner: NgxSpinnerService,
@@ -533,12 +535,14 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     } else if (formatId === 'fmd') {
       file = ForeFlightFormat.fromProto(this.selectedFile);
     } else if (formatId === 'pdf') {
-      file = PrintDialogComponent.show(this._dialog).then(async (options?: PdfWriterOptions): Promise<File> => {
-        if (options) {
-          return PdfFormat.fromProto(this.selectedFile!, options);
-        }
-        throw new Error('PDF dialog cancelled');
-      });
+      file = PrintDialogComponent.show(this._dialog, this._prefs).then(
+        async (options?: PdfWriterOptions): Promise<File> => {
+          if (options) {
+            return PdfFormat.fromProto(this.selectedFile!, options);
+          }
+          throw new Error('PDF dialog cancelled');
+        },
+      );
     } else {
       file = Promise.reject(new FormatError(`Unknown format "${formatId}"`));
     }

@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
+  MAT_DIALOG_DATA,
   MatDialog,
   MatDialogActions,
   MatDialogClose,
@@ -15,6 +16,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { lastValueFrom, Observable } from 'rxjs';
 import { DEFAULT_OPTIONS, PdfWriterOptions } from '../../../../model/formats/pdf-writer';
+import { PreferenceStorage } from '../../../../model/storage/preference-storage';
 
 @Component({
   selector: 'checklist-print-dialog',
@@ -36,10 +38,12 @@ import { DEFAULT_OPTIONS, PdfWriterOptions } from '../../../../model/formats/pdf
   styleUrl: './print-dialog.component.scss',
 })
 export class PrintDialogComponent {
-  options: PdfWriterOptions = DEFAULT_OPTIONS;
+  public options = inject(MAT_DIALOG_DATA) as PdfWriterOptions;
 
-  public static async show(dialog: MatDialog): Promise<PdfWriterOptions | undefined> {
+  public static async show(dialog: MatDialog, prefs: PreferenceStorage): Promise<PdfWriterOptions | undefined> {
+    const data = (await prefs.getPrintOptions()) ?? DEFAULT_OPTIONS;
     const pdfDialog = dialog.open(PrintDialogComponent, {
+      data: data,
       hasBackdrop: true,
       closeOnNavigation: true,
       enterAnimationDuration: 200,
@@ -48,6 +52,11 @@ export class PrintDialogComponent {
       ariaModal: true,
     });
     const afterClosed$ = pdfDialog.afterClosed() as Observable<PdfWriterOptions | undefined>;
-    return lastValueFrom(afterClosed$, { defaultValue: undefined });
+    return lastValueFrom(afterClosed$, { defaultValue: undefined }).then(async (opts?: PdfWriterOptions) => {
+      if (opts) {
+        await prefs.setPrintOptions(opts);
+      }
+      return opts;
+    });
   }
 }

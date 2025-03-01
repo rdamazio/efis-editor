@@ -7,6 +7,9 @@ import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { DEFAULT_OPTIONS, PdfWriterOptions } from '../../../../model/formats/pdf-writer';
 import { PrintDialogComponent } from './print-dialog.component';
+import { PreferenceStorage } from '../../../../model/storage/preference-storage';
+import { LazyBrowserStorage } from '../../../../model/storage/browser-storage';
+import { ComponentFixture, inject } from '@angular/core/testing';
 
 @Component({
   standalone: true,
@@ -17,10 +20,13 @@ import { PrintDialogComponent } from './print-dialog.component';
 export class DialogTestComponent {
   public readonly dataOut = output<PdfWriterOptions | undefined>();
 
-  constructor(private readonly _dialog: MatDialog) {}
+  constructor(
+    private readonly _dialog: MatDialog,
+    private readonly _prefs: PreferenceStorage,
+  ) {}
 
   async openDialog() {
-    return PrintDialogComponent.show(this._dialog).then((value) => {
+    return PrintDialogComponent.show(this._dialog, this._prefs).then((value) => {
       this.dataOut.emit(value);
       return void 0;
     });
@@ -30,6 +36,8 @@ export class DialogTestComponent {
 describe('PrintDialogComponent', () => {
   let user: UserEvent;
   let loader: HarnessLoader;
+  let prefs: PreferenceStorage;
+  let fixture: ComponentFixture<DialogTestComponent>;
   let dataOut: jasmine.Spy;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
@@ -38,14 +46,23 @@ describe('PrintDialogComponent', () => {
   let landscape: HTMLElement;
   let pageNumbers: HTMLElement;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     user = userEvent.setup();
     dataOut = jasmine.createSpy('dataOut');
+
+    fixture = (await render(DialogTestComponent, { on: { dataOut } })).fixture;
   });
 
-  async function openDialog() {
-    const { fixture } = await render(DialogTestComponent, { on: { dataOut } });
+  beforeEach(inject(
+    [LazyBrowserStorage, PreferenceStorage],
+    async (browserStore: LazyBrowserStorage, prefsStore: PreferenceStorage) => {
+      browserStore.forceBrowserStorage();
+      (await browserStore.storage).clear();
+      prefs = prefsStore;
+    },
+  ));
 
+  async function openDialog() {
     const openDialogButton = await screen.findByRole('button', { name: /open dialog/i });
     await user.click(openDialogButton);
 
@@ -71,6 +88,29 @@ describe('PrintDialogComponent', () => {
     expect(dataOut).toHaveBeenCalledOnceWith(undefined);
   });
 
+  it('should open, modify and cancel the dialog, without changing stored settings', async () => {
+    await prefs.setPrintOptions({
+      pageSize: 'a6',
+    });
+
+    await openDialog();
+
+    await user.click(paperSize);
+    const a1 = await screen.findByRole('option', { name: 'A1' });
+    await user.click(a1);
+
+    await user.click(cancelButton);
+
+    const dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs.length).toBe(0);
+
+    expect(dataOut).toHaveBeenCalledOnceWith(undefined);
+
+    const newOpts = await prefs.getPrintOptions();
+    expect(newOpts).not.toBeNull();
+    expect(newOpts!.pageSize).toEqual('a6');
+  });
+
   it('should accept defaults ', async () => {
     await openDialog();
 
@@ -83,7 +123,7 @@ describe('PrintDialogComponent', () => {
     expect(dataOut).toHaveBeenCalledOnceWith(DEFAULT_OPTIONS);
   });
 
-  it('should emit changed options', async () => {
+  it('should emit and store changed options', async () => {
     await openDialog();
 
     await user.click(paperSize);
@@ -94,13 +134,36 @@ describe('PrintDialogComponent', () => {
 
     await user.click(okButton);
 
-    expect(dataOut).toHaveBeenCalledOnceWith({
+    const expectedOpts: PdfWriterOptions = {
       ...DEFAULT_OPTIONS,
       pageSize: 'a1',
       orientation: 'landscape',
       outputCoverPage: true,
       outputCoverPageFooter: false,
       outputPageNumbers: false,
-    });
+    };
+    expect(dataOut).toHaveBeenCalledOnceWith(expectedOpts);
+    const newOpts = await prefs.getPrintOptions();
+    expect(newOpts).toEqual(expectedOpts);
+  });
+
+  it('should use stored options as new default', async () => {
+    const expectedOpts: PdfWriterOptions = {
+      ...DEFAULT_OPTIONS,
+      pageSize: 'a6',
+      orientation: 'landscape',
+    };
+    await prefs.setPrintOptions(expectedOpts);
+
+    await openDialog();
+
+    await user.click(okButton);
+
+    const dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs.length).toBe(0);
+
+    expect(dataOut).toHaveBeenCalledOnceWith(expectedOpts);
+    const newOpts = await prefs.getPrintOptions();
+    expect(newOpts).toEqual(expectedOpts);
   });
 });
