@@ -33,6 +33,7 @@ export interface PdfWriterOptions {
 
   outputCoverPage?: boolean;
   outputCoverPageFooter?: boolean;
+  outputGroupCoverPages?: boolean;
   outputPageNumbers?: boolean;
 }
 
@@ -43,6 +44,7 @@ export const DEFAULT_OPTIONS: PdfWriterOptions = {
   customPageHeight: 11,
   outputCoverPage: true,
   outputCoverPageFooter: false,
+  outputGroupCoverPages: false,
   outputPageNumbers: true,
 };
 
@@ -258,7 +260,7 @@ export class PdfWriter {
     this._doc.deletePage(this._doc.internal.pages.length - 1);
   }
 
-  private _addGroupTitle(group: ChecklistGroup) {
+  private _addGroupTitle(group: ChecklistGroup, height: number) {
     if (!this._doc) return;
     console.debug(`PDF: Group ${group.title}`);
 
@@ -273,9 +275,9 @@ export class PdfWriter {
     }
     this._doc.setFillColor(rectColor);
     this._doc.setTextColor(textColor);
-    this._doc.rect(0, 0, this._pageWidth, PdfWriter.GROUP_TITLE_HEIGHT + 2, PdfWriter.RECT_FILL_STYLE);
+    this._doc.rect(0, 0, this._pageWidth, height, PdfWriter.RECT_FILL_STYLE);
 
-    this._setCurrentY(PdfWriter.GROUP_TITLE_HEIGHT);
+    this._setCurrentY(height / 2);
     this._addCenteredText(
       group.title,
       PdfWriter.GROUP_TITLE_HEIGHT,
@@ -289,7 +291,14 @@ export class PdfWriter {
   private _addGroup(group: ChecklistGroup) {
     if (!this._doc) return;
 
-    this._addGroupTitle(group);
+    let titleOffset = 0;
+    if (this._options.outputGroupCoverPages) {
+      this._addGroupTitle(group, this._pageHeight);
+      this._newPage();
+    } else {
+      titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2;
+      this._addGroupTitle(group, titleOffset - 1);
+    }
 
     let first = true;
     for (const checklist of group.checklists) {
@@ -298,7 +307,7 @@ export class PdfWriter {
       // Calculate where to start the next table.
       let startY = this._tableMargin;
       if (first) {
-        startY = PdfWriter.GROUP_TITLE_HEIGHT * 2;
+        startY = titleOffset || this._tableMargin;
         first = false;
       } else {
         const lastY = this._doc.lastAutoTable.finalY;
