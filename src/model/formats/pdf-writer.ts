@@ -382,7 +382,7 @@ export class PdfWriter {
         first = false;
       } else {
         const lastY = this._doc.lastAutoTable.finalY;
-        if (lastY > this._pageHeight / 2) {
+        if (lastY - this._tableMargin.top > this._innerPageHeight / 2) {
           // More than half the page is already used, start on the next page.
           this._newPage();
         } else {
