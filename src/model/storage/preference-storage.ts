@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
+import { DEFAULT_OPTIONS, PdfWriterOptions } from '../formats/pdf-writer';
 import { LazyBrowserStorage } from './browser-storage';
-import { PdfWriterOptions } from '../formats/pdf-writer';
 
 @Injectable({ providedIn: 'root' })
 export class PreferenceStorage {
@@ -21,7 +21,13 @@ export class PreferenceStorage {
       return null;
     }
 
-    return JSON.parse(optsStr) as PdfWriterOptions;
+    const opts = JSON.parse(optsStr) as PdfWriterOptions;
+
+    // If any fields are missing (because they were added later), add them from the defaults.
+    return {
+      ...DEFAULT_OPTIONS,
+      ...opts,
+    };
   }
 
   public async setPrintOptions(opts: PdfWriterOptions) {

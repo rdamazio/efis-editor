@@ -11,6 +11,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
@@ -29,6 +30,7 @@ import { PreferenceStorage } from '../../../../model/storage/preference-storage'
     MatDialogActions,
     MatDialogClose,
     MatFormFieldModule,
+    MatGridListModule,
     MatInputModule,
     MatRadioModule,
     MatSelectModule,

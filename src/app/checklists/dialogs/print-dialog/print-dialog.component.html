@@ -60,6 +60,80 @@
     </div>
   }
 
+  <div>
+    <mat-label>Margins:</mat-label>
+    <mat-grid-list cols="3" rowHeight="60px">
+      <mat-grid-tile></mat-grid-tile>
+      <mat-grid-tile>
+        <mat-form-field class="margin-input">
+          <mat-label id="top-margin-label">Top</mat-label>
+          <input
+            matInput
+            cdkFocusInitial
+            required
+            aria-labelledby="top-margin-label"
+            placeholder="5"
+            [(ngModel)]="options.marginTop"
+          />
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile></mat-grid-tile>
+
+      <mat-grid-tile>
+        <mat-form-field class="margin-input">
+          <mat-label id="left-margin-label">Left</mat-label>
+          <input
+            matInput
+            cdkFocusInitial
+            required
+            aria-labelledby="left-margin-label"
+            placeholder="5"
+            [(ngModel)]="options.marginLeft"
+          />
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile>
+        <mat-form-field class="margin-input">
+          <mat-label>Units</mat-label>
+          <mat-select required [(value)]="options.marginUnits" aria-label="Select the margin units">
+            <mat-option value="percent">%</mat-option>
+            <mat-option value="in">in</mat-option>
+            <mat-option value="mm">mm</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile>
+        <mat-form-field class="margin-input">
+          <mat-label id="right-margin-label">Right</mat-label>
+          <input
+            matInput
+            cdkFocusInitial
+            required
+            aria-labelledby="right-margin-label"
+            placeholder="5"
+            [(ngModel)]="options.marginRight"
+          />
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile></mat-grid-tile>
+      <mat-grid-tile>
+        <mat-form-field class="margin-input">
+          <mat-label id="bottom-margin-label">Bottom</mat-label>
+          <input
+            matInput
+            cdkFocusInitial
+            required
+            aria-labelledby="bottom-margin-label"
+            placeholder="5"
+            [(ngModel)]="options.marginBottom"
+          />
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile></mat-grid-tile>
+    </mat-grid-list>
+  </div>
+
   <mat-checkbox [(ngModel)]="options.outputCoverPage">Output cover page</mat-checkbox><br />
   <mat-checkbox [(ngModel)]="options.outputGroupCoverPages">Output group cover pages</mat-checkbox><br />
   <mat-checkbox [(ngModel)]="options.outputPageNumbers">Output page numbers</mat-checkbox>
