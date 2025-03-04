@@ -1,5 +1,5 @@
 import { jsPDF, jsPDFOptions } from 'jspdf';
-import autoTable, { CellDef, CellHookData, FontStyle, RowInput, UserOptions } from 'jspdf-autotable';
+import autoTable, { CellDef, CellHookData, FontStyle, MarginPadding, RowInput, UserOptions } from 'jspdf-autotable';
 import 'svg2pdf.js';
 import {
   Checklist,
@@ -31,6 +31,13 @@ export interface PdfWriterOptions {
   customPageWidth?: number;
   customPageHeight?: number;
 
+  // Units for the 4 margin values below. Defaults to 'percent'.
+  marginUnits?: 'percent' | 'in' | 'mm';
+  marginLeft?: number;
+  marginRight?: number;
+  marginBottom?: number;
+  marginTop?: number;
+
   outputCoverPage?: boolean;
   outputCoverPageFooter?: boolean;
   outputGroupCoverPages?: boolean;
@@ -42,6 +49,11 @@ export const DEFAULT_OPTIONS: PdfWriterOptions = {
   pageSize: 'letter',
   customPageWidth: 8.5,
   customPageHeight: 11,
+  marginUnits: 'percent',
+  marginLeft: 7,
+  marginRight: 7,
+  marginBottom: 7,
+  marginTop: 7,
   outputCoverPage: true,
   outputCoverPageFooter: false,
   outputGroupCoverPages: false,
@@ -57,7 +69,8 @@ interface IconToDraw {
 
 export class PdfWriter {
   private static readonly DEBUG_LAYOUT = false;
-  private static readonly TABLE_MARGIN_FRACTION = 0.07;
+  private static readonly INCHES_TO_EM = 6;
+  private static readonly MM_TO_EM = this.INCHES_TO_EM * 25.4;
   private static readonly GROUP_TITLE_HEIGHT = 3;
   private static readonly GROUP_TITLE_FONT_SIZE = 20;
   private static readonly MAIN_TITLE_FONT_SIZE = 30;
@@ -94,8 +107,9 @@ export class PdfWriter {
   private _doc?: AutoTabledPDF;
   private _pageWidth = 0;
   private _pageHeight = 0;
+  private _lineHeightFactor = 0;
   private _scaleFactor = 0;
-  private _tableMargin = 0;
+  private _tableMargin: MarginPadding = { left: 0, right: 0, top: 0, bottom: 0 };
   private _footNoteY = 0;
   private _defaultPadding = 0;
   private _defaultCellPadding?: CellPaddingInputStructured;
@@ -120,10 +134,12 @@ export class PdfWriter {
     // Letter gives 51x66, A4 gives 49.6077x70.1575
     this._pageHeight = this._doc.internal.pageSize.getHeight();
     this._pageWidth = this._doc.internal.pageSize.getWidth();
+    this._lineHeightFactor = this._doc.getLineHeightFactor();
     this._scaleFactor = this._doc.internal.scaleFactor;
     this._defaultPadding = 5 / this._scaleFactor;
-    this._tableMargin = this._pageWidth * PdfWriter.TABLE_MARGIN_FRACTION;
-    this._footNoteY = this._pageHeight - this._tableMargin / 2;
+    this._tableMargin = this._tableMarginFromOptions();
+
+    this._footNoteY = this._pageHeight - this._tableMargin.bottom / 2;
 
     console.debug(
       `PDF: page w=${this._pageWidth}, h=${this._pageHeight}, sf=${this._scaleFactor}, margin=${this._tableMargin}, footnote=${this._footNoteY}, pad=${this._defaultPadding}`,
@@ -164,7 +180,7 @@ export class PdfWriter {
       }
 
       // Custom page size was specified in inches, convert to em.
-      format = [width * 6, height * 6];
+      format = [width * PdfWriter.INCHES_TO_EM, height * PdfWriter.INCHES_TO_EM];
       orientation = height > width ? 'portrait' : 'landscape';
       console.debug(`Custom page size: [${format}], ${orientation}`);
     } else {
@@ -178,6 +194,37 @@ export class PdfWriter {
       unit: 'em',
       putOnlyUsedFonts: true,
     };
+  }
+
+  private _tableMarginFromOptions(): MarginPadding {
+    const left = this._options.marginLeft ?? 0;
+    const right = this._options.marginRight ?? 0;
+    const top = this._options.marginTop ?? 0;
+    const bottom = this._options.marginBottom ?? 0;
+
+    switch (this._options.marginUnits ?? 'percent') {
+      case 'percent':
+        return {
+          left: (this._pageWidth * left) / 100,
+          right: (this._pageWidth * right) / 100,
+          top: (this._pageWidth * top) / 100,
+          bottom: (this._pageWidth * bottom) / 100,
+        };
+      case 'in':
+        return {
+          left: PdfWriter.INCHES_TO_EM * left,
+          right: PdfWriter.INCHES_TO_EM * right,
+          top: PdfWriter.INCHES_TO_EM * top,
+          bottom: PdfWriter.INCHES_TO_EM * bottom,
+        };
+      case 'mm':
+        return {
+          left: PdfWriter.MM_TO_EM * left,
+          right: PdfWriter.MM_TO_EM * right,
+          top: PdfWriter.MM_TO_EM * top,
+          bottom: PdfWriter.MM_TO_EM * bottom,
+        };
+    }
   }
 
   private _addCover(metadata: ChecklistFileMetadata) {
@@ -281,13 +328,27 @@ export class PdfWriter {
     this._doc.setTextColor(textColor);
     this._doc.rect(0, 0, this._pageWidth, height, PdfWriter.RECT_FILL_STYLE);
 
-    this._setCurrentY(height / 2);
-    this._addCenteredText(
-      group.title,
-      PdfWriter.GROUP_TITLE_HEIGHT,
-      PdfWriter.GROUP_TITLE_FONT_SIZE,
-      PdfWriter.BOLD_FONT_STYLE,
+    // TODO: This makes sense if you're using the top margin for spiral binding,
+    // but looks like a weird offset otherwise.
+    // ---------------------------
+    // Margin                                    \
+    // | _ textTopY              \               |
+    // Title    ) textHeight     | usableHeight  | height
+    // | ‾ textBaseY             /               /
+    // ---------
+    const textHeight = (PdfWriter.GROUP_TITLE_FONT_SIZE * this._lineHeightFactor) / this._scaleFactor;
+    const usableHeight = height - this._tableMargin.top;
+    const usableCenterY = this._tableMargin.top + usableHeight / 2;
+    const textBaseY = usableCenterY + textHeight / 2;
+    const textTopY = usableCenterY - textHeight / 2;
+    if (textTopY < this._tableMargin.top) {
+      console.warn('PDF: Group title invades margin');
+    }
+    console.debug(
+      `PDF: Title height=${height}; usable=${usableHeight}; usableCenter=${usableCenterY}; textHeight=${textHeight}; textBase=${textBaseY}`,
     );
+    this._setCurrentY(textBaseY);
+    this._addCenteredText(group.title, textBaseY, PdfWriter.GROUP_TITLE_FONT_SIZE, PdfWriter.BOLD_FONT_STYLE);
 
     this._doc.restoreGraphicsState();
     return { usedDarkBackground: darkBackground };
@@ -304,7 +365,7 @@ export class PdfWriter {
       }
       this._newPage();
     } else {
-      titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2;
+      titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2 + this._tableMargin.top;
       this._addGroupTitle(group, titleOffset - 1);
     }
 
@@ -313,9 +374,9 @@ export class PdfWriter {
       console.debug(`PDF: Checklist ${checklist.title}`);
 
       // Calculate where to start the next table.
-      let startY = this._tableMargin;
+      let startY = this._tableMargin.top;
       if (first) {
-        startY = titleOffset || this._tableMargin;
+        startY = titleOffset || this._tableMargin.top;
         first = false;
       } else {
         const lastY = this._doc.lastAutoTable.finalY;
@@ -457,7 +518,7 @@ export class PdfWriter {
 
     let leftPadding = data.cell.padding('left');
     let tableWidth = data.cell.width;
-    let margin = this._tableMargin;
+    const margin = { ...this._tableMargin };
 
     if (data.cell.styles.halign === 'center') {
       // We'll center the entire table instead of the content cell.
@@ -465,10 +526,12 @@ export class PdfWriter {
       leftPadding = 0;
       const textWidth = this._textWidth(data.cell.text);
       tableWidth = PdfWriter.PREFIX_CELL_WIDTH + textWidth + 2 * this._defaultPadding;
-      margin = (this._pageWidth - tableWidth) / 2;
-      console.debug(
-        `PDF: Centered: textW=${textWidth}, tableWidth=${tableWidth}, margin=${margin}, text="${contents}"`,
-      );
+      const outerTableWidth = this._pageWidth - this._tableMargin.left - this._tableMargin.right;
+      const innerMargins = (outerTableWidth - tableWidth) / 2;
+      margin.left += innerMargins;
+      margin.right += innerMargins;
+
+      console.debug(`PDF: Centered: textW=${textWidth}, tableWidth=${tableWidth}, text="${contents}"`);
     }
 
     // Draw a nested table for the prefixed item.
@@ -518,7 +581,7 @@ export class PdfWriter {
         name: icon,
         page: firstPageNumber + data.pageNumber - 1,
         // Position to the left of the text.
-        x: margin + leftPadding,
+        x: margin.left + leftPadding,
         // Position at the top of the cell.
         y: data.cell.y + PdfWriter.ICON_MARGIN / 2,
       });
@@ -630,7 +693,8 @@ export class PdfWriter {
       // The whole page:
       this._pageWidth -
       // The whole table:
-      2 * this._tableMargin -
+      this._tableMargin.left -
+      this._tableMargin.right -
       // The prefix + content (with padding):
       indentWidth -
       // The content (with padding):
