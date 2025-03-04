@@ -38,6 +38,10 @@ export interface PdfWriterOptions {
   marginBottom?: number;
   marginTop?: number;
 
+  // Whether group titles should be centered on the area *below* the margin.
+  // This makes sense when the margin will be used for spiral binding or similar.
+  marginOffsetsGroupTitle?: boolean;
+
   outputCoverPage?: boolean;
   outputCoverPageFooter?: boolean;
   outputGroupCoverPages?: boolean;
@@ -54,6 +58,7 @@ export const DEFAULT_OPTIONS: PdfWriterOptions = {
   marginRight: 7,
   marginBottom: 7,
   marginTop: 7,
+  marginOffsetsGroupTitle: false,
   outputCoverPage: true,
   outputCoverPageFooter: false,
   outputGroupCoverPages: false,
@@ -328,17 +333,16 @@ export class PdfWriter {
     this._doc.setTextColor(textColor);
     this._doc.rect(0, 0, this._pageWidth, height, PdfWriter.RECT_FILL_STYLE);
 
-    // TODO: This makes sense if you're using the top margin for spiral binding,
-    // but looks like a weird offset otherwise.
     // ---------------------------
-    // Margin                                    \
+    // Margin                    | marginOffset  \
     // | _ textTopY              \               |
     // Title    ) textHeight     | usableHeight  | height
     // | ‾ textBaseY             /               /
     // ---------
     const textHeight = (PdfWriter.GROUP_TITLE_FONT_SIZE * this._lineHeightFactor) / this._scaleFactor;
-    const usableHeight = height - this._tableMargin.top;
-    const usableCenterY = this._tableMargin.top + usableHeight / 2;
+    const marginOffset = this._options.marginOffsetsGroupTitle ? this._tableMargin.top : 0;
+    const usableHeight = height - marginOffset;
+    const usableCenterY = marginOffset + usableHeight / 2;
     const textBaseY = usableCenterY + textHeight / 2;
     const textTopY = usableCenterY - textHeight / 2;
     if (textTopY < this._tableMargin.top) {
@@ -365,7 +369,10 @@ export class PdfWriter {
       }
       this._newPage();
     } else {
-      titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2 + this._tableMargin.top;
+      titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2;
+      if (this._options.marginOffsetsGroupTitle) {
+        titleOffset += this._tableMargin.top;
+      }
       this._addGroupTitle(group, titleOffset - 1);
     }
 
