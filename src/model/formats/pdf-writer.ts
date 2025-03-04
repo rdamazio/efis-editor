@@ -753,7 +753,9 @@ export class PdfWriter {
       this._doc.setFontSize(fontSize);
     }
     this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, fontStyle);
-    this._doc.text(txt, this._pageWidth / 2, this._currentY, { align: 'center' });
+    const tableWidth = this._pageWidth - this._tableMargin.left - this._tableMargin.right;
+    const center = this._tableMargin.left + tableWidth / 2;
+    this._doc.text(txt, center, this._currentY, { align: 'center' });
     this._doc.restoreGraphicsState();
 
     this._currentY += advanceY;
