@@ -142,7 +142,7 @@ export class PdfWriter {
     this._footNoteY = this._pageHeight - this._tableMargin.bottom / 2;
 
     console.debug(
-      `PDF: page w=${this._pageWidth}, h=${this._pageHeight}, sf=${this._scaleFactor}, margin=${this._tableMargin}, footnote=${this._footNoteY}, pad=${this._defaultPadding}`,
+      `PDF: page w=${this._pageWidth}, h=${this._pageHeight}, sf=${this._scaleFactor}, margin=${JSON.stringify(this._tableMargin)}, footnote=${this._footNoteY}, pad=${this._defaultPadding}`,
     );
     this._defaultCellPadding = {
       left: this._defaultPadding,
@@ -491,6 +491,8 @@ export class PdfWriter {
     // Caveat: If we had a plaintext field where the text starts with these prefixes,
     // we'd also format that - that's probably OK.
     const firstLine = data.cell.text[0];
+    if (!firstLine) return;
+
     let icon: string | undefined;
     let prefix: string | undefined;
     let prefixFontStyle: FontStyle = PdfWriter.NORMAL_FONT_STYLE;
@@ -571,7 +573,7 @@ export class PdfWriter {
       },
       tableWidth: tableWidth,
     };
-    console.debug('Drawing prefixed cell: ', options);
+    console.debug('PDF: Drawing prefixed cell: ', options);
     autoTable(this._doc, options);
 
     if (icon) {
@@ -685,7 +687,7 @@ export class PdfWriter {
     const roundWidth = 1.0 / this._scaleFactor;
 
     console.debug(
-      `Prefixed width: page=${this._pageWidth}; margin=${this._tableMargin}; indent=${indentWidth}; prefix=${PdfWriter.PREFIX_CELL_WIDTH}; padding=${this._defaultPadding}`,
+      `PDF: Prefixed width: page=${this._pageWidth}; indent=${indentWidth}; prefix=${PdfWriter.PREFIX_CELL_WIDTH}; padding=${this._defaultPadding}`,
     );
 
     // Calculate the cell width that's available for the text contents
