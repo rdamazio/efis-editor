@@ -111,9 +111,9 @@ export class PdfWriter {
   private _doc?: AutoTabledPDF;
   private _pageWidth = 0;
   private _pageHeight = 0;
-  private _lineHeightFactor = 0;
   private _scaleFactor = 0;
   private _tableMargin: MarginPadding = { left: 0, right: 0, top: 0, bottom: 0 };
+  private _innerPageHeight = 0;
   private _footNoteY = 0;
   private _defaultPadding = 0;
   private _defaultCellPadding?: CellPaddingInputStructured;
@@ -138,15 +138,15 @@ export class PdfWriter {
     // Letter gives 51x66, A4 gives 49.6077x70.1575
     this._pageHeight = this._doc.internal.pageSize.getHeight();
     this._pageWidth = this._doc.internal.pageSize.getWidth();
-    this._lineHeightFactor = this._doc.getLineHeightFactor();
     this._scaleFactor = this._doc.internal.scaleFactor;
     this._defaultPadding = 5 / this._scaleFactor;
     this._tableMargin = this._tableMarginFromOptions();
 
+    this._innerPageHeight = this._pageHeight - this._tableMargin.top - this._tableMargin.bottom;
     this._footNoteY = this._pageHeight - this._tableMargin.bottom / 2;
 
     console.debug(
-      `PDF: page w=${this._pageWidth}, h=${this._pageHeight}, sf=${this._scaleFactor}, margin=${JSON.stringify(this._tableMargin)}, footnote=${this._footNoteY}, pad=${this._defaultPadding}`,
+      `PDF: page w=${this._pageWidth}, h=${this._pageHeight}, innerH=${this._innerPageHeight}, sf=${this._scaleFactor}, margin=${JSON.stringify(this._tableMargin)}, footnote=${this._footNoteY}, pad=${this._defaultPadding}`,
     );
     this._defaultCellPadding = {
       left: this._defaultPadding,
@@ -235,7 +235,7 @@ export class PdfWriter {
     if (!this._doc) return;
 
     // Center the title at the top half.
-    this._setCurrentY(this._pageHeight / 4);
+    this._setCurrentY(this._tableMargin.top + this._innerPageHeight / 4);
     this._addCenteredText('Checklists', 0, PdfWriter.MAIN_TITLE_FONT_SIZE, PdfWriter.BOLD_FONT_STYLE);
 
     // Center the metadata at the bottom half.
@@ -244,7 +244,7 @@ export class PdfWriter {
     if (metadata.makeAndModel) metadataHeight += PdfWriter.METADATA_HEADER_HEIGHT + PdfWriter.METADATA_VALUE_HEIGHT;
     if (metadata.manufacturerInfo) metadataHeight += PdfWriter.METADATA_HEADER_HEIGHT + PdfWriter.METADATA_VALUE_HEIGHT;
     if (metadata.copyrightInfo) metadataHeight += PdfWriter.METADATA_HEADER_HEIGHT + PdfWriter.METADATA_VALUE_HEIGHT;
-    const metadataStartY = (this._pageHeight * 3) / 4 - metadataHeight / 2;
+    const metadataStartY = this._tableMargin.top + (this._innerPageHeight * 3) / 4 - metadataHeight / 2;
     this._setCurrentY(metadataStartY);
 
     if (metadata.aircraftInfo) {
