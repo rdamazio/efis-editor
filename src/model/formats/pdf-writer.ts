@@ -1,4 +1,4 @@
-import { jsPDF, jsPDFOptions } from 'jspdf';
+import { jsPDF, jsPDFOptions, TextOptionsLight } from 'jspdf';
 import autoTable, { CellDef, CellHookData, FontStyle, MarginPadding, RowInput, UserOptions } from 'jspdf-autotable';
 import 'svg2pdf.js';
 import {
@@ -14,6 +14,7 @@ import { FormatError } from './error';
 
 type OrientationType = jsPDFOptions['orientation'];
 type FormatType = jsPDFOptions['format'];
+type BaselineType = TextOptionsLight['baseline'];
 type AutoTabledPDF = jsPDF & { lastAutoTable: { finalY: number } };
 interface CellPaddingInputStructured {
   top?: number;
@@ -336,23 +337,21 @@ export class PdfWriter {
     // ---------------------------
     // Margin                    | marginOffset  \
     // | _ textTopY              \               |
-    // Title    ) textHeight     | usableHeight  | height
+    // Title                     | usableHeight  | height
     // | ‾ textBaseY             /               /
     // ---------
-    const textHeight = (PdfWriter.GROUP_TITLE_FONT_SIZE * this._lineHeightFactor) / this._scaleFactor;
     const marginOffset = this._options.marginOffsetsGroupTitle ? this._tableMargin.top : 0;
     const usableHeight = height - marginOffset;
     const usableCenterY = marginOffset + usableHeight / 2;
-    const textBaseY = usableCenterY + textHeight / 2;
-    const textTopY = usableCenterY - textHeight / 2;
-    if (textTopY < this._tableMargin.top) {
-      console.warn('PDF: Group title invades margin');
-    }
-    console.debug(
-      `PDF: Title height=${height}; usable=${usableHeight}; usableCenter=${usableCenterY}; textHeight=${textHeight}; textBase=${textBaseY}`,
+    console.debug(`PDF: Title height=${height}; usable=${usableHeight}; usableCenter=${usableCenterY}`);
+    this._setCurrentY(usableCenterY);
+    this._addCenteredText(
+      group.title,
+      usableCenterY,
+      PdfWriter.GROUP_TITLE_FONT_SIZE,
+      PdfWriter.BOLD_FONT_STYLE,
+      'middle',
     );
-    this._setCurrentY(textBaseY);
-    this._addCenteredText(group.title, textBaseY, PdfWriter.GROUP_TITLE_FONT_SIZE, PdfWriter.BOLD_FONT_STYLE);
 
     this._doc.restoreGraphicsState();
     return { usedDarkBackground: darkBackground };
@@ -752,7 +751,13 @@ export class PdfWriter {
     this._setCurrentY(0);
   }
 
-  private _addCenteredText(txt: string, advanceY: number, fontSize?: number, fontStyle?: string) {
+  private _addCenteredText(
+    txt: string,
+    advanceY: number,
+    fontSize?: number,
+    fontStyle?: string,
+    baseline?: BaselineType,
+  ) {
     if (!this._doc) return;
 
     this._doc.saveGraphicsState();
@@ -762,7 +767,7 @@ export class PdfWriter {
     this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, fontStyle);
     const tableWidth = this._pageWidth - this._tableMargin.left - this._tableMargin.right;
     const center = this._tableMargin.left + tableWidth / 2;
-    this._doc.text(txt, center, this._currentY, { align: 'center' });
+    this._doc.text(txt, center, this._currentY, { align: 'center', baseline: baseline ?? 'alphabetic' });
     this._doc.restoreGraphicsState();
 
     this._currentY += advanceY;
