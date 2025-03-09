@@ -367,6 +367,10 @@ export class PdfWriter {
       titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2;
       if (this._options.marginOffsetsGroupTitle) {
         titleOffset += this._tableMargin.top;
+      } else if (titleOffset < this._tableMargin.top) {
+        // Ensure that the margin is respected for the table, even if they
+        // want the group title to go there.
+        titleOffset = this._tableMargin.top;
       }
       this._addGroupTitle(group, titleOffset - 1);
     }
