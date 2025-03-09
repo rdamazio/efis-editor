@@ -139,7 +139,6 @@ describe('PrintDialogComponent', () => {
       pageSize: 'a1',
       orientation: 'landscape',
       outputCoverPage: true,
-      outputCoverPageFooter: false,
       outputPageNumbers: false,
     };
     expect(dataOut).toHaveBeenCalledOnceWith(expectedOpts);
