@@ -117,7 +117,5 @@ describe('ChecklistStorage', () => {
       jasmine.arrayWithExactContents([A_CHECKLIST_FILE.metadata!.name, YET_ANOTHER_CHECKLIST_FILE.metadata!.name]),
     );
     expect(await getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).toBeNull();
-
-    await store.clear();
   });
 });
