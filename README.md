@@ -64,8 +64,8 @@ file in one format and then export it in another.
 ## File storage
 
 Unless cloud synchronization (described below) is enabled, this is a standalone web app that doesn't talk to any servers.
-To accomplish this, files are stored on your browser's local storage. This does mean that if you lose your device or clear your
-browser's data, they will be lost - so download your files and keep a copy safe.
+To accomplish this, files and preferences are stored on your browser's local storage. This does mean that if you lose your
+device or clear your browser's data, they will be lost - so download your files and keep a copy safe.
 
 ## Cloud synchronization
 
