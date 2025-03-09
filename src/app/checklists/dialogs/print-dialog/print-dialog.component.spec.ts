@@ -108,7 +108,7 @@ describe('PrintDialogComponent', () => {
 
     const newOpts = await prefs.getPrintOptions();
     expect(newOpts).not.toBeNull();
-    expect(newOpts!.pageSize).toEqual('a6');
+    expect(newOpts.pageSize).toEqual('a6');
   });
 
   it('should accept defaults ', async () => {

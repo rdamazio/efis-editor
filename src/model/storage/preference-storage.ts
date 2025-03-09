@@ -13,12 +13,12 @@ export class PreferenceStorage {
     this._browserStorage = lazyStorage.storage;
   }
 
-  public async getPrintOptions(): Promise<PdfWriterOptions | null> {
+  public async getPrintOptions(): Promise<PdfWriterOptions> {
     const store = await this._browserStorage;
 
     const optsStr = store.getItem(PreferenceStorage.PRINT_OPTIONS_KEY);
     if (!optsStr) {
-      return null;
+      return { ...DEFAULT_OPTIONS };
     }
 
     const opts = JSON.parse(optsStr) as PdfWriterOptions;

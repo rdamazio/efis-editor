@@ -16,7 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { lastValueFrom, Observable } from 'rxjs';
-import { DEFAULT_OPTIONS, PdfWriterOptions } from '../../../../model/formats/pdf-writer';
+import { PdfWriterOptions } from '../../../../model/formats/pdf-writer';
 import { PreferenceStorage } from '../../../../model/storage/preference-storage';
 
 @Component({
@@ -43,7 +43,7 @@ export class PrintDialogComponent {
   public options = inject(MAT_DIALOG_DATA) as PdfWriterOptions;
 
   public static async show(dialog: MatDialog, prefs: PreferenceStorage): Promise<PdfWriterOptions | undefined> {
-    const data = (await prefs.getPrintOptions()) ?? DEFAULT_OPTIONS;
+    const data = await prefs.getPrintOptions();
     const pdfDialog = dialog.open(PrintDialogComponent, {
       data: data,
       hasBackdrop: true,
