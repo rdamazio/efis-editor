@@ -12,9 +12,10 @@ export const APP_CONFIG: ApplicationConfig = {
     provideRouter(ROUTES, withPreloading(PreloadAllModules)),
     provideClientHydration(withIncrementalHydration()),
     provideAnimationsAsync(),
-    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 5000 } }, provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          }),
+    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 5000 } },
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:5000',
+    }),
   ],
 };
