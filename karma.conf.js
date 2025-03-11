@@ -33,8 +33,10 @@ module.exports = function (config) {
       subdir: '.',
       reporters: [{ type: 'html' }, { type: 'text-summary' }],
     },
-    files: [{ pattern: './src/assets/**', included: false, served: true }],
-    proxies: { '/assets': '/base/src/assets' },
+    files: [{ pattern: './public/**', included: false, served: true }],
+    // If any files need to be served at the root directory (instead of /base/public), they'll need to be individually
+    // added to proxies.
+    proxies: {},
     reporters: ['spec', 'kjhtml', 'jasmine-order'],
     // Prevents jasmine-order from also logging all the output
     disableJasmineOrderStandardLogging: true,

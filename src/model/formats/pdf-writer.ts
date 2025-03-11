@@ -94,8 +94,8 @@ export class PdfWriter {
   private static readonly ICON_SIZE = 1.5;
   private static readonly ICON_MARGIN = 0.3;
   private static readonly ICON_TOTAL_SIZE = this.ICON_SIZE + this.ICON_MARGIN;
-  private static readonly WARNING_ICON = 'assets/warning-icon.svg';
-  private static readonly CAUTION_ICON = 'assets/caution-icon.svg';
+  private static readonly WARNING_ICON = 'warning-icon.svg';
+  private static readonly CAUTION_ICON = 'caution-icon.svg';
   private static readonly ALL_ICONS = [this.WARNING_ICON, this.CAUTION_ICON];
 
   private static readonly WARNING_PREFIX = 'WARNING: ';
@@ -155,8 +155,8 @@ export class PdfWriter {
       right: this._defaultPadding,
     };
 
-    this._doc.addFont('assets/Roboto-Regular.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
-    this._doc.addFont('assets/Roboto-Bold.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
+    this._doc.addFont('Roboto-Regular.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
+    this._doc.addFont('Roboto-Bold.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
     this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
 
     if (file.metadata && this._options.outputCoverPage) {
