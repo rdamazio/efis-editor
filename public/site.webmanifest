@@ -1,6 +1,9 @@
 {
   "name": "EFIS Editor",
-  "short_name": "efis-editor",
+  "short_name": "EFIS Editor",
+  "description": "Web-based editor for file formats used by modern EFIS avionics systems on aircraft",
+  "categories": ["productivity", "travel"],
+  "id": "./",
   "scope": "./",
   "start_url": "./",
   "icons": [
@@ -22,6 +25,22 @@
       "src": "icon-512-nomask.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "960x680",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Checklist editor screen"
+    },
+    {
+      "src": "screenshot-narrow.png",
+      "sizes": "833x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Checklist editor screen"
     }
   ],
   "theme_color": "#7b1fa2",
