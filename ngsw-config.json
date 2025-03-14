@@ -27,7 +27,12 @@
       "installMode": "lazy",
       "updateMode": "prefetch",
       "resources": {
-        "urls": ["https://fonts.googleapis.com/**", "https://fonts.gstatic.com/**", "https://ssl.gstatic.com/**"]
+        "urls": [
+          "https://apis.google.com/**",
+          "https://fonts.googleapis.com/**",
+          "https://fonts.gstatic.com/**",
+          "https://ssl.gstatic.com/**"
+        ]
       }
     },
     {
@@ -37,6 +42,18 @@
       "resources": {
         "files": ["/**/screenshot*.png"]
       }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "apis",
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 100,
+        "maxAge": "3d",
+        "timeout": "10s"
+      },
+      "urls": ["https://content.googleapis.com/**", "https://www.googleapis.com/**"]
     }
   ]
 }
