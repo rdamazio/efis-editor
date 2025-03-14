@@ -13,6 +13,7 @@ export class GoogleDriveApi {
   private static readonly API_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 
   private _loaded = false;
+  private readonly _loadedScripts: string[] = [];
 
   constructor(private readonly _injector: Injector) {}
 
@@ -60,13 +61,19 @@ export class GoogleDriveApi {
   }
 
   private async _loadScript(src: string): Promise<void> {
+    if (this._loadedScripts.includes(src)) return;
+
     return new Promise<void>((resolve, reject) => {
       const s = document.createElement('script');
-      s.src = src;
       s.onload = () => {
+        this._loadedScripts.push(src);
         resolve();
       };
-      s.onerror = reject;
+      s.onerror = (event: Event | string) => {
+        document.head.removeChild(s);
+        reject(new Error(`Failed to load script "${src}"`, { cause: event }));
+      };
+      s.src = src;
       document.head.appendChild(s);
     });
   }
