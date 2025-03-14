@@ -25,6 +25,12 @@ export enum DriveSyncState {
   FAILED = 4,
 }
 
+enum InitState {
+  NOT_INITIALIZED = 0,
+  INITIALIZING = 1,
+  INITIALIZED = 2,
+}
+
 type PostAuthFunction = () => Promise<void>;
 
 /** Represents a local deletion. */
@@ -84,6 +90,7 @@ export class GoogleDriveStorage {
   public static readonly CHECKLIST_EXTENSION = '.checklist';
   public static readonly LONG_SYNC_INTERVAL_MS = 60_000;
   public static readonly SHORT_SYNC_INTERVAL_MS = 10_000;
+  private static readonly INIT_RETRY_INTERVAL_MS = 30_000;
   private static readonly TOKEN_STORAGE_KEY = 'gdrive_token';
   private static readonly LOCAL_DELETIONS_STORAGE_KEY = 'local_deletions';
   private static readonly MAX_RETRIES = 3;
@@ -93,6 +100,8 @@ export class GoogleDriveStorage {
   private readonly _downloads$ = new Subject<string>();
   private readonly _errors$ = new Subject<string>();
   private readonly _destroyed = new EventEmitter<void>();
+  private _initialization?: Promise<void>;
+  private _initState = InitState.NOT_INITIALIZED;
   private _retryCount = 0;
   private _needsSync = false;
   private _lastChecklistList: string[] = [];
@@ -115,36 +124,67 @@ export class GoogleDriveStorage {
   }
 
   public async init() {
-    return Promise.all([this._api.load(), this._browserStorage]).then(async (all: [void, Storage]) => {
-      console.debug('SYNC: gDrive API initialized');
-      const store = all[1];
-      const token = store.getItem(GoogleDriveStorage.TOKEN_STORAGE_KEY) ?? undefined;
-      if (token) {
-        this._api.accessToken = token;
-      }
+    switch (this._initState) {
+      case InitState.NOT_INITIALIZED:
+        this._initState = InitState.INITIALIZING;
+        break;
+      case InitState.INITIALIZING:
+        // Don't double-initialize in race conditions.
+        return this._initialization;
+      case InitState.INITIALIZED:
+        return void 0;
+    }
 
-      return new Promise((resolve) => {
-        let first = true;
-        this._checklistStorage
-          .listChecklistFiles()
-          .pipe(takeUntil(this._destroyed))
-          .subscribe((checklists: string[]) => {
-            void this._onChecklistsUpdated(checklists).then(async () => {
-              // The above will trigger the first _needsSync, but if we're connected, we force a first
-              // immediate synchronization.
-              if (first) {
-                first = false;
-                if (token) {
-                  this._state$.next(DriveSyncState.NEEDS_SYNC);
-                  await this.synchronize();
+    this._initialization = Promise.all([this._api.load(), this._browserStorage])
+      .then(async (all: [void, Storage]) => {
+        console.debug('SYNC: gDrive API initialized');
+        // Note: we don't need to wait for the other promise below since it has no init failure paths.
+        this._initState = InitState.INITIALIZED;
+
+        const store = all[1];
+        const token = store.getItem(GoogleDriveStorage.TOKEN_STORAGE_KEY) ?? undefined;
+        if (token) {
+          this._api.accessToken = token;
+        }
+
+        return new Promise<void>((resolve) => {
+          let first = true;
+          this._checklistStorage
+            .listChecklistFiles()
+            .pipe(takeUntil(this._destroyed))
+            .subscribe((checklists: string[]) => {
+              void this._onChecklistsUpdated(checklists).then(async () => {
+                // The above will trigger the first _needsSync, but if we're connected, we force a first
+                // immediate synchronization.
+                if (first) {
+                  first = false;
+                  if (token) {
+                    this._state$.next(DriveSyncState.NEEDS_SYNC);
+                    await this.synchronize();
+                  }
+                  resolve(void 0);
                 }
-                resolve(void 0);
-              }
-              return void 0;
+                return void 0;
+              });
             });
-          });
+        });
+      })
+      .catch((reason: unknown): void => {
+        console.warn('SYNC: Failed to initialize gDrive API (will retry):', reason);
+        this._initState = InitState.NOT_INITIALIZED;
+
+        // For the case of spotty or no connectivity, we retry automatically - this way, if the user
+        // comes back online, we'll initialize it in the background automatically.
+        // If the user happens to force a sync before we do that, the other entry points will call
+        // into init(), and this call will become a NOP.
+        window.setTimeout(() => {
+          void this.init();
+        }, GoogleDriveStorage.INIT_RETRY_INTERVAL_MS);
+
+        // Still let the original operation fail for now.
+        throw new Error('Failed to initialize gDrive API');
       });
-    });
+    return this._initialization;
   }
 
   public destroy() {
@@ -205,6 +245,8 @@ export class GoogleDriveStorage {
   }
 
   public async deleteAllData(): Promise<void> {
+    await this.init();
+
     this._stopBackgroundSync();
 
     // Wait until we're not syncing anymore.
@@ -230,6 +272,7 @@ export class GoogleDriveStorage {
 
   public async disableSync(revokeToken: boolean) {
     console.debug('SYNC: Disabling');
+    await this.init();
 
     this._stopBackgroundSync();
 
@@ -248,6 +291,8 @@ export class GoogleDriveStorage {
   }
 
   public async synchronize() {
+    await this.init();
+
     if (this._state$.value === DriveSyncState.SYNCING) {
       console.error('SYNC: overlapping syncs');
       return;
