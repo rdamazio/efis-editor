@@ -21,6 +21,7 @@ This is a web-based editor for file formats used by modern EFIS avionics systems
 - Checklist metadata editing, including Garmin's default group/checklist
 - Keyboard shortcuts for navigation and editing
 - Renders (fake) live data in place of GRT tokens like %1% (see GRT user manual for all tokens)
+- Works offline
 - (optional) Google Drive™ synchronization
 
 ## Preview
@@ -96,6 +97,20 @@ and instead the version that was saved most recently wins.
 This works through the [Google Drive API](https://developers.google.com/drive/api/),
 and use of this feature is subject to the
 [Google Drive API Terms of Service](https://developers.google.com/drive/api/terms).
+
+## Offline use
+
+The editor is a PWA (Progressive Web App) and should load and work normally even if you have no
+Internet connection (except for Cloud synchronization, obviously). Entering/selecting the app's
+web address on your browser will simply work even without a connection.
+
+You can also install it as a browser/OS application so you can get a dedicated icon to launch it.
+How to install it is browser-specific - on Chrome, you can
+[click Install on the address bar](https://support.google.com/chrome/answer/9658361), while
+Safari lets you add a Home Screen icon
+([macOS instructions](https://support.apple.com/en-mide/104996) /
+[iOS instructions](https://support.apple.com/en-mide/guide/iphone/iph42ab2f3a7/ios) /
+[iPadOS instructions](https://support.apple.com/en-mide/guide/ipad/ipadc602b75b/ipados)).
 
 ## Disclaimer
 
