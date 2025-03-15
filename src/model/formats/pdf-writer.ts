@@ -155,8 +155,12 @@ export class PdfWriter {
       right: this._defaultPadding,
     };
 
-    this._doc.addFont('Roboto-Regular.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
-    this._doc.addFont('Roboto-Bold.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
+    // We have to fetch the font files ourselves to support offline mode, else jspdf will use its own
+    // service worker and skip our cache.
+    await Promise.all([
+      this._registerFont('Roboto-Regular.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE),
+      this._registerFont('Roboto-Bold.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE),
+    ]);
     this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
 
     if (file.metadata && this._options.outputCoverPage) {
@@ -171,6 +175,21 @@ export class PdfWriter {
     await this._addIcons();
 
     return this._doc.output('blob');
+  }
+
+  private async _registerFont(fileName: string, fontName: string, fontStyle: string) {
+    if (!this._doc) return;
+
+    const contents = await fetch(fileName).then(async (resp: Response) => {
+      if (!resp.ok) {
+        throw new Error(`Failed to fetch font'${fileName}'`);
+      }
+      return resp.bytes();
+    });
+
+    const contentsBase64 = Buffer.from(contents).toString('base64');
+    this._doc.addFileToVFS(fileName, contentsBase64);
+    this._doc.addFont(fileName, fontName, fontStyle);
   }
 
   private _pdfOptions(): jsPDFOptions {
