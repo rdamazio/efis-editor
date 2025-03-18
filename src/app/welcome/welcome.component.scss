@@ -20,12 +20,20 @@
   padding: 10px;
   border-radius: 10px;
   display: inline-flex;
+  color: #222;
   @include mat.elevation(5);
+}
+
+.callout a:link {
+  color: #43a047;
+}
+
+.callout a:visited {
+  color: #616161;
 }
 
 .danger {
   background-color: #faa; // Pun intended.
-  color: #222;
 }
 
 .important {
