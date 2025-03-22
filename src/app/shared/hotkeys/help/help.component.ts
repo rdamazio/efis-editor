@@ -23,10 +23,10 @@ export class HelpComponent {
     this.hotkeys = hotkeysService.getShortcuts();
   }
 
-  static toggleHelp(dialog: MatDialog) {
+  static toggleHelp(dialog: MatDialog): MatDialogRef<HelpComponent> | undefined {
     if (this._helpRef) {
       this._helpRef.close();
-      return;
+      return undefined;
     }
 
     this._helpRef = dialog.open(HelpComponent, { hasBackdrop: true, width: '500px' });
@@ -34,5 +34,7 @@ export class HelpComponent {
     this._helpRef.afterClosed().subscribe(() => {
       this._helpRef = undefined;
     });
+
+    return this._helpRef;
   }
 }

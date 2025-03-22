@@ -4,7 +4,9 @@ import { loadFile } from './test-utils';
 import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
 
-const GRT_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), GRT_FORMAT_OPTIONS).testCaseify(EXPECTED_CONTENTS);
+export const GRT_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), GRT_FORMAT_OPTIONS).testCaseify(
+  EXPECTED_CONTENTS,
+);
 
 describe('GrtFormat', () => {
   beforeAll(() => {

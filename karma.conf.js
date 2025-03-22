@@ -32,6 +32,14 @@ module.exports = function (config) {
       dir: require('path').join(__dirname, './coverage/efis-editor'),
       subdir: '.',
       reporters: [{ type: 'html' }, { type: 'text-summary' }],
+      check: {
+        global: {
+          statements: 80,
+          branches: 75,
+          functions: 80,
+          lines: 80,
+        },
+      },
     },
     files: [{ pattern: './public/**', included: false, served: true }],
     // If any files need to be served at the root directory (instead of /base/public), they'll need to be individually

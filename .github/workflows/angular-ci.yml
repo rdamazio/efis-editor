@@ -31,7 +31,7 @@ jobs:
         run: npm run build --if-present
       - name: Run tests
         # Attempt to re-run in case there's flakiness.
-        run: npm run test:headless || npm run test:headless
+        run: npm run test:coverage || npm run test:coverage
 
   lint:
     runs-on: ubuntu-latest

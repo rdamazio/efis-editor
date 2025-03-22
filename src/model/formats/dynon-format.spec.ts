@@ -4,7 +4,7 @@ import { loadFile } from './test-utils';
 import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
 
-const DYNON_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), DYNON_FORMAT_OPTIONS).testCaseify(
+export const DYNON_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), DYNON_FORMAT_OPTIONS).testCaseify(
   EXPECTED_CONTENTS,
 );
 
