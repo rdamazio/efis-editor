@@ -1,6 +1,9 @@
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 
+var minCoverage = 80;
+var minBranchCoverage = 75;
+
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -34,11 +37,17 @@ module.exports = function (config) {
       reporters: [{ type: 'html' }, { type: 'text-summary' }],
       check: {
         global: {
-          statements: 80,
-          branches: 75,
-          functions: 80,
-          lines: 80,
+          statements: minCoverage,
+          functions: minCoverage,
+          lines: minCoverage,
+          branches: minBranchCoverage,
         },
+      },
+      watermarks: {
+        statements: [minCoverage / 2, minCoverage],
+        functions: [minCoverage / 2, minCoverage],
+        lines: [minCoverage / 2, minCoverage],
+        branches: [minBranchCoverage / 2, minBranchCoverage],
       },
     },
     files: [{ pattern: './public/**', included: false, served: true }],
