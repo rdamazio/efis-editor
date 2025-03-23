@@ -1,19 +1,45 @@
 import { ComponentFixture } from '@angular/core/testing';
 
-import { render, screen, within } from '@testing-library/angular';
+import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { NavData } from './nav-data';
 import { NavComponent } from './nav.component';
+import { HotkeysService } from '@ngneat/hotkeys';
+import { HelpComponent } from '../shared/hotkeys/help/help.component';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { HarnessLoader } from '@angular/cdk/testing';
+import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('NavComponent', () => {
   let user: UserEvent;
+  let rendered: RenderResult<NavComponent>;
   let fixture: ComponentFixture<NavComponent>;
+  let loader: HarnessLoader;
   let navData: NavData;
+  let hotkeys: jasmine.SpyObj<HotkeysService>;
+  let toggleHelp: jasmine.Spy;
 
   beforeEach(async () => {
     user = userEvent.setup();
-    ({ fixture } = await render(NavComponent));
+    hotkeys = jasmine.createSpyObj<HotkeysService>('HotkeysService', ['getHotkeys', 'getShortcuts']);
+    hotkeys.getHotkeys.and.returnValue([]);
+    hotkeys.getShortcuts.and.returnValue([]);
+    toggleHelp = spyOn(HelpComponent, 'toggleHelp');
+
+    rendered = await render(NavComponent, {
+      imports: [MatDialogModule, NoopAnimationsModule],
+      providers: [
+        {
+          provide: HotkeysService,
+          useValue: hotkeys,
+        },
+      ],
+    });
+    fixture = rendered.fixture;
     navData = fixture.componentInstance.navData;
+    loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
   });
 
   it('should render', () => {
@@ -55,5 +81,59 @@ describe('NavComponent', () => {
     await user.type(editBox, 'Renamed file[Enter]');
 
     expect(navData.fileName()).toEqual('Renamed file');
+  });
+
+  it('should hide shortcuts icon when there are none', () => {
+    expect(screen.queryByRole('button', { name: 'Show keyboard shorcuts' })).not.toBeInTheDocument();
+  });
+
+  it('should show shortcuts help when they exist and are clicked', async () => {
+    hotkeys.getHotkeys.and.returnValue([
+      {
+        keys: 'shift.right',
+        description: 'Shift something right',
+        group: 'Main group',
+      },
+    ]);
+    hotkeys.getShortcuts.and.returnValue([
+      {
+        group: 'Main group',
+        hotkeys: [
+          {
+            keys: 'shift.right',
+            description: 'Shift something right',
+          },
+        ],
+      },
+    ]);
+    fixture.detectChanges();
+
+    const button = screen.getByRole('button', { name: 'Show keyboard shortcuts' });
+    expect(button).toBeVisible();
+
+    await user.click(button);
+    expect(toggleHelp).toHaveBeenCalledOnceWith(jasmine.any(MatDialog));
+  });
+
+  it('should show About dialog', async () => {
+    const sidenavToggle = screen.getByRole('button', { name: 'Toggle sidenav' });
+    expect(sidenavToggle).toBeVisible();
+    await user.click(sidenavToggle);
+
+    const aboutLink = await screen.findByText('About');
+    expect(aboutLink).toBeVisible();
+    await user.click(aboutLink);
+
+    let dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs).toHaveSize(1);
+
+    expect(screen.getByRole('img', { name: 'GitHub logo' })).toBeVisible();
+
+    const okButton = screen.getByRole('button', { name: 'Ok' });
+    expect(okButton).toBeVisible();
+    await user.click(okButton);
+
+    dialogs = await loader.getAllHarnesses(MatDialogHarness);
+    expect(dialogs).toHaveSize(0);
   });
 });

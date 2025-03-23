@@ -55,10 +55,6 @@ export class NavComponent {
   }
 
   showKeyboardShortcuts() {
-    if (this._hotkeys.getHotkeys().length === 0) {
-      return;
-    }
-
     HelpComponent.toggleHelp(this._dialog);
   }
 }
