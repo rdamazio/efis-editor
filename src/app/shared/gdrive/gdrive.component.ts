@@ -76,7 +76,7 @@ export class GoogleDriveComponent implements OnInit, OnDestroy {
         this.disconnectCloudDisabled = true;
         this.needsConnectDialog = true;
         this.cloudIcon = 'cloud_off';
-        this.cloudIconTooltip = 'Google drive disconnected. Click to connect and synchronize.';
+        this.cloudIconTooltip = 'Google Drive disconnected. Click to connect and synchronize.';
         break;
       case DriveSyncState.SYNCING:
         this.cloudIconDisabled = true;
