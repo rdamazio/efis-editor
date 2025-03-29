@@ -1,10 +1,6 @@
 import { v4 as uuidV4 } from 'uuid';
 import { ChecklistItem_Type } from '../../../gen/ts/checklist';
-
-enum KeyUsage {
-  ENCRYPT = 'encrypt',
-  DECRYPT = 'decrypt',
-}
+import { CryptoUtils } from './crypto-utils';
 
 interface PartialChecklistItem {
   type: ChecklistItem_Type;
@@ -24,12 +20,7 @@ export class ForeFlightUtils {
   public static readonly ITEM_HEADER = 'comment';
   public static readonly NOTE_INDENT = 1;
 
-  private static readonly CIPHER_TYPE = 'AES-CBC';
-  private static readonly CIPHER_BLOCK_SIZE = 16;
   private static readonly CIPHER_KEY = Buffer.from('81e06e41a93f3848', 'ascii');
-
-  private static readonly ENCODER = new TextEncoder();
-  private static readonly DECODER = new TextDecoder();
 
   public static readonly CHECKLIST_ITEM_PREFIXES = new Map([
     [ChecklistItem_Type.ITEM_PLAINTEXT, ''],
@@ -58,38 +49,15 @@ export class ForeFlightUtils {
       : { type: ChecklistItem_Type.ITEM_PLAINTEXT, prompt: prompt };
   }
 
-  private static async _getKey(keyUsage: KeyUsage): Promise<CryptoKey> {
-    return window.crypto.subtle.importKey(
-      'raw',
-      ForeFlightUtils.CIPHER_KEY,
-      { name: ForeFlightUtils.CIPHER_TYPE },
-      false,
-      [keyUsage],
-    );
-  }
-
   public static async decrypt(stream: ArrayBuffer): Promise<string> {
-    const decrypted = await window.crypto.subtle.decrypt(
-      { name: ForeFlightUtils.CIPHER_TYPE, iv: new Uint8Array(stream.slice(0, ForeFlightUtils.CIPHER_BLOCK_SIZE)) },
-      await ForeFlightUtils._getKey(KeyUsage.DECRYPT),
-      new Uint8Array(stream.slice(ForeFlightUtils.CIPHER_BLOCK_SIZE)),
-    );
-    return ForeFlightUtils.DECODER.decode(new Uint8Array(decrypted));
+    const iv = new Uint8Array(stream.slice(0, CryptoUtils.CIPHER_BLOCK_SIZE));
+    const data = stream.slice(CryptoUtils.CIPHER_BLOCK_SIZE);
+    return await CryptoUtils.decryptText(ForeFlightUtils.CIPHER_KEY, iv, data);
   }
 
-  public static async encrypt(data: string): Promise<Blob> {
-    const iv = window.crypto.getRandomValues(new Uint8Array(ForeFlightUtils.CIPHER_BLOCK_SIZE));
-    return new Blob(
-      [
-        iv,
-        await window.crypto.subtle.encrypt(
-          { name: ForeFlightUtils.CIPHER_TYPE, iv: iv },
-          await ForeFlightUtils._getKey(KeyUsage.ENCRYPT),
-          ForeFlightUtils.ENCODER.encode(data),
-        ),
-      ],
-      { type: 'application/octet-stream' },
-    );
+  public static async encrypt(text: string): Promise<Blob> {
+    const iv = window.crypto.getRandomValues(new Uint8Array(CryptoUtils.CIPHER_BLOCK_SIZE));
+    return CryptoUtils.toBlob([iv, await CryptoUtils.encryptText(ForeFlightUtils.CIPHER_KEY, iv, text)]);
   }
 
   /**
