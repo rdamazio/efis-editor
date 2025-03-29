@@ -56,9 +56,7 @@ export class ChecklistStorage {
     if (!file.metadata?.name) {
       throw new Error('Must specify checklist file name in metadata.');
     }
-    if (!mtime) {
-      mtime = new Date();
-    }
+    mtime ??= new Date();
     file.metadata.modifiedTime = Math.floor(mtime.valueOf() / 1000);
 
     const blob = JsonFormat.fromProto(file);

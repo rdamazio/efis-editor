@@ -175,24 +175,22 @@ export class GoogleDriveApi {
     mtime: Date,
     contents: string,
   ): Promise<void> {
-    if (!existingId) {
-      existingId = await gapi.client.drive.files
-        .create({
-          resource: {
-            name: name,
-            mimeType: mimeType,
-            // Set a modified time in the past so that, if the upload step fails, we try to upload
-            // again (instead of keeping the create time which may be newer than the file's local
-            // mtime, and would result in us downloading it).
-            modifiedTime: '1970-01-01T00:00:00Z',
-            parents: ['appDataFolder'],
-          },
-        })
-        .then((resp: gapi.client.Response<gapi.client.drive.File>) => {
-          console.debug('GDRIVE: Created file', resp);
-          return resp.result.id;
-        });
-    }
+    existingId ??= await gapi.client.drive.files
+      .create({
+        resource: {
+          name: name,
+          mimeType: mimeType,
+          // Set a modified time in the past so that, if the upload step fails, we try to upload
+          // again (instead of keeping the create time which may be newer than the file's local
+          // mtime, and would result in us downloading it).
+          modifiedTime: '1970-01-01T00:00:00Z',
+          parents: ['appDataFolder'],
+        },
+      })
+      .then((resp: gapi.client.Response<gapi.client.drive.File>) => {
+        console.debug('GDRIVE: Created file', resp);
+        return resp.result.id;
+      });
 
     const metadata: gapi.client.drive.File = {
       modifiedTime: mtime.toISOString(),

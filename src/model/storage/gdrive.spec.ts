@@ -102,9 +102,7 @@ describe('GoogleDriveApi', () => {
   }
 
   function newFile(name: string, modifiedTime?: Date, mimeType?: string): gapi.client.drive.File {
-    if (!modifiedTime) {
-      modifiedTime = FAKE_NOW;
-    }
+    modifiedTime ??= FAKE_NOW;
     const fileId = fileIdForName(name);
     if (!mimeType || mimeType === GoogleDriveStorage.CHECKLIST_MIME_TYPE) {
       mimeType = GoogleDriveStorage.CHECKLIST_MIME_TYPE;
