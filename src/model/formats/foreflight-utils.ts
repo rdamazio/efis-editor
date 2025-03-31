@@ -12,8 +12,6 @@ function swap<T1, T2>([a, b]: [T1, T2]): [T2, T1] {
 }
 
 export class ForeFlightUtils {
-  public static readonly FILE_EXTENSION = 'fmd';
-
   public static readonly CONTAINER_TYPE = 'checklist';
   public static readonly SCHEMA_VERSION = '1.0';
 

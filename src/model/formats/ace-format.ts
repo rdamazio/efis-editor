@@ -1,14 +1,15 @@
 import { ChecklistFile } from '../../../gen/ts/checklist';
 import { AceReader } from './ace-reader';
 import { AceWriter } from './ace-writer';
+import { AbstractChecklistFormat } from './abstract-format';
 
-export class AceFormat {
-  public static async toProto(file: File): Promise<ChecklistFile> {
+export class AceFormat extends AbstractChecklistFormat {
+  public async toProto(file: File): Promise<ChecklistFile> {
     return new AceReader(file).read();
   }
 
-  public static async fromProto(file: ChecklistFile): Promise<File> {
+  public async fromProto(file: ChecklistFile): Promise<File> {
     const blob = await new AceWriter().write(file);
-    return new File([blob], file.metadata!.name + '.ace');
+    return new File([blob], `${file.metadata!.name}.${this.extension}`);
   }
 }

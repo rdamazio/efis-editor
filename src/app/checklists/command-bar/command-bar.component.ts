@@ -8,10 +8,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
 import { TitleDialogComponent } from '../dialogs/title-dialog/title-dialog.component';
 
-export interface DownloadFormat {
-  id: string;
-  name: string;
-}
+import { OutputFormat } from '../../../model/formats/abstract-format';
+import { FormatId } from '../../../model/formats/format-id';
 
 @Component({
   selector: 'checklist-command-bar',
@@ -20,13 +18,15 @@ export interface DownloadFormat {
   styleUrl: './command-bar.component.scss',
 })
 export class ChecklistCommandBarComponent {
+  protected readonly _formatIdPdf = FormatId.PDF;
+
   readonly hasFiles = input.required<boolean>();
   readonly fileIsOpen = input.required<boolean>();
-  readonly downloadFormats = input.required<DownloadFormat[]>();
+  readonly downloadFormats = input.required<OutputFormat[]>();
   readonly newFile = output<string>(); // Emits filename
   readonly openFile = output<boolean>();
   readonly uploadFile = output<boolean>();
-  readonly downloadFile = output<string>();
+  readonly downloadFile = output<FormatId>();
   readonly deleteFile = output<boolean>();
   readonly fileInfo = output<boolean>();
 

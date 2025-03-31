@@ -12,16 +12,7 @@
           (downloadFile)="onDownloadFile($event)"
           (deleteFile)="onDeleteFile()"
           (fileInfo)="onFileInfo()"
-          [downloadFormats]="[
-            { id: 'ace', name: 'Garmin G3X/GTN [.ace]' },
-            { id: 'dynon', name: 'Dynon - no wrapping [.txt]' },
-            { id: 'dynon31', name: 'Dynon - 40% / 31 columns [.txt]' },
-            { id: 'dynon40', name: 'Dynon - 50% / 40 columns [.txt]' },
-            { id: 'afs', name: 'Advanced Flight Systems [.afd]' },
-            { id: 'grt', name: 'GRT [.txt]' },
-            { id: 'fmd', name: 'ForeFlight [.fmd]' },
-            { id: 'json', name: 'Raw data [.json]' },
-          ]"
+          [downloadFormats]="_downloadFormats"
         />
         <checklist-file-picker
           [selectedFile]="selectedFile?.metadata?.name ?? ''"

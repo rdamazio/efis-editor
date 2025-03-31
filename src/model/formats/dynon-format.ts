@@ -1,10 +1,12 @@
 import { ChecklistFile } from '../../../gen/ts/checklist';
-import { TextFormatOptions } from './text-format-options';
+import { AbstractChecklistFormat, FileExtension, FormatOptions } from './abstract-format';
+import { FormatId } from './format-id';
+import { TextFormatOptions, TXT_EXTENSION } from './text-format-options';
 import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
 
 export const DYNON_FORMAT_OPTIONS: TextFormatOptions = {
-  fileExtensions: ['.txt', '.afd'],
+  fileExtensions: [],
   indentWidth: 2,
   allUppercase: true,
   checklistTopBlankLine: true,
@@ -27,15 +29,35 @@ export const DYNON_FORMAT_OPTIONS: TextFormatOptions = {
   commentPrefix: '#',
 };
 
-export class DynonFormat {
-  public static async toProto(file: File): Promise<ChecklistFile> {
-    return new TextReader(file, DYNON_FORMAT_OPTIONS).read();
+export interface DynonFormatOptions extends FormatOptions {
+  fileName?: string;
+  maxLineLength?: number;
+}
+
+export class DynonFormat extends AbstractChecklistFormat<DynonFormatOptions> {
+  private readonly _textFormatOptions: TextFormatOptions;
+  private readonly _fileName: string;
+
+  constructor(formatId: FormatId, name: string, args?: DynonFormatOptions) {
+    super(formatId, name, args);
+    this._textFormatOptions = Object.assign({}, DYNON_FORMAT_OPTIONS);
+    this._textFormatOptions.maxLineLength = args?.maxLineLength;
+    this._textFormatOptions.fileExtensions = [this.extension];
+    this._fileName = args?.fileName ?? `checklist.${this.extension}`;
   }
 
-  public static fromProto(file: ChecklistFile, fileName: string, maxLineLength?: number): File {
-    const options = Object.assign({}, DYNON_FORMAT_OPTIONS);
-    options.maxLineLength = maxLineLength;
-    const blob = new TextWriter(options).write(file);
-    return new File([blob], fileName);
+  public override get extension(): FileExtension {
+    return this._extension ?? TXT_EXTENSION;
+  }
+
+  public async toProto(file: File): Promise<ChecklistFile> {
+    return new TextReader(file, this._textFormatOptions).read();
+  }
+
+  public async fromProto(file: ChecklistFile): Promise<File> {
+    const blob = new TextWriter(this._textFormatOptions).write(file);
+    return new Promise((resolve) => {
+      resolve(new File([blob], this._fileName));
+    });
   }
 }

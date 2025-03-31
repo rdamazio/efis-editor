@@ -44,7 +44,7 @@ describe('ForeFlightFormat', () => {
 
   describe('ForeFlightReader', () => {
     it('should determine correct checklist metadata', () => {
-      const mockFile = new File([], `bar.${ForeFlightUtils.FILE_EXTENSION}`);
+      const mockFile = new File([], 'bar.fmd');
       expect(ForeFlightReader.getChecklistMetadata(mockFile, ForeFlightChecklistMetadata.create())).toEqual(
         ChecklistFileMetadata.create({ name: 'bar' }),
       );

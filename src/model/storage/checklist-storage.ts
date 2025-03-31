@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
-import { JsonFormat } from '../formats/json-format';
+import { FormatId } from '../formats/format-id';
+import { FORMAT_REGISTRY } from '../formats/format-registry';
 import { LazyBrowserStorage } from './browser-storage';
 
 const CHECKLIST_PREFIX = 'checklists:';
 
 @Injectable({ providedIn: 'root' })
 export class ChecklistStorage {
+  private readonly _jsonFormat = FORMAT_REGISTRY.getFormat(FormatId.JSON);
+
   constructor(private readonly _browserStorage: LazyBrowserStorage) {
     _browserStorage.storage
       .then((store: Storage) => {
@@ -39,7 +42,7 @@ export class ChecklistStorage {
     const store = await this._browserStorage.storage;
     const blob = store.getItem(CHECKLIST_PREFIX + id);
     if (blob) {
-      return JsonFormat.toProto(new File([blob], id)).then(async (checklist: ChecklistFile) => {
+      return this._jsonFormat.toProto(new File([blob], id)).then(async (checklist: ChecklistFile) => {
         if (!checklist.metadata?.modifiedTime) {
           // If checklist didn't have mtime, save it to add it now.
           await this.saveChecklistFile(checklist);
@@ -59,7 +62,7 @@ export class ChecklistStorage {
     mtime ??= new Date();
     file.metadata.modifiedTime = Math.floor(mtime.valueOf() / 1000);
 
-    const blob = JsonFormat.fromProto(file);
+    const blob = await this._jsonFormat.fromProto(file);
     store.setItem(CHECKLIST_PREFIX + file.metadata.name, await blob.text());
     this._publishList(store);
   }

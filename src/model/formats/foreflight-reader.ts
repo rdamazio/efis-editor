@@ -17,6 +17,7 @@ import {
 } from '../../../gen/ts/foreflight';
 import { ForeFlightFormatError } from './foreflight-format';
 import { ForeFlightUtils } from './foreflight-utils';
+import { FormatId } from './format-id';
 
 export class ForeFlightReader {
   public static async read(file: File): Promise<ChecklistFile> {
@@ -46,7 +47,7 @@ export class ForeFlightReader {
   public static getChecklistMetadata(file: File, metadata: ForeFlightChecklistMetadata): ChecklistFileMetadata {
     return ChecklistFileMetadata.create({
       // eslint-disable-next-line  @typescript-eslint/prefer-nullish-coalescing
-      name: metadata.name || file.name.replace(new RegExp(`\\.${ForeFlightUtils.FILE_EXTENSION}$`), ''),
+      name: metadata.name || file.name.replace(new RegExp(`\\.${FormatId.FOREFLIGHT}$`), ''),
       aircraftInfo: metadata.tailNumber,
       makeAndModel: metadata.detail,
     });

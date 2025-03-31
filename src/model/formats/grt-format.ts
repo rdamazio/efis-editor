@@ -1,10 +1,11 @@
 import { ChecklistFile } from '../../../gen/ts/checklist';
-import { TextFormatOptions } from './text-format-options';
+import { TXT_EXTENSION, TextFormatOptions } from './text-format-options';
 import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
+import { AbstractChecklistFormat } from './abstract-format';
 
 export const GRT_FORMAT_OPTIONS: TextFormatOptions = {
-  fileExtensions: ['.txt'],
+  fileExtensions: [`.${TXT_EXTENSION}`],
   indentWidth: 2,
 
   checklistPrefix: 'LIST',
@@ -22,13 +23,13 @@ export const GRT_FORMAT_OPTIONS: TextFormatOptions = {
   outputMetadata: true,
 };
 
-export class GrtFormat {
-  public static async toProto(file: File): Promise<ChecklistFile> {
+export class GrtFormat extends AbstractChecklistFormat {
+  public async toProto(file: File): Promise<ChecklistFile> {
     return new TextReader(file, GRT_FORMAT_OPTIONS).read();
   }
 
-  public static fromProto(file: ChecklistFile): File {
+  public async fromProto(file: ChecklistFile): Promise<File> {
     const blob = new TextWriter(GRT_FORMAT_OPTIONS).write(file);
-    return new File([blob], 'checklist.txt');
+    return Promise.resolve(new File([blob], `checklist.${TXT_EXTENSION}`));
   }
 }

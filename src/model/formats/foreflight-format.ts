@@ -2,8 +2,9 @@ import { ChecklistFile } from '../../../gen/ts/checklist';
 
 import { FormatError } from './error';
 import { ForeFlightReader } from './foreflight-reader';
-import { ForeFlightUtils } from './foreflight-utils';
 import { ForeFlightWriter } from './foreflight-writer';
+
+import { AbstractChecklistFormat } from './abstract-format';
 
 export class ForeFlightFormatError extends FormatError {
   constructor(message: string, cause?: Error) {
@@ -35,13 +36,13 @@ export class ForeFlightFormatError extends FormatError {
  *
  *   Multiline ForeFlight notes are expanded as multiple indented text elements.
  */
-export class ForeFlightFormat {
-  public static async toProto(file: File): Promise<ChecklistFile> {
+export class ForeFlightFormat extends AbstractChecklistFormat {
+  public async toProto(file: File): Promise<ChecklistFile> {
     return ForeFlightReader.read(file);
   }
 
-  public static async fromProto(file: ChecklistFile): Promise<File> {
+  public async fromProto(file: ChecklistFile): Promise<File> {
     const blob = await ForeFlightWriter.write(file);
-    return new File([blob], `${file.metadata!.name}.${ForeFlightUtils.FILE_EXTENSION}`);
+    return new File([blob], `${file.metadata!.name}.${this.extension}`);
   }
 }

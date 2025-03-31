@@ -1,7 +1,7 @@
 <div class="file-upload">
   <ngx-file-drop
     #drop
-    accept=".ace, .txt, .afd, .json, .fmd"
+    [accept]="_acceptExtensions"
     [directory]="false"
     [multiple]="false"
     [showBrowseBtn]="false"

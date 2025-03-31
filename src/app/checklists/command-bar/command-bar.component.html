@@ -38,7 +38,7 @@
     matTooltip="Print file"
     aria-label="Print file"
     [disabled]="!fileIsOpen()"
-    (click)="downloadFile.emit('pdf')"
+    (click)="downloadFile.emit(_formatIdPdf)"
   >
     <mat-icon>print</mat-icon>
   </button>

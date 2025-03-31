@@ -11,6 +11,7 @@ import {
 } from '../../../gen/ts/checklist';
 import * as AceConstants from './ace-constants';
 import { FormatError } from './error';
+import { FormatId } from './format-id';
 
 export class AceReader {
   private static readonly ENCODING = 'latin1'; // equivalent to ISO-8859-1
@@ -42,7 +43,7 @@ export class AceReader {
     let name = this._readLine();
     if (!name) {
       name = this._file.name;
-      if (name.toLowerCase().endsWith('.ace') && name.length > 4) {
+      if (name.toLowerCase().endsWith(`.${FormatId.ACE}`) && name.length > 4) {
         name = name.slice(0, -4);
       }
     }

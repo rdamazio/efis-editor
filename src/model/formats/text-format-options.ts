@@ -9,6 +9,8 @@ export const DEFAULT_FIRST_GROUP = 'Main group';
 export const HEADER_COMMENT = '# CHECKLIST EXPORTED FROM https://github.com/rdamazio/efis-editor/';
 export const LAST_UPDATED_FOOTER = 'Last updated ';
 
+export const TXT_EXTENSION = 'txt';
+
 export interface TextFormatOptions {
   // Extensions that this format can parse.
   fileExtensions: string[];

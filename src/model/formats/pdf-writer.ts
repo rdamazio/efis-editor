@@ -10,6 +10,7 @@ import {
   ChecklistItem,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
+import { ExportOptions } from './abstract-format';
 import { FormatError } from './error';
 
 type OrientationType = jsPDFOptions['orientation'];
@@ -23,7 +24,7 @@ interface CellPaddingInputStructured {
   left?: number;
 }
 
-export interface PdfWriterOptions {
+export interface PdfWriterOptions extends ExportOptions {
   orientation?: OrientationType;
 
   // Must be a valid page size string, or 'custom'.

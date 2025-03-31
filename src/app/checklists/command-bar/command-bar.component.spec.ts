@@ -4,11 +4,14 @@ import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatMenuHarness } from '@angular/material/menu/testing';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
-import { ChecklistCommandBarComponent, DownloadFormat } from './command-bar.component';
+import { ChecklistCommandBarComponent } from './command-bar.component';
 
-const DOWNLOAD_FORMATS: DownloadFormat[] = [
-  { id: 'foo', name: 'Foobar' },
-  { id: 'baz', name: 'Baz' },
+import { OutputFormat } from '../../../model/formats/abstract-format';
+import { FormatId } from '../../../model/formats/format-id';
+
+const DOWNLOAD_FORMATS: OutputFormat[] = [
+  { id: FormatId.ACE, name: 'Foobar', description: 'Foo bar format', supportsImport: true, extension: FormatId.ACE },
+  { id: FormatId.DYNON, name: 'Baz', description: 'Baz format', supportsImport: true, extension: FormatId.DYNON },
 ];
 
 describe('ChecklistCommandBarComponent', () => {
@@ -149,7 +152,7 @@ describe('ChecklistCommandBarComponent', () => {
     expect(formatButton).toBeVisible();
     await user.click(formatButton);
 
-    expect(downloadFile).toHaveBeenCalledOnceWith('foo');
+    expect(downloadFile).toHaveBeenCalledOnceWith(FormatId.ACE);
   });
 
   it('should emit when Delete is clicked', async () => {

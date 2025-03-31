@@ -25,16 +25,11 @@ import {
   ChecklistGroup_Category,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
-import { AceFormat } from '../../model/formats/ace-format';
-import { DynonFormat } from '../../model/formats/dynon-format';
-import { FormatError } from '../../model/formats/error';
-import { ForeFlightFormat } from '../../model/formats/foreflight-format';
-import { GrtFormat } from '../../model/formats/grt-format';
-import { JsonFormat } from '../../model/formats/json-format';
-import { PdfFormat } from '../../model/formats/pdf-format';
-import { PdfWriterOptions } from '../../model/formats/pdf-writer';
+import { FormatId } from '../../model/formats/format-id';
+import { FORMAT_REGISTRY, serializeChecklistFile } from '../../model/formats/format-registry';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { GoogleDriveStorage } from '../../model/storage/gdrive';
+import { PreferenceStorage } from '../../model/storage/preference-storage';
 import { NavData } from '../nav/nav-data';
 import { HotkeyRegistar, HotkeyRegistree, HotkeyRegistry } from '../shared/hotkeys/hotkey-registration';
 import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
@@ -45,7 +40,6 @@ import { PrintDialogComponent } from './dialogs/print-dialog/print-dialog.compon
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
-import { PreferenceStorage } from '../../model/storage/preference-storage';
 
 interface ParsedFragment {
   fileName?: string;
@@ -71,6 +65,8 @@ interface ParsedFragment {
   styleUrl: './checklists.component.scss',
 })
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, HotkeyRegistree {
+  protected readonly _downloadFormats = FORMAT_REGISTRY.getSupportedOutputFormats();
+
   static readonly NEW_ITEM_SHORTCUTS = [
     { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
     { secondKey: 'c', typeDescription: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
@@ -511,40 +507,16 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     this._notifyComplete();
   }
 
-  async onDownloadFile(formatId: string) {
+  async onDownloadFile(formatId: FormatId) {
     this.showFilePicker = false;
     this.showFileUpload = false;
 
     if (!this.selectedFile) return;
 
-    let file: Promise<File> | File;
-    if (formatId === 'ace') {
-      file = AceFormat.fromProto(this.selectedFile);
-    } else if (formatId === 'json') {
-      file = JsonFormat.fromProto(this.selectedFile);
-    } else if (formatId === 'afs') {
-      file = DynonFormat.fromProto(this.selectedFile, 'CHKLST.AFD');
-    } else if (formatId === 'dynon') {
-      file = DynonFormat.fromProto(this.selectedFile, 'checklist.txt');
-    } else if (formatId === 'dynon31') {
-      file = DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 31);
-    } else if (formatId === 'dynon40') {
-      file = DynonFormat.fromProto(this.selectedFile, 'checklist.txt', 40);
-    } else if (formatId === 'grt') {
-      file = GrtFormat.fromProto(this.selectedFile);
-    } else if (formatId === 'fmd') {
-      file = ForeFlightFormat.fromProto(this.selectedFile);
-    } else if (formatId === 'pdf') {
-      file = PrintDialogComponent.show(this._dialog, this._prefs).then(
-        async (options?: PdfWriterOptions): Promise<File> => {
-          if (options) {
-            return PdfFormat.fromProto(this.selectedFile!, options);
-          }
-          throw new Error('PDF dialog cancelled');
-        },
-      );
-    } else {
-      file = Promise.reject(new FormatError(`Unknown format "${formatId}"`));
+    const pdfRequested = formatId === FormatId.PDF;
+    const pdfOptions = pdfRequested ? await PrintDialogComponent.show(this._dialog, this._prefs) : undefined;
+    if (pdfRequested && pdfOptions === undefined) {
+      throw new Error('PDF options dialog cancelled');
     }
 
     // Some format generations, notably PDF, can take a while - show a spinner.
@@ -556,7 +528,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
           () => {
             const fn = async () => {
               try {
-                const f = await file;
+                const f = await serializeChecklistFile(this.selectedFile!, formatId, pdfOptions);
                 saveAs(f, f.name);
               } finally {
                 await this._spinner.hide(this._downloadSpinner);
