@@ -13,7 +13,7 @@
     <mat-card class="filetype-card">
       <mat-card-header>
         <mat-card-title>Checklists</mat-card-title>
-        <mat-card-subtitle>(e.g .ace, .txt, .afd, .fmd)</mat-card-subtitle>
+        <mat-card-subtitle>(e.g {{ _formatRegistry.getSupportedInputExtensions() }})</mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
@@ -26,12 +26,14 @@
         </p>
         <p>Currently supported import/export formats:</p>
         <ul>
-          <li>Garmin G3X&trade;/GTN&trade; (.ace)</li>
-          <li>Dynon SkyView&trade; - multiple width options (.txt)</li>
-          <li>Advanced Flight Systems (.afd)</li>
-          <li>Grand Rapids Technology (.txt)</li>
-          <li>Boeing ForeFlight (.fmd)</li>
-          <li>Printable (.pdf) - export only</li>
+          @for (format of _formatRegistry.getSupportedOutputFormats(); track format.id) {
+            <li>
+              {{ format.description }} (.{{ format.extension }})
+              @if (!format.supportsImport) {
+                - export only
+              }
+            </li>
+          }
         </ul>
         <p>Not all avionics systems support all the features of this editor.</p>
       </mat-card-content>
