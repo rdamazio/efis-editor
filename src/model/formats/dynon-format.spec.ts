@@ -4,7 +4,7 @@ import { EXPECTED_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
 import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
-import { FORMAT_REGISTRY } from './format-registry';
+import { FORMAT_REGISTRY, parseChecklistFile } from './format-registry';
 
 export const DYNON_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), DYNON_FORMAT_OPTIONS).testCaseify(
   EXPECTED_CONTENTS,
@@ -30,10 +30,8 @@ describe('DynonFormat', () => {
   });
 
   async function testWriteRead(fileName: string, formatId: FormatId): Promise<void> {
-    const readFormat = FORMAT_REGISTRY.getFormat(FormatId.DYNON);
-
     const f = await loadFile('/model/formats/' + fileName, 'test.txt');
-    const readFile = await readFormat.toProto(f);
+    const readFile = await parseChecklistFile(f);
     expect(readFile).toEqual(DYNON_EXPECTED_CONTENTS);
 
     // Now write the file back.
