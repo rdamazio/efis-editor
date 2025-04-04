@@ -1,10 +1,15 @@
 import { ChecklistFile } from '../../../gen/ts/checklist';
 import { FormatId } from './format-id';
 
-export type FileExtension = string;
+// https://github.com/microsoft/TypeScript/issues/44268
+function toLowerCase<T extends string>(str: T) {
+  return str.toLowerCase() as Lowercase<T>;
+}
+
+export type FileExtension = `.${Lowercase<string>}`;
 
 export function getFileExtension(fileName: string): FileExtension {
-  return fileName.slice(fileName.lastIndexOf('.') + 1).toLowerCase();
+  return `.${toLowerCase(fileName.slice(fileName.lastIndexOf('.') + 1))}`;
 }
 
 export interface FormatOptions {
@@ -34,7 +39,7 @@ export abstract class AbstractChecklistFormat<T extends FormatOptions = FormatOp
   }
 
   public get extension(): FileExtension {
-    return this._extension ?? this._formatId;
+    return this._extension ?? `.${this._formatId}`;
   }
 
   public abstract toProto(file: File): Promise<ChecklistFile>;

@@ -43,6 +43,6 @@ export class ForeFlightFormat extends AbstractChecklistFormat {
 
   public async fromProto(file: ChecklistFile): Promise<File> {
     const blob = await ForeFlightWriter.write(file);
-    return new File([blob], `${file.metadata!.name}.${this.extension}`);
+    return new File([blob], `${file.metadata!.name}${this.extension}`);
   }
 }

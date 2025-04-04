@@ -15,6 +15,6 @@ export class JsonFormat extends AbstractChecklistFormat {
 
   public async fromProto(file: ChecklistFile): Promise<File> {
     const contents = ChecklistFile.toJsonString(file, { prettySpaces: 2 });
-    return Promise.resolve(new File([contents], `${file.metadata!.name}.${this.extension}`));
+    return Promise.resolve(new File([contents], `${file.metadata!.name}${this.extension}`));
   }
 }

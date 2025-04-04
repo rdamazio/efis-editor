@@ -10,6 +10,6 @@ export class AceFormat extends AbstractChecklistFormat {
 
   public async fromProto(file: ChecklistFile): Promise<File> {
     const blob = await new AceWriter().write(file);
-    return new File([blob], `${file.metadata!.name}.${this.extension}`);
+    return new File([blob], `${file.metadata!.name}${this.extension}`);
   }
 }

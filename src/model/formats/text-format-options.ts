@@ -1,3 +1,5 @@
+import { FileExtension } from './abstract-format';
+
 export const WRAP_PREFIX = '| ';
 export const METADATA_CHECKLIST_TITLE = 'Checklist Info';
 export const METADATA_FILE_TITLE = 'Checklist file:';
@@ -9,7 +11,7 @@ export const DEFAULT_FIRST_GROUP = 'Main group';
 export const HEADER_COMMENT = '# CHECKLIST EXPORTED FROM https://github.com/rdamazio/efis-editor/';
 export const LAST_UPDATED_FOOTER = 'Last updated ';
 
-export const TXT_EXTENSION = 'txt';
+export const TXT_EXTENSION: FileExtension = '.txt';
 
 export interface TextFormatOptions {
   // Extensions that this format can parse.

@@ -28,7 +28,7 @@
         <ul>
           @for (format of _formatRegistry.getSupportedOutputFormats(); track format.id) {
             <li>
-              {{ format.description }} (.{{ format.extension }})
+              {{ format.name }} ({{ format.extension }})
               @if (!format.supportsImport) {
                 - export only
               }

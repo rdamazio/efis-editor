@@ -26,7 +26,7 @@
   <mat-menu #downloadMenu>
     @for (format of downloadFormats; track format.id) {
       <button mat-menu-item [attr.aria-label]="'Download as ' + format.name" (click)="downloadFile.emit(format.id)">
-        {{ format.name }} [.{{ format.extension }}]
+        {{ format.name }} [{{ format.extension }}]
       </button>
     }
   </mat-menu>

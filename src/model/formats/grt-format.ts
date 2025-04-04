@@ -5,7 +5,7 @@ import { TextWriter } from './text-writer';
 import { AbstractChecklistFormat } from './abstract-format';
 
 export const GRT_FORMAT_OPTIONS: TextFormatOptions = {
-  fileExtensions: [`.${TXT_EXTENSION}`],
+  fileExtensions: [TXT_EXTENSION],
   indentWidth: 2,
 
   checklistPrefix: 'LIST',
@@ -30,6 +30,6 @@ export class GrtFormat extends AbstractChecklistFormat {
 
   public async fromProto(file: ChecklistFile): Promise<File> {
     const blob = new TextWriter(GRT_FORMAT_OPTIONS).write(file);
-    return Promise.resolve(new File([blob], `checklist.${TXT_EXTENSION}`));
+    return Promise.resolve(new File([blob], `checklist${TXT_EXTENSION}`));
   }
 }

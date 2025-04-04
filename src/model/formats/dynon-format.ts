@@ -43,7 +43,7 @@ export class DynonFormat extends AbstractChecklistFormat<DynonFormatOptions> {
     this._textFormatOptions = Object.assign({}, DYNON_FORMAT_OPTIONS);
     this._textFormatOptions.maxLineLength = args?.maxLineLength;
     this._textFormatOptions.fileExtensions = [this.extension];
-    this._fileName = args?.fileName ?? `checklist.${this.extension}`;
+    this._fileName = args?.fileName ?? `checklist${this.extension}`;
   }
 
   public override get extension(): FileExtension {

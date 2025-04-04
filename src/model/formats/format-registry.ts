@@ -53,15 +53,12 @@ class FormatRegistry {
     return format;
   }
 
-  public getFormatsByExtension(extension: string): AbstractChecklistFormat[] {
+  public getFormatsByExtension(extension: FileExtension): AbstractChecklistFormat[] {
     return this._inputFormats.get(extension) ?? [];
   }
 
   public getSupportedInputExtensions(): string {
-    return [...this._inputFormats.keys()]
-      .sort()
-      .map((item) => `.${item}`)
-      .join(', ');
+    return [...this._inputFormats.keys()].sort().join(', ');
   }
 
   public getSupportedOutputFormats(): OutputFormat[] {
@@ -79,8 +76,7 @@ class FormatRegistry {
 export const FORMAT_REGISTRY = new FormatRegistry();
 
 FORMAT_REGISTRY.register(AceFormat, FormatId.ACE, 'Garmin G3X™/GTN™');
-FORMAT_REGISTRY.register(DynonFormat, FormatId.AFD, 'Advanced Flight Systems', {
-  extension: FormatId.AFD,
+FORMAT_REGISTRY.register<DynonFormatOptions>(DynonFormat, FormatId.AFD, 'Advanced Flight Systems', {
   fileName: 'CHKLST.AFD',
 });
 FORMAT_REGISTRY.register(DynonFormat, FormatId.DYNON, 'Dynon SkyView™ - no wrap');
