@@ -31,13 +31,6 @@ export class ChecklistCommandBarComponent {
 
   constructor(private readonly _dialog: MatDialog) {}
 
-  isValidFileName(name: string): string | undefined {
-    if (!name) {
-      return 'A name must be provided!';
-    }
-    return undefined;
-  }
-
   async onNewFile() {
     const title = await TitleDialogComponent.promptForTitle({ promptType: 'file' }, this._dialog);
     if (title) {
