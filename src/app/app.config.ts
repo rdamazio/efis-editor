@@ -4,8 +4,8 @@ import { PreloadAllModules, provideRouter, withPreloading } from '@angular/route
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { ROUTES } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
+import { ROUTES } from './app.routes';
 
 export const APP_CONFIG: ApplicationConfig = {
   providers: [

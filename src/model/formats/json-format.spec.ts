@@ -1,6 +1,6 @@
+import { parseChecklistFile } from './format-registry';
 import { EXPECTED_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
-import { parseChecklistFile } from './format-registry';
 
 describe('JsonFormat', () => {
   it('read test file', async () => {

@@ -1,16 +1,16 @@
 import { ComponentFixture } from '@angular/core/testing';
 
+import { HarnessLoader } from '@angular/cdk/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { HotkeysService } from '@ngneat/hotkeys';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
+import { HelpComponent } from '../shared/hotkeys/help/help.component';
 import { NavData } from './nav-data';
 import { NavComponent } from './nav.component';
-import { HotkeysService } from '@ngneat/hotkeys';
-import { HelpComponent } from '../shared/hotkeys/help/help.component';
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { HarnessLoader } from '@angular/cdk/testing';
-import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('NavComponent', () => {
   let user: UserEvent;

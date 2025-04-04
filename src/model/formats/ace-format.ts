@@ -1,7 +1,7 @@
 import { ChecklistFile } from '../../../gen/ts/checklist';
+import { AbstractChecklistFormat } from './abstract-format';
 import { AceReader } from './ace-reader';
 import { AceWriter } from './ace-writer';
-import { AbstractChecklistFormat } from './abstract-format';
 
 export class AceFormat extends AbstractChecklistFormat {
   public async toProto(file: File): Promise<ChecklistFile> {

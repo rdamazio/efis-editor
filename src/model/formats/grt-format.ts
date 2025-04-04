@@ -1,8 +1,8 @@
 import { ChecklistFile } from '../../../gen/ts/checklist';
+import { AbstractChecklistFormat } from './abstract-format';
 import { TXT_EXTENSION, TextFormatOptions } from './text-format-options';
 import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
-import { AbstractChecklistFormat } from './abstract-format';
 
 export const GRT_FORMAT_OPTIONS: TextFormatOptions = {
   fileExtensions: [TXT_EXTENSION],

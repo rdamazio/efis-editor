@@ -1,15 +1,15 @@
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { Component, output } from '@angular/core';
+import { ComponentFixture, inject } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { DEFAULT_OPTIONS, PdfWriterOptions } from '../../../../model/formats/pdf-writer';
-import { PrintDialogComponent } from './print-dialog.component';
-import { PreferenceStorage } from '../../../../model/storage/preference-storage';
 import { LazyBrowserStorage } from '../../../../model/storage/browser-storage';
-import { ComponentFixture, inject } from '@angular/core/testing';
+import { PreferenceStorage } from '../../../../model/storage/preference-storage';
+import { PrintDialogComponent } from './print-dialog.component';
 
 @Component({
   standalone: true,

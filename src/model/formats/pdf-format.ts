@@ -1,6 +1,6 @@
 import { ChecklistFile } from '../../../gen/ts/checklist';
-import { PdfWriter, PdfWriterOptions } from './pdf-writer';
 import { AbstractChecklistFormat } from './abstract-format';
+import { PdfWriter, PdfWriterOptions } from './pdf-writer';
 
 export class PdfFormat extends AbstractChecklistFormat {
   public async fromProto(file: ChecklistFile, options: PdfWriterOptions): Promise<File> {

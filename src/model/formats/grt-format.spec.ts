@@ -1,10 +1,10 @@
 import { FormatId } from './format-id';
+import { FORMAT_REGISTRY, parseChecklistFile } from './format-registry';
 import { GRT_FORMAT_OPTIONS } from './grt-format';
 import { EXPECTED_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
 import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
-import { FORMAT_REGISTRY, parseChecklistFile } from './format-registry';
 
 export const GRT_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), GRT_FORMAT_OPTIONS).testCaseify(
   EXPECTED_CONTENTS,
