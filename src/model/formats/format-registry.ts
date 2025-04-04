@@ -69,7 +69,6 @@ class FormatRegistry {
       ([formatId, format]): OutputFormat => ({
         id: formatId,
         name: format.name,
-        description: `${format.name} [.${format.extension}]`,
         extension: format.extension,
         supportsImport: format.supportsImport,
       }),

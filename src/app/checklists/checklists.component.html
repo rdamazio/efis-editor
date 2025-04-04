@@ -12,7 +12,6 @@
           (downloadFile)="onDownloadFile($event)"
           (deleteFile)="onDeleteFile()"
           (fileInfo)="onFileInfo()"
-          [downloadFormats]="_downloadFormats"
         />
         <checklist-file-picker
           [selectedFile]="selectedFile?.metadata?.name ?? ''"

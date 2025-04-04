@@ -24,14 +24,11 @@
     <mat-icon>download</mat-icon>
   </button>
   <mat-menu #downloadMenu>
-    <button
-      mat-menu-item
-      *ngFor="let format of downloadFormats()"
-      [attr.aria-label]="'Download as ' + format.name"
-      (click)="downloadFile.emit(format.id)"
-    >
-      {{ format.name }}
-    </button>
+    @for (format of downloadFormats; track format.id) {
+      <button mat-menu-item [attr.aria-label]="'Download as ' + format.name" (click)="downloadFile.emit(format.id)">
+        {{ format.name }} [.{{ format.extension }}]
+      </button>
+    }
   </mat-menu>
   <button
     mat-icon-button

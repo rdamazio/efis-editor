@@ -26,7 +26,7 @@ import {
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
 import { FormatId } from '../../model/formats/format-id';
-import { FORMAT_REGISTRY, serializeChecklistFile } from '../../model/formats/format-registry';
+import { serializeChecklistFile } from '../../model/formats/format-registry';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { GoogleDriveStorage } from '../../model/storage/gdrive';
 import { PreferenceStorage } from '../../model/storage/preference-storage';
@@ -65,8 +65,6 @@ interface ParsedFragment {
   styleUrl: './checklists.component.scss',
 })
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, HotkeyRegistree {
-  protected readonly _downloadFormats = FORMAT_REGISTRY.getSupportedOutputFormats();
-
   static readonly NEW_ITEM_SHORTCUTS = [
     { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
     { secondKey: 'c', typeDescription: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },

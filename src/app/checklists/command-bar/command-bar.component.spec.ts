@@ -6,13 +6,7 @@ import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistCommandBarComponent } from './command-bar.component';
 
-import { OutputFormat } from '../../../model/formats/abstract-format';
 import { FormatId } from '../../../model/formats/format-id';
-
-const DOWNLOAD_FORMATS: OutputFormat[] = [
-  { id: FormatId.ACE, name: 'Foobar', description: 'Foo bar format', supportsImport: true, extension: FormatId.ACE },
-  { id: FormatId.DYNON, name: 'Baz', description: 'Baz format', supportsImport: true, extension: FormatId.DYNON },
-];
 
 describe('ChecklistCommandBarComponent', () => {
   let loader: HarnessLoader;
@@ -44,7 +38,7 @@ describe('ChecklistCommandBarComponent', () => {
 
   async function renderComponent(hasFiles: boolean, fileIsOpen: boolean) {
     const { fixture } = await render(ChecklistCommandBarComponent, {
-      inputs: { hasFiles: hasFiles, fileIsOpen: fileIsOpen, downloadFormats: DOWNLOAD_FORMATS },
+      inputs: { hasFiles: hasFiles, fileIsOpen: fileIsOpen },
       on: { newFile, openFile, uploadFile, downloadFile, deleteFile, fileInfo },
     });
 
@@ -148,11 +142,11 @@ describe('ChecklistCommandBarComponent', () => {
     const menu = await loader.getHarness(MatMenuHarness.with({ triggerText: 'download' }));
     expect(await menu.isOpen()).toBeTrue();
 
-    const formatButton = await screen.findByRole('menuitem', { name: 'Download as Foobar' });
+    const formatButton = await screen.findByRole('menuitem', { name: 'Download as Boeing ForeFlight' });
     expect(formatButton).toBeVisible();
     await user.click(formatButton);
 
-    expect(downloadFile).toHaveBeenCalledOnceWith(FormatId.ACE);
+    expect(downloadFile).toHaveBeenCalledOnceWith(FormatId.FOREFLIGHT);
   });
 
   it('should emit when Delete is clicked', async () => {

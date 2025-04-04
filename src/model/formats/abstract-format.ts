@@ -45,7 +45,6 @@ export abstract class AbstractChecklistFormat<T extends FormatOptions = FormatOp
 export interface OutputFormat {
   id: FormatId;
   name: string;
-  description: string;
   supportsImport: boolean;
   extension: FileExtension;
 }
