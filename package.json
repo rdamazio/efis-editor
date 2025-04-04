@@ -17,7 +17,7 @@
     "test:headless": "ng test --watch=false --browsers=ChromeHeadless",
     "test:coverage": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
     "lint": "ng lint",
-    "format": "prettier --check \"{./*,src/**}.{js,json,ts,html,css,scss}\" \"./public/site.webmanifest\"",
+    "format": "prettier --check \"{./*,src/**/*}.{js,json,ts,html,css,scss}\" \"./public/site.webmanifest\"",
     "format:fix": "npm run format -- --write",
     "spell": "codespell src/",
     "spell:fix": "codespell -w -i 3 src/",
