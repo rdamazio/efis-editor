@@ -10,10 +10,10 @@ const HELP_KEYS = 'shift.?';
 export const HOTKEY_DEBOUNCE_TIME = new InjectionToken<number>('Hotkey sequence debounce time in ms');
 
 export interface HotkeyRegistree {
-  registerHotkeys(service: HotkeyRegistar): void;
+  registerHotkeys(service: HotkeyRegistrar): void;
 }
 
-export class HotkeyRegistar {
+export class HotkeyRegistrar {
   private readonly _keys: string[] = [];
   private readonly _destroy$ = new Subject<void>();
 
@@ -56,7 +56,7 @@ export class HotkeyRegistar {
 
 @Injectable({ providedIn: 'root' })
 export class HotkeyRegistry {
-  private readonly _hotkeyRegistrars = new Map<HotkeyRegistree, HotkeyRegistar>();
+  private readonly _hotkeyRegistrars = new Map<HotkeyRegistree, HotkeyRegistrar>();
   private _helpRegistered = false;
 
   constructor(
@@ -77,8 +77,8 @@ export class HotkeyRegistry {
       return;
     }
 
-    const registar = new HotkeyRegistar(this._hotkeys, this._dialog);
-    this._hotkeyRegistrars.set(registree, registar);
+    const registrar = new HotkeyRegistrar(this._hotkeys, this._dialog);
+    this._hotkeyRegistrars.set(registree, registrar);
 
     // Shortcut registration affects global state which then changes the parent NavComponent, so do it off-cycle.
     setTimeout(() => {
@@ -89,7 +89,7 @@ export class HotkeyRegistry {
         this._helpRegistered = true;
       }
 
-      registree.registerHotkeys(registar);
+      registree.registerHotkeys(registrar);
     });
   }
 
