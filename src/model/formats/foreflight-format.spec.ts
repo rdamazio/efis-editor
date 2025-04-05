@@ -3,7 +3,8 @@ import { ChecklistFileMetadata } from '../../../gen/ts/checklist';
 import { ForeFlightChecklistMetadata } from '../../../gen/ts/foreflight';
 import { ForeFlightReader } from './foreflight-reader';
 import { ForeFlightUtils } from './foreflight-utils';
-import { ForeFlightWriter } from './foreflight-writer';
+import { FormatId } from './format-id';
+import { parseChecklistFile, serializeChecklistFile } from './format-registry';
 import { EXPECTED_FOREFLIGHT_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
 
@@ -63,7 +64,7 @@ describe('ForeFlightFormat', () => {
 
   it('should read test file', async () => {
     const file = await loadFile('/model/formats/test-foreflight.fmd', 'test-foreflight.fmd');
-    const checklistFile = await ForeFlightReader.read(file);
+    const checklistFile = await parseChecklistFile(file);
     expect(checklistFile).toEqual(EXPECTED_FOREFLIGHT_CONTENTS);
   });
 
@@ -71,7 +72,7 @@ describe('ForeFlightFormat', () => {
    * Test it this way to avoid having to deal with constantly changing objectIds
    **/
   it('should pass a round-trip test', async () => {
-    const writtenFile = await ForeFlightWriter.write(EXPECTED_FOREFLIGHT_CONTENTS);
+    const writtenFile = await serializeChecklistFile(EXPECTED_FOREFLIGHT_CONTENTS, FormatId.FOREFLIGHT);
     const writtenData = new Uint8Array(await writtenFile.arrayBuffer());
     expect(writtenData.byteLength).toBeGreaterThan(1000);
 

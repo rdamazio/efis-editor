@@ -1,6 +1,6 @@
 import { DYNON_FORMAT_OPTIONS } from './dynon-format';
 import { FormatId } from './format-id';
-import { FORMAT_REGISTRY, parseChecklistFile } from './format-registry';
+import { parseChecklistFile, serializeChecklistFile } from './format-registry';
 import { EXPECTED_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
 import { TextReader } from './text-reader';
@@ -36,8 +36,7 @@ describe('DynonFormat', () => {
 
     // Now write the file back.
     const decoder = new TextDecoder('UTF-8');
-    const writeFormat = FORMAT_REGISTRY.getFormat(formatId);
-    const writtenFile = await writeFormat.fromProto(readFile);
+    const writtenFile = await serializeChecklistFile(readFile, formatId);
     const writtenData = decoder.decode(await writtenFile.arrayBuffer());
     const writtenLines = writtenData.split('\r\n');
     const readData = decoder.decode(await f.arrayBuffer());

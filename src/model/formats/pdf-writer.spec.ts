@@ -1,6 +1,8 @@
 import * as pdfjs from 'pdfjs-dist';
 import 'pdfjs-dist/build/pdf.worker';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
+import { FormatId } from './format-id';
+import { serializeChecklistFile } from './format-registry';
 import { PdfWriter, PdfWriterOptions } from './pdf-writer';
 import { EXPECTED_CONTENTS } from './test-data';
 
@@ -101,8 +103,7 @@ describe('PdfWriter', () => {
   });
 
   async function writeAndParsePdf(options: PdfWriterOptions): Promise<pdfjs.PDFDocumentProxy> {
-    const writer = new PdfWriter(options);
-    const writtenFile = await writer.write(EXPECTED_CONTENTS);
+    const writtenFile = await serializeChecklistFile(EXPECTED_CONTENTS, FormatId.PDF, options);
     const writtenData = await writtenFile.arrayBuffer();
     expect(writtenData.byteLength).toBeGreaterThan(1000);
     return parsePdf(writtenData);

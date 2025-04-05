@@ -1,7 +1,7 @@
 import { ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
-import { AceReader } from './ace-reader';
-import { AceWriter } from './ace-writer';
 import { FormatError } from './error';
+import { FormatId } from './format-id';
+import { parseChecklistFile, serializeChecklistFile } from './format-registry';
 import { loadFile } from './test-utils';
 
 describe('AceWriter', () => {
@@ -9,10 +9,10 @@ describe('AceWriter', () => {
     // Read the test file.
     // The correctness of the reading is already checked in ace-reader.spec.ts
     const f = await loadFile('/model/formats/test.ace', 'test.ace');
-    const readFile = await new AceReader(f).read();
+    const readFile = await parseChecklistFile(f);
 
     // Now write the file back.
-    const writtenFile = await new AceWriter().write(readFile);
+    const writtenFile = await serializeChecklistFile(readFile, FormatId.ACE);
     const writtenData = new Uint8Array(await writtenFile.arrayBuffer());
     const readData = new Uint8Array(await f.arrayBuffer());
     expect(writtenData.byteLength).toBeGreaterThan(1000);
@@ -26,7 +26,7 @@ describe('AceWriter', () => {
       ChecklistFile.create({ metadata: ChecklistFileMetadata.create({ name: '' }) }),
     ].forEach((file: ChecklistFile) => {
       it('write nameless file', async () => {
-        await expectAsync(new AceWriter().write(file)).toBeRejectedWithError(FormatError);
+        await expectAsync(serializeChecklistFile(file, FormatId.ACE)).toBeRejectedWithError(FormatError);
       });
     });
   });

@@ -1,5 +1,5 @@
 import { FormatId } from './format-id';
-import { FORMAT_REGISTRY, parseChecklistFile } from './format-registry';
+import { parseChecklistFile, serializeChecklistFile } from './format-registry';
 import { GRT_FORMAT_OPTIONS } from './grt-format';
 import { EXPECTED_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
@@ -23,7 +23,7 @@ describe('GrtFormat', () => {
 
     // Now write the file back.
     const decoder = new TextDecoder('UTF-8');
-    const writtenFile = await FORMAT_REGISTRY.getFormat(FormatId.GRT).fromProto(readFile);
+    const writtenFile = await serializeChecklistFile(readFile, FormatId.GRT);
     const writtenData = decoder.decode(await writtenFile.arrayBuffer());
     const writtenLines = writtenData.split('\r\n');
     const readData = decoder.decode(await f.arrayBuffer());
