@@ -1,5 +1,4 @@
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Component, inject, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,7 +9,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { HotkeysService } from '@ngneat/hotkeys';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
-import { map, Observable, shareReplay } from 'rxjs';
 import { AboutComponent } from '../about/about.component';
 import { EditableLabelComponent } from '../shared/editable-label/editable-label.component';
 import { GoogleDriveComponent } from '../shared/gdrive/gdrive.component';
@@ -37,13 +35,7 @@ import { NavData } from './nav-data';
   ],
 })
 export class NavComponent {
-  private readonly _breakpointObserver = inject(BreakpointObserver);
   readonly navData: NavData = { routeTitle: signal(undefined), fileName: signal(undefined) };
-
-  isHandset$: Observable<boolean> = this._breakpointObserver.observe(Breakpoints.Handset).pipe(
-    map((result) => result.matches),
-    shareReplay({ bufferSize: 1, refCount: false }),
-  );
 
   constructor(
     protected _hotkeys: HotkeysService,

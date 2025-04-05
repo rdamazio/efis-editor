@@ -31,7 +31,7 @@ import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { GoogleDriveStorage } from '../../model/storage/gdrive';
 import { PreferenceStorage } from '../../model/storage/preference-storage';
 import { NavData } from '../nav/nav-data';
-import { HotkeyRegistar, HotkeyRegistree, HotkeyRegistry } from '../shared/hotkeys/hotkey-registration';
+import { HotkeyRegistrar, HotkeyRegistree, HotkeyRegistry } from '../shared/hotkeys/hotkey-registration';
 import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
 import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.component';
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
@@ -149,7 +149,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     this._hotkeys.unregisterShortcuts(this);
   }
 
-  registerHotkeys(hotkeys: HotkeyRegistar) {
+  registerHotkeys(hotkeys: HotkeyRegistrar) {
     hotkeys
       .addShortcut({
         keys: 'down',
