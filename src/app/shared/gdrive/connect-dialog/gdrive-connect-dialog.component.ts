@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -11,7 +12,7 @@ import { filter, lastValueFrom, Observable } from 'rxjs';
 
 @Component({
   selector: 'gdrive-connect-dialog',
-  imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, NgOptimizedImage],
   templateUrl: './gdrive-connect-dialog.component.html',
   styleUrl: './gdrive-connect-dialog.component.scss',
 })
