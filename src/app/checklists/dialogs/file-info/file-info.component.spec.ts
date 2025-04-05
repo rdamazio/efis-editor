@@ -124,6 +124,7 @@ describe('ChecklistFileInfoComponent', () => {
 
     await user.clear(nameBox);
     expect(okButton).toBeDisabled();
+    await user.click(cancelButton);
   });
 
   it('should change default checklist', async () => {
