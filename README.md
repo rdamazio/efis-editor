@@ -44,7 +44,7 @@ You can try it out directly in the link above, but here's what it currently look
 Different checklist file formats support different subsets of all the features in the editor:
 
 | **Feature**                | Garmin             | AFS/Dynon            | GRT                  | Foreflight           | PDF                |
-| -------------------------- | ------------------ | -------------------- | -------------------- | -------------------- | ------------------ |
+|----------------------------|--------------------|----------------------|----------------------|----------------------|--------------------|
 | Checklist groups           | :white_check_mark: | :white_check_mark: ¹ | :white_check_mark: ¹ | :white_check_mark:   | :white_check_mark: |
 | Checklist group categories | :x:                | :x:                  | :x:                  | :white_check_mark:   | :white_check_mark: |
 | Item types                 | :white_check_mark: | :white_check_mark: ² | :white_check_mark: ² | :white_check_mark:   | :white_check_mark: |
