@@ -196,7 +196,21 @@ module.exports = tseslint.config(
   },
   {
     files: ['**/*.html'],
-    extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility, prettierRecommended],
-    rules: { 'prettier/prettier': ['error', { parser: 'angular' }] },
+    extends: [...angular.configs.templateAll, prettierRecommended],
+    rules: {
+      'prettier/prettier': ['error', { parser: 'angular' }],
+      '@angular-eslint/template/attributes-order': 'off',
+      '@angular-eslint/template/button-has-type': 'off',
+      '@angular-eslint/template/i18n': 'off',
+      // This one makes no sense with signals.
+      '@angular-eslint/template/no-call-expression': 'off',
+      // TODO: Fix these then remove
+      '@angular-eslint/template/no-inline-styles': 'off',
+      '@angular-eslint/template/no-interpolation-in-attributes': 'off',
+      '@angular-eslint/template/prefer-contextual-for-variables': 'off',
+      '@angular-eslint/template/prefer-control-flow': 'off',
+      '@angular-eslint/template/prefer-self-closing-tags': 'off',
+      '@angular-eslint/template/use-track-by-function': 'off',
+    },
   },
 );
