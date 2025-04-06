@@ -8,25 +8,22 @@
   (focus)="hideButtons = false"
   (mouseleave)="hideButtons = true"
 >
-  <button
-    *ngIf="n.isAddNew"
-    mat-icon-button
-    mat-medium-icon-button
-    class="checklist-tree-node-add"
-    [attr.aria-label]="n.title"
-  >
-    <mat-icon>add</mat-icon>
-  </button>
+  @if (n.isAddNew) {
+    <button mat-icon-button mat-medium-icon-button class="checklist-tree-node-add" [attr.aria-label]="n.title">
+      <mat-icon>add</mat-icon>
+    </button>
+  }
 
-  <mat-icon
-    *ngIf="n.checklist"
-    cdkDragHandle
-    class="mat-icon-rtl-mirror checklist-tree-drag-icon"
-    [style.visibility]="hideButtons || disableButtonHover() ? 'hidden' : 'visible'"
-    matTooltip="Drag to reorder"
-  >
-    drag_handle
-  </mat-icon>
+  @if (n.checklist) {
+    <mat-icon
+      cdkDragHandle
+      class="mat-icon-rtl-mirror checklist-tree-drag-icon"
+      [style.visibility]="hideButtons || disableButtonHover() ? 'hidden' : 'visible'"
+      matTooltip="Drag to reorder"
+    >
+      drag_handle
+    </mat-icon>
+  }
 
   <div class="checklist-tree-node-title">
     @if (n.group && !n.checklist && !n.isAddNew) {
@@ -50,34 +47,37 @@
 
   <span class="checklist-tree-node-spacer"></span>
 
-  <div
-    class="checklist-tree-node-buttons"
-    *ngIf="!n.isAddNew"
-    [style.visibility]="hideButtons || disableButtonHover() ? 'hidden' : 'visible'"
-  >
-    <button
-      data-testid="rename-button"
-      mat-icon-button
-      mat-small-icon-button
-      [attr.aria-label]="'Rename ' + n.title"
-      [matTooltip]="'Rename ' + n.title"
-      (click)="nodeRename.emit(n)"
+  @if (!n.isAddNew) {
+    <div
+      class="checklist-tree-node-buttons"
+      [style.visibility]="hideButtons || disableButtonHover() ? 'hidden' : 'visible'"
     >
-      <mat-icon>edit</mat-icon>
-    </button>
-    <button
-      data-testid="delete-button"
-      mat-icon-button
-      mat-small-icon-button
-      [attr.aria-label]="'Delete ' + n.title"
-      [matTooltip]="'Delete ' + n.title + ' and all its items'"
-      (click)="onDelete()"
-    >
-      <mat-icon>delete</mat-icon>
-    </button>
+      <button
+        data-testid="rename-button"
+        mat-icon-button
+        mat-small-icon-button
+        [attr.aria-label]="'Rename ' + n.title"
+        [matTooltip]="'Rename ' + n.title"
+        (click)="nodeRename.emit(n)"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button
+        data-testid="delete-button"
+        mat-icon-button
+        mat-small-icon-button
+        [attr.aria-label]="'Delete ' + n.title"
+        [matTooltip]="'Delete ' + n.title + ' and all its items'"
+        (click)="onDelete()"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
 
-    <button *ngIf="!n.checklist && !n.isAddNew" mat-icon-button mat-small-icon-button matTooltip="Drag to reorder">
-      <mat-icon cdkDragHandle>drag_handle</mat-icon>
-    </button>
-  </div>
+      @if (!n.checklist && !n.isAddNew) {
+        <button mat-icon-button mat-small-icon-button matTooltip="Drag to reorder">
+          <mat-icon cdkDragHandle>drag_handle</mat-icon>
+        </button>
+      }
+    </div>
+  }
 </div>

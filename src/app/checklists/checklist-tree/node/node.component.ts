@@ -1,5 +1,4 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
-import { NgIf } from '@angular/common';
 import { Component, input, output, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -20,7 +19,6 @@ import { ChecklistTreeNode } from './node';
     MatIconButtonSizesModule,
     MatIconModule,
     MatTooltipModule,
-    NgIf,
     MatSelect,
     MatOption,
   ],
