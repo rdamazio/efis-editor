@@ -8,7 +8,7 @@
       cdkFocusInitial
       required
       aria-labelledby="title-label"
-      placeholder="My {{ data.promptType }} title"
+      [placeholder]="`My ${data.promptType} title`"
       [(ngModel)]="title"
     />
   </mat-form-field>

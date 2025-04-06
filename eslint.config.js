@@ -206,7 +206,6 @@ module.exports = tseslint.config(
       '@angular-eslint/template/no-call-expression': 'off',
       '@angular-eslint/template/no-inline-styles': ['error', { allowBindToStyle: true }],
       // TODO: Fix these then remove
-      '@angular-eslint/template/no-interpolation-in-attributes': 'off',
       '@angular-eslint/template/prefer-contextual-for-variables': 'off',
       '@angular-eslint/template/prefer-control-flow': 'off',
       '@angular-eslint/template/prefer-self-closing-tags': 'off',
