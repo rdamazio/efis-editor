@@ -204,8 +204,8 @@ module.exports = tseslint.config(
       '@angular-eslint/template/i18n': 'off',
       // This one makes no sense with signals.
       '@angular-eslint/template/no-call-expression': 'off',
+      '@angular-eslint/template/no-inline-styles': ['error', { allowBindToStyle: true }],
       // TODO: Fix these then remove
-      '@angular-eslint/template/no-inline-styles': 'off',
       '@angular-eslint/template/no-interpolation-in-attributes': 'off',
       '@angular-eslint/template/prefer-contextual-for-variables': 'off',
       '@angular-eslint/template/prefer-control-flow': 'off',
