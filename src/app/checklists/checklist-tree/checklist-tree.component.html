@@ -75,7 +75,7 @@
     <!-- There is inline padding applied to this div using styles.
         This padding value depends on the mat-icon-button width.  -->
     <div [class.checklist-tree-invisible]="!tree.isExpanded(node)" role="group">
-      <ng-container matTreeNodeOutlet></ng-container>
+      <ng-container matTreeNodeOutlet />
     </div>
   </mat-nested-tree-node>
 </mat-tree>

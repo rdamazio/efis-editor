@@ -205,8 +205,6 @@ module.exports = tseslint.config(
       // This one makes no sense with signals.
       '@angular-eslint/template/no-call-expression': 'off',
       '@angular-eslint/template/no-inline-styles': ['error', { allowBindToStyle: true }],
-      // TODO: Fix these then remove
-      '@angular-eslint/template/prefer-self-closing-tags': 'off',
     },
   },
 );
