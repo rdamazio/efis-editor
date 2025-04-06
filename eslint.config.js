@@ -1,5 +1,6 @@
 // @ts-check
 const depend = require('eslint-plugin-depend');
+const css = require('@eslint/css');
 const eslint = require('@eslint/js');
 const angular = require('angular-eslint');
 const jasmine = require('eslint-plugin-jasmine');
@@ -206,5 +207,10 @@ module.exports = tseslint.config(
       '@angular-eslint/template/no-call-expression': 'off',
       '@angular-eslint/template/no-inline-styles': ['error', { allowBindToStyle: true }],
     },
+  },
+  {
+    files: ['**/*.scss'],
+    extends: [css.default.configs.recommended],
+    language: 'css/css',
   },
 );
