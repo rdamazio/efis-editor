@@ -5,6 +5,7 @@ import { ForeFlightReader } from './foreflight-reader';
 import { ForeFlightUtils } from './foreflight-utils';
 import { FormatId } from './format-id';
 import { parseChecklistFile, serializeChecklistFile } from './format-registry';
+import { FormatUtils } from './format-utils';
 import { EXPECTED_FOREFLIGHT_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
 
@@ -35,8 +36,8 @@ describe('ForeFlightFormat', () => {
     });
 
     it('should determine checklist item type by prefix correctly', () => {
-      for (const [expectedType, prefix] of ForeFlightUtils.CHECKLIST_ITEM_PREFIXES) {
-        const { type: actualType, prompt: text } = ForeFlightUtils.promptToPartialChecklistItem(`${prefix}: text`);
+      for (const [expectedType, prefix] of FormatUtils.CHECKLIST_ITEM_PREFIXES) {
+        const { type: actualType, prompt: text } = FormatUtils.promptToPartialChecklistItem(`${prefix}: text`);
         expect(actualType).toBe(expectedType);
         expect(text).toBe(': text');
       }

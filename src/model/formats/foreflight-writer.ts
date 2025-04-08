@@ -14,6 +14,7 @@ import {
 } from '../../../gen/ts/foreflight';
 
 import { ForeFlightUtils } from './foreflight-utils';
+import { FormatUtils } from './format-utils';
 
 export class ForeFlightWriter {
   public static async write(file: ChecklistFile): Promise<Blob> {
@@ -100,10 +101,10 @@ export class ForeFlightWriter {
           case ChecklistItem_Type.ITEM_NOTE:
           case ChecklistItem_Type.ITEM_CAUTION:
           case ChecklistItem_Type.ITEM_WARNING: {
-            const text = ForeFlightUtils.getChecklistItemPrefix(itemEFIS.type) + itemEFIS.prompt;
+            const text = FormatUtils.getChecklistItemPrefix(itemEFIS.type) + itemEFIS.prompt;
 
             const [lastItemFF, lastItemEFIS] = accumulator.at(-2) ?? [];
-            if (lastItemFF && lastItemEFIS && ForeFlightUtils.shouldMergeNotes(itemEFIS, lastItemEFIS)) {
+            if (lastItemFF && lastItemEFIS && FormatUtils.shouldMergeNotes(itemEFIS, lastItemEFIS)) {
               // If this is an indented text item, then...
               const appendNote = (field: string, appendText: string) => {
                 const typedField = field as keyof typeof lastItemFF;
