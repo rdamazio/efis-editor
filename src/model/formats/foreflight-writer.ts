@@ -134,6 +134,6 @@ export class ForeFlightWriter {
         }
         return accumulator;
       }, [])
-      .map((tuple: [ForeFlightChecklistItem, ChecklistItem]) => tuple[0]);
+      .map(([itemFF, _itemEFIS]) => itemFF);
   }
 }
