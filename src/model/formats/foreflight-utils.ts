@@ -1,6 +1,7 @@
 import { v4 as uuidV4 } from 'uuid';
 import { ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { CryptoUtils } from './crypto-utils';
+import { ForeFlightFormatError } from './foreflight-format';
 
 interface PartialChecklistItem {
   type: ChecklistItem_Type;
@@ -30,6 +31,14 @@ export class ForeFlightUtils {
   public static readonly CHECKLIST_ITEM_TYPES = new Map(
     Array.from(ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.entries()).map((item) => swap(item)),
   );
+
+  public static getChecklistItemPrefix(type: ChecklistItem_Type): string {
+    const prefix = ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.get(type);
+    if (prefix === undefined) {
+      throw new ForeFlightFormatError(`unsupported prefix type: ${type}`);
+    }
+    return prefix;
+  }
 
   public static splitLines(text: string): string[] {
     return text.split(/\r?\n/);
