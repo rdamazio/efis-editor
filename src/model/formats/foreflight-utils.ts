@@ -67,6 +67,21 @@ export class ForeFlightUtils {
     );
   }
 
+  public static shouldMergeNotes(
+    itemEFIS: ChecklistItem,
+    lastItemEFIS: ChecklistItem,
+    titleLikeItems: ChecklistItem_Type[] = [ChecklistItem_Type.ITEM_TITLE, ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE],
+  ): boolean {
+    return (
+      // Previous item was a title-like entry (detail or check item with note)
+      (titleLikeItems.includes(lastItemEFIS.type) && lastItemEFIS.indent < itemEFIS.indent) ||
+      // Previous item was an indented note-like entry (multiline note)
+      ([...ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.keys()].includes(lastItemEFIS.type) &&
+        lastItemEFIS.indent <= itemEFIS.indent &&
+        lastItemEFIS.indent >= ForeFlightUtils.NOTE_INDENT)
+    );
+  }
+
   public static async decrypt(stream: ArrayBuffer): Promise<string> {
     const iv = new Uint8Array(stream.slice(0, CryptoUtils.CIPHER_BLOCK_SIZE));
     const data = stream.slice(CryptoUtils.CIPHER_BLOCK_SIZE);
