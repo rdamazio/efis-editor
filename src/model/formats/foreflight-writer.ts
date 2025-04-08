@@ -1,5 +1,4 @@
 import {
-  Checklist,
   ChecklistFile,
   ChecklistGroup,
   ChecklistGroup_Category,
@@ -49,7 +48,7 @@ export class ForeFlightWriter {
 
   private static _checklistGroupsToFFGroup(groupsEFIS: ChecklistGroup[]): ForeFlightChecklistGroup[] {
     return [ChecklistGroup_Category.normal, ChecklistGroup_Category.abnormal, ChecklistGroup_Category.emergency].map(
-      (category: ChecklistGroup_Category) => ({
+      (category) => ({
         objectId: ForeFlightUtils.getObjectId(),
         groupType: category,
         items: groupsEFIS
@@ -63,7 +62,7 @@ export class ForeFlightWriter {
     return {
       objectId: ForeFlightUtils.getObjectId(),
       title: checklistGroupEFIS.title,
-      items: checklistGroupEFIS.checklists.map((checklistEFIS: Checklist) => ({
+      items: checklistGroupEFIS.checklists.map((checklistEFIS) => ({
         objectId: ForeFlightUtils.getObjectId(),
         title: checklistEFIS.title,
         items: ForeFlightWriter._checklistItemsToFF(checklistEFIS.items),
@@ -73,7 +72,7 @@ export class ForeFlightWriter {
 
   private static _checklistItemsToFF(itemsEFIS: ChecklistItem[]): ForeFlightChecklistItem[] {
     return itemsEFIS
-      .reduce<[ForeFlightChecklistItem, ChecklistItem][]>((accumulator, itemEFIS: ChecklistItem) => {
+      .reduce<[ForeFlightChecklistItem, ChecklistItem][]>((accumulator, itemEFIS) => {
         switch (itemEFIS.type) {
           case ChecklistItem_Type.ITEM_UNKNOWN:
             throw new Error(`Unknown item type for "${itemEFIS.prompt}"`);
