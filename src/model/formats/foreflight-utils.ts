@@ -1,5 +1,5 @@
 import { v4 as uuidV4 } from 'uuid';
-import { ChecklistItem_Type } from '../../../gen/ts/checklist';
+import { ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { CryptoUtils } from './crypto-utils';
 import { ForeFlightFormatError } from './foreflight-format';
 
@@ -54,6 +54,17 @@ export class ForeFlightUtils {
     return itemType !== undefined
       ? { type: itemType, prompt: rest }
       : { type: ChecklistItem_Type.ITEM_PLAINTEXT, prompt: prompt };
+  }
+
+  public static possiblyMultilineNoteToChecklistItems(text: string, standalone: boolean): ChecklistItem[] {
+    const noteLines = ForeFlightUtils.splitLines(text);
+    return noteLines.map((noteLine) =>
+      ChecklistItem.create({
+        // Add extra indent for lines belonging to the same multiline note or notes attached to a previous item
+        indent: noteLines.length > 1 || !standalone ? ForeFlightUtils.NOTE_INDENT : 0,
+        ...ForeFlightUtils.promptToPartialChecklistItem(noteLine),
+      }),
+    );
   }
 
   public static async decrypt(stream: ArrayBuffer): Promise<string> {

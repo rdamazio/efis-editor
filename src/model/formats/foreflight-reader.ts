@@ -90,8 +90,8 @@ export class ForeFlightReader {
       } else {
         // Title is not set
         if (checklistItem.detail) {
-          // Detail is set - interpret as unindented text
-          result.push(ChecklistItem.create(ForeFlightUtils.promptToPartialChecklistItem(checklistItem.detail)));
+          // Detail is set - interpret as unindented text (unless multi-line note)
+          result.push(...ForeFlightUtils.possiblyMultilineNoteToChecklistItems(checklistItem.detail, true));
         } else {
           // Neither title, nor detail set - interpret as empty space
           result.push(ChecklistItem.create({ type: ChecklistItem_Type.ITEM_SPACE }));
@@ -123,14 +123,7 @@ export class ForeFlightReader {
       // Check Item with a note
       checklistItem.note
     ) {
-      for (const noteLine of ForeFlightUtils.splitLines(possibleNote ?? '')) {
-        result.push(
-          ChecklistItem.create({
-            indent: ForeFlightUtils.NOTE_INDENT,
-            ...ForeFlightUtils.promptToPartialChecklistItem(noteLine),
-          }),
-        );
-      }
+      result.push(...ForeFlightUtils.possiblyMultilineNoteToChecklistItems(possibleNote ?? '', false));
     }
 
     return result;
