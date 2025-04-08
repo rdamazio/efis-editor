@@ -100,7 +100,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
     if (file) {
       data = file.groups.map(ChecklistTreeComponent._groupToNode);
       data.push({ title: 'Add new checklist group', isAddNew: true });
-      this.groupDropListIds.set(file.groups.map((v: ChecklistGroup, idx: number) => `group_${idx}`));
+      this.groupDropListIds.set(file.groups.map((_: ChecklistGroup, idx: number) => `group_${idx}`));
     } else {
       this.groupDropListIds.set([]);
     }
@@ -132,7 +132,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
     return node;
   }
 
-  hasChild = (unusedNum: number, node: ChecklistTreeNode) => node.children && node.children.length > 0;
+  hasChild = (_: number, node: ChecklistTreeNode) => node.children && node.children.length > 0;
   childrenAccessor = (node: ChecklistTreeNode) => node.children ?? [];
 
   async onNodeSelect(node: ChecklistTreeNode) {
@@ -168,7 +168,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
     return !enter.data.checklist;
   }
 
-  groupDropSortPredicate(index: number, item: CdkDrag<ChecklistTreeNode>): boolean {
+  groupDropSortPredicate(_: number, item: CdkDrag<ChecklistTreeNode>): boolean {
     return !item.data.isAddNew && !item.data.checklist;
   }
 
