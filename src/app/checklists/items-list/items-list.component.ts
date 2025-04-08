@@ -253,4 +253,7 @@ export class ChecklistItemsComponent {
     }
     return `Item: ${item.prompt}`;
   }
+
+  // Opt-out of NG0956 warning regarding tracking by identity (non-static collection)
+  protected readonly _trackChecklistItem = (item: ChecklistItem) => item;
 }
