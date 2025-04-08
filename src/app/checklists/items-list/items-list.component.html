@@ -11,7 +11,7 @@
       [cdkDropListConnectedTo]="groupDropListIds()"
       (cdkDropListDropped)="onDrop($event)"
     >
-      @for (item of chklist.items; track item) {
+      @for (item of chklist.items; track _trackChecklistItem(item)) {
         <div class="list-item" cdkDrag [cdkDragData]="item" role="listitem" [attr.aria-label]="itemLabel(item)">
           <checklist-item
             #item
