@@ -7,8 +7,8 @@ export class CryptoUtils {
   public static readonly CIPHER_TYPE = 'AES-CBC';
   public static readonly CIPHER_BLOCK_SIZE = 16;
 
-  private static readonly ENCODER = new TextEncoder();
-  private static readonly DECODER = new TextDecoder();
+  public static readonly ENCODER = new TextEncoder();
+  public static readonly DECODER = new TextDecoder();
 
   public static async getKey(
     cipherKey: ArrayBuffer,
