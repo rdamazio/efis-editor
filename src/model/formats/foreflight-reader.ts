@@ -18,6 +18,7 @@ import {
 import { ForeFlightFormatError } from './foreflight-format';
 import { ForeFlightUtils } from './foreflight-utils';
 import { FormatId } from './format-id';
+import { FormatUtils } from './format-utils';
 
 export class ForeFlightReader {
   public static async read(file: File): Promise<ChecklistFile> {
@@ -91,7 +92,7 @@ export class ForeFlightReader {
         // Title is not set
         if (checklistItem.detail) {
           // Detail is set - interpret as unindented text (unless multi-line note)
-          result.push(...ForeFlightUtils.possiblyMultilineNoteToChecklistItems(checklistItem.detail, true));
+          result.push(...FormatUtils.possiblyMultilineNoteToChecklistItems(checklistItem.detail, true));
         } else {
           // Neither title, nor detail set - interpret as empty space
           result.push(ChecklistItem.create({ type: ChecklistItem_Type.ITEM_SPACE }));
@@ -123,7 +124,7 @@ export class ForeFlightReader {
       // Check Item with a note
       checklistItem.note
     ) {
-      result.push(...ForeFlightUtils.possiblyMultilineNoteToChecklistItems(possibleNote ?? '', false));
+      result.push(...FormatUtils.possiblyMultilineNoteToChecklistItems(possibleNote ?? '', false));
     }
 
     return result;
