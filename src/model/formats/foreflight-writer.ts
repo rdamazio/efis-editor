@@ -73,35 +73,36 @@ export class ForeFlightWriter {
   private static _checklistItemsToFF(itemsEFIS: ChecklistItem[]): ForeFlightChecklistItem[] {
     return itemsEFIS
       .reduce<[ForeFlightChecklistItem, ChecklistItem][]>((accumulator, itemEFIS) => {
+        const itemFF: ForeFlightChecklistItem = {
+          objectId: ForeFlightUtils.getObjectId(),
+          title: itemEFIS.prompt,
+          detail: itemEFIS.expectation.toUpperCase(),
+        };
+        accumulator.push([itemFF, itemEFIS]);
+
         switch (itemEFIS.type) {
           case ChecklistItem_Type.ITEM_UNKNOWN:
-            throw new Error(`Unknown item type for "${itemEFIS.prompt}"`);
+            throw new Error(`unknown item type for "${itemEFIS.prompt}"`);
+
           case ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE:
-            accumulator.push([
-              {
-                objectId: ForeFlightUtils.getObjectId(),
-                title: itemEFIS.prompt,
-                detail: itemEFIS.expectation.toUpperCase(),
-              },
-              itemEFIS,
-            ]);
             break;
+
           case ChecklistItem_Type.ITEM_CHALLENGE:
-            accumulator.push([{ objectId: ForeFlightUtils.getObjectId(), title: itemEFIS.prompt }, itemEFIS]);
+            itemFF.detail = undefined;
             break;
+
           case ChecklistItem_Type.ITEM_TITLE:
-            accumulator.push([
-              { objectId: ForeFlightUtils.getObjectId(), type: ForeFlightUtils.ITEM_HEADER, title: itemEFIS.prompt },
-              itemEFIS,
-            ]);
+            itemFF.type = ForeFlightUtils.ITEM_HEADER;
+            itemFF.detail = undefined;
             break;
+
           case ChecklistItem_Type.ITEM_PLAINTEXT:
           case ChecklistItem_Type.ITEM_NOTE:
           case ChecklistItem_Type.ITEM_CAUTION:
           case ChecklistItem_Type.ITEM_WARNING: {
             const text = ForeFlightUtils.getChecklistItemPrefix(itemEFIS.type) + itemEFIS.prompt;
 
-            const [lastItemFF, lastItemEFIS] = accumulator.at(-1) ?? [];
+            const [lastItemFF, lastItemEFIS] = accumulator.at(-2) ?? [];
             if (lastItemFF && lastItemEFIS && ForeFlightUtils.shouldMergeNotes(itemEFIS, lastItemEFIS)) {
               // If this is an indented text item, then...
               const appendNote = (field: string, appendText: string) => {
@@ -110,6 +111,7 @@ export class ForeFlightWriter {
                   ? lastItemFF[typedField] + '\n' + appendText
                   : appendText;
               };
+
               appendNote(
                 lastItemFF.type !== ForeFlightUtils.ITEM_HEADER
                   ? // ...append note to the previous Check...
@@ -118,21 +120,24 @@ export class ForeFlightWriter {
                     'detail',
                 text,
               );
-            } else {
-              // ...otherwise, create a Detail Item without title, but with a note
-              accumulator.push([
-                { objectId: ForeFlightUtils.getObjectId(), type: ForeFlightUtils.ITEM_HEADER, detail: text },
-                itemEFIS,
-              ]);
+
+              accumulator.pop();
+              break;
             }
+
+            // ...otherwise, create a Detail Item without title, but with a note
+            itemFF.type = ForeFlightUtils.ITEM_HEADER;
+            itemFF.title = undefined;
+            itemFF.detail = text;
             break;
           }
+
           case ChecklistItem_Type.ITEM_SPACE:
-            accumulator.push([
-              { objectId: ForeFlightUtils.getObjectId(), type: ForeFlightUtils.ITEM_HEADER },
-              itemEFIS,
-            ]);
+            itemFF.type = ForeFlightUtils.ITEM_HEADER;
+            itemFF.title = undefined;
+            itemFF.detail = undefined;
         }
+
         return accumulator;
       }, [])
       .map(([itemFF, _itemEFIS]) => itemFF);
