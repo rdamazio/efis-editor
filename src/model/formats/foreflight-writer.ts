@@ -99,7 +99,7 @@ export class ForeFlightWriter {
           case ChecklistItem_Type.ITEM_NOTE:
           case ChecklistItem_Type.ITEM_CAUTION:
           case ChecklistItem_Type.ITEM_WARNING: {
-            const text = ForeFlightUtils.CHECKLIST_ITEM_PREFIXES.get(itemEFIS.type)! + itemEFIS.prompt;
+            const text = ForeFlightUtils.getChecklistItemPrefix(itemEFIS.type) + itemEFIS.prompt;
             const [lastItemFF, lastItemEFIS] = accumulator[accumulator.length - 1] || [];
             if (accumulator.length && lastItemEFIS.indent < itemEFIS.indent) {
               // If this is an indented text item, then...
