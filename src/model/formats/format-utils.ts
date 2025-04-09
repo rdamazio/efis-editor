@@ -20,7 +20,7 @@ export class FormatUtils {
     [ChecklistItem_Type.ITEM_WARNING, 'WARNING: '],
   ]);
 
-  private static readonly CHECKLIST_ITEM_TYPES = new Map(
+  public static readonly CHECKLIST_ITEM_TYPES = new Map(
     Array.from(FormatUtils.CHECKLIST_ITEM_PREFIXES.entries()).map((item) => swap(item)),
   );
 
