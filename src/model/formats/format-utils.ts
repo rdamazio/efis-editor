@@ -49,6 +49,17 @@ export class FormatUtils {
       : { type: ChecklistItem_Type.ITEM_PLAINTEXT, prompt: prompt };
   }
 
+  /**
+   * The current strategy for mapping possibly multiline notes is as follows:
+   *
+   *   - If the note is standalone (detail item w/o title) _and_ single line, don't indent it
+   *   - If the note is standalone _and_ multiline, then indent the lines to show that they belong together
+   *   - If the note is _not_ standalone (belongs to a check or detail item), then indent it, whether single or multi-line
+   *
+   * Unfortunately, this algorithm makes it impossible to distinguish adjacent multiline notes, but this can only be
+   * improved by introducing additional elements and markers. However, this case should not be relevant in practice,
+   * so it is not considered worth pursuing at this time.
+   */
   public static possiblyMultilineNoteToChecklistItems(text: string, standalone: boolean): ChecklistItem[] {
     const noteLines = FormatUtils._splitLines(text);
     return noteLines.map((noteLine) =>
