@@ -10,5 +10,5 @@
       "--ts_out=${workspaceRoot}/gen/ts"
     ]
   },
-  "formatFiles.excludePattern": "src/model/formats/test-foreflight.fmd,src/model/formats/test.json,src/model/formats/test.ace"
+  "formatFiles.excludePattern": "src/model/formats/test-foreflight.fmd,src/model/formats/test-garmin-pilot.gplt,src/model/formats/test.json,src/model/formats/test.ace"
 }
