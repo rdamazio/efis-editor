@@ -34,26 +34,30 @@ You can try it out directly in the link above, but here's what it currently look
 ## Supported file types:
 
 - Checklists:
-  - Advanced Flight systems (AFS)
-  - Dynon Skyview
-  - Foreflight (.fmd file format) - thanks to [zyv](https://github.com/zyv)!
+  - Advanced Flight Systems (AFS)
+  - Dynon SkyView
+  - ForeFlight (.fmd file format)<sup>†</sup>
+  - Garmin Pilot (.gplts file format)<sup>†</sup>
   - Garmin G3X / G3X Touch / GTN (.ace file format)
   - Grand Rapids (GRT)
   - Printable (PDF) - export only, selectable page size
   - Raw (JSON) - the editor's internal format (for lossless backup purposes)
 
+<sup>†</sup> Thanks to [Yury V. Zaytsev](https://github.com/zyv)!
+
 Different checklist file formats support different subsets of all the features in the editor:
 
-| **Feature**                | Garmin             | AFS/Dynon            | GRT                  | Foreflight           | PDF                |
-| -------------------------- | ------------------ | -------------------- | -------------------- | -------------------- | ------------------ |
-| Checklist groups           | :white_check_mark: | :white_check_mark: ¹ | :white_check_mark: ¹ | :white_check_mark:   | :white_check_mark: |
-| Checklist group categories | :x:                | :x:                  | :x:                  | :white_check_mark:   | :white_check_mark: |
-| Item types                 | :white_check_mark: | :white_check_mark: ² | :white_check_mark: ² | :white_check_mark:   | :white_check_mark: |
-| Indentation                | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :x:                  | :white_check_mark: |
-| Centering                  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :x:                  | :white_check_mark: |
-| Default checklist/group    | :white_check_mark: | :x:                  | :x:                  | :x:                  | :x:                |
-| Checklist metadata         | :white_check_mark: | :white_check_mark: ³ | :white_check_mark: ³ | :white_check_mark: ⁴ | :white_check_mark: |
-| Live data                  | :x:                | :x:                  | :white_check_mark:   | :x:                  | :x:                |
+| **Feature**                | Garmin             | AFS/Dynon            | GRT                  | ForeFlight           | Garmin Pilot       | PDF                |
+|----------------------------|--------------------|----------------------|----------------------|----------------------|--------------------|--------------------|
+| Checklist groups           | :white_check_mark: | :white_check_mark: ¹ | :white_check_mark: ¹ | :white_check_mark:   | :white_check_mark: | :white_check_mark: |
+| Checklist group categories | :x:                | :x:                  | :x:                  | :white_check_mark:   | :white_check_mark: | :white_check_mark: |
+| Item types                 | :white_check_mark: | :white_check_mark: ² | :white_check_mark: ² | :white_check_mark:   | :white_check_mark: | :white_check_mark: |
+| Indentation                | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :x:                  | :x:                | :white_check_mark: |
+| Centering                  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :x:                  | :x:                | :white_check_mark: |
+| Default checklist/group    | :white_check_mark: | :x:                  | :x:                  | :x:                  | :x:                | :x:                |
+| Checklist metadata         | :white_check_mark: | :white_check_mark: ³ | :white_check_mark: ³ | :white_check_mark: ⁴ | :x:                | :white_check_mark: |
+| Live data                  | :x:                | :x:                  | :white_check_mark:   | :x:                  | :white_check_mark: | :x:                |
+| Completion actions         | :x:                | :x:                  | :x:                  | :x:                  | :white_check_mark: | :x:                |
 
 ¹ Groups names after the first will become part of the exported checklist name<br>
 ² Prefixes, suffixes and formatting used to differentiate types<br>
