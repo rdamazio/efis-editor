@@ -1,6 +1,6 @@
 @if (!editing()) {
   @if (dynamicData()) {
-    {{ value() | dynamicData }}
+    {{ value() | dynamicData: isExpectation() }}
   } @else {
     {{ value() }}
   }
