@@ -16,6 +16,7 @@ import {
   GarminPilotObjectsContainer,
 } from '../../../gen/ts/garmin_pilot';
 import { FormatUtils } from './format-utils';
+import { GarminPilotLiveData } from './garmin-pilot-live-data';
 import {
   EfisChecklistGroupKey,
   GarminChecklistGroupKey,
@@ -102,7 +103,6 @@ export class GarminPilotReader {
     const resultMap = new Map<string, ChecklistItem[]>();
 
     checklistItems.forEach((checklistItemGarmin) => {
-      // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
       switch (checklistItemGarmin.itemType) {
         case GarminPilotChecklistItem_ItemType.TYPE_PLAIN_TEXT:
           // Plain text item (= check item)
@@ -151,7 +151,25 @@ export class GarminPilotReader {
           break;
         }
 
-        // TODO: Live data fields.
+        case GarminPilotChecklistItem_ItemType.TYPE_LOCAL_ALTIMETER:
+        case GarminPilotChecklistItem_ItemType.TYPE_OPEN_NEAREST:
+        case GarminPilotChecklistItem_ItemType.TYPE_OPEN_ATIS_SCRATCHPAD:
+        case GarminPilotChecklistItem_ItemType.TYPE_OPEN_CRAFT_SCRATCHPAD:
+        case GarminPilotChecklistItem_ItemType.TYPE_WEATHER_FREQUENCY:
+        case GarminPilotChecklistItem_ItemType.TYPE_CLEARANCE_FREQUENCY:
+        case GarminPilotChecklistItem_ItemType.TYPE_GROUND_CTAF_FREQUENCY:
+        case GarminPilotChecklistItem_ItemType.TYPE_TOWER_CTAF_FREQUENCY:
+        case GarminPilotChecklistItem_ItemType.TYPE_APPROACH_FREQUENCY:
+        case GarminPilotChecklistItem_ItemType.TYPE_CENTER_FREQUENCY:
+          // Live data
+          resultMap.set(checklistItemGarmin.uuid, [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: checklistItemGarmin.title,
+              expectation: GarminPilotLiveData.getLiveDataFieldSlug(checklistItemGarmin.itemType),
+            }),
+          ]);
+          break;
       }
     });
 
