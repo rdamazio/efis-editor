@@ -13,6 +13,7 @@ import { DynonFormat, DynonFormatOptions } from './dynon-format';
 import { FormatError } from './error';
 import { ForeFlightFormat } from './foreflight-format';
 import { FormatId } from './format-id';
+import { GarminPilotFormat } from './garmin-pilot-format';
 import { GrtFormat } from './grt-format';
 import { JsonFormat } from './json-format';
 import { PdfFormat } from './pdf-format';
@@ -90,6 +91,7 @@ FORMAT_REGISTRY.register<DynonFormatOptions>(DynonFormat, FormatId.DYNON40, 'Dyn
   maxLineLength: 40,
 });
 FORMAT_REGISTRY.register(ForeFlightFormat, FormatId.FOREFLIGHT, 'Boeing ForeFlight');
+FORMAT_REGISTRY.register(GarminPilotFormat, FormatId.GARMIN_PILOT, 'Garmin Pilot™');
 FORMAT_REGISTRY.register(GrtFormat, FormatId.GRT, 'Grand Rapids Technologies', {
   supportsImport: true,
   extension: TXT_EXTENSION,
