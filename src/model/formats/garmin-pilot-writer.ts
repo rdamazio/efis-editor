@@ -18,6 +18,7 @@ import {
 } from '../../../gen/ts/garmin_pilot';
 import { NullValue } from '../../../gen/ts/google/protobuf/struct';
 import { FormatUtils } from './format-utils';
+import { GarminPilotLiveData } from './garmin-pilot-live-data';
 import { GarminChecklistGroupKey, GarminPilotFormatError, GarminPilotUtils } from './garmin-pilot-utils';
 
 export class GarminPilotWriter {
@@ -135,9 +136,11 @@ export class GarminPilotWriter {
             throw new GarminPilotFormatError(`unknown EFIS item type for '${itemEFIS.prompt}'`);
 
           case ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE: {
-            // TODO: Live data field types.
-            itemGarmin.itemType = GarminPilotChecklistItem_ItemType.TYPE_PLAIN_TEXT;
-            itemGarmin.action = itemEFIS.expectation;
+            const garminLiveDataItemType = GarminPilotLiveData.getGarminLiveDataTypeByExpectation(itemEFIS.expectation);
+            [itemGarmin.itemType, itemGarmin.action] =
+              garminLiveDataItemType !== undefined
+                ? [garminLiveDataItemType, '']
+                : [GarminPilotChecklistItem_ItemType.TYPE_PLAIN_TEXT, itemEFIS.expectation];
             break;
           }
 
