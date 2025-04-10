@@ -34,32 +34,43 @@ You can try it out directly in the link above, but here's what it currently look
 ## Supported file types:
 
 - Checklists:
-  - Advanced Flight systems (AFS)
-  - Dynon Skyview
-  - Foreflight (.fmd file format) - thanks to [zyv](https://github.com/zyv)!
+  - Advanced Flight Systems (AFS)
+  - Dynon SkyView
+  - ForeFlight (.fmd file format)<sup>†</sup>
+  - Garmin Pilot (.gplt file format) <sup>ᶢ†</sup>
   - Garmin G3X / G3X Touch / GTN (.ace file format)
   - Grand Rapids (GRT)
   - Printable (PDF) - export only, selectable page size
   - Raw (JSON) - the editor's internal format (for lossless backup purposes)
 
+<sup>ᶢ</sup> At Garmin's request, we only support this unencrypted version of the .gplts format -
+it can be imported into Garmin Pilot just the same, but the editor will not import .gplts files. It
+will import the .gplt files that it generates.<br>
+<sup>†</sup> Thanks to [Yury V. Zaytsev](https://github.com/zyv)!
+
 Different checklist file formats support different subsets of all the features in the editor:
 
-| **Feature**                | Garmin             | AFS/Dynon            | GRT                  | Foreflight           | PDF                |
-| -------------------------- | ------------------ | -------------------- | -------------------- | -------------------- | ------------------ |
-| Checklist groups           | :white_check_mark: | :white_check_mark: ¹ | :white_check_mark: ¹ | :white_check_mark:   | :white_check_mark: |
-| Checklist group categories | :x:                | :x:                  | :x:                  | :white_check_mark:   | :white_check_mark: |
-| Item types                 | :white_check_mark: | :white_check_mark: ² | :white_check_mark: ² | :white_check_mark:   | :white_check_mark: |
-| Indentation                | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :x:                  | :white_check_mark: |
-| Centering                  | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :x:                  | :white_check_mark: |
-| Default checklist/group    | :white_check_mark: | :x:                  | :x:                  | :x:                  | :x:                |
-| Checklist metadata         | :white_check_mark: | :white_check_mark: ³ | :white_check_mark: ³ | :white_check_mark: ⁴ | :white_check_mark: |
-| Live data                  | :x:                | :x:                  | :white_check_mark:   | :x:                  | :x:                |
+| **Feature**                | AFS/Dynon            | ForeFlight           | Garmin (G3X/GTN)   | Garmin Pilot         | GRT                  | PDF                |
+| -------------------------- | -------------------- | -------------------- | ------------------ | -------------------- | -------------------- | ------------------ |
+| Checklist groups           | :white_check_mark: ¹ | :white_check_mark:   | :white_check_mark: | :white_check_mark: ⁶ | :white_check_mark: ¹ | :white_check_mark: |
+| Checklist group categories | :x:                  | :white_check_mark:   | :x:                | :white_check_mark: ⁶ | :x:                  | :white_check_mark: |
+| Item types                 | :white_check_mark: ² | :white_check_mark:   | :white_check_mark: | :white_check_mark:   | :white_check_mark: ² | :white_check_mark: |
+| Indentation                | :white_check_mark:   | :x:                  | :white_check_mark: | :x:                  | :white_check_mark:   | :white_check_mark: |
+| Centering                  | :white_check_mark:   | :x:                  | :white_check_mark: | :x:                  | :white_check_mark:   | :white_check_mark: |
+| Default checklist/group    | :x:                  | :x:                  | :white_check_mark: | :x:                  | :x:                  | :x:                |
+| Checklist metadata         | :white_check_mark: ³ | :white_check_mark: ⁴ | :white_check_mark: | :x:                  | :white_check_mark: ³ | :white_check_mark: |
+| Live data ⁵                | :x:                  | :x:                  | :x:                | :white_check_mark:   | :white_check_mark:   | :x:                |
+| Completion actions ⁵       | :x:                  | :x:                  | :x:                | :white_check_mark:   | :x:                  | :x:                |
 
 ¹ Groups names after the first will become part of the exported checklist name<br>
 ² Prefixes, suffixes and formatting used to differentiate types<br>
 ³ Output as a separate checklist (last)<br>
 ⁴ Only file name, aircraft information and make/model (not manufacturer or copyright info)<br>
-<br>
+⁵ See section below on dynamic data.
+⁶ For groups to map to Garmin Pilot's "Normal" subcategories, they must be named exactly
+`Preflight`, `Takeoff/Cruise` or `Landing` - checklists under any other group names will show up
+as `Other`.
+
 Internally, files are stored in our own format, so it is possible to import a
 file in one format and then export it in another.
 
@@ -112,6 +123,24 @@ Safari lets you add a Home Screen icon
 ([macOS instructions](https://support.apple.com/en-mide/104996) /
 [iOS instructions](https://support.apple.com/en-mide/guide/iphone/iph42ab2f3a7/ios) /
 [iPadOS instructions](https://support.apple.com/en-mide/guide/ipad/ipadc602b75b/ipados)).
+
+## Dynamic data/actions
+
+Some apps and EFISs support displaying dynamic data in the checklist - for instance, replacing
+a token with the current engine RPM or approach control frequency, or providing a button to
+open other app functionality like showing the nearest airports.
+
+To enter dynamic data tokens, simply type them as normal text, such as `%24%` (GRT token for
+oil temperature) or `%APPROACH_FREQUENCY%` (Garmin Pilot token for approach control frequency).
+
+For GRT, tokens can be mixed with other text on any type of item, and supported tokens are listed
+in the GRT manual (there's 130 of them).
+
+For Garmin Pilot, tokens are only supported on the response (right side) of challenge/response
+items, and cannot be mixed with other text in that field. Supported tokens are `%LOCAL_ALTIMETER%`,
+`%OPEN_NEAREST%`, `%OPEN_ATIS_SCRATCHPAD%`, `%OPEN_CRAFT_SCRATCHPAD%`, `%WEATHER_FREQUENCY%`,
+`%CLEARANCE_FREQUENCY%`, `%GROUND_CTAF_FREQUENCY%`, `%TOWER_CTAF_FREQUENCY%`,
+`%APPROACH_FREQUENCY%`, and `%CENTER_FREQUENCY%`.
 
 ## Disclaimer
 
