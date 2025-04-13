@@ -78,6 +78,7 @@ export const FORMAT_REGISTRY = new FormatRegistry();
 FORMAT_REGISTRY.register(AceFormat, FormatId.ACE, 'Garmin G3X™/GTN™');
 FORMAT_REGISTRY.register<DynonFormatOptions>(DynonFormat, FormatId.AFD, 'Advanced Flight Systems', {
   fileName: 'CHKLST.AFD',
+  maxLineLength: 96,
 });
 FORMAT_REGISTRY.register(DynonFormat, FormatId.DYNON, 'Dynon SkyView™ - no wrap');
 FORMAT_REGISTRY.register<DynonFormatOptions>(DynonFormat, FormatId.DYNON31, 'Dynon SkyView™ - 40% / 31 cols.', {
