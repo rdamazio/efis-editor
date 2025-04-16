@@ -73,8 +73,9 @@ export class FormatUtils {
       // Previous item was a title-like entry (detail or check item with note)
       (titleLikeItems.includes(lastItemEFIS.type) && lastItemEFIS.indent < itemEFIS.indent) ||
       // Previous item was an indented note-like entry (multiline note)
-      ([...FormatUtils.CHECKLIST_ITEM_PREFIXES.keys()].includes(lastItemEFIS.type) &&
-        lastItemEFIS.indent <= itemEFIS.indent &&
+      ((([...FormatUtils.CHECKLIST_ITEM_PREFIXES.keys()].includes(lastItemEFIS.type) &&
+        lastItemEFIS.indent <= itemEFIS.indent) ||
+        itemEFIS.type === ChecklistItem_Type.ITEM_SPACE) &&
         lastItemEFIS.indent >= FormatUtils.NOTE_INDENT)
     );
   }
