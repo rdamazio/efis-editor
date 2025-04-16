@@ -110,6 +110,13 @@ export class ChecklistItemComponent {
     this.itemDeleted.emit(true);
   }
 
+  onItemClick(event: MouseEvent) {
+    event.stopPropagation();
+    if (!this.promptInput().editing()) {
+      this.focus();
+    }
+  }
+
   focus() {
     this.containerRef().nativeElement.focus();
   }

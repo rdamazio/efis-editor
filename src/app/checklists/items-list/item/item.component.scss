@@ -3,6 +3,12 @@
   align-items: baseline;
 }
 
+.item-container:focus {
+  outline: none;
+  border-radius: 5px;
+  box-shadow: 0 0 3px 5px #303f9f;
+}
+
 .actions {
   float: left;
   flex: none;

@@ -596,6 +596,8 @@ describe('ChecklistsComponent', () => {
       await retype(promptBox1, 'New prompt');
       await retype(expectationBox, 'New expectation[Enter]');
 
+      // Items present: ['New prompt']
+
       await debounce();
       await user.keyboard('nw');
       await debounce();
@@ -615,6 +617,8 @@ describe('ChecklistsComponent', () => {
 
       await expectFile('My file', expectedFile, completed);
 
+      // Items present: ['New prompt', 'Other prompt']
+
       // Move back up and modify the first item again.
       await user.keyboard('[ArrowUp]');
       await user.keyboard('[Enter]');
@@ -625,6 +629,23 @@ describe('ChecklistsComponent', () => {
 
       expectedFile.groups[0].checklists[0].items[0].prompt = 'Third prompt';
       await expectFile('My file', expectedFile, completed2);
+
+      // Items present: ['Third prompt', 'Other prompt']
+
+      // Once again, but this time select the item by clicking on it.
+      const secondItem = await screen.findByText('Other prompt');
+      expect(secondItem).toBeVisible();
+      await user.click(secondItem);
+      await user.keyboard('[Enter]');
+
+      const completed3 = storageCompleted();
+      const promptBox4 = await screen.findByRole('textbox', { name: 'Prompt text' });
+      await retype(promptBox4, 'Yet another prompt[Enter]');
+
+      expectedFile.groups[0].checklists[0].items[1].prompt = 'Yet another prompt';
+      await expectFile('My file', expectedFile, completed3);
+
+      // Items present: ['Third prompt', 'Yet another prompt']
     });
 
     it('should indent an item', async () => {

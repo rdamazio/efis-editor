@@ -1,6 +1,13 @@
 @let it = item();
 
-<div #container class="item-container" tabindex="0" (focus)="itemFocused.emit(true)" (blur)="itemBlurred.emit(true)">
+<div
+  #container
+  class="item-container"
+  tabindex="0"
+  (focus)="itemFocused.emit(true)"
+  (blur)="itemBlurred.emit(true)"
+  (click)="onItemClick($event)"
+>
   <div class="actions">
     <mat-icon cdkDragHandle class="mat-icon-rtl-mirror action-icon drag-icon" matTooltip="Drag to reorder">
       drag_pan
