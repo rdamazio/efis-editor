@@ -38,10 +38,8 @@ export class FormatUtils {
 
   public static promptToPartialChecklistItem(prompt: string): Partial<ChecklistItem> {
     const [prefix, rest] = FormatUtils._splitByColon(prompt);
-    const itemType = FormatUtils.CHECKLIST_ITEM_TYPES.get(prefix);
-    return itemType !== undefined
-      ? { type: itemType, prompt: rest }
-      : { type: ChecklistItem_Type.ITEM_PLAINTEXT, prompt: prompt };
+    const itemType = FormatUtils.CHECKLIST_ITEM_TYPES.get(prefix) ?? ChecklistItem_Type.ITEM_PLAINTEXT;
+    return rest !== '' ? { type: itemType, prompt: rest } : { type: ChecklistItem_Type.ITEM_SPACE, indent: 0 };
   }
 
   /**
