@@ -20,13 +20,16 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
+**Checklist files**
+If the issue happens with a particular checklist, please download it as Raw data (.json) and include that file in your bug report.
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
 **Browser:**
  - OS: [e.g. iOS]
  - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+ - Browser version [e.g. 22]
 
 **Logs:**
 - open your browser's console (on Chrome, right-click the app's page (NOT this bug filing page!), select Inspect, then click on Console at the top)
