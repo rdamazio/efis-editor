@@ -5,11 +5,6 @@ export function swap<T1, T2>([a, b]: [T1, T2]): [T2, T1] {
   return [b, a];
 }
 
-interface PartialChecklistItem {
-  type: ChecklistItem_Type;
-  prompt: string;
-}
-
 export class FormatUtils {
   private static readonly NOTE_INDENT = 1;
 
@@ -41,7 +36,7 @@ export class FormatUtils {
     return matches !== null ? [matches[1] || '', matches[2]] : ['', text];
   }
 
-  public static promptToPartialChecklistItem(prompt: string): PartialChecklistItem {
+  public static promptToPartialChecklistItem(prompt: string): Partial<ChecklistItem> {
     const [prefix, rest] = FormatUtils._splitByColon(prompt);
     const itemType = FormatUtils.CHECKLIST_ITEM_TYPES.get(prefix);
     return itemType !== undefined
