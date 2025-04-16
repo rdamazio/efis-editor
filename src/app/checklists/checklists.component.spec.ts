@@ -653,13 +653,15 @@ describe('ChecklistsComponent', () => {
     it('should center an item', async () => {
       await newFile('My file');
       await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+
       // We can't use the built-in item because challenge/response doesn't support centering.
       await addItem('caution', 'Center me');
 
+      expect(screen.getByText('Center me')).toBeVisible();
+
       // Select and shift the item.
       const completed = storageCompleted();
-      await user.keyboard('[ArrowUp]');
-      await debounce();
+      // The added item will have kept focus - center it.
       await user.keyboard('[ShiftLeft>]c[/ShiftLeft]');
       await debounce();
 
@@ -673,6 +675,7 @@ describe('ChecklistsComponent', () => {
       // Uncenter it.
       const completed2 = storageCompleted();
       await user.keyboard('[ShiftLeft>]c[/ShiftLeft]');
+      await debounce();
 
       // Verify that it was indented in storage.
       expectedFile.groups[0].checklists[0].items[1].centered = false;
@@ -766,15 +769,20 @@ describe('ChecklistsComponent', () => {
 
     it('should reorder items', async () => {
       await newFile('My file');
-      await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+      const checklistTreeItem = screen.getByRole('treeitem', { name: 'Checklist: First checklist' });
+      await user.click(checklistTreeItem);
+
       await addItem('caution', 'Second item');
       await addItem('title', 'Third item');
+      // addItem may have left focus on the item - divert that elsewhere.
+      checklistTreeItem.focus();
+      await debounce();
 
       const item1 = ChecklistItem.clone(NEW_FILE.groups[0].checklists[0].items[0]);
       const item2 = ChecklistItem.create({ type: ChecklistItem_Type.ITEM_CAUTION, prompt: 'Second item' });
       const item3 = ChecklistItem.create({ type: ChecklistItem_Type.ITEM_TITLE, prompt: 'Third item' });
 
-      // Shift first item down
+      // Shift first item down.
       const completed = storageCompleted();
       await user.keyboard('[ArrowDown]');
       await debounce();
