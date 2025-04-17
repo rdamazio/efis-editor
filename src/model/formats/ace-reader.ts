@@ -17,6 +17,9 @@ export class AceReader {
   private static readonly ENCODING = 'latin1'; // equivalent to ISO-8859-1
   private static readonly DECODER = new TextDecoder(this.ENCODING);
 
+  // For testing only.
+  static trimMetadataFields = true;
+
   private _buf: ArrayBuffer | undefined;
   private _arr: Uint8Array | undefined;
   private _offset = 0;
@@ -51,10 +54,16 @@ export class AceReader {
       // Oh well, we tried.
       throw new FormatError("No file name in file's metadata or uploaded file");
     }
-    const makeAndModel = this._readLine();
-    const aircraftInfo = this._readLine();
-    const manufacturerInfo = this._readLine();
-    const copyrightInfo = this._readLine();
+    let makeAndModel = this._readLine();
+    let aircraftInfo = this._readLine();
+    let manufacturerInfo = this._readLine();
+    let copyrightInfo = this._readLine();
+    if (AceReader.trimMetadataFields) {
+      makeAndModel = makeAndModel.trim();
+      aircraftInfo = aircraftInfo.trim();
+      manufacturerInfo = manufacturerInfo.trim();
+      copyrightInfo = copyrightInfo.trim();
+    }
 
     const outFile: ChecklistFile = {
       groups: [],

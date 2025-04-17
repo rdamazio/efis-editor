@@ -18,10 +18,13 @@ export class AceWriter {
     this._addLine();
 
     this._addLine(file.metadata.name);
-    this._addLine(metadata.makeAndModel);
-    this._addLine(metadata.aircraftInfo);
-    this._addLine(metadata.manufacturerInfo);
-    this._addLine(metadata.copyrightInfo);
+
+    // Garmin's ACE editor thinks the file corrupt if any of these fields are empty,
+    // so we fill them with a single space otherwise (#199).
+    this._addLine(metadata.makeAndModel || ' ');
+    this._addLine(metadata.aircraftInfo || ' ');
+    this._addLine(metadata.manufacturerInfo || ' ');
+    this._addLine(metadata.copyrightInfo || ' ');
 
     for (const group of file.groups) {
       this._addPart(AceConstants.GROUP_HEADER);
