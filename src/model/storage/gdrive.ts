@@ -288,6 +288,10 @@ export class GoogleDriveStorage {
     // Transition to disconnected only after the token is discarded above so
     // there's no chance it'll be used for another sync.
     this._state$.next(DriveSyncState.DISCONNECTED);
+
+    // Deletions that happened before disconnecting will not be deleted remotely in future syncs.
+    // We prefer to preserve more data than the user expects, instead of deleting more.
+    await this._setLocalDeletions([]);
   }
 
   public async synchronize() {
@@ -555,14 +559,21 @@ export class GoogleDriveStorage {
   }
 
   private async _onChecklistsUpdated(checklists: string[]) {
+    const lastChecklistList = this._lastChecklistList;
+    this._lastChecklistList = Array.from(checklists);
+
+    if (this._state$.value === DriveSyncState.DISCONNECTED) {
+      // Users might find it unexpected that we delete something remotely due to a local deletion that
+      // happened before they enabled sync, so just don't do anything when disconnected.
+      return;
+    }
+
     // Detect newly deleted checklists.
-    const newlyDeletedNames = this._lastChecklistList.filter((x: string) => !checklists.includes(x));
+    const newlyDeletedNames = lastChecklistList.filter((x: string) => !checklists.includes(x));
     const localDeletions: LocalDeletion[] = newlyDeletedNames.map((name: string): LocalDeletion => {
       console.debug(`SYNC: Detected deletion of '${name}'`);
       return { fileName: name, deletionTime: new Date() };
     });
-
-    this._lastChecklistList = Array.from(checklists);
 
     // Merge it with previously-known deletions.
     const previousDeletions = await this._getLocalDeletions();
