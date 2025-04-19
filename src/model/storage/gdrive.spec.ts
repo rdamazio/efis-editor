@@ -1,5 +1,5 @@
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom } from 'rxjs';
 import { ChecklistFile, ChecklistGroup } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../formats/test-data';
 import { LazyBrowserStorage } from './browser-storage';
@@ -84,6 +84,10 @@ describe('GoogleDriveApi', () => {
   async function expectState(state: DriveSyncState) {
     const currentState = await firstValueFrom(gdrive.getState(), { defaultValue: DriveSyncState.FAILED });
     expect(currentState).toEqual(state);
+  }
+
+  async function awaitState(state: DriveSyncState) {
+    return firstValueFrom(gdrive.getState().pipe(filter((s) => s === state)), { defaultValue: DriveSyncState.FAILED });
   }
 
   function expectStates(states: DriveSyncState[]) {
@@ -210,6 +214,7 @@ describe('GoogleDriveApi', () => {
     await gdrive.synchronize();
 
     await expectState(DriveSyncState.IN_SYNC);
+    expect(gdriveApi.downloadFile).not.toHaveBeenCalled();
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
   });
 
@@ -294,10 +299,16 @@ describe('GoogleDriveApi', () => {
   });
 
   it('should delete a remote file when locally deleted more recently', async () => {
-    await store.saveChecklistFile(EXPECTED_CONTENTS, NEWER_MTIME);
-    await store.deleteChecklistFile(FILE_NAME);
+    // Start with a synced-up state.
+    gdriveApi.listFiles.and.resolveTo([newFile(EXPECTED_CONTENTS.metadata!.name, OLDER_MTIME)]);
+    await store.saveChecklistFile(EXPECTED_CONTENTS, OLDER_MTIME);
+    await gdrive.synchronize();
+    await expectState(DriveSyncState.IN_SYNC);
 
-    gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, OLDER_MTIME)]);
+    // Delete the file locally.
+    await store.deleteChecklistFile(FILE_NAME);
+    await awaitState(DriveSyncState.NEEDS_SYNC);
+
     gdriveApi.trashFile.withArgs(FILE_ID).and.resolveTo();
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
@@ -305,6 +316,30 @@ describe('GoogleDriveApi', () => {
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
     expect(gdriveApi.downloadFile).not.toHaveBeenCalled();
     expect(gdriveApi.trashFile).toHaveBeenCalledOnceWith(FILE_ID);
+  });
+
+  it('should not delete a remote file when locally deleted while disconnected', async () => {
+    // Sync first.
+    await store.saveChecklistFile(EXPECTED_CONTENTS, OLDER_MTIME);
+    gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, OLDER_MTIME)]);
+    await gdrive.synchronize();
+    await expectState(DriveSyncState.IN_SYNC);
+
+    // Then disconnect
+    await gdrive.disableSync(false);
+    await expectState(DriveSyncState.DISCONNECTED);
+
+    // Delete the file while disconnected, wait for that to propagate.
+    await store.deleteChecklistFile(FILE_NAME);
+
+    // Connect and sync again - file should be downloaded, not deleted.
+    gdriveApi.downloadFile.withArgs(FILE_ID).and.resolveTo(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+    await gdrive.synchronize();
+    await gdrive.synchronize();
+    await expectState(DriveSyncState.IN_SYNC);
+
+    expect(gdriveApi.downloadFile).toHaveBeenCalledOnceWith(FILE_ID);
+    expect(gdriveApi.trashFile).not.toHaveBeenCalled();
   });
 
   it('should skip a local deletion that does not exist remotely', async () => {
