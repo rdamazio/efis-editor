@@ -28,6 +28,11 @@
 }
 
 .add-bar {
+  position: sticky;
+  bottom: -10px;
+  padding-bottom: 20px;
+  background: black;
+
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
