@@ -132,7 +132,7 @@ export const EXPECTED_FOREFLIGHT_CONTENTS = ChecklistFile.create({
               type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
             }),
             ChecklistItem.create({ prompt: 'scary multiline note!', type: ChecklistItem_Type.ITEM_WARNING, indent: 1 }),
-            ChecklistItem.create({ type: ChecklistItem_Type.ITEM_PLAINTEXT, indent: 1 }),
+            ChecklistItem.create({ type: ChecklistItem_Type.ITEM_SPACE }),
             ChecklistItem.create({ prompt: 'line after line break.', type: ChecklistItem_Type.ITEM_NOTE, indent: 1 }),
             ChecklistItem.create({ prompt: 'Adjacent text.', type: ChecklistItem_Type.ITEM_PLAINTEXT, indent: 1 }),
             ChecklistItem.create({

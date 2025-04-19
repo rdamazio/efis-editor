@@ -100,8 +100,12 @@ export class ForeFlightWriter {
           case ChecklistItem_Type.ITEM_PLAINTEXT:
           case ChecklistItem_Type.ITEM_NOTE:
           case ChecklistItem_Type.ITEM_CAUTION:
-          case ChecklistItem_Type.ITEM_WARNING: {
-            const text = FormatUtils.getChecklistItemPrefix(itemEFIS.type) + itemEFIS.prompt;
+          case ChecklistItem_Type.ITEM_WARNING:
+          case ChecklistItem_Type.ITEM_SPACE: {
+            const text =
+              itemEFIS.type !== ChecklistItem_Type.ITEM_SPACE
+                ? FormatUtils.getChecklistItemPrefix(itemEFIS.type) + itemEFIS.prompt
+                : '';
 
             const [lastItemFF, lastItemEFIS] = accumulator.at(-2) ?? [];
             if (lastItemFF && lastItemEFIS && FormatUtils.shouldMergeNotes(itemEFIS, lastItemEFIS)) {
@@ -129,14 +133,9 @@ export class ForeFlightWriter {
             // ...otherwise, create a Detail Item without title, but with a note
             itemFF.type = ForeFlightUtils.ITEM_HEADER;
             itemFF.title = undefined;
-            itemFF.detail = text;
+            itemFF.detail = itemEFIS.type !== ChecklistItem_Type.ITEM_SPACE ? text : undefined;
             break;
           }
-
-          case ChecklistItem_Type.ITEM_SPACE:
-            itemFF.type = ForeFlightUtils.ITEM_HEADER;
-            itemFF.title = undefined;
-            itemFF.detail = undefined;
         }
 
         return accumulator;

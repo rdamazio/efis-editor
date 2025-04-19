@@ -38,10 +38,8 @@ export class FormatUtils {
 
   public static promptToPartialChecklistItem(prompt: string): Partial<ChecklistItem> {
     const [prefix, rest] = FormatUtils._splitByColon(prompt);
-    const itemType = FormatUtils.CHECKLIST_ITEM_TYPES.get(prefix);
-    return itemType !== undefined
-      ? { type: itemType, prompt: rest }
-      : { type: ChecklistItem_Type.ITEM_PLAINTEXT, prompt: prompt };
+    const itemType = FormatUtils.CHECKLIST_ITEM_TYPES.get(prefix) ?? ChecklistItem_Type.ITEM_PLAINTEXT;
+    return rest !== '' ? { type: itemType, prompt: rest } : { type: ChecklistItem_Type.ITEM_SPACE, indent: 0 };
   }
 
   /**
@@ -75,8 +73,9 @@ export class FormatUtils {
       // Previous item was a title-like entry (detail or check item with note)
       (titleLikeItems.includes(lastItemEFIS.type) && lastItemEFIS.indent < itemEFIS.indent) ||
       // Previous item was an indented note-like entry (multiline note)
-      ([...FormatUtils.CHECKLIST_ITEM_PREFIXES.keys()].includes(lastItemEFIS.type) &&
-        lastItemEFIS.indent <= itemEFIS.indent &&
+      ((([...FormatUtils.CHECKLIST_ITEM_PREFIXES.keys()].includes(lastItemEFIS.type) &&
+        lastItemEFIS.indent <= itemEFIS.indent) ||
+        itemEFIS.type === ChecklistItem_Type.ITEM_SPACE) &&
         lastItemEFIS.indent >= FormatUtils.NOTE_INDENT)
     );
   }

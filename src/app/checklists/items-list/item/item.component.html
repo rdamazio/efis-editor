@@ -74,6 +74,12 @@
     </button>
   </div>
   <div class="item" [class.item-centered]="it.centered" tabindex="0">
+    <span class="prompt-spacer" [style.padding-left]="it.centered ? '' : '10px'"></span>
+    @if (!it.centered) {
+      @for (_ of [].constructor(it.indent); track $index) {
+        <span class="prompt-tabulator">⟶</span>
+      }
+    }
     <span
       class="prompt"
       [class.prompt-challenge]="it.type === itemType.ITEM_CHALLENGE"
@@ -83,7 +89,7 @@
       [class.prompt-caution]="it.type === itemType.ITEM_CAUTION"
       [class.prompt-note]="it.type === itemType.ITEM_NOTE"
       [class.prompt-space]="it.type === itemType.ITEM_SPACE"
-      [style.padding-left]="it.centered ? '' : 10 + it.indent * 25 + 'px'"
+
     >
       <!-- TODO: Find a better solution than to save/cancel independent fields together -->
       <editable-label
