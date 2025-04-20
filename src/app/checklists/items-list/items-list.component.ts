@@ -1,4 +1,5 @@
 import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { LowerCasePipe } from '@angular/common';
 import {
   afterNextRender,
   Component,
@@ -29,6 +30,7 @@ import { ChecklistItemComponent } from './item/item.component';
     CdkDragPlaceholder,
     CdkDropList,
     ChecklistItemComponent,
+    LowerCasePipe,
     MatButtonModule,
     MatIconModule,
     NgxResizeObserverModule,
@@ -41,14 +43,14 @@ export class ChecklistItemsComponent {
   static readonly UNDO_LEVELS = 1;
 
   readonly itemTypes: { label: string; type: ChecklistItem_Type }[] = [
-    { label: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
-    { label: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
-    { label: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
-    { label: 'title', type: ChecklistItem_Type.ITEM_TITLE },
-    { label: 'warning', type: ChecklistItem_Type.ITEM_WARNING },
-    { label: 'caution', type: ChecklistItem_Type.ITEM_CAUTION },
-    { label: 'note', type: ChecklistItem_Type.ITEM_NOTE },
-    { label: 'blank row', type: ChecklistItem_Type.ITEM_SPACE },
+    { label: 'Challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
+    { label: 'Challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
+    { label: 'Text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
+    { label: 'Title', type: ChecklistItem_Type.ITEM_TITLE },
+    { label: 'Warning', type: ChecklistItem_Type.ITEM_WARNING },
+    { label: 'Caution', type: ChecklistItem_Type.ITEM_CAUTION },
+    { label: 'Note', type: ChecklistItem_Type.ITEM_NOTE },
+    { label: 'Blank row', type: ChecklistItem_Type.ITEM_SPACE },
   ];
 
   readonly checklist = model<Checklist | undefined>();

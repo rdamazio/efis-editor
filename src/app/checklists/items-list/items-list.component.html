@@ -38,11 +38,11 @@
             mat-fab
             extended
             class="action-button"
-            [attr.aria-label]="`Add a new checklist ${item_type.label}`"
+            aria-label="Add a new checklist {{ item_type.label | lowercase }}"
             (click)="onNewItem(item_type.type)"
           >
             <mat-icon class="action-icon">add</mat-icon>
-            <span class="action-label">Add {{ item_type.label }}</span>
+            <span class="action-label">{{ item_type.label }}</span>
           </button>
         </div>
       }

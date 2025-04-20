@@ -301,6 +301,7 @@ module.exports = defineConfig(
       // This one makes no sense with signals.
       '@angular-eslint/template/no-call-expression': 'off',
       '@angular-eslint/template/no-inline-styles': ['error', { allowBindToStyle: true }],
+      '@angular-eslint/template/no-interpolation-in-attributes': ['error', { allowSubstringInterpolation: true }],
       '@angular-eslint/template/no-non-null-assertion': 'off',
     },
   },
