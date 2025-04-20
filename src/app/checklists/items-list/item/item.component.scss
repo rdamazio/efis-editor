@@ -76,18 +76,19 @@
 .expectation-container {
   flex-grow: 1;
   display: flex;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='20' height='100' viewBox='0 0 20 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3ctext x='10' y='16' fill='white' font-size='2em'%3e.%3c/text%3e%3c/svg%3e ");
+  background-repeat: repeat-x;
 }
 
 .expectation-spacer {
   flex-grow: 1;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='20' height='100' viewBox='0 0 20 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3ctext x='10' y='16' fill='white' font-size='2em'%3e.%3c/text%3e%3c/svg%3e ");
-  background-repeat: repeat-x;
 }
 
 .expectation {
   float: right;
   color: cyan;
   padding-left: 5px;
+  background-color: #000;
 }
 
 .prompt-input-editing {
