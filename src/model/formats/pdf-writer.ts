@@ -75,7 +75,7 @@ interface IconToDraw {
 export class PdfWriter {
   private static readonly DEBUG_LAYOUT = false;
   private static readonly INCHES_TO_EM = 6;
-  private static readonly MM_TO_EM = this.INCHES_TO_EM * 25.4;
+  private static readonly MM_TO_EM = this.INCHES_TO_EM / 25.4;
   private static readonly GROUP_TITLE_HEIGHT = 3;
   private static readonly GROUP_TITLE_FONT_SIZE = 20;
   private static readonly MAIN_TITLE_FONT_SIZE = 30;
