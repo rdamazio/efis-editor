@@ -39,7 +39,7 @@
       class="action-icon"
       matTooltip="Indent left"
       [attr.aria-label]="`Indent ${it.prompt} left`"
-      [disabled]="it.indent === 0 || it.centered || it.type === itemType.ITEM_SPACE"
+      [disabled]="it.indent === 0 || it.centered"
       (click)="onIndent(-1)"
     >
       <mat-icon>format_indent_decrease</mat-icon>
@@ -50,7 +50,7 @@
       class="action-icon"
       matTooltip="Indent right"
       [attr.aria-label]="`Indent ${it.prompt} right`"
-      [disabled]="it.indent === 4 || it.centered || it.type === itemType.ITEM_SPACE"
+      [disabled]="it.indent === 4 || it.centered"
       (click)="onIndent(1)"
     >
       <mat-icon>format_indent_increase</mat-icon>
