@@ -49,10 +49,6 @@ export class ChecklistItemComponent {
 
   onIndent(delta: number) {
     const item = this.item();
-    if (item.type === ChecklistItem_Type.ITEM_SPACE) {
-      return;
-    }
-
     const indent = item.indent + delta;
     if (indent >= 0 && indent <= 4) {
       item.indent = indent;
