@@ -7,7 +7,29 @@
   overflow-y: auto;
 
   color: #bbb;
-  background: black;
+
+  background:
+		/* Shadow covers */
+    linear-gradient(white 30%, rgba(0, 0, 0, 0)),
+    linear-gradient(rgba(0, 0, 0, 0), black 70%) 0 100%,
+    /* Shadows */ radial-gradient(50% 0, farthest-side, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)),
+    radial-gradient(50% 100%, farthest-side, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)) 0 100%;
+  background:
+		/* Shadow covers */
+    linear-gradient(black 30%, rgba(0, 0, 0, 0)),
+    linear-gradient(rgba(0, 0, 0, 0), black 70%) 0 100%,
+    /* Shadows */ radial-gradient(farthest-side at 50% 0, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)),
+    radial-gradient(farthest-side at 50% 100%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)) 0 100%;
+  background-repeat: no-repeat;
+  background-color: black;
+  background-size:
+    100% 40px,
+    100% 40px,
+    100% 14px,
+    100% 14px;
+
+  /* Opera doesn't support this in the shorthand */
+  background-attachment: local, local, scroll, scroll;
 }
 
 .list {
@@ -28,6 +50,11 @@
 }
 
 .add-bar {
+  position: sticky;
+  bottom: -10px;
+  padding-bottom: 20px;
+  background: black;
+
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
