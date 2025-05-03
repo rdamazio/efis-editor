@@ -128,7 +128,7 @@ describe('ChecklistItemComponent', () => {
     expect(item.expectation).toEqual('My expectation');
   });
 
-  it('should not be able to edit or indent a blank item', async () => {
+  it('should not be able to edit but able to indent a blank item', async () => {
     item.type = ChecklistItem_Type.ITEM_SPACE;
     item.prompt = '';
     await renderComponent();
@@ -137,7 +137,7 @@ describe('ChecklistItemComponent', () => {
     expect(editButton).toBeDisabled();
     expect(centerButton).toBeDisabled();
     expect(indentLeftButton).toBeDisabled();
-    expect(indentRightButton).toBeDisabled();
+    expect(indentRightButton).toBeEnabled();
   });
 
   it('should emit when Delete is clicked', async () => {

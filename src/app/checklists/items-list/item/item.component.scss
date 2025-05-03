@@ -87,6 +87,7 @@
 .expectation {
   float: right;
   color: cyan;
+  margin-top: 1px;
   padding-left: 5px;
   background-color: #000;
 }
@@ -99,4 +100,20 @@
 .expectation-input-editing {
   display: inline-block;
   width: 300px;
+}
+
+.prompt-tabulator:first-child,
+.prompt:first-child:not(.item-centered > span) {
+  padding-left: 10px;
+}
+
+.prompt-tabulator {
+  opacity: 33%;
+  width: 25px;
+  margin-top: -3px;
+}
+
+.item-container:hover .prompt-tabulator:before,
+.item-container:focus .prompt-tabulator:before {
+  content: '⟷';
 }
