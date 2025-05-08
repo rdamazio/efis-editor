@@ -23,7 +23,7 @@
       mat-medium-icon-button
       matSuffix
       matTooltip="Save (⏎)"
-      [attr.aria-label]="'Save changes to ' + label()"
+      [attr.aria-label]="`Save changes to ${label()}`"
       [disabled]="saveDisabled()"
       (click)="save()"
     >
@@ -34,7 +34,7 @@
       mat-medium-icon-button
       matSuffix
       matTooltip="Cancel (Esc)"
-      [attr.aria-label]="'Cancel changes to ' + label()"
+      [attr.aria-label]="`Cancel changes to ${label()}`"
       (click)="cancel()"
     >
       <mat-icon>cancel</mat-icon>

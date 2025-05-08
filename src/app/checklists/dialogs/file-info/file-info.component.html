@@ -33,7 +33,7 @@
       @for (group of data.allGroups; track $index; let groupIdx = $index) {
         <mat-optgroup [label]="group.title">
           @for (checklist of group.checklists; track $index; let checklistIdx = $index) {
-            <mat-option [value]="groupIdx + '.' + checklistIdx">{{ checklist.title }}</mat-option>
+            <mat-option [value]="`${groupIdx}.${checklistIdx}`">{{ checklist.title }}</mat-option>
           }
         </mat-optgroup>
       }

@@ -40,7 +40,7 @@
   <!-- TODO: Dragging of groups could use a better preview and placeholder -->
   <mat-nested-tree-node
     *matTreeNodeDef="let node; when: hasChild"
-    [id]="'group_' + node.groupIdx"
+    [id]="`group_${node.groupIdx}`"
     [attr.aria-label]="(node.isAddNew ? '' : 'Group: ') + node.title"
     level="0"
     checklistDrag
@@ -58,7 +58,7 @@
     (cdkDropListExited)="onLeafExited($event)"
   >
     <div class="mat-tree-node" [class.group-selected]="node.group && selectedChecklistGroup() === node.group">
-      <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle group ' + node.title">
+      <button mat-icon-button matTreeNodeToggle [attr.aria-label]="`Toggle group ${node.title}`">
         <mat-icon class="mat-icon-rtl-mirror">
           {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
         </mat-icon>

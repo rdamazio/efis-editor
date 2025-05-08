@@ -17,7 +17,7 @@
       mat-medium-icon-button
       class="action-icon"
       matTooltip="Edit this line"
-      [attr.aria-label]="'Edit ' + it.prompt"
+      [attr.aria-label]="`Edit ${it.prompt}`"
       [disabled]="it.type === itemType.ITEM_SPACE"
       (click)="onEdit($event)"
     >
@@ -28,7 +28,7 @@
       mat-medium-icon-button
       class="action-icon"
       matTooltip="Delete this line"
-      [attr.aria-label]="'Delete ' + it.prompt"
+      [attr.aria-label]="`Delete ${it.prompt}`"
       (click)="onDelete()"
     >
       <mat-icon>delete</mat-icon>
@@ -38,7 +38,7 @@
       mat-medium-icon-button
       class="action-icon"
       matTooltip="Indent left"
-      [attr.aria-label]="'Indent ' + it.prompt + ' left'"
+      [attr.aria-label]="`Indent ${it.prompt} left`"
       [disabled]="it.indent === 0 || it.centered || it.type === itemType.ITEM_SPACE"
       (click)="onIndent(-1)"
     >
@@ -49,7 +49,7 @@
       mat-medium-icon-button
       class="action-icon"
       matTooltip="Indent right"
-      [attr.aria-label]="'Indent ' + it.prompt + ' right'"
+      [attr.aria-label]="`Indent ${it.prompt} right`"
       [disabled]="it.indent === 4 || it.centered || it.type === itemType.ITEM_SPACE"
       (click)="onIndent(1)"
     >
@@ -59,8 +59,8 @@
       mat-icon-button
       mat-medium-icon-button
       class="action-icon"
-      [matTooltip]="(it.centered ? 'Left-justify' : 'Center') + ' this line'"
-      [attr.aria-label]="'Center ' + it.prompt"
+      [matTooltip]="`${(it.centered ? 'Left-justify' : 'Center')}  this line`"
+      [attr.aria-label]="`Center ${it.prompt}`"
       [disabled]="it.type === itemType.ITEM_SPACE || it.type === itemType.ITEM_CHALLENGE_RESPONSE"
       (click)="onCenterToggle()"
     >
@@ -83,7 +83,7 @@
       [class.prompt-caution]="it.type === itemType.ITEM_CAUTION"
       [class.prompt-note]="it.type === itemType.ITEM_NOTE"
       [class.prompt-space]="it.type === itemType.ITEM_SPACE"
-      [style.padding-left]="it.centered ? '' : 10 + it.indent * 25 + 'px'"
+      [style.padding-left]="it.centered ? '' : `${10 + it.indent * 25}px`"
     >
       <!-- TODO: Find a better solution than to save/cancel independent fields together -->
       <editable-label

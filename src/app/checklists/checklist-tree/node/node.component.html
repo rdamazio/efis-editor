@@ -29,13 +29,13 @@
     @if (n.group && !n.checklist && !n.isAddNew) {
       <mat-select
         [(value)]="checklistGroupCategory"
-        [class]="'checklist-tree-node-title-category checklist-tree-node-title-category-' + checklistGroupCategory"
+        [class]="`checklist-tree-node-title-category checklist-tree-node-title-category-${checklistGroupCategory}`"
         matTooltip="Checklist group category"
         panelWidth="12em"
       >
         @for (category of _groupCategories; track category[0]) {
           <mat-option [value]="category[0]"
-            ><span [class]="'checklist-tree-node-title-category-' + category[0]">{{ category[1] }}</span>
+            ><span [class]="`checklist-tree-node-title-category-${category[0]}`">{{ category[1] }}</span>
           </mat-option>
         }
       </mat-select>
@@ -56,8 +56,8 @@
         data-testid="rename-button"
         mat-icon-button
         mat-small-icon-button
-        [attr.aria-label]="'Rename ' + n.title"
-        [matTooltip]="'Rename ' + n.title"
+        [attr.aria-label]="`Rename ${n.title}`"
+        [matTooltip]="`Rename ${n.title}`"
         (click)="nodeRename.emit(n)"
       >
         <mat-icon>edit</mat-icon>
@@ -66,8 +66,8 @@
         data-testid="delete-button"
         mat-icon-button
         mat-small-icon-button
-        [attr.aria-label]="'Delete ' + n.title"
-        [matTooltip]="'Delete ' + n.title + ' and all its items'"
+        [attr.aria-label]="`Delete ${n.title}`"
+        [matTooltip]="`Delete ${n.title} and all its items`"
         (click)="onDelete()"
       >
         <mat-icon>delete</mat-icon>
