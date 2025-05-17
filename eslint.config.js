@@ -160,6 +160,7 @@ module.exports = tseslint.config(
       'no-sequences': 'error',
       'no-template-curly-in-string': 'error',
       'no-throw-literal': 'error',
+      'no-unassigned-vars': 'error',
       'no-unmodified-loop-condition': 'error',
       'no-unneeded-ternary': 'error',
       'no-unreachable-loop': 'error',
