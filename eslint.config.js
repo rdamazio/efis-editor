@@ -212,6 +212,7 @@ module.exports = tseslint.config(
       '@angular-eslint/template/attributes-order': 'off',
       '@angular-eslint/template/button-has-type': 'off',
       '@angular-eslint/template/click-events-have-key-events': 'off',
+      '@angular-eslint/template/cyclomatic-complexity': ['error', { maxComplexity: 8 }],
       '@angular-eslint/template/i18n': 'off',
       // This one makes no sense with signals.
       '@angular-eslint/template/no-call-expression': 'off',

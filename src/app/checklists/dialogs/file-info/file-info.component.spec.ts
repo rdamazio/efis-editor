@@ -11,9 +11,9 @@ import { EXPECTED_CONTENTS } from '../../../../model/formats/test-data';
 import { ChecklistFileInfoComponent } from './file-info.component';
 
 @Component({
-  standalone: true,
-  imports: [MatDialogModule],
   selector: 'test-info-dialog',
+  imports: [MatDialogModule],
+  standalone: true,
   template: '<button (click)="openDialog()">Open dialog</button>',
 })
 export class DialogTestComponent {

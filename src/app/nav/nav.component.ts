@@ -17,8 +17,6 @@ import { NavData } from './nav-data';
 
 @Component({
   selector: 'app-nav',
-  templateUrl: './nav.component.html',
-  styleUrl: './nav.component.scss',
   imports: [
     EditableLabelComponent,
     GoogleDriveComponent,
@@ -33,6 +31,8 @@ import { NavData } from './nav-data';
     RouterLink,
     RouterOutlet,
   ],
+  templateUrl: './nav.component.html',
+  styleUrl: './nav.component.scss',
 })
 export class NavComponent {
   readonly navData: NavData = { routeTitle: signal(undefined), fileName: signal(undefined) };

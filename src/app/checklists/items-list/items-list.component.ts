@@ -9,9 +9,9 @@ import { ChecklistItemComponent } from './item/item.component';
 
 @Component({
   selector: 'checklist-items',
+  imports: [CdkDrag, CdkDragPlaceholder, CdkDropList, ChecklistItemComponent, MatButtonModule, MatIconModule],
   templateUrl: './items-list.component.html',
   styleUrl: './items-list.component.scss',
-  imports: [CdkDrag, CdkDragPlaceholder, CdkDropList, ChecklistItemComponent, MatButtonModule, MatIconModule],
 })
 export class ChecklistItemsComponent {
   // TODO: Customize snackbar to allow multiple undos.

@@ -12,9 +12,9 @@ import { PreferenceStorage } from '../../../../model/storage/preference-storage'
 import { PrintDialogComponent } from './print-dialog.component';
 
 @Component({
-  standalone: true,
-  imports: [MatDialogModule],
   selector: 'test-print-dialog',
+  imports: [MatDialogModule],
+  standalone: true,
   template: '<button (click)="openDialog()">Open dialog</button>',
 })
 export class DialogTestComponent {
