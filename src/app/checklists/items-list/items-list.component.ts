@@ -3,10 +3,12 @@ import { afterNextRender, Component, Injector, input, model, output, viewChildre
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 import { ChecklistItemComponent } from './item/item.component';
 
+@UntilDestroy()
 @Component({
   selector: 'checklist-items',
   imports: [CdkDrag, CdkDragPlaceholder, CdkDropList, ChecklistItemComponent, MatButtonModule, MatIconModule],
@@ -226,12 +228,18 @@ export class ChecklistItemsComponent {
 
     // Show snackbar with option to undo.
     this._undoSnackbar = this._snackBar.open(txt, 'Undo');
-    this._undoSnackbar.onAction().subscribe(() => {
-      this._popUndoState();
-    });
-    this._undoSnackbar.afterDismissed().subscribe(() => {
-      this._undoSnackbar = undefined;
-    });
+    this._undoSnackbar
+      .onAction()
+      .pipe(untilDestroyed(this))
+      .subscribe(() => {
+        this._popUndoState();
+      });
+    this._undoSnackbar
+      .afterDismissed()
+      .pipe(untilDestroyed(this))
+      .subscribe(() => {
+        this._undoSnackbar = undefined;
+      });
   }
 
   private _dismissUndoSnackbar() {

@@ -150,6 +150,8 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   }
 
   registerHotkeys(hotkeys: HotkeyRegistrar) {
+    // The hotkeys library handles unsubscription for us.
+    /* eslint-disable rxjs-x/no-ignored-subscription */
     hotkeys
       .addShortcut({
         keys: 'down',
@@ -341,6 +343,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
           this.items().onNewItem(shortcut.type);
         });
     }
+    /* eslint-enable rxjs-x/no-ignored-subscription */
   }
 
   private async _onFragmentChange(fragment: string | null) {

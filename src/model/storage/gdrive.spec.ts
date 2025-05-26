@@ -1,5 +1,5 @@
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { filter, firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom, Subscription } from 'rxjs';
 import { ChecklistFile, ChecklistGroup } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../formats/test-data';
 import { LazyBrowserStorage } from './browser-storage';
@@ -32,6 +32,8 @@ describe('GoogleDriveApi', () => {
   let gdriveApi: jasmine.SpyObj<GoogleDriveApi>;
   let allStates: DriveSyncState[];
   let allDownloads: string[];
+  let stateSub: Subscription | undefined;
+  let downloadSub: Subscription | undefined;
 
   beforeEach(async () => {
     clock = jasmine.clock();
@@ -63,16 +65,18 @@ describe('GoogleDriveApi', () => {
     await gdrive.init();
 
     allStates = [];
-    gdrive.getState().subscribe((state: DriveSyncState) => {
+    stateSub = gdrive.getState().subscribe((state: DriveSyncState) => {
       allStates.push(state);
     });
     allDownloads = [];
-    gdrive.onDownloads().subscribe((name: string) => {
+    downloadSub = gdrive.onDownloads().subscribe((name: string) => {
       allDownloads.push(name);
     });
   });
 
   afterEach(waitForAsync(async () => {
+    stateSub?.unsubscribe();
+    downloadSub?.unsubscribe();
     await gdrive.disableSync(false);
     await expectState(DriveSyncState.DISCONNECTED);
     gdrive.destroy();

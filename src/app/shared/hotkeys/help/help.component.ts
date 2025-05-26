@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
 import { HotkeyGroup, HotkeysService } from '@ngneat/hotkeys';
+import { take } from 'rxjs';
 import { ShortcutPipe } from './shortcut.pipe';
 
 @Component({
@@ -31,9 +32,12 @@ export class HelpComponent {
 
     this._helpRef = dialog.open(HelpComponent, { hasBackdrop: true, width: '500px' });
 
-    this._helpRef.afterClosed().subscribe(() => {
-      this._helpRef = undefined;
-    });
+    this._helpRef
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(() => {
+        this._helpRef = undefined;
+      });
 
     return this._helpRef;
   }

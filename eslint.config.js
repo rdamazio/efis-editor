@@ -189,6 +189,13 @@ module.exports = tseslint.config(
       'rxjs-x/finnish': ['error', { functions: false, methods: false }],
       'rxjs-x/no-ignored-error': 'off',
       'rxjs-x/no-ignored-subscribe': 'error',
+      'rxjs-x/no-ignored-subscription': [
+        'error',
+        {
+          // Add untilDestroyed to the list of completers.
+          completers: ['takeUntil', 'takeWhile', 'take', 'first', 'last', 'takeUntilDestroyed', 'untilDestroyed'],
+        },
+      ],
     },
   },
   {
