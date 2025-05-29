@@ -251,7 +251,16 @@ export class ChecklistItemsComponent {
       return;
     }
 
-    this.checklist.set(this._undoState.pop());
+    // The checklist object is referenced from the higher-level checklist file object,
+    // so we must update it instead of replacing it.
+    this.checklist.update((c?: Checklist) => {
+      const undoTo = this._undoState.pop();
+      if (c && undoTo) {
+        c.title = undoTo.title;
+        c.items = undoTo.items;
+      }
+      return c;
+    });
     this.onItemsUpdated();
   }
 
