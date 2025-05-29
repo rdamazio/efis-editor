@@ -3,7 +3,7 @@ name: Bug report
 about: Create a report to help us improve
 title: "[BUG] "
 labels: bug
-assignees: rdamazio
+assignees: ''
 
 ---
 
@@ -20,6 +20,9 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
+**Actual behavior**
+A clear and concise description of what's actually happening.
+
 **Checklist files**
 If the issue happens with a particular checklist, please download it as Raw data (.json) and include that file in your bug report.
 
@@ -28,8 +31,8 @@ If applicable, add screenshots to help explain your problem.
 
 **Browser:**
  - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Browser version [e.g. 22]
+ - Browser: [e.g. chrome, safari]
+ - Browser version: [e.g. 136.0.7103.114]
 
 **Logs:**
 - open your browser's console (on Chrome, right-click the app's page (NOT this bug filing page!), select Inspect, then click on Console at the top)
