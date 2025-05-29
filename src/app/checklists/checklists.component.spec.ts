@@ -59,7 +59,7 @@ describe('ChecklistsComponent', () => {
     rendered = await render(ChecklistsComponent, {
       providers: [
         { provide: ROUTER_OUTLET_DATA, useValue: signal(navData) },
-        { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 1 } },
+        { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 0 } },
         { provide: HOTKEY_DEBOUNCE_TIME, useValue: 50 },
       ],
     });
@@ -435,6 +435,38 @@ describe('ChecklistsComponent', () => {
     const expectedFile = ChecklistFile.clone(NEW_FILE);
     expectedFile.groups[0].checklists[0].items = [];
     await expectFile('My file', expectedFile, completed);
+  });
+
+  it('should undo deletion of an item', async () => {
+    await newFile('My file');
+    await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+
+    await addItem('caution', 'Delete me');
+    const item = screen.getByRole('listitem', { name: 'Item: Delete me' });
+    expect(item).toBeInTheDocument();
+
+    // Delete the item.
+    const completed = storageCompleted();
+    await user.click(within(item).getByRole('button', { name: 'Delete Delete me' }));
+    expect(screen.queryByRole('listitem', { name: 'Item: Delete me' })).not.toBeInTheDocument();
+    await expectFile('My file', NEW_FILE, completed);
+
+    // Undo the deletion.
+    const completed2 = storageCompleted();
+    const undoButton = await screen.findByRole('button', { name: 'Undo', hidden: true });
+    expect(undoButton).toBeVisible();
+    await user.click(undoButton);
+
+    // Verify that it's back to the screen and in storage.
+    expect(await screen.findByRole('listitem', { name: 'Item: Delete me' })).toBeInTheDocument();
+    const expectedFile = ChecklistFile.clone(NEW_FILE);
+    expectedFile.groups[0].checklists[0].items.push(
+      ChecklistItem.create({
+        type: ChecklistItem_Type.ITEM_CAUTION,
+        prompt: 'Delete me',
+      }),
+    );
+    await expectFile('My file', expectedFile, completed2);
   });
 
   it('should delete checklists', async () => {
