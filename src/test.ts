@@ -1,11 +1,11 @@
 import { getTestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import JasmineDOM from '@testing-library/jasmine-dom';
 
 // First, initialize the Angular testing environment.
-getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {});
+getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting(), {});
 
 // Install custom matchers from jasmine-dom
 beforeAll(() => {
