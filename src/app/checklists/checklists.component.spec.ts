@@ -99,6 +99,9 @@ describe('ChecklistsComponent', () => {
     await user.click(screen.getByRole('button', { name: 'New file' }));
     const checklistTitleBox = await screen.findByRole('textbox', { name: 'Title' });
     await user.type(checklistTitleBox, `${fileName}[Enter]`);
+
+    rendered.detectChanges();
+    await rendered.fixture.whenStable();
   }
 
   async function newEmptyFile(fileName: string) {
@@ -170,13 +173,6 @@ describe('ChecklistsComponent', () => {
     expect(navData.fileName()).toEqual(fileName);
   }
 
-  async function getChecklistFile(name: string): Promise<ChecklistFile | null> {
-    rendered.detectChanges();
-    await rendered.fixture.whenStable();
-
-    return storage.getChecklistFile(name);
-  }
-
   async function storageCompleted(): Promise<boolean> {
     // There's no good way to wait for some of the storage asynchronous operations, so inject one.
     const component = rendered.fixture.componentInstance;
@@ -190,7 +186,7 @@ describe('ChecklistsComponent', () => {
       expect(await completed).toBeTrue();
     }
 
-    const storedFile = await getChecklistFile(name);
+    const storedFile = await storage.getChecklistFile(name);
     expect(storedFile).not.toBeNull();
     storedFile!.metadata!.modifiedTime = 0;
     expect(storedFile).toEqual(expectedFile);
@@ -284,7 +280,7 @@ describe('ChecklistsComponent', () => {
 
   it('should create and delete a file', async () => {
     await newFile('My file');
-    expect(await getChecklistFile('My file')).not.toBeNull();
+    expect(await storage.getChecklistFile('My file')).not.toBeNull();
     expectFragment('My file');
     expectNavData('My file');
     expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
@@ -297,14 +293,14 @@ describe('ChecklistsComponent', () => {
 
     expect(await completed).toBeTrue();
     expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
-    expect(await getChecklistFile('My file')).toBeNull();
+    expect(await storage.getChecklistFile('My file')).toBeNull();
     expectFragment('');
     expectNavData(undefined);
   });
 
   it('should create and rename a file', async () => {
     await newFile('My file');
-    expect(await getChecklistFile('My file')).not.toBeNull();
+    expect(await storage.getChecklistFile('My file')).not.toBeNull();
     expectFragment('My file');
     expectNavData('My file');
 
@@ -317,8 +313,8 @@ describe('ChecklistsComponent', () => {
     await user.click(okButton);
 
     expect(await completed).toBeTrue();
-    expect(await getChecklistFile('My file')).toBeNull();
-    expect(await getChecklistFile('Renamed file')).not.toBeNull();
+    expect(await storage.getChecklistFile('My file')).toBeNull();
+    expect(await storage.getChecklistFile('Renamed file')).not.toBeNull();
 
     expectFragment('Renamed file');
     expectNavData('Renamed file');
@@ -326,7 +322,7 @@ describe('ChecklistsComponent', () => {
 
   it('should rename a file through navigation', async () => {
     await newFile('My file');
-    expect(await getChecklistFile('My file')).not.toBeNull();
+    expect(await storage.getChecklistFile('My file')).not.toBeNull();
     expectFragment('My file');
     expectNavData('My file');
 
@@ -340,8 +336,8 @@ describe('ChecklistsComponent', () => {
     expect(await completed).toBeTrue();
 
     expectFragment('Renamed file');
-    expect(await getChecklistFile('My file')).toBeNull();
-    expect(await getChecklistFile('Renamed file')).not.toBeNull();
+    expect(await storage.getChecklistFile('My file')).toBeNull();
+    expect(await storage.getChecklistFile('Renamed file')).not.toBeNull();
   });
 
   it('should not overwrite an existing file', async () => {
@@ -795,6 +791,8 @@ describe('ChecklistsComponent', () => {
 
       await addItem('caution', 'Second item');
       await addItem('title', 'Third item');
+      await rendered.fixture.whenStable();
+
       // addItem may have left focus on the item - divert that elsewhere.
       checklistTreeItem.focus();
       await debounce();
@@ -867,7 +865,7 @@ describe('ChecklistsComponent', () => {
       await addItem('text', 'Checklist III');
       expectFragment('My file/1/0');
 
-      const expectedFile = (await getChecklistFile('My file'))!;
+      const expectedFile = (await storage.getChecklistFile('My file'))!;
       expectedFile.metadata!.modifiedTime = 0;
       const checklist1 = expectedFile.groups[0].checklists[0];
       const checklist2 = expectedFile.groups[0].checklists[1];
@@ -934,8 +932,9 @@ describe('ChecklistsComponent', () => {
       await addChecklist('Second checklist group', 'Third checklist');
       await addGroup('Third checklist group');
       await addChecklist('Third checklist group', 'Fourth checklist');
+      await rendered.fixture.whenStable();
 
-      const expectedFile = (await getChecklistFile('My file'))!;
+      const expectedFile = (await storage.getChecklistFile('My file'))!;
       expectedFile.metadata!.modifiedTime = 0;
       const group1 = expectedFile.groups[0];
       const group2 = expectedFile.groups[1];
