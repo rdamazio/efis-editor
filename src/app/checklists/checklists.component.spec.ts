@@ -335,7 +335,7 @@ describe('ChecklistsComponent', () => {
     navData.fileName.set('Renamed file');
 
     rendered.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
     await rendered.fixture.whenStable();
     expect(await completed).toBeTrue();
 
