@@ -15,6 +15,10 @@ describe('DynonFormat', () => {
     TextWriter.testingTime = new Date(2024, 4, 3);
   });
 
+  afterAll(() => {
+    TextWriter.testingTime = undefined;
+  });
+
   describe('read then write back test file', () => {
     it('with no wrapping', async () => {
       await testWriteRead('test-dynon.txt', FormatId.DYNON);

@@ -19,7 +19,7 @@ const NON_DEFAULT_OPTS: PdfWriterOptions = {
   outputPageNumbers: false,
 };
 
-describe('ChecklistStorage', () => {
+describe('PreferenceStorage', () => {
   let store: PreferenceStorage;
   let browserStore: Storage;
 
@@ -37,7 +37,7 @@ describe('ChecklistStorage', () => {
     browserStore.clear();
   });
 
-  it('should retrieve default prin options when none are stored', async () => {
+  it('should retrieve default print options when none are stored', async () => {
     const opts = await store.getPrintOptions();
     expect(opts).toEqual(DEFAULT_OPTIONS);
   });

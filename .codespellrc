@@ -1,3 +1,3 @@
 [codespell]
-ignore-words-list = finalY,currentY
+ignore-words-list = finalY,currentY,afterAll
 skip = src/environments/dev-keys.ts

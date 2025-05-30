@@ -15,6 +15,10 @@ describe('GrtFormat', () => {
     TextWriter.testingTime = new Date(2024, 4, 3);
   });
 
+  afterAll(() => {
+    TextWriter.testingTime = undefined;
+  });
+
   it('read then write back test file', async () => {
     // Read file and check the proto contents.
     const f = await loadFile('/model/formats/test-grt.txt', 'test.txt');
