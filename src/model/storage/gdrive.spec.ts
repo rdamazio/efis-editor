@@ -1,4 +1,4 @@
-import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { filter, firstValueFrom, Subscription } from 'rxjs';
 import { ChecklistFile, ChecklistGroup } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../formats/test-data';
@@ -35,7 +35,7 @@ describe('GoogleDriveApi', () => {
   let stateSub: Subscription | undefined;
   let downloadSub: Subscription | undefined;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     clock = jasmine.clock();
     clock.install();
     clock.mockDate(FAKE_NOW);
@@ -52,27 +52,32 @@ describe('GoogleDriveApi', () => {
 
     TestBed.configureTestingModule({ providers: [{ provide: GoogleDriveApi, useValue: gdriveApi }] });
 
-    lazyBrowserStore = TestBed.inject(LazyBrowserStorage);
-    lazyBrowserStore.forceBrowserStorage();
-    browserStore = await lazyBrowserStore.storage;
-
-    store = TestBed.inject(ChecklistStorage);
-    await store.clear();
-
     gdriveApi.load.and.resolveTo();
     gdriveApi.authenticate.and.resolveTo('some_token');
-    gdrive = TestBed.inject(GoogleDriveStorage);
-    await gdrive.init();
-
-    allStates = [];
-    stateSub = gdrive.getState().subscribe((state: DriveSyncState) => {
-      allStates.push(state);
-    });
-    allDownloads = [];
-    downloadSub = gdrive.onDownloads().subscribe((name: string) => {
-      allDownloads.push(name);
-    });
   });
+
+  beforeEach(inject(
+    [ChecklistStorage, LazyBrowserStorage, GoogleDriveStorage],
+    async (s: ChecklistStorage, bs: LazyBrowserStorage, gds: GoogleDriveStorage) => {
+      store = s;
+      lazyBrowserStore = bs;
+      gdrive = gds;
+
+      lazyBrowserStore.forceBrowserStorage();
+      browserStore = await lazyBrowserStore.storage;
+      await store.clear();
+
+      await gdrive.init();
+      allStates = [];
+      stateSub = gdrive.getState().subscribe((state: DriveSyncState) => {
+        allStates.push(state);
+      });
+      allDownloads = [];
+      downloadSub = gdrive.onDownloads().subscribe((name: string) => {
+        allDownloads.push(name);
+      });
+    },
+  ));
 
   afterEach(waitForAsync(async () => {
     stateSub?.unsubscribe();

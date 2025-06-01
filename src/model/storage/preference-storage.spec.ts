@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 import { DEFAULT_OPTIONS, PdfWriterOptions } from '../formats/pdf-writer';
 import { LazyBrowserStorage } from './browser-storage';
 import { PreferenceStorage } from './preference-storage';
@@ -23,15 +23,20 @@ describe('PreferenceStorage', () => {
   let store: PreferenceStorage;
   let browserStore: Storage;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     TestBed.configureTestingModule({});
-    const lazyBrowserStore = TestBed.inject(LazyBrowserStorage);
-    lazyBrowserStore.forceBrowserStorage();
-    browserStore = await lazyBrowserStore.storage;
-    browserStore.clear();
-
-    store = TestBed.inject(PreferenceStorage);
   });
+
+  beforeEach(inject(
+    [PreferenceStorage, LazyBrowserStorage],
+    async (s: PreferenceStorage, lazyBrowserStore: LazyBrowserStorage) => {
+      lazyBrowserStore.forceBrowserStorage();
+      browserStore = await lazyBrowserStore.storage;
+      browserStore.clear();
+
+      store = s;
+    },
+  ));
 
   afterEach(() => {
     browserStore.clear();

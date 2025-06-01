@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import {
   ChecklistFile,
@@ -45,14 +45,18 @@ const YET_ANOTHER_CHECKLIST_FILE: ChecklistFile = {
 describe('ChecklistStorage', () => {
   let store: ChecklistStorage;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     TestBed.configureTestingModule({});
-    const browserStore = TestBed.inject(LazyBrowserStorage);
-    browserStore.forceBrowserStorage();
-
-    store = TestBed.inject(ChecklistStorage);
-    await store.clear();
   });
+
+  beforeEach(inject(
+    [ChecklistStorage, LazyBrowserStorage],
+    async (s: ChecklistStorage, browserStore: LazyBrowserStorage) => {
+      browserStore.forceBrowserStorage();
+      store = s;
+      await store.clear();
+    },
+  ));
 
   afterEach(async () => {
     await store.clear();
