@@ -569,7 +569,7 @@ describe('ChecklistsComponent', () => {
   describe('keyboard shortcuts', () => {
     async function debounce() {
       return new Promise((resolve) => {
-        setTimeout(resolve, 550);
+        setTimeout(resolve, 100);
       });
     }
 
