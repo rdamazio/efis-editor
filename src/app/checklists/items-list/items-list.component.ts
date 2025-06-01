@@ -38,6 +38,9 @@ export class ChecklistItemsComponent {
   readonly groupDropListIds = input<string[]>([]);
   readonly items = viewChildren(ChecklistItemComponent);
   private _selectedIdx: number | null = null;
+  // Whether to keep the intended selected item even if it loses focus.
+  // This is used when DOM reconstruction is expected (e.g. reordering items).
+  private _keepSelectedIdx = false;
   private _undoState: Checklist[] = [];
   private _undoSnackbar?: MatSnackBarRef<TextOnlySnackBar>;
 
@@ -162,12 +165,13 @@ export class ChecklistItemsComponent {
       return;
     }
 
+    // We're moving the item that's currently focused, so Angular may detach and reattach it from the DOM,
+    // which would cause it to lose focus before we can set the focus on the newly-moved item after rendering),
+    // so force ourselved to keep it as the next selected item until the next focusing.
+    this._keepSelectedIdx = true;
     moveItemInArray(this.checklist()!.items, this._selectedIdx! - 1, this._selectedIdx!);
     this._selectedIdx!--;
     this.onItemsUpdated();
-
-    // HACK: I don't really understand why it works IFF this is done both before and after render on move up (but not down).
-    this._focusSelectedItem();
   }
 
   moveCurrentItemDown() {
@@ -175,6 +179,9 @@ export class ChecklistItemsComponent {
       return;
     }
 
+    // While detaching/reattaching the DOM doesn't currently happen when moving the item down, it technically
+    // could, so we also do this here in case Angular changes their implementation.
+    this._keepSelectedIdx = true;
     moveItemInArray(this.checklist()!.items, this._selectedIdx! + 1, this._selectedIdx!);
     this._selectedIdx!++;
     this.onItemsUpdated();
@@ -198,14 +205,19 @@ export class ChecklistItemsComponent {
   }
 
   onItemFocused(idx: number) {
-    this._selectedIdx = idx;
+    if (!this._keepSelectedIdx) {
+      this._selectedIdx = idx;
+    }
   }
 
   onItemBlurred() {
-    this._selectedIdx = null;
+    if (!this._keepSelectedIdx) {
+      this._selectedIdx = null;
+    }
   }
 
   private _focusSelectedItem() {
+    this._keepSelectedIdx = false;
     const item = this._selectedItemComponent();
     const containerRef = item?.containerRef();
     if (item && containerRef) {
