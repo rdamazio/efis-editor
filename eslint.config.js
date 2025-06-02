@@ -34,6 +34,7 @@ module.exports = tseslint.config(
         'error',
         { type: 'attribute', prefix: ['app', 'checklist'], style: 'camelCase' },
       ],
+      '@angular-eslint/no-uncalled-signals': 'off',
       '@angular-eslint/prefer-inject': 'off',
       // TODO: Move to OnPush
       '@angular-eslint/prefer-on-push-component-change-detection': 'off',
