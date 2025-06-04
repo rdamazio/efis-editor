@@ -13,14 +13,15 @@ This is a web-based editor for file formats used by modern EFIS avionics systems
 
 ## Editor features
 
-- Import/export from the formats above
-- Multiple checklist files
-- Checklist item editing, reordering, moving within a file
-- Checklist renaming, reordering
-- Checklist group renaming, reordering
-- Checklist metadata editing, including Garmin's default group/checklist
+- Checklists
+  - Import/export from the formats below.
+  - Multiple checklist files
+  - Checklist item editing, reordering, moving within a file
+  - Checklist renaming, reordering
+  - Checklist group renaming, reordering
+  - Checklist metadata editing, including Garmin's default group/checklist
+  - Renders (fake) live data in place of GRT tokens like %1% (see GRT user manual for all tokens)
 - Keyboard shortcuts for navigation and editing
-- Renders (fake) live data in place of GRT tokens like %1% (see GRT user manual for all tokens)
 - Works offline
 - (optional) Google Drive™ synchronization
 
@@ -44,7 +45,7 @@ You can try it out directly in the link above, but here's what it currently look
 Different checklist file formats support different subsets of all the features in the editor:
 
 | **Feature**                | Garmin             | AFS/Dynon            | GRT                  | Foreflight           | PDF                |
-|----------------------------|--------------------|----------------------|----------------------|----------------------|--------------------|
+| -------------------------- | ------------------ | -------------------- | -------------------- | -------------------- | ------------------ |
 | Checklist groups           | :white_check_mark: | :white_check_mark: ¹ | :white_check_mark: ¹ | :white_check_mark:   | :white_check_mark: |
 | Checklist group categories | :x:                | :x:                  | :x:                  | :white_check_mark:   | :white_check_mark: |
 | Item types                 | :white_check_mark: | :white_check_mark: ² | :white_check_mark: ² | :white_check_mark:   | :white_check_mark: |
@@ -88,7 +89,7 @@ You can see the connection between the app and Google Drive, as well as delete c
 synchronized to it, by going to [Drive settings](https://drive.google.com/drive/u/0/settings)
 and selecting "Manage apps". Disconnecting from Google Drive, either within this app, or
 through that settings interface, does not automatically delete synchronized data.
-Google Drive does not support directly manipulating files stored in it this way.
+Google Drive does not support directly viewing or manipulating files stored in it this way.
 
 The synchronization is _simple_ and based purely on when a file was last modified. If the same
 file is modified on multiple instances of the app at the same time, changes are NOT merged,
@@ -162,8 +163,11 @@ We do have [a few policies and
 suggestions](https://github.com/rdamazio/efis-editor/blob/main/docs/contributing.md)
 for contributors. The broad TL;DR:
 
-- Bug reports are very welcome!
+- Bug reports and feature requests are very welcome!
 - Every commit that lands in the `main` branch is code reviewed.
+- We try to keep reasonably high [unit](https://github.com/search?q=repo%3Ardamazio%2Fefis-editor%20path%3A*.spec.ts&type=code)
+  and [e2e](https://github.com/rdamazio/efis-editor/blob/main/src/app/checklists/checklists.component.spec.ts) test coverage so
+  we can catch regressions easily
 - Please behave yourself, and obey the Community Guidelines.
 - There **is** a mandatory CLA you must agree to. Importantly, it **does not**
   transfer copyright ownership to Google or anyone else; it simply gives us the
