@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { DeferBlockState, inject, TestBed } from '@angular/core/testing';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from '@angular/material/snack-bar';
+import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
 import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
@@ -61,6 +62,7 @@ describe('ChecklistsComponent', () => {
         { provide: ROUTER_OUTLET_DATA, useValue: signal(navData) },
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 0 } },
         { provide: HOTKEY_DEBOUNCE_TIME, useValue: 50 },
+        provideClientHydration(withIncrementalHydration()),
       ],
     });
 

@@ -4,6 +4,7 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HotkeysService } from '@ngneat/hotkeys';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
@@ -35,6 +36,7 @@ describe('NavComponent', () => {
           provide: HotkeysService,
           useValue: hotkeys,
         },
+        provideClientHydration(withIncrementalHydration()),
       ],
     });
     fixture = rendered.fixture;
