@@ -43,8 +43,8 @@ jobs:
           name: prepared-source
       - name: Extract prepared artifacts
         run: tar xf prepared-source.tar
-      - run: npm run format
       - run: npm run lint
+      - run: npm run format
       - uses: codespell-project/actions-codespell@406322ec52dd7b488e48c1c4b82e2a8b3a1bf630 # v2
         with:
           path: src
