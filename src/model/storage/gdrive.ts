@@ -240,7 +240,7 @@ export class GoogleDriveStorage {
       }
     } else {
       this._state$.next(DriveSyncState.FAILED);
-      throw new Error('gDrive request failed with status ' + reason.status);
+      throw new Error(`gDrive request failed with status ${reason.status}`);
     }
   }
 

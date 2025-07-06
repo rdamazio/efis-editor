@@ -99,7 +99,6 @@ module.exports = tseslint.config(
       '@typescript-eslint/prefer-readonly': 'error',
       '@typescript-eslint/promise-function-async': 'error',
       '@typescript-eslint/require-array-sort-compare': ['error', { ignoreStringArrays: true }],
-      '@typescript-eslint/restrict-plus-operands': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
       '@typescript-eslint/switch-exhaustiveness-check': ['error', { considerDefaultExhaustiveForUnions: true }],
       '@typescript-eslint/typedef': ['error', { parameter: true, propertyDeclaration: true }],

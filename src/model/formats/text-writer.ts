@@ -137,7 +137,7 @@ export class TextWriter {
         case ChecklistItem_Type.ITEM_SPACE:
           break;
         default:
-          throw new FormatError('Unexpected item type: ' + item.type.valueOf());
+          throw new FormatError(`Unexpected item type: ${item.type.valueOf()}`);
       }
 
       let fullLine = prefix + item.prompt;
