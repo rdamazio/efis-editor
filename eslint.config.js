@@ -206,6 +206,8 @@ module.exports = tseslint.config(
       '@typescript-eslint/unbound-method': 'off',
       'no-await-in-loop': 'off',
       'no-restricted-imports': ['error', '@testing-library/dom'],
+      // Due to https://github.com/testing-library/eslint-plugin-testing-library/issues/1038:
+      'testing-library/no-node-access': 'off',
       'testing-library/no-render-in-lifecycle': 'off',
       'testing-library/prefer-explicit-assert': 'error',
       'testing-library/prefer-user-event': 'error',
