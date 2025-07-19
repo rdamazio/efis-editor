@@ -80,14 +80,14 @@
     "@types/uuid": "^10.0.0",
     "angular-eslint": "20.1.1",
     "eslint": "^9.31.0",
-    "eslint-config-prettier": "^10.1.5",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-depend": "^1.2.0",
     "eslint-plugin-jasmine": "^4.2.2",
     "eslint-plugin-no-secrets": "^2.2.1",
-    "eslint-plugin-prettier": "^5.5.1",
+    "eslint-plugin-prettier": "^5.5.3",
     "eslint-plugin-promise": "^7.1.0",
     "eslint-plugin-rxjs-x": "^0.7.7",
-    "eslint-plugin-testing-library": "^7.5.4",
+    "eslint-plugin-testing-library": "^7.6.0",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
@@ -101,6 +101,6 @@
     "prettier-eslint": "^16.4.2",
     "prettier-plugin-organize-imports": "^4.1.0",
     "typescript": "~5.8.3",
-    "typescript-eslint": "8.36.0"
+    "typescript-eslint": "8.37.0"
   }
 }
