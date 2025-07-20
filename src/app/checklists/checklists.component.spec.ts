@@ -245,7 +245,8 @@ describe('ChecklistsComponent', () => {
               await user.click(within(itemEl).getByRole('button', { name: `Center ${item.prompt}` }));
             }
             if (item.indent) {
-              const indentButton = within(itemEl).getByRole('button', { name: `Indent ${item.prompt} right` });
+              const promptText = item.prompt || 'blank row';
+              const indentButton = within(itemEl).getByRole('button', { name: `Indent ${promptText} right` });
               for (let i = 0; i < item.indent; i++) {
                 await user.click(indentButton);
               }

@@ -28,7 +28,7 @@
       mat-medium-icon-button
       class="action-icon"
       matTooltip="Delete this line"
-      [attr.aria-label]="`Delete ${it.prompt}`"
+      [attr.aria-label]="`Delete ${it.prompt || 'blank row'}`"
       (click)="onDelete()"
     >
       <mat-icon>delete</mat-icon>
@@ -38,7 +38,7 @@
       mat-medium-icon-button
       class="action-icon"
       matTooltip="Indent left"
-      [attr.aria-label]="`Indent ${it.prompt} left`"
+      [attr.aria-label]="`Indent ${it.prompt || 'blank row'} left`"
       [disabled]="it.indent === 0 || it.centered"
       (click)="onIndent(-1)"
     >
@@ -49,7 +49,7 @@
       mat-medium-icon-button
       class="action-icon"
       matTooltip="Indent right"
-      [attr.aria-label]="`Indent ${it.prompt} right`"
+      [attr.aria-label]="`Indent ${it.prompt || 'blank row'} right`"
       [disabled]="it.indent === 4 || it.centered"
       (click)="onIndent(1)"
     >
