@@ -4,7 +4,11 @@ import { firstValueFrom, timer } from 'rxjs';
 import { ChecklistFile } from '../../../../gen/ts/checklist';
 import { DYNON_EXPECTED_CONTENTS } from '../../../model/formats/dynon-format.spec';
 import { GRT_EXPECTED_CONTENTS } from '../../../model/formats/grt-format.spec';
-import { EXPECTED_CONTENTS, EXPECTED_FOREFLIGHT_CONTENTS } from '../../../model/formats/test-data';
+import {
+  EXPECTED_CONTENTS,
+  EXPECTED_CONTENTS_WITH_INDENTED_SPACE,
+  EXPECTED_FOREFLIGHT_CONTENTS,
+} from '../../../model/formats/test-data';
 import { loadFile } from '../../../model/formats/test-utils';
 import { ChecklistFileUploadComponent } from './file-upload.component';
 
@@ -42,7 +46,7 @@ describe('ChecklistFileUploadComponent', () => {
   }
 
   it('should upload JSON file', async () => {
-    await expectUpload('test.json', EXPECTED_CONTENTS);
+    await expectUpload('test.json', EXPECTED_CONTENTS_WITH_INDENTED_SPACE);
   });
 
   it('should upload ACE file', async () => {

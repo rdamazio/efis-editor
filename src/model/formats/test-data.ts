@@ -85,6 +85,17 @@ export const EXPECTED_CONTENTS = ChecklistFile.create({
   },
 });
 
+// Most formats don't support indented spaces, but for those that do, provide that.
+export const EXPECTED_CONTENTS_WITH_INDENTED_SPACE: ChecklistFile = (() => {
+  const expectedContents = ChecklistFile.clone(EXPECTED_CONTENTS);
+  const blankItem = expectedContents.groups[0].checklists[0].items[8];
+  if (blankItem.type !== ChecklistItem_Type.ITEM_SPACE) {
+    throw new Error('Unexpected item type');
+  }
+  blankItem.indent = 1;
+  return expectedContents;
+})();
+
 export const EXPECTED_FOREFLIGHT_CONTENTS = ChecklistFile.create({
   groups: [
     { category: ChecklistGroup_Category.normal, title: 'Empty subgroup', checklists: [] },

@@ -49,7 +49,8 @@
               "type": "ITEM_PLAINTEXT"
             },
             {
-              "type": "ITEM_SPACE"
+              "type": "ITEM_SPACE",
+              "indent": 1
             },
             {
               "prompt": "Item with 2 blank lines",
