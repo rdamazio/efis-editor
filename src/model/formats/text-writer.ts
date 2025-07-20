@@ -147,8 +147,10 @@ export class TextWriter {
       }
       fullLine += suffix;
 
-      let indentWidth = item.indent * this._options.indentWidth;
-      if (item.centered) {
+      let indentWidth;
+      if (item.type === ChecklistItem_Type.ITEM_SPACE) {
+        indentWidth = 0;
+      } else if (item.centered) {
         if (this._options.maxLineLength && fullLine.length < this._options.maxLineLength) {
           // See how much room is left and indent by half of that
           indentWidth = Math.floor((this._options.maxLineLength - fullLine.length) / 2);
@@ -159,6 +161,8 @@ export class TextWriter {
           // TODO: There's probably a better solution here.
           indentWidth = 7;
         }
+      } else {
+        indentWidth = item.indent * this._options.indentWidth;
       }
       const indentStr = ' '.repeat(indentWidth);
 
