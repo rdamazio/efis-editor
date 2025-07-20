@@ -35,10 +35,10 @@ export class TextWriter {
         this._addPart(this._replaceNumbers(this._options.checklistPrefix, checklistIdx, 0));
         this._addPart(' ');
         if (!firstGroup || !this._options.skipFirstGroup) {
-          this._addPart(group.title);
+          this._addPart(this._normalizeText(group.title));
           this._addPart(': ');
         }
-        this._addLine(checklist.title);
+        this._addLine(this._normalizeText(checklist.title));
 
         this._addItems(checklist.items, checklistIdx);
 
@@ -103,7 +103,7 @@ export class TextWriter {
     this._addLine(title);
     this._addPart(this._replaceNumbers(this._options.itemPrefix, checklistIdx, metadataIdx++));
     this._addPart('   ');
-    this._addLine(contents);
+    this._addLine(this._normalizeText(contents));
     return metadataIdx;
   }
 
@@ -140,10 +140,10 @@ export class TextWriter {
           throw new FormatError(`Unexpected item type: ${item.type.valueOf()}`);
       }
 
-      let fullLine = prefix + item.prompt;
+      let fullLine = prefix + this._normalizeText(item.prompt);
       if (item.expectation) {
         fullLine += this._options.expectationSeparator;
-        fullLine += item.expectation;
+        fullLine += this._normalizeText(item.expectation);
       }
       fullLine += suffix;
 
@@ -228,5 +228,12 @@ export class TextWriter {
     return template
       .replace('{{checklistNum}}', checklistNumber.toString())
       .replace('{{itemNum}}', itemNumber.toString());
+  }
+
+  private _normalizeText(text: string): string {
+    if (this._options.forbidCommas) {
+      return text.replaceAll(',', '');
+    }
+    return text;
   }
 }

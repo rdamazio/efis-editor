@@ -80,6 +80,7 @@ FORMAT_REGISTRY.register<DynonFormatOptions>(DynonFormat, FormatId.AFD, 'Advance
   extension: `.${FormatId.AFD}`,
   fileName: 'CHKLST.AFD',
   maxLineLength: 96,
+  forbidCommas: true,
 });
 FORMAT_REGISTRY.register(DynonFormat, FormatId.DYNON, 'Dynon SkyView™ - no wrap');
 FORMAT_REGISTRY.register<DynonFormatOptions>(DynonFormat, FormatId.DYNON31, 'Dynon SkyView™ - 40% / 31 cols.', {

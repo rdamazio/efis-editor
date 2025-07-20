@@ -32,6 +32,7 @@ export const DYNON_FORMAT_OPTIONS: TextFormatOptions = {
 export interface DynonFormatOptions extends FormatOptions {
   fileName?: string;
   maxLineLength?: number;
+  forbidCommas?: boolean;
 }
 
 export class DynonFormat extends AbstractChecklistFormat<DynonFormatOptions> {
@@ -42,6 +43,7 @@ export class DynonFormat extends AbstractChecklistFormat<DynonFormatOptions> {
     super(formatId, name, args);
     this._textFormatOptions = Object.assign({}, DYNON_FORMAT_OPTIONS);
     this._textFormatOptions.maxLineLength = args?.maxLineLength;
+    this._textFormatOptions.forbidCommas = args?.forbidCommas;
     this._textFormatOptions.fileExtensions = [this.extension];
     this._fileName = args?.fileName ?? `checklist${this.extension}`;
   }

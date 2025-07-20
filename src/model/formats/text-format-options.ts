@@ -46,6 +46,9 @@ export interface TextFormatOptions {
   checklistZeroIndexed?: boolean;
   checklistItemZeroIndexed?: boolean;
 
+  // Whether commas are allowed in the checklist text.
+  forbidCommas?: boolean;
+
   expectationSeparator: string;
   notePrefix: string;
   titlePrefixSuffix: string;
