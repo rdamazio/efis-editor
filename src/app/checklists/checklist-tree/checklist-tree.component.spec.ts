@@ -1,3 +1,4 @@
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { Checklist, ChecklistFile } from '../../../../gen/ts/checklist';
@@ -24,6 +25,7 @@ describe('ChecklistTreeComponent', () => {
 
   async function renderComponent(): Promise<RenderResult<ChecklistTreeComponent>> {
     return render(ChecklistTreeComponent, {
+      imports: [NoopAnimationsModule],
       inputs: { file: file, selectedChecklist: selectedChecklistInput },
       on: { fileModified, selectedChecklist, selectedChecklistGroup },
     });

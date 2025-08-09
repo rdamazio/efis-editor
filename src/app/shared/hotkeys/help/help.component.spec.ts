@@ -4,6 +4,7 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { firstValueFrom } from 'rxjs';
 import { HelpComponent } from './help.component';
 
@@ -14,7 +15,7 @@ describe('HelpComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HelpComponent, MatDialogModule],
+      imports: [HelpComponent, MatDialogModule, NoopAnimationsModule],
       providers: [{ provide: MatDialogRef, useValue: {} }],
     }).compileComponents();
 

@@ -1,3 +1,4 @@
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { render, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { Checklist, ChecklistItem_Type } from '../../../../gen/ts/checklist';
@@ -16,7 +17,11 @@ describe('ChecklistItemsComponent', () => {
       checklist = newChecklist;
     });
 
-    await render(ChecklistItemsComponent, { inputs: { checklist }, on: { checklistChange } });
+    await render(ChecklistItemsComponent, {
+      imports: [NoopAnimationsModule],
+      inputs: { checklist },
+      on: { checklistChange },
+    });
   });
 
   it('should render', async () => {

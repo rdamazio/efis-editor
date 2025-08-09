@@ -2,6 +2,7 @@ import { signal } from '@angular/core';
 import { DeferBlockState, inject, TestBed } from '@angular/core/testing';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from '@angular/material/snack-bar';
 import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
@@ -58,6 +59,7 @@ describe('ChecklistsComponent', () => {
 
     navData = { routeTitle: signal(undefined), fileName: signal(undefined) };
     rendered = await render(ChecklistsComponent, {
+      imports: [NoopAnimationsModule],
       providers: [
         { provide: ROUTER_OUTLET_DATA, useValue: signal(navData) },
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 0 } },

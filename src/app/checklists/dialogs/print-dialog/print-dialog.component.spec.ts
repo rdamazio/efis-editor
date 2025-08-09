@@ -4,6 +4,7 @@ import { Component, output } from '@angular/core';
 import { ComponentFixture, inject } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { DEFAULT_OPTIONS, PdfWriterOptions } from '../../../../model/formats/pdf-writer';
@@ -50,7 +51,7 @@ describe('PrintDialogComponent', () => {
     user = userEvent.setup();
     dataOut = jasmine.createSpy('dataOut');
 
-    fixture = (await render(DialogTestComponent, { on: { dataOut } })).fixture;
+    fixture = (await render(DialogTestComponent, { on: { dataOut }, imports: [NoopAnimationsModule] })).fixture;
   });
 
   beforeEach(inject(

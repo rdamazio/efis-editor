@@ -1,3 +1,4 @@
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistTreeComponent } from '../checklist-tree.component';
@@ -20,7 +21,10 @@ describe('ChecklistTreeBarComponent', () => {
       'collapseAll',
     ]);
 
-    rendered = await render(ChecklistTreeBarComponent, { inputs: { tree: tree } });
+    rendered = await render(ChecklistTreeBarComponent, {
+      imports: [NoopAnimationsModule],
+      inputs: { tree: tree },
+    });
     expandButton = screen.queryByRole('button', { name: 'Expand all checklist groups' })!;
     collapseButton = screen.queryByRole('button', { name: 'Collapse all checklist groups' })!;
   });
