@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
+
+package garmin_pilot;
+
+option optimize_for = CODE_SIZE;
+
+message GarminPilotChecklistContainer {
+  int32 dataModelVersion = 1;
+  int32 packageTypeVersion = 2;
+  string name = 3;
+  string type = 4;
+  repeated GarminPilotObjectsContainer objects = 5;
+}
+
+message GarminPilotObjectsContainer {
+  repeated GarminPilotChecklist checklists = 1;
+  repeated GarminPilotBinder binders = 2;
+  repeated GarminPilotChecklistItem checklistItems = 3;
+  google.protobuf.NullValue version = 4;
+}
+
+message GarminPilotChecklist {
+
+  enum CompletionItem {
+    ACTION_DO_NOTHING = 0;
+    ACTION_GO_TO_NEXT_CHECKLIST = 1;
+    ACTION_OPEN_FLIGHT_PLAN = 2;
+    ACTION_CLOSE_FLIGHT_PLAN = 3;
+    ACTION_OPEN_SAFETAXI = 4;
+    ACTION_OPEN_MAP = 5;
+  }
+
+  CompletionItem completionItem = 1;
+
+  string uuid = 2;
+  repeated string checklistItems = 3;
+  string name = 4;
+
+  enum Type {
+    TYPE_NORMAL = 0;
+    TYPE_ABNORMAL = 1;
+    TYPE_EMERGENCY = 2;
+  }
+
+  Type type = 5;
+
+  enum SubType {
+    SUBTYPE_PREFLIGHT = 0;
+    SUBTYPE_TAKEOFF_CRUISE = 1;
+    SUBTYPE_LANDING = 2;
+    SUBTYPE_OTHER = 3;
+    SUBTYPE_EMERGENCY = 4;
+  }
+
+  SubType subtype = 6;
+}
+
+/* This is a partial duplicate of the following message */
+message GarminPilotMetadata {
+  google.protobuf.StringValue sourceTemplateUUID = 1;
+  int32 sortOrder = 2;
+}
+
+message GarminPilotBinder {
+  string uuid = 1;
+  google.protobuf.StringValue sourceTemplateUUID = 2;
+  int32 sortOrder = 3;
+  string name = 4;
+  repeated string checklists = 5;
+}
+
+message GarminPilotChecklistItem {
+  bool checked = 1;
+
+  enum ItemType {
+    TYPE_PLAIN_TEXT = 0;
+    TYPE_LOCAL_ALTIMETER = 1;
+    TYPE_OPEN_NEAREST = 2;
+    TYPE_OPEN_ATIS_SCRATCHPAD = 3;
+    TYPE_OPEN_CRAFT_SCRATCHPAD = 4;
+    TYPE_WEATHER_FREQUENCY = 5;
+    TYPE_CLEARANCE_FREQUENCY = 6;
+    TYPE_GROUND_CTAF_FREQUENCY = 7;
+    TYPE_TOWER_CTAF_FREQUENCY = 8;
+    TYPE_APPROACH_FREQUENCY = 9;
+    TYPE_CENTER_FREQUENCY = 10;
+    TYPE_NOTE = 11;
+  }
+
+  ItemType itemType = 2;
+
+  string title = 3;
+  string uuid = 4;
+  string action = 5;
+}
+

@@ -179,3 +179,302 @@ export const EXPECTED_FOREFLIGHT_CONTENTS = ChecklistFile.create({
     copyrightInfo: '',
   },
 });
+
+export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
+  groups: [
+    {
+      category: ChecklistGroup_Category.normal,
+      title: 'Preflight',
+      checklists: [
+        {
+          title: 'New Checklist - Normal Preflight ',
+          items: [
+            ChecklistItem.create({ type: ChecklistItem_Type.ITEM_CHALLENGE }),
+            ChecklistItem.create({ type: ChecklistItem_Type.ITEM_CHALLENGE, prompt: 'Call w/o action' }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Call with action ',
+              expectation: 'Action',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              expectation: 'Action w/o Call',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              expectation: '\n\n',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_TITLE,
+              prompt: 'Note subject w/o body',
+            }),
+            ChecklistItem.create({ prompt: 'Note body w/o subject', type: ChecklistItem_Type.ITEM_PLAINTEXT }),
+            ChecklistItem.create({ prompt: 'Note subject', type: ChecklistItem_Type.ITEM_TITLE }),
+            ChecklistItem.create({ prompt: 'Note body', type: ChecklistItem_Type.ITEM_PLAINTEXT, indent: 1 }),
+            ChecklistItem.create({ type: ChecklistItem_Type.ITEM_SPACE }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Local Altimeter ',
+              expectation: '%LOCAL_ALTIMETER%',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Open Nearest',
+              expectation: '%OPEN_NEAREST%',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Open ATIS ScratchPad',
+              expectation: '%OPEN_ATIS_SCRATCHPAD%',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Open CRAFT ScratchPad',
+              expectation: '%OPEN_CRAFT_SCRATCHPAD%',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Weather Frequency ',
+              expectation: '%WEATHER_FREQUENCY%',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Clearance Frequency ',
+              expectation: '%CLEARANCE_FREQUENCY%',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Ground/CTAF Frequency ',
+              expectation: '%GROUND_CTAF_FREQUENCY%',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Tower/CTAF Frequency ',
+              expectation: '%TOWER_CTAF_FREQUENCY%',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Approach Frequency ',
+              expectation: '%APPROACH_FREQUENCY%',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+              prompt: 'Center Frequency',
+              expectation: '%CENTER_FREQUENCY%',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Go to Next Checklist',
+            }),
+          ],
+        },
+      ],
+    },
+    {
+      category: ChecklistGroup_Category.normal,
+      title: 'Takeoff/Cruise',
+      checklists: [
+        {
+          title: 'New Checklist - Normal Takeoff/Cruise',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Go to Next Checklist',
+            }),
+          ],
+        },
+      ],
+    },
+    {
+      category: ChecklistGroup_Category.normal,
+      title: 'Landing',
+      checklists: [
+        {
+          title: 'New Checklist - Normal Landing ',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Go to Next Checklist',
+            }),
+          ],
+        },
+      ],
+    },
+    {
+      category: ChecklistGroup_Category.normal,
+      title: 'Other',
+      checklists: [
+        {
+          title: 'New Checklist - Normal Other',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Go to Next Checklist',
+            }),
+          ],
+        },
+      ],
+    },
+    {
+      category: ChecklistGroup_Category.abnormal,
+      title: 'Abnormal',
+      checklists: [
+        {
+          title: 'New Checklist - Abnormal - Go to Next Checklist ',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Go to Next Checklist',
+            }),
+          ],
+        },
+        {
+          title: 'New Checklist - Completion - Do Nothing',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Do Nothing',
+            }),
+          ],
+        },
+        {
+          title: 'New Checklist - Completion Open Flight Plan',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Open Flight Plan',
+            }),
+          ],
+        },
+        {
+          title: 'New Checklist - Completion Close Flihgh Plan',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Close Flight Plan',
+            }),
+          ],
+        },
+        {
+          title: 'New Checklist - Completion - Open SafeTaxi',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Open SafeTaxi',
+            }),
+          ],
+        },
+        {
+          title: 'New Checklist - Completion - Open Map',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Open Map',
+            }),
+          ],
+        },
+      ],
+    },
+    {
+      category: ChecklistGroup_Category.emergency,
+      title: 'Emergency',
+      checklists: [
+        {
+          title: 'New Checklist - Emergency ',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Do Nothing',
+            }),
+          ],
+        },
+        {
+          title: 'Notes Torture Checklist',
+          items: [
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_TITLE,
+              prompt: 'Title without note',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'Normal note',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_TITLE,
+              prompt: 'Note with title',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'And',
+              indent: 1,
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'Multiple',
+              indent: 1,
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'Lines',
+              indent: 1,
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_NOTE,
+              prompt: 'some note',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_TITLE,
+              prompt: 'Note with title',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'And one line',
+              indent: 1,
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CAUTION,
+              prompt: 'some caution ',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'Note without title',
+              indent: 1,
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'With',
+              indent: 1,
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_CAUTION,
+              prompt: 'multiple',
+              indent: 1,
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'Lines',
+              indent: 1,
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_WARNING,
+              prompt: 'some warning',
+            }),
+            ChecklistItem.create({
+              type: ChecklistItem_Type.ITEM_PLAINTEXT,
+              prompt: 'On Completion: Do Nothing',
+            }),
+          ],
+        },
+      ],
+    },
+  ],
+  metadata: {
+    name: 'New Checklist Binder',
+    defaultGroupIndex: 0,
+    defaultChecklistIndex: 0,
+    makeAndModel: '',
+    aircraftInfo: '',
+    manufacturerInfo: '',
+    copyrightInfo: '{"sortOrder":3}',
+  },
+});
