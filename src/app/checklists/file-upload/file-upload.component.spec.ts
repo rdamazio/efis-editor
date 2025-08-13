@@ -27,6 +27,7 @@ describe('ChecklistFileUploadComponent', () => {
       on: { fileUploaded },
     });
     // The input is hidden and has no text, so we must fetch it directly from the document.
+    // eslint-disable-next-line testing-library/no-node-access
     uploadInput = document.querySelector('input[type="file"]')!;
   });
 
