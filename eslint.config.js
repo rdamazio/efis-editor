@@ -41,6 +41,24 @@ module.exports = tseslint.config(
       '@typescript-eslint/default-param-last': 'error',
       '@typescript-eslint/max-params': ['error', { max: 5 }],
       '@typescript-eslint/method-signature-style': ['error', 'method'],
+      // TODO: Complete upgrade to Angular 20.2 animations.
+      '@typescript-eslint/no-deprecated': [
+        'error',
+        {
+          allow: [
+            {
+              from: 'package',
+              name: 'NoopAnimationsModule',
+              package: '@angular/platform-browser/animations',
+            },
+            {
+              from: 'package',
+              name: 'provideAnimationsAsync',
+              package: '@angular/platform-browser/animations/async',
+            },
+          ],
+        },
+      ],
       '@typescript-eslint/no-extraneous-class': 'off',
       '@typescript-eslint/no-invalid-void-type': 'off',
       '@typescript-eslint/naming-convention': [
