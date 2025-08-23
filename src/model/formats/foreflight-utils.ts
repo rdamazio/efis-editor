@@ -16,7 +16,7 @@ export class ForeFlightUtils {
 
   public static async encrypt(text: string): Promise<Blob> {
     const iv = window.crypto.getRandomValues(new Uint8Array(CryptoUtils.CIPHER_BLOCK_SIZE));
-    return CryptoUtils.toBlob([iv, await CryptoUtils.encryptText(ForeFlightUtils.CIPHER_KEY, iv, text)]);
+    return CryptoUtils.toBlob([iv.buffer, await CryptoUtils.encryptText(ForeFlightUtils.CIPHER_KEY, iv, text)]);
   }
 
   /**
