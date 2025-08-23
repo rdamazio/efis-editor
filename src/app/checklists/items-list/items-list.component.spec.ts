@@ -33,7 +33,7 @@ describe('ChecklistItemsComponent', () => {
       expect(item).toBeVisible();
     }
     const textContents = items.map((item: HTMLElement) =>
-      item.textContent!.replace(/drag_.*format_align_[a-z]+/, '').trim(),
+      item.textContent.replace(/drag_.*format_align_[a-z]+/, '').trim(),
     );
     expect(textContents).toHaveSize(18);
     expect(textContents[0]).toEqual('Challenge item');

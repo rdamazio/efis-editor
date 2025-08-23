@@ -61,8 +61,6 @@ module.exports = tseslint.config(
       ],
       '@typescript-eslint/no-extraneous-class': 'off',
       '@typescript-eslint/no-invalid-void-type': 'off',
-      // TODO: Re-enable after upgrade to TypeScript 5.9.
-      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
       '@typescript-eslint/naming-convention': [
         'error',
         {
