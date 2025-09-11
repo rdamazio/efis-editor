@@ -39,7 +39,7 @@
     "@angular/platform-server": "^20.2.4",
     "@angular/router": "^20.2.4",
     "@angular/service-worker": "^20.2.4",
-    "@angular/ssr": "^20.2.2",
+    "@angular/ssr": "^20.3.0",
     "@ngneat/hotkeys": "^4.1.0",
     "@ngneat/until-destroy": "^10.0.0",
     "buffer": "^6.0.3",
