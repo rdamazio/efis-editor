@@ -87,7 +87,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-promise": "^7.1.0",
     "eslint-plugin-rxjs-x": "^0.7.7",
-    "eslint-plugin-testing-library": "^7.6.8",
+    "eslint-plugin-testing-library": "^7.7.0",
     "jasmine-core": "~5.10.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
