@@ -4,7 +4,8 @@
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
     "strict": true,
-    "noImplicitOverride": true,
+    /* This had to be turned off to accept generated code from protoc */
+    "noImplicitOverride": false,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,

@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { GarminPilotUtils } from '../../../model/formats/garmin-pilot-utils';
 
 // Pipe that replaces dynamic data tokens with random dynamic data
 // when not editing an entry.
@@ -11,6 +12,13 @@ export class DynamicDataPipe implements PipeTransform {
   private static readonly GRT_FIELD = /%(?<fieldnum>\d{1,3})%/;
 
   transform(value: string): string {
+    // Garmin Pilot
+    const garminLiveFieldValue = GarminPilotUtils.getLiveDataFieldExample(value);
+    if (garminLiveFieldValue) {
+      return garminLiveFieldValue;
+    }
+
+    // GRT
     let match = value.match(DynamicDataPipe.GRT_FIELD);
     while (match?.groups) {
       const fieldNum = parseInt(match.groups['fieldnum'], 10);
