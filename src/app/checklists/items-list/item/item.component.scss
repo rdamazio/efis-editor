@@ -1,6 +1,7 @@
 .item-container {
   display: flex;
   align-items: center;
+  min-width: 500px; /* min width required for challenge-response editables */
 }
 
 .item-container:focus {
@@ -27,6 +28,8 @@
   color: #eee;
   display: flex;
   width: 100%;
+  position: relative;
+  min-height: 22px;
 }
 
 .item-centered {
@@ -37,39 +40,43 @@
   box-decoration-break: clone;
 }
 
-.prompt-title {
+.item-title .prompt {
   font-size: 18px;
   font-weight: bold;
   color: white;
 }
 
-.prompt-challenge:before {
-  content: ' □';
-  vertical-align: 1px;
-}
-
-.prompt-challenge-response:before {
-  content: ' □ ';
-  vertical-align: 1px;
-}
-
-.prompt-caution:before {
-  content: 'CAUTION:';
-}
-
-.prompt-warning {
+.item-warning .prompt {
   color: yellow;
 }
 
-.prompt-warning:before {
-  content: 'WARNING:';
-}
-
-.prompt-note {
+.item-note .prompt {
   color: gray;
 }
 
-.prompt-note:before {
+/* Expand editors of note and title to full available width */
+.item-text .prompt,
+.item-title .prompt,
+.item-text .prompt-input,
+.item-title .prompt-input {
+  width: 100%;
+}
+
+.item-challenge .prompt:before,
+.item-challenge-response .prompt:before {
+  content: ' □';
+  vertical-align: 2px;
+}
+
+.item-caution .prompt:before {
+  content: 'CAUTION:';
+}
+
+.item-warning .prompt:before {
+  content: 'WARNING:';
+}
+
+.item-note .prompt:before {
   content: 'NOTE:';
 }
 
@@ -80,16 +87,39 @@
   background-repeat: repeat-x;
 }
 
-.expectation-spacer {
-  flex-grow: 1;
-}
-
 .expectation {
   float: right;
   color: cyan;
   margin-top: 1px;
   padding-left: 5px;
   background-color: #000;
+}
+
+.item-challenge .prompt-input,
+.item-challenge-response .prompt-input {
+  position: absolute;
+  left: 30px;
+  top: 1px;
+  background: #000;
+  padding-right: 5px;
+}
+
+.item-warning .prompt-input,
+.item-caution .prompt-input {
+  position: absolute;
+  left: 100px;
+}
+
+.expectation-input {
+  position: absolute;
+  right: 0;
+  background: #000;
+  padding-left: 10px;
+}
+
+.prompt-input-editing,
+.expectation-input-editing {
+  margin-top: -8px;
 }
 
 .prompt-input-editing {
@@ -105,6 +135,7 @@
 .prompt-tabulator:first-child,
 .prompt:first-child:not(.item-centered > span) {
   padding-left: 10px;
+  padding-right: 10px;
 }
 
 .prompt-tabulator {
