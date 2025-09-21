@@ -73,51 +73,55 @@
       </mat-icon>
     </button>
   </div>
-  <div class="item" [class.item-centered]="it.centered" tabindex="0">
+  <div
+    class="item"
+    [class.item-centered]="it.centered"
+    tabindex="0"
+    [class.item-challenge]="it.type === itemType.ITEM_CHALLENGE"
+    [class.item-challenge-response]="it.type === itemType.ITEM_CHALLENGE_RESPONSE"
+    [class.item-title]="it.type === itemType.ITEM_TITLE"
+    [class.item-warning]="it.type === itemType.ITEM_WARNING"
+    [class.item-caution]="it.type === itemType.ITEM_CAUTION"
+    [class.item-note]="it.type === itemType.ITEM_NOTE"
+    [class.item-space]="it.type === itemType.ITEM_SPACE"
+  >
     @for (_ of [].constructor(it.indent); track $index) {
       <span class="prompt-tabulator"></span>
     }
-    <span
-      class="prompt"
-      [class.prompt-challenge]="it.type === itemType.ITEM_CHALLENGE"
-      [class.prompt-challenge-response]="it.type === itemType.ITEM_CHALLENGE_RESPONSE"
-      [class.prompt-title]="it.type === itemType.ITEM_TITLE"
-      [class.prompt-warning]="it.type === itemType.ITEM_WARNING"
-      [class.prompt-caution]="it.type === itemType.ITEM_CAUTION"
-      [class.prompt-note]="it.type === itemType.ITEM_NOTE"
-      [class.prompt-space]="it.type === itemType.ITEM_SPACE"
-    >
-      <!-- TODO: Find a better solution than to save/cancel independent fields together -->
-      <editable-label
-        #promptInput
-        class="prompt-input"
-        [class.prompt-input-editing]="promptInput.editing()"
-        label="Prompt text"
-        [value]="it.prompt"
-        [dynamicData]="true"
-        [disableSave]="it.type === itemType.ITEM_CHALLENGE_RESPONSE && !expectationInput.isValid()"
-        (saved)="onSavePrompt($event)"
-        (cancelled)="onCancelEdit()"
-      />
-    </span>
-    <!-- hidden doesn't work if display is set -->
-    <span
-      [class.expectation-container]="it.type === itemType.ITEM_CHALLENGE_RESPONSE"
-      [hidden]="it.type !== itemType.ITEM_CHALLENGE_RESPONSE"
-    >
-      <span class="expectation-spacer"></span>
-      <span class="expectation">
+    <span class="indentable-container">
+      <span class="prompt">
+        <!-- TODO: Find a better solution than to save/cancel independent fields together -->
         <editable-label
-          #expectationInput
-          class="expectation-input"
-          [class.expectation-input-editing]="expectationInput.editing()"
-          label="Expectation text"
-          [value]="it.expectation"
+          #promptInput
+          class="prompt-input"
+          [class.prompt-input-editing]="promptInput.editing()"
+          label="Prompt text"
+          [value]="it.prompt"
           [dynamicData]="true"
-          [disableSave]="!promptInput.isValid()"
-          (saved)="onSaveExpectation($event)"
+          [disableSave]="it.type === itemType.ITEM_CHALLENGE_RESPONSE && !expectationInput.isValid()"
+          (saved)="onSavePrompt($event)"
           (cancelled)="onCancelEdit()"
         />
+      </span>
+      <!-- hidden doesn't work if display is set -->
+      <span
+        [class.expectation-container]="it.type === itemType.ITEM_CHALLENGE_RESPONSE"
+        [hidden]="it.type !== itemType.ITEM_CHALLENGE_RESPONSE"
+      >
+        <span class="expectation-spacer"></span>
+        <span class="expectation">
+          <editable-label
+            #expectationInput
+            class="expectation-input"
+            [class.expectation-input-editing]="expectationInput.editing()"
+            label="Expectation text"
+            [value]="it.expectation"
+            [dynamicData]="true"
+            [disableSave]="!promptInput.isValid()"
+            (saved)="onSaveExpectation($event)"
+            (cancelled)="onCancelEdit()"
+          />
+        </span>
       </span>
     </span>
   </div>
