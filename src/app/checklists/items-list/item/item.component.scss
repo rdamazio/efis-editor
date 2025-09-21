@@ -29,11 +29,6 @@
   width: 100%;
 }
 
-.item-challenge-response {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3e %3Ccircle cx='10' cy='15' r='2' fill='white' /%3e %3c/svg%3e");
-  background-repeat: repeat-x;
-}
-
 .item-centered {
   place-content: center;
 }
@@ -48,39 +43,41 @@
   color: white;
 }
 
-.item-challenge .prompt:before {
+.prompt-challenge:before {
   content: ' □';
   vertical-align: 1px;
 }
 
-.item-challenge-response .prompt:before {
+.prompt-challenge-response:before {
   content: ' □ ';
   vertical-align: 1px;
 }
 
-.item-caution .prompt:before {
+.prompt-caution:before {
   content: 'CAUTION:';
 }
 
-.item-warning .prompt {
+.prompt-warning {
   color: yellow;
 }
 
-.item-warning .prompt:before {
+.prompt-warning:before {
   content: 'WARNING:';
 }
 
-.item-note .prompt {
+.prompt-note {
   color: gray;
 }
 
-.item-note .prompt:before {
+.prompt-note:before {
   content: 'NOTE:';
 }
 
 .expectation-container {
   flex-grow: 1;
   display: flex;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3e %3Ccircle cx='10' cy='15' r='2' fill='white' /%3e %3c/svg%3e");
+  background-repeat: repeat-x;
 }
 
 .expectation-spacer {
