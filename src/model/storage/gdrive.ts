@@ -119,7 +119,7 @@ export class GoogleDriveStorage {
       .asObservable()
       .pipe(takeUntil(this._destroyed))
       .subscribe((state: DriveSyncState) => {
-        console.debug('SYNC: state ' + state.toString());
+        console.debug('SYNC: state ' + DriveSyncState[state]);
       });
   }
 
