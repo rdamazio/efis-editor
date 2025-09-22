@@ -148,11 +148,13 @@
 
 /* Full width editors for non-centered, non-challenge-response items */
 
-.item:not(.item-challenge-response):not(.item-centered) .prompt {
+.item:not(.item-challenge-response):not(.item-centered) .prompt,
+.item-title.item-centered .prompt {
   display: flex;
 }
 
-.item:not(.item-challenge-response):not(.item-centered) .prompt-input {
+.item:not(.item-challenge-response):not(.item-centered) .prompt-input,
+.item-title.item-centered .prompt-input {
   width: auto;
   flex-grow: 1;
 }
