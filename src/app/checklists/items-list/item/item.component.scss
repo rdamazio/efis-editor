@@ -77,9 +77,9 @@
   min-height: 1em;
 }
 
-.item-caution .prompt:before,
-.item-warning .prompt:before,
-.item-note .prompt:before {
+.item-caution:not(.item-centered) .prompt:before,
+.item-warning:not(.item-centered) .prompt:before,
+.item-note:not(.item-centered) .prompt:before {
   padding-right: 10px;
 }
 
@@ -149,13 +149,13 @@
   content: '⟷';
 }
 
-/* Full with editors for non challenge-response items */
+/* Full with editors for non-centered, non-challenge-response items */
 
-.item:not(.item-challenge-response) .prompt {
+.item:not(.item-challenge-response):not(.item-centered) .prompt {
   display: flex;
 }
 
-.item:not(.item-challenge-response) .prompt-input {
+.item:not(.item-challenge-response):not(.item-centered) .prompt-input {
   width: auto;
   flex-grow: 1;
 }
