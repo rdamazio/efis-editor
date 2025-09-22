@@ -77,6 +77,12 @@
   min-height: 1em;
 }
 
+.item-caution .prompt:before,
+.item-warning .prompt:before,
+.item-note .prompt:before {
+  padding-right: 10px;
+}
+
 .item-caution .prompt:before {
   content: 'CAUTION:';
 }
@@ -110,6 +116,7 @@
   margin-top: 1px;
   padding-left: 5px;
   background-color: #000;
+  text-align: right;
 }
 
 .prompt-input {
@@ -140,4 +147,15 @@
 .item-container:hover .prompt-tabulator:before,
 .item-container:focus .prompt-tabulator:before {
   content: '⟷';
+}
+
+/* Full with editors for non challenge-response items */
+
+.item:not(.item-challenge-response) .prompt {
+  display: flex;
+}
+
+.item:not(.item-challenge-response) .prompt-input {
+  width: auto;
+  flex-grow: 1;
 }
