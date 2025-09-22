@@ -1,6 +1,5 @@
 .item-container {
   display: flex;
-  align-items: center;
 }
 
 .item-container:focus {
@@ -27,57 +26,81 @@
   color: #eee;
   display: flex;
   width: 100%;
+  padding-left: 10px;
 }
 
-.item-centered {
-  place-content: center;
+.item-centered .indentable-container {
+  text-align: center;
+}
+
+.indentable-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  padding-top: 6px;
 }
 
 .prompt {
   box-decoration-break: clone;
+  flex-grow: 1;
 }
 
-.prompt-title {
+.item-title .prompt {
   font-size: 18px;
   font-weight: bold;
   color: white;
 }
 
-.prompt-challenge:before {
-  content: ' □';
-  vertical-align: 1px;
+.item-challenge .indentable-container:before,
+.item-challenge-response .indentable-container:before {
+  content: '□';
+  position: absolute;
+  top: 5px;
+  left: 0px;
+  background: #000;
+  width: 20px;
 }
 
-.prompt-challenge-response:before {
-  content: ' □ ';
-  vertical-align: 1px;
+.item-challenge .indentable-container,
+.item-challenge-response .indentable-container {
+  padding-left: 20px;
 }
 
-.prompt-caution:before {
+.item-challenge-response .indentable-container {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3e %3Ccircle cx='10' cy='15' r='2' fill='white' /%3e %3c/svg%3e");
+  background-repeat: repeat-x;
+  background-position-y: 5px;
+  min-height: 1em;
+}
+
+.item-caution:not(.item-centered) .prompt:before,
+.item-warning:not(.item-centered) .prompt:before,
+.item-note:not(.item-centered) .prompt:before {
+  padding-right: 10px;
+}
+
+.item-caution .prompt:before {
   content: 'CAUTION:';
 }
 
-.prompt-warning {
+.item-warning .prompt {
   color: yellow;
 }
 
-.prompt-warning:before {
+.item-warning .prompt:before {
   content: 'WARNING:';
 }
 
-.prompt-note {
+.item-note .prompt {
   color: gray;
 }
 
-.prompt-note:before {
+.item-note .prompt:before {
   content: 'NOTE:';
 }
 
 .expectation-container {
-  flex-grow: 1;
   display: flex;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3e %3Ccircle cx='10' cy='15' r='2' fill='white' /%3e %3c/svg%3e");
-  background-repeat: repeat-x;
 }
 
 .expectation-spacer {
@@ -85,11 +108,21 @@
 }
 
 .expectation {
-  float: right;
   color: cyan;
   margin-top: 1px;
   padding-left: 5px;
   background-color: #000;
+  text-align: right;
+}
+
+.prompt-input {
+  background: #000;
+  padding-right: 5px;
+}
+
+.prompt-input-editing,
+.expectation-input-editing {
+  margin-top: -8px;
 }
 
 .prompt-input-editing {
@@ -102,18 +135,26 @@
   width: 300px;
 }
 
-.prompt-tabulator:first-child,
-.prompt:first-child:not(.item-centered > span) {
-  padding-left: 10px;
-}
-
 .prompt-tabulator {
   opacity: 33%;
-  width: 25px;
-  margin-top: -3px;
+  width: 26px;
+  margin-top: 3px;
 }
 
 .item-container:hover .prompt-tabulator:before,
 .item-container:focus .prompt-tabulator:before {
   content: '⟷';
+}
+
+/* Full width editors for non-centered, non-challenge-response items */
+
+.item:not(.item-challenge-response):not(.item-centered) .prompt,
+.item-title.item-centered .prompt {
+  display: flex;
+}
+
+.item:not(.item-challenge-response):not(.item-centered) .prompt-input,
+.item-title.item-centered .prompt-input {
+  width: auto;
+  flex-grow: 1;
 }

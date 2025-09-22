@@ -1,0 +1,337 @@
+{
+  "metadata": {
+    "name": "Test checklist for manual UI testing",
+    "defaultGroupIndex": 1,
+    "defaultChecklistIndex": 2,
+    "makeAndModel": "Test make and model",
+    "aircraftInfo": "Test aircraft",
+    "manufacturerInfo": "Test manufacturer",
+    "copyrightInfo": "Test copyright",
+    "modifiedTime": 1758502046
+  },
+  "groups": [
+    {
+      "title": "Test group 1",
+      "checklists": [
+        {
+          "title": "Test group 1 checklist 1",
+          "items": [
+            {
+              "prompt": "A center aligned title",
+              "type": "ITEM_TITLE",
+              "centered": true
+            },
+            {
+              "prompt": "A 1st level C/R item",
+              "expectation": "ANSWER",
+              "type": "ITEM_CHALLENGE_RESPONSE"
+            },
+            {
+              "prompt": "A 2nd level C/R item",
+              "expectation": "LONGER ANSWER",
+              "type": "ITEM_CHALLENGE_RESPONSE",
+              "indent": 1
+            },
+            {
+              "prompt": "A 3rd level C/R item",
+              "expectation": "AN EVEN LONGER ANSWER THAT HAVE MULTIPLE LINES",
+              "type": "ITEM_CHALLENGE_RESPONSE",
+              "indent": 2
+            },
+            {
+              "prompt": "A 4th level C/R item that's very very very very very very very very very very very very very very very very very very very  long",
+              "expectation": "SHORT ANSWER",
+              "type": "ITEM_CHALLENGE_RESPONSE",
+              "indent": 3
+            },
+            {
+              "prompt": "A 5th level C/R item",
+              "expectation": "ANSWER",
+              "type": "ITEM_CHALLENGE_RESPONSE",
+              "indent": 4
+            },
+            {
+              "prompt": "A 1st level left aligned title",
+              "type": "ITEM_TITLE"
+            },
+            {
+              "prompt": "A 2nd level left aligned title that is also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_TITLE",
+              "indent": 1
+            },
+            {
+              "prompt": "A 3rd level left aligned title",
+              "type": "ITEM_TITLE",
+              "indent": 2
+            },
+            {
+              "prompt": "A 4th level left aligned title",
+              "type": "ITEM_TITLE",
+              "indent": 3
+            },
+            {
+              "prompt": "A 5th level left aligned title that is also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very  long",
+              "type": "ITEM_TITLE",
+              "indent": 4
+            },
+            {
+              "prompt": "1st level Challenge item",
+              "type": "ITEM_CHALLENGE"
+            },
+            {
+              "prompt": "1st level Challenge item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_CHALLENGE"
+            },
+            {
+              "prompt": "2nd level Challenge item",
+              "type": "ITEM_CHALLENGE",
+              "indent": 1
+            },
+            {
+              "prompt": "3rd level Challenge item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_CHALLENGE",
+              "indent": 2
+            },
+            {
+              "prompt": "4th level Challenge item",
+              "type": "ITEM_CHALLENGE",
+              "indent": 3
+            },
+            {
+              "prompt": "5th level Challenge item",
+              "type": "ITEM_CHALLENGE",
+              "indent": 4
+            },
+            {
+              "prompt": "Centered Challenge item",
+              "type": "ITEM_CHALLENGE",
+              "centered": true
+            },
+            {
+              "prompt": "Centered level Challenge item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_CHALLENGE",
+              "centered": true
+            },
+            {
+              "type": "ITEM_SPACE"
+            },
+            {
+              "type": "ITEM_SPACE",
+              "indent": 1
+            },
+            {
+              "type": "ITEM_SPACE",
+              "indent": 2
+            },
+            {
+              "prompt": "Centered text item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_PLAINTEXT",
+              "centered": true
+            },
+            {
+              "prompt": "1st level text",
+              "type": "ITEM_PLAINTEXT"
+            },
+            {
+              "prompt": "1st level text item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_PLAINTEXT"
+            },
+            {
+              "prompt": "2nd level text ",
+              "type": "ITEM_PLAINTEXT",
+              "indent": 1
+            },
+            {
+              "prompt": "Very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long question",
+              "expectation": "Very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long answer",
+              "type": "ITEM_CHALLENGE_RESPONSE"
+            },
+            {
+              "prompt": "3rd level text ",
+              "type": "ITEM_PLAINTEXT",
+              "indent": 2
+            },
+            {
+              "prompt": "4th level text ",
+              "type": "ITEM_PLAINTEXT",
+              "indent": 3
+            },
+            {
+              "prompt": "5th level text ",
+              "type": "ITEM_PLAINTEXT",
+              "indent": 4
+            },
+            {
+              "prompt": "5th level text item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_PLAINTEXT",
+              "indent": 4
+            },
+            {
+              "prompt": "1st level warning item",
+              "type": "ITEM_WARNING"
+            },
+            {
+              "prompt": "1st level warning item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_WARNING"
+            },
+            {
+              "prompt": "2nd level warning item",
+              "type": "ITEM_WARNING",
+              "indent": 1
+            },
+            {
+              "prompt": "3rd level warning item",
+              "type": "ITEM_WARNING",
+              "indent": 2
+            },
+            {
+              "prompt": "4th level warning item",
+              "type": "ITEM_WARNING",
+              "indent": 3
+            },
+            {
+              "prompt": "5th level warning item",
+              "type": "ITEM_WARNING",
+              "indent": 4
+            },
+            {
+              "prompt": "5th level warning item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_WARNING",
+              "indent": 4
+            },
+            {
+              "prompt": "Centered short warning",
+              "type": "ITEM_WARNING",
+              "centered": true
+            },
+            {
+              "prompt": "Centered warning item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_WARNING",
+              "centered": true
+            },
+            {
+              "prompt": "1st level caution item",
+              "type": "ITEM_CAUTION"
+            },
+            {
+              "prompt": "1st level caution item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_CAUTION"
+            },
+            {
+              "prompt": "2nd level caution item",
+              "type": "ITEM_CAUTION",
+              "indent": 1
+            },
+            {
+              "prompt": "3rd level caution item",
+              "type": "ITEM_CAUTION",
+              "indent": 2
+            },
+            {
+              "prompt": "4th level caution item",
+              "type": "ITEM_CAUTION",
+              "indent": 3
+            },
+            {
+              "prompt": "5th level caution item",
+              "type": "ITEM_CAUTION",
+              "indent": 4
+            },
+            {
+              "prompt": "5th level caution item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_CAUTION",
+              "indent": 4
+            },
+            {
+              "prompt": "Centered short caution",
+              "type": "ITEM_CAUTION",
+              "centered": true
+            },
+            {
+              "prompt": "Centered caution item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_CAUTION",
+              "centered": true
+            },
+            {
+              "prompt": "1st level note item",
+              "type": "ITEM_NOTE"
+            },
+            {
+              "prompt": "1st level note item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_NOTE"
+            },
+            {
+              "prompt": "2nd level note item",
+              "type": "ITEM_NOTE",
+              "indent": 1
+            },
+            {
+              "prompt": "3rd level note item",
+              "type": "ITEM_NOTE",
+              "indent": 2
+            },
+            {
+              "prompt": "4th level note item",
+              "type": "ITEM_NOTE",
+              "indent": 3
+            },
+            {
+              "prompt": "5th level note item",
+              "type": "ITEM_NOTE",
+              "indent": 4
+            },
+            {
+              "prompt": "5th level note item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_NOTE",
+              "indent": 4
+            },
+            {
+              "prompt": "Centered short note",
+              "type": "ITEM_NOTE",
+              "centered": true
+            },
+            {
+              "prompt": "Centered note item that's also also very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+              "type": "ITEM_NOTE",
+              "centered": true
+            }
+          ]
+        }
+      ],
+      "category": "normal"
+    },
+    {
+      "title": "Test group 2 (default)",
+      "checklists": [
+        {
+          "title": "Test group 2 checklist 1",
+          "items": [
+            {
+              "prompt": "Test group 2 checklist 1 item 1",
+              "type": "ITEM_PLAINTEXT"
+            }
+          ]
+        },
+        {
+          "title": "Test group 2 checklist 2",
+          "items": [
+            {
+              "prompt": "Test group 2 checklist 2 item 1",
+              "type": "ITEM_TITLE"
+            }
+          ]
+        },
+        {
+          "title": "Test group 2 checklist 3 (default)",
+          "items": [
+            {
+              "prompt": "Test group 2 checklist 3 item 1",
+              "type": "ITEM_NOTE"
+            }
+          ]
+        }
+      ],
+      "category": "normal"
+    }
+  ]
+}
