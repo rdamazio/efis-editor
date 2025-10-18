@@ -111,7 +111,7 @@ export class TextReader {
             checklistTitle = lineContents.slice(groupSepIdx + groupSep.length);
           }
         }
-        if (!currentGroup || currentGroup.title !== groupTitle) {
+        if (currentGroup?.title !== groupTitle) {
           currentGroup = { title: groupTitle, checklists: [], category: ChecklistGroup_Category.normal };
           outFile.groups.push(currentGroup);
         }
@@ -187,7 +187,7 @@ export class TextReader {
     // Process the last item.
     processItem();
 
-    if (currentChecklist && currentChecklist.title === this._properCase(METADATA_CHECKLIST_TITLE)) {
+    if (currentChecklist?.title === this._properCase(METADATA_CHECKLIST_TITLE)) {
       outFile.metadata = this._extractMetadata(currentChecklist);
       currentGroup!.checklists.pop();
       if (currentGroup!.checklists.length === 0) {
