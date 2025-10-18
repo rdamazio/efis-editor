@@ -58,8 +58,6 @@ export class DynonFormat extends AbstractChecklistFormat<DynonFormatOptions> {
 
   public async fromProto(file: ChecklistFile): Promise<File> {
     const blob = new TextWriter(this._textFormatOptions).write(file);
-    return new Promise((resolve) => {
-      resolve(new File([blob], this._fileName));
-    });
+    return Promise.resolve(new File([blob], this._fileName));
   }
 }
