@@ -43,33 +43,24 @@ You can try it out directly in the link above, but here's what it currently look
   - Printable (PDF) - export only, selectable page size
   - Raw (JSON) - the editor's internal format (for lossless backup purposes)
 
-<sup>ᶢ</sup> At Garmin's request, we only support this unencrypted version of the .gplts format -
-it can be imported into Garmin Pilot just the same, but the editor will not import .gplts files. It
-will import the .gplt files that it generates.<br>
 <sup>†</sup> Thanks to [Yury V. Zaytsev](https://github.com/zyv)!
 
 Different checklist file formats support different subsets of all the features in the editor:
 
-| **Feature**                | AFS/Dynon            | ForeFlight           | Garmin (G3X/GTN)   | Garmin Pilot         | GRT                  | PDF                |
-| -------------------------- | -------------------- | -------------------- | ------------------ | -------------------- | -------------------- | ------------------ |
-| Checklist groups           | :white_check_mark: ¹ | :white_check_mark:   | :white_check_mark: | :white_check_mark: ⁶ | :white_check_mark: ¹ | :white_check_mark: |
-| Checklist group categories | :x:                  | :white_check_mark:   | :x:                | :white_check_mark: ⁶ | :x:                  | :white_check_mark: |
-| Item types                 | :white_check_mark: ² | :white_check_mark:   | :white_check_mark: | :white_check_mark:   | :white_check_mark: ² | :white_check_mark: |
-| Indentation                | :white_check_mark:   | :x:                  | :white_check_mark: | :x:                  | :white_check_mark:   | :white_check_mark: |
-| Centering                  | :white_check_mark:   | :x:                  | :white_check_mark: | :x:                  | :white_check_mark:   | :white_check_mark: |
-| Default checklist/group    | :x:                  | :x:                  | :white_check_mark: | :x:                  | :x:                  | :x:                |
-| Checklist metadata         | :white_check_mark: ³ | :white_check_mark: ⁴ | :white_check_mark: | :x:                  | :white_check_mark: ³ | :white_check_mark: |
-| Live data ⁵                | :x:                  | :x:                  | :x:                | :white_check_mark:   | :white_check_mark:   | :x:                |
-| Completion actions ⁵       | :x:                  | :x:                  | :x:                | :white_check_mark:   | :x:                  | :x:                |
+| **Feature**                | AFS/Dynon          | ForeFlight         | Garmin (G3X/GTN)   | Garmin Pilot       | GRT                | PDF                |
+| -------------------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Checklist groups           | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Checklist group categories | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: |
+| Item types                 | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Indentation                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
+| Centering                  | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
+| Default checklist/group    | :x:                | :x:                | :white_check_mark: | :x:                | :x:                | :x:                |
+| Checklist metadata         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
+| Live data                  | :x:                | :x:                | :x:                | :white_check_mark: | :white_check_mark: | :x:                |
+| Completion actions         | :x:                | :x:                | :x:                | :white_check_mark: | :x:                | :x:                |
 
-¹ Groups names after the first will become part of the exported checklist name<br>
-² Prefixes, suffixes and formatting used to differentiate types<br>
-³ Output as a separate checklist (last)<br>
-⁴ Only file name, aircraft information and make/model (not manufacturer or copyright info)<br>
-⁵ See section below on dynamic data.
-⁶ For groups to map to Garmin Pilot's "Normal" subcategories, they must be named exactly
-`Preflight`, `Takeoff/Cruise` or `Landing` - checklists under any other group names will show up
-as `Other`.
+> [!NOTE]
+> See sections below on format-specific details to understand how data from the editor gets translated to those formats.
 
 Internally, files are stored in our own format, so it is possible to import a
 file in one format and then export it in another.
@@ -124,23 +115,95 @@ Safari lets you add a Home Screen icon
 [iOS instructions](https://support.apple.com/en-mide/guide/iphone/iph42ab2f3a7/ios) /
 [iPadOS instructions](https://support.apple.com/en-mide/guide/ipad/ipadc602b75b/ipados)).
 
-## Dynamic data/actions
+## Format-specific information
 
-Some apps and EFISs support displaying dynamic data in the checklist - for instance, replacing
-a token with the current engine RPM or approach control frequency, or providing a button to
-open other app functionality like showing the nearest airports.
+### AFS/Dynon
 
-To enter dynamic data tokens, simply type them as normal text, such as `%24%` (GRT token for
-oil temperature) or `%APPROACH_FREQUENCY%` (Garmin Pilot token for approach control frequency).
+AFS and Dynon use a simple text format for checklists, so different item types, identation,
+centering, etc. are represented with plain text formatting (e.g. titles show up as
+`** YOUR TITLE **`) or prefixes (e.g. a warning will read `WARNING: Your warning text`). As much as
+possible, the editor supports parsing this formatting back when importing, but if you add your own
+formatting to an item's text, it may get it wrong.
 
-For GRT, tokens can be mixed with other text on any type of item, and supported tokens are listed
-in the GRT manual (there's 130 of them).
+This format supports multiple checklists, but not checklist groups - instead, groups after the first
+one have the group names prepended to the checklist name (e.g. an "Engine-out landing" checklist
+under the "Emergency" group will show up as a checklist named "Emergency - Engine-out landing").
 
-For Garmin Pilot, tokens are only supported on the response (right side) of challenge/response
-items, and cannot be mixed with other text in that field. Supported tokens are `%LOCAL_ALTIMETER%`,
-`%OPEN_NEAREST%`, `%OPEN_ATIS_SCRATCHPAD%`, `%OPEN_CRAFT_SCRATCHPAD%`, `%WEATHER_FREQUENCY%`,
-`%CLEARANCE_FREQUENCY%`, `%GROUND_CTAF_FREQUENCY%`, `%TOWER_CTAF_FREQUENCY%`,
-`%APPROACH_FREQUENCY%`, and `%CENTER_FREQUENCY%`.
+Because the UI on these EFISs can take different layouts, and the EFIS does not support wrapping of
+lines that exceed the UI's width, you must export the checklist with the right width. The export
+process will then wrap lines longer than that length.
+
+This format also does not support checklist metadata, so an additional checklist with all your
+metadata is added to the end of the file.
+
+### GRT
+
+GRT uses a text format for checklists, very similar to AFS/Dynon (see above).
+
+It also supports dynamic data, where certain EFIS parameters are baked into the text by entering
+tokens like `%24%` (oil temperature) anywhere in the text of any item type. Supported tokens are
+listed in the GRT manual (there's 130 of them).
+
+### ForeFlight
+
+ForeFlight only supports two item types native - "Detail" and "Check" items. Challenge and
+challenge/response items are exported as "Check" items, while all other types are exported
+as "Detail" items, with appropriate prefixes.
+
+ForeFlight also supports notes with multiple lines, while EFIS Editor does not - when
+exporting and importing, plaintext/note/caution/warning items will be combined or split
+as appropriate.
+
+ForeFlight has partial support for checklist metadata - of the information you enter on EFIS
+Editor, only file name, aircraft information and make/model will be included, but not
+manufacturer or copyright info.
+
+### Garmin Pilot
+
+At Garmin's request, the EFIS editor supports the `.gplt` file format (unencrypted), but not
+`.gplts` (encrypted). `.gplt` files can be imported into Garmin Pilot just the same, and can be
+imported back into the EFIS editor, but the editor will not import existing .gplts files, and
+Garmin Pilot unfortunately gives no way to export checklists as `.gplt`. If you'd like to see
+full `.gplts` support, let Garmin know!
+
+Garmin Pilot does not support arbitrary checklist groups - you may still use them in the editor,
+but when exporting, all checklists will be grouped by category (normal/abnormal/emergency) and
+subcategory (preflight/takeoff/cruise/landing/other), and the group titles are discarded.
+
+Garmin Pilot subcategories exist only for the `Normal` category, and are derived from the group
+title - for the mapping to occur, the group title must be named exactly `Preflight`,
+`Takeoff/Cruise` or `Landing` - checklists under any other group names will show up
+as `Other`.
+
+Garmin Pilot also supports dynamic data and actions in the checklists. To insert one of these,
+add a challenge/response item, and on the response (right) side, enter only the token for the
+data or action you'd like. Tokens cannot be mixed with other text on the response side, though
+you can still enter any text you'd like on the challenge (left) side.
+
+Supported tokens are `%LOCAL_ALTIMETER%`, `%OPEN_NEAREST%`, `%OPEN_ATIS_SCRATCHPAD%`,
+`%OPEN_CRAFT_SCRATCHPAD%`, `%WEATHER_FREQUENCY%`, `%CLEARANCE_FREQUENCY%`,
+`%GROUND_CTAF_FREQUENCY%`, `%TOWER_CTAF_FREQUENCY%`, `%APPROACH_FREQUENCY%`, and
+`%CENTER_FREQUENCY%`.
+
+### PDF (printing)
+
+PDF format exports are meant for printing, so you can have a hard copy backup of your checklists.
+There's no support for importing PDF files back into the editor, so be sure to keep a copy of your
+data in other formats (we recommend JSON for backup purposes).
+
+The "Offset group title by top margin" option lets you offset the group title to allow room for
+spiral binding. If not selected, the group title will be centered on the top part of the page.
+Alternatively, you can select "Output group cover pages" and the start of each group will have a
+full page with the group title.
+
+Printing settings are preserved on your browser's storage (but not synchronized even if you have
+Cloud synchronization enabled).
+
+### JSON
+
+The JSON format exported by this editor reflects the raw storage format the app uses internally,
+and will reflect the `ChecklistFile` proto message defined
+[here](https://github.com/rdamazio/efis-editor/blob/main/src/model/proto/checklist.proto).
 
 ## Disclaimer
 
@@ -221,11 +284,11 @@ The following steps can be followed to set up a development environment:
 - Clone this project (we recommend using [jj](http://github.com/martinvonz/jj) for that!)
 - `npm install` (will install all dependencies into `node_modules/`)
 - `npm run genproto` (will generate protocol buffer files into `gen/ts/`)
-- `npm run genkeys` (will populate a dummy dev-only client ID into src/environments/dev-keys.ts)
+- `npm run genkeys` (will populate a dummy dev-only client ID into `src/environments/dev-keys.ts`)
 - If you plan to use/change the Google Drive synchronization feature while running locally,
-  edit src/environments/dev-keys.ts to set your own OAuth client ID that allows localhost
-  connections. See the [Drive API documentation](https://developers.google.com/drive/api/) for
-  how to do obtain a client ID.
+  edit `src/environments/dev-keys.ts` to set your own OAuth client ID that allows localhost
+  connections. See the [Drive API documentation](https://developers.google.com/drive/api/) for how
+  to do obtain a client ID.
 
 You can then develop as you normally would any Angular app (e.g. `ng serve`).
 
