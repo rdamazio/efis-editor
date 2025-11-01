@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +16,10 @@ import { GoogleDriveDisconnectDialogComponent } from './disconnect-dialog/gdrive
   imports: [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatSnackBarModule, MatTooltipModule],
   templateUrl: './gdrive.component.html',
   styleUrl: './gdrive.component.scss',
+  host: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    '(window:beforeunload)': 'onPageUnload()',
+  },
 })
 export class GoogleDriveComponent implements OnInit, OnDestroy {
   cloudIconDisabled = false;
@@ -111,7 +115,6 @@ export class GoogleDriveComponent implements OnInit, OnDestroy {
       });
   }
 
-  @HostListener('window:beforeunload')
   onPageUnload() {
     if (this.needsSync) {
       // Get synchronization going right away. There's no guarantee that it'll complete.
