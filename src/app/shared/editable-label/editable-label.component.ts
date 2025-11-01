@@ -38,6 +38,7 @@ export class EditableLabelComponent {
   readonly disableSave = input(false);
   readonly disallowEmpty = input(false);
   readonly dynamicData = input(false);
+  readonly isExpectation = input(false);
 
   constructor() {
     this.editing.set(false);

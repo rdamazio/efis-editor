@@ -117,6 +117,7 @@
             label="Expectation text"
             [value]="it.expectation"
             [dynamicData]="true"
+            [isExpectation]="true"
             [disableSave]="!promptInput.isValid()"
             (saved)="onSaveExpectation($event)"
             (cancelled)="onCancelEdit()"
