@@ -121,13 +121,12 @@ module.exports = tseslint.config(
       '@typescript-eslint/switch-exhaustiveness-check': ['error', { considerDefaultExhaustiveForUnions: true }],
       '@typescript-eslint/typedef': ['error', { parameter: true, propertyDeclaration: true }],
       '@typescript-eslint/unbound-method': ['error', { ignoreStatic: true }],
-      // TODO: Re-enable once https://github.com/typescript-eslint/typescript-eslint/issues/11732 is fixed.
-      '@typescript-eslint/unified-signatures': 'off',
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
       'accessor-pairs': 'error',
       'array-callback-return': 'error',
       'arrow-body-style': ['error', 'as-needed'],
       'block-scoped-var': 'error',
+      // TODO: Address actual complexity then re-enable.
       // complexity: 'error',
       curly: ['error', 'multi-line'],
       eqeqeq: 'error',
