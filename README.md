@@ -36,7 +36,7 @@ You can try it out directly in the link above, but here's what it currently look
 - Checklists:
   - Advanced Flight Systems (AFS)
   - Dynon SkyView
-  - ForeFlight (.fmd file format)<sup>†</sup>
+  - Jeppesen ForeFlight (.fmd file format)<sup>†</sup>
   - Garmin Pilot (.gplt file format) <sup>ᶢ†</sup>
   - Garmin G3X / G3X Touch / GTN (.ace file format)
   - Grand Rapids (GRT)

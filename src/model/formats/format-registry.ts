@@ -90,7 +90,7 @@ FORMAT_REGISTRY.register<DynonFormatOptions>(DynonFormat, FormatId.DYNON31, 'Dyn
 FORMAT_REGISTRY.register<DynonFormatOptions>(DynonFormat, FormatId.DYNON40, 'Dynon SkyView™ - 50% / 40 cols.', {
   maxLineLength: 40,
 });
-FORMAT_REGISTRY.register(ForeFlightFormat, FormatId.FOREFLIGHT, 'Boeing ForeFlight');
+FORMAT_REGISTRY.register(ForeFlightFormat, FormatId.FOREFLIGHT, 'Jeppesen ForeFlight');
 FORMAT_REGISTRY.register(GarminPilotFormat, FormatId.GARMIN_PILOT, 'Garmin Pilot™');
 FORMAT_REGISTRY.register(GrtFormat, FormatId.GRT, 'Grand Rapids Technologies', {
   supportsImport: true,
