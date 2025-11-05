@@ -144,7 +144,7 @@ describe('ChecklistCommandBarComponent', () => {
     const menu = await loader.getHarness(MatMenuHarness.with({ triggerText: 'download' }));
     expect(await menu.isOpen()).toBeTrue();
 
-    const formatButton = await screen.findByRole('menuitem', { name: 'Download as Boeing ForeFlight' });
+    const formatButton = await screen.findByRole('menuitem', { name: 'Download as Jeppesen ForeFlight' });
     expect(formatButton).toBeVisible();
     await user.click(formatButton);
 
