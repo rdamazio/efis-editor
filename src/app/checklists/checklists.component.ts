@@ -233,6 +233,16 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       });
     hotkeys
       .addShortcut({
+        keys: 'meta.D',
+        description: 'Duplicate checklist item',
+        preventDefault: true,
+        group: 'Editing',
+      })
+      .subscribe(() => {
+        this.items().duplicateCurrentItem();
+      });
+    hotkeys
+      .addShortcut({
         keys: 'shift.right',
         description: 'Indent checklist item',
         preventDefault: true,

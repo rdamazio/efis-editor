@@ -160,6 +160,30 @@ export class ChecklistItemsComponent {
     this._selectedItemComponent()?.onCenterToggle();
   }
 
+  duplicateCurrentItem() {
+    const currentItem = this._selectedItem();
+    if (!currentItem || this._selectedIdx === null) {
+      return;
+    }
+
+    const items = this.checklist()!.items;
+    const newItem = ChecklistItem.clone(currentItem);
+    const newIdx = this._selectedIdx + 1;
+
+    items.splice(newIdx, 0, newItem);
+
+    this.onItemsUpdated();
+
+    // Set focus to the newly added item.
+    afterNextRender(
+      () => {
+        this._selectedIdx = newIdx;
+        this._focusSelectedItem();
+      },
+      { injector: this._injector },
+    );
+  }
+
   moveCurrentItemUp() {
     if (!this._selectedItem() || this._selectedIdx === 0) {
       return;

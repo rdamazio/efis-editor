@@ -767,6 +767,54 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile, completed2);
     });
 
+    it('should duplicate an item', async () => {
+      await newFile('My file');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+
+      // Add a second item.
+      await addItem('caution', 'Later item');
+      expect(await screen.findByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
+      expect(await screen.findByRole('listitem', { name: 'Item: Later item' })).toBeInTheDocument();
+
+      // Select the first item again.
+      await user.keyboard('[ArrowUp]');
+
+      // Duplicate it.
+      const completed = storageCompleted();
+      await user.keyboard(`[${metaKey}>]D[/${metaKey}]`);
+
+      expect(await screen.findAllByRole('listitem', { name: 'Item: Checklist created' })).toHaveSize(2);
+
+      // Check storage.
+      const expectedFile = ChecklistFile.clone(NEW_FILE);
+      const items = expectedFile.groups[0].checklists[0].items;
+      items.push(ChecklistItem.clone(items[0]));
+      items.push(
+        ChecklistItem.create({
+          type: ChecklistItem_Type.ITEM_CAUTION,
+          prompt: 'Later item',
+        }),
+      );
+      await expectFile('My file', expectedFile, completed);
+
+      // Edit the duplicate, which should already be selected.
+      const completed2 = storageCompleted();
+      await user.keyboard('[Enter]');
+      const promptBox1 = await screen.findByRole('textbox', { name: 'Prompt text' });
+      const expectationBox = await screen.findByRole('textbox', { name: 'Expectation text' });
+      await retype(promptBox1, 'Modified item');
+      await retype(expectationBox, 'Modified expectation[Enter]');
+
+      expect(await screen.findByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
+      expect(await screen.findByRole('listitem', { name: 'Item: Modified item' })).toBeInTheDocument();
+      expect(await screen.findByRole('listitem', { name: 'Item: Later item' })).toBeInTheDocument();
+
+      // Check storage.
+      items[1].prompt = 'Modified item';
+      items[1].expectation = 'Modified expectation';
+      await expectFile('My file', expectedFile, completed2);
+    });
+
     it('should navigate between checklists and groups', async () => {
       await newFile('My file');
       expectFragment('My file');
