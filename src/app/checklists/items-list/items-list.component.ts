@@ -58,10 +58,12 @@ export class ChecklistItemsComponent {
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
     moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    console.error('UPDATED-DRP');
     this.onItemsUpdated();
   }
 
   onItemsUpdated() {
+    console.error('UPDATE1');
     this.checklistChange.emit(this.checklist());
     afterNextRender(
       () => {
@@ -72,6 +74,7 @@ export class ChecklistItemsComponent {
   }
 
   onItemDeleted(idx: number) {
+    console.error('DELETE1');
     this._pushUndoState('Item deleted');
 
     const checklist = this.checklist();
@@ -98,6 +101,7 @@ export class ChecklistItemsComponent {
     }
     items.splice(newIdx, 0, item);
 
+    console.error('UPDATED-NEW');
     this.onItemsUpdated();
 
     // Set focus to the newly added item.
@@ -121,6 +125,7 @@ export class ChecklistItemsComponent {
     } else if (this._selectedIdx < checklist.items.length - 1) {
       this._selectedIdx++;
     }
+    console.error('UPDATED-NXT');
     this.onItemsUpdated();
   }
 
@@ -135,6 +140,7 @@ export class ChecklistItemsComponent {
     } else if (this._selectedIdx > 0) {
       this._selectedIdx--;
     }
+    console.error('UPDATED-PRV');
     this.onItemsUpdated();
   }
 
@@ -148,6 +154,7 @@ export class ChecklistItemsComponent {
     if (this._selectedIdx === this.checklist()!.items.length) {
       this.selectPreviousItem();
     } else {
+      console.error('UPDATED-DEL');
       this.onItemsUpdated();
     }
   }
@@ -171,7 +178,7 @@ export class ChecklistItemsComponent {
     const newIdx = this._selectedIdx + 1;
 
     items.splice(newIdx, 0, newItem);
-
+    console.error('UPDATED-DUP');
     this.onItemsUpdated();
 
     // Set focus to the newly added item.
@@ -195,6 +202,7 @@ export class ChecklistItemsComponent {
     this._keepSelectedIdx = true;
     moveItemInArray(this.checklist()!.items, this._selectedIdx! - 1, this._selectedIdx!);
     this._selectedIdx!--;
+    console.error('UPDATED-MUP');
     this.onItemsUpdated();
   }
 
@@ -208,6 +216,7 @@ export class ChecklistItemsComponent {
     this._keepSelectedIdx = true;
     moveItemInArray(this.checklist()!.items, this._selectedIdx! + 1, this._selectedIdx!);
     this._selectedIdx!++;
+    console.error('UPDATED-MDN');
     this.onItemsUpdated();
   }
 
@@ -297,6 +306,7 @@ export class ChecklistItemsComponent {
       }
       return c;
     });
+    console.error('UPDATED-UND');
     this.onItemsUpdated();
   }
 

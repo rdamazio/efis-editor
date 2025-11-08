@@ -1,5 +1,5 @@
 import { signal } from '@angular/core';
-import { DeferBlockState, inject, TestBed } from '@angular/core/testing';
+import { DeferBlockBehavior, DeferBlockState, inject, TestBed } from '@angular/core/testing';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from '@angular/material/snack-bar';
 import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -33,7 +33,7 @@ const NEW_FILE = ChecklistFile.create({
   ],
 });
 
-describe('ChecklistsComponent', () => {
+fdescribe('ChecklistsComponent', () => {
   let originalTimeout: number;
   let user: UserEvent;
   let rendered: RenderResult<ChecklistsComponent>;
@@ -57,6 +57,7 @@ describe('ChecklistsComponent', () => {
 
     user = userEvent.setup();
 
+    globalThis['ngServerMode'] = true;
     navData = { routeTitle: signal(undefined), fileName: signal(undefined) };
     rendered = await render(ChecklistsComponent, {
       imports: [NoopAnimationsModule],
@@ -65,7 +66,11 @@ describe('ChecklistsComponent', () => {
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 0 } },
         { provide: HOTKEY_DEBOUNCE_TIME, useValue: 50 },
         provideClientHydration(withIncrementalHydration()),
+        // provideServerRendering(),
+        // { provide: INITIAL_CONFIG, useValue: { document: '<app></app>' } },
+        // { provide: PLATFORM_ID, useValue: 'server' },
       ],
+      deferBlockBehavior: DeferBlockBehavior.Playthrough,
       deferBlockStates: DeferBlockState.Complete,
     });
   });
@@ -762,7 +767,7 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile, completed2);
     });
 
-    it('should duplicate an item', async () => {
+    fit('should duplicate an item', async () => {
       await newFile('My file');
       await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
 
@@ -793,21 +798,26 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile, completed);
 
       // Edit the duplicate, which should already be selected.
+      console.error('TEST1');
       const completed2 = storageCompleted();
       await user.keyboard('[Enter]');
       const promptBox1 = await screen.findByRole('textbox', { name: 'Prompt text' });
       const expectationBox = await screen.findByRole('textbox', { name: 'Expectation text' });
       await retype(promptBox1, 'Modified item');
+      console.error('TEST2');
       await retype(expectationBox, 'Modified expectation[Enter]');
+      console.error('TEST3');
 
       expect(await screen.findByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
       expect(await screen.findByRole('listitem', { name: 'Item: Modified item' })).toBeInTheDocument();
       expect(await screen.findByRole('listitem', { name: 'Item: Later item' })).toBeInTheDocument();
 
+      console.error('TEST4');
       // Check storage.
       items[1].prompt = 'Modified item';
       items[1].expectation = 'Modified expectation';
       await expectFile('My file', expectedFile, completed2);
+      console.error('TEST5');
     });
 
     it('should navigate between checklists and groups', async () => {

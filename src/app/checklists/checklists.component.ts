@@ -640,7 +640,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
 
     const file = this.selectedFile;
     if (file) {
+      console.log('CHECK1');
       await this.store.saveChecklistFile(file);
+      console.log('CHECK2');
     }
 
     this._notifyComplete();

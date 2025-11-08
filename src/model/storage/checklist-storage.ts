@@ -45,6 +45,7 @@ export class ChecklistStorage {
       return this._jsonFormat.toProto(new File([blob], id)).then(async (checklist: ChecklistFile) => {
         if (!checklist.metadata?.modifiedTime) {
           // If checklist didn't have mtime, save it to add it now.
+          console.error('SAVER1');
           await this.saveChecklistFile(checklist);
         }
         return checklist;
@@ -54,6 +55,7 @@ export class ChecklistStorage {
   }
 
   async saveChecklistFile(file: ChecklistFile, mtime?: Date) {
+    console.error('SAVE1');
     const store = await this._browserStorage.storage;
     file = ChecklistFile.clone(file);
     if (!file.metadata?.name) {
@@ -62,9 +64,13 @@ export class ChecklistStorage {
     mtime ??= new Date();
     file.metadata.modifiedTime = Math.floor(mtime.valueOf() / 1000);
 
+    console.error('SAVE2');
     const blob = await this._jsonFormat.fromProto(file);
+    console.error('SAVE3');
     store.setItem(CHECKLIST_PREFIX + file.metadata.name, await blob.text());
+    console.error('SAVE4');
     this._publishList(store);
+    console.error('SAVE5');
   }
 
   async deleteChecklistFile(id: string) {
