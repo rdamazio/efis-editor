@@ -69,18 +69,24 @@ export class ChecklistItemComponent {
 
   onSavePrompt(prompt: string) {
     this.item().prompt = prompt;
-    this.onItemUpdated();
-    if (this.item().type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
+    if (this.item().type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE && this.expectationInput().editing()) {
+      // Let the expectation input propagate the change.
       this.expectationInput().save();
+    } else {
+      this.onItemUpdated();
+      this._restoreFocus();
     }
-    this._restoreFocus();
   }
 
   onSaveExpectation(expectation: string) {
     this.item().expectation = expectation;
-    this.onItemUpdated();
-    this.promptInput().save();
-    this._restoreFocus();
+    if (this.promptInput().editing()) {
+      // Let the prompt input propagate the change.
+      this.promptInput().save();
+    } else {
+      this.onItemUpdated();
+      this._restoreFocus();
+    }
   }
 
   onCancelEdit() {
