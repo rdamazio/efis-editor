@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
+    globalThis['ngServerMode'] = true;
     await TestBed.configureTestingModule({
       imports: [AppComponent, NoopAnimationsModule, RouterModule.forRoot([])],
       providers: [provideClientHydration(withIncrementalHydration())],
