@@ -38,6 +38,7 @@ describe('NavComponent', () => {
         },
         provideClientHydration(withIncrementalHydration()),
       ],
+      deferBlockStates: DeferBlockState.Complete,
     });
     fixture = rendered.fixture;
     navData = fixture.componentInstance.navData;

@@ -66,13 +66,8 @@ describe('ChecklistsComponent', () => {
         { provide: HOTKEY_DEBOUNCE_TIME, useValue: 50 },
         provideClientHydration(withIncrementalHydration()),
       ],
+      deferBlockStates: DeferBlockState.Complete,
     });
-
-    // Force rendering of all deferred blocks before we start interacting.
-    const deferredBlocks = await rendered.fixture.getDeferBlocks();
-    for (const deferredBlock of deferredBlocks) {
-      await deferredBlock.render(DeferBlockState.Complete);
-    }
   });
 
   beforeEach(inject(
