@@ -5,6 +5,15 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
+  beforeAll(() => {
+    // Avoid hydration warnings by rendering in server mode.
+    globalThis.ngServerMode = true;
+  });
+
+  afterAll(() => {
+    globalThis.ngServerMode = false;
+  });
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent, NoopAnimationsModule, RouterModule.forRoot([])],

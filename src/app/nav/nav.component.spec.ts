@@ -1,4 +1,4 @@
-import { ComponentFixture } from '@angular/core/testing';
+import { ComponentFixture, DeferBlockState } from '@angular/core/testing';
 
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -29,6 +29,9 @@ describe('NavComponent', () => {
     hotkeys.getShortcuts.and.returnValue([]);
     toggleHelp = spyOn(HelpComponent, 'toggleHelp');
 
+    // Avoid hydration warnings by first rendering in server mode.
+    globalThis.ngServerMode = true;
+
     rendered = await render(NavComponent, {
       imports: [MatDialogModule, NoopAnimationsModule],
       providers: [
@@ -43,6 +46,13 @@ describe('NavComponent', () => {
     fixture = rendered.fixture;
     navData = fixture.componentInstance.navData;
     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+
+    globalThis.ngServerMode = false;
+  });
+
+  afterAll(() => {
+    // Clean up in case beforeEach above doesn't complete.
+    globalThis.ngServerMode = false;
   });
 
   it('should render', () => {

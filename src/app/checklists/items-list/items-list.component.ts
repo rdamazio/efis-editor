@@ -171,7 +171,6 @@ export class ChecklistItemsComponent {
     const newIdx = this._selectedIdx + 1;
 
     items.splice(newIdx, 0, newItem);
-
     this.onItemsUpdated();
 
     // Set focus to the newly added item.

@@ -47,6 +47,9 @@ describe('ChecklistsComponent', () => {
   let metaKey: string;
 
   beforeEach(async () => {
+    // Avoid hydration warnings by first rendering in server mode.
+    globalThis.ngServerMode = true;
+
     // We have a lot of large tests in this file, override the timeout.
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
@@ -68,6 +71,13 @@ describe('ChecklistsComponent', () => {
       ],
       deferBlockStates: DeferBlockState.Complete,
     });
+
+    globalThis.ngServerMode = false;
+  });
+
+  afterAll(() => {
+    // Clean up in case beforeEach above doesn't complete.
+    globalThis.ngServerMode = false;
   });
 
   beforeEach(inject(
@@ -775,6 +785,7 @@ describe('ChecklistsComponent', () => {
       await user.keyboard('[ArrowUp]');
 
       // Duplicate it.
+      globalThis.ngServerMode = false;
       const completed = storageCompleted();
       await user.keyboard(`[${metaKey}>]D[/${metaKey}]`);
 
@@ -791,6 +802,10 @@ describe('ChecklistsComponent', () => {
         }),
       );
       await expectFile('My file', expectedFile, completed);
+
+      rendered.detectChanges();
+      await rendered.fixture.whenRenderingDone();
+      await debounce();
 
       // Edit the duplicate, which should already be selected.
       const completed2 = storageCompleted();
