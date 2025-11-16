@@ -44,13 +44,15 @@ export class GarminPilotWriter {
     this._checklistItemsGarmin.length = 0;
 
     let metadata;
-
-    try {
-      metadata = GarminPilotMetadata.fromJsonString(file.metadata!.copyrightInfo);
-    } catch (e) {
-      console.warn('Unable to parse GarminPilotMetadata:', e);
-      metadata = GarminPilotMetadata.create({ sortOrder: 0 });
+    if (file.metadata?.copyrightInfo) {
+      // Attempt to parse copyrightInfo as GarminPilotMetadata only if it's present.
+      try {
+        metadata = GarminPilotMetadata.fromJsonString(file.metadata.copyrightInfo);
+      } catch (e) {
+        console.warn('Unable to parse GarminPilotMetadata:', e);
+      }
     }
+    metadata ??= GarminPilotMetadata.create({ sortOrder: 0 });
 
     file.groups.forEach((groupEFIS) => {
       this._checklistGroupToGarmin(groupEFIS);
