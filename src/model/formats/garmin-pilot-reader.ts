@@ -12,7 +12,6 @@ import {
   GarminPilotChecklistContainer,
   GarminPilotChecklistItem,
   GarminPilotChecklistItem_ItemType,
-  GarminPilotMetadata,
   GarminPilotObjectsContainer,
 } from '../../../gen/ts/garmin_pilot';
 import { FormatUtils } from './format-utils';
@@ -39,17 +38,11 @@ export class GarminPilotReader {
       throw new GarminPilotFormatError('unsupported container type');
     }
 
-    const metadata = GarminPilotMetadata.create({
-      sortOrder: container.objects[0].binders[0].sortOrder,
-      sourceTemplateUUID: container.objects[0].binders[0].sourceTemplateUUID,
-    });
-
     return {
       groups: GarminPilotReader._checklistGroupsToEFIS(container.objects[0]),
-      metadata: ChecklistFileMetadata.create({
-        name: container.name,
-        copyrightInfo: GarminPilotMetadata.toJsonString(metadata),
-      }),
+      // TODO: If we start supporting Garmin-Pilot-generated GPLTS files, then we'll also
+      // want to preserve binder metadata like sort order and UUID.
+      metadata: ChecklistFileMetadata.create({ name: container.name }),
     };
   }
 

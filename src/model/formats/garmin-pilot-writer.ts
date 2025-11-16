@@ -14,7 +14,6 @@ import {
   GarminPilotChecklistContainer,
   GarminPilotChecklistItem,
   GarminPilotChecklistItem_ItemType,
-  GarminPilotMetadata,
 } from '../../../gen/ts/garmin_pilot';
 import { NullValue } from '../../../gen/ts/google/protobuf/struct';
 import { FormatUtils } from './format-utils';
@@ -43,17 +42,6 @@ export class GarminPilotWriter {
     this._checklistsGarmin.clear();
     this._checklistItemsGarmin.length = 0;
 
-    let metadata;
-    if (file.metadata?.copyrightInfo) {
-      // Attempt to parse copyrightInfo as GarminPilotMetadata only if it's present.
-      try {
-        metadata = GarminPilotMetadata.fromJsonString(file.metadata.copyrightInfo);
-      } catch (e) {
-        console.warn('Unable to parse GarminPilotMetadata:', e);
-      }
-    }
-    metadata ??= GarminPilotMetadata.create({ sortOrder: 0 });
-
     file.groups.forEach((groupEFIS) => {
       this._checklistGroupToGarmin(groupEFIS);
     });
@@ -69,8 +57,10 @@ export class GarminPilotWriter {
           binders: [
             {
               uuid: uuidV4(),
-              sourceTemplateUUID: metadata.sourceTemplateUUID,
-              sortOrder: metadata.sortOrder,
+              // TODO: if we ever start importing GPLTS files, we'll want to preserve sortOrder and
+              // sourceTemplateUUID on import and re-export them instead.
+              sourceTemplateUUID: undefined,
+              sortOrder: 0,
               name: file.metadata!.name,
               checklists: [...this._checklistsGarmin]
                 .map(([_checklistKeyGarmin, checklistsGarmin]) => checklistsGarmin)
