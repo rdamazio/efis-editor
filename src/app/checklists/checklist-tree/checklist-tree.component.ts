@@ -33,6 +33,7 @@ import {
   ChecklistGroup_Category,
   ChecklistItem,
 } from '../../../../gen/ts/checklist';
+import { ChecklistInfoComponent } from '../dialogs/checklist-info/checklist-info';
 import { TitleDialogComponent } from '../dialogs/title-dialog/title-dialog.component';
 import { ChecklistDragDirective } from './drag.directive';
 import { ChecklistTreeNode } from './node/node';
@@ -154,8 +155,8 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
           checklist.completionAction = Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST;
         }
 
-        // TODO: Make a dialog to fill title + completion action.
-        if (!(await this._fillTitle(checklist, 'checklist'))) {
+        checklist = await ChecklistInfoComponent.showChecklistInfo(checklist, this._dialog);
+        if (!checklist) {
           return;
         }
 
@@ -639,7 +640,13 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
   }
 
   async onChecklistRename(node: ChecklistTreeNode) {
-    if (await this._fillTitle(node.checklist!, 'checklist')) {
+    const checklist = node.checklist;
+    if (!checklist) return;
+
+    const updatedChecklist = await ChecklistInfoComponent.showChecklistInfo(checklist, this._dialog);
+    if (updatedChecklist) {
+      checklist.title = updatedChecklist.title;
+      checklist.completionAction = updatedChecklist.completionAction;
       this._reloadFile(true);
     }
   }
