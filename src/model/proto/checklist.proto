@@ -49,6 +49,16 @@ message Checklist {
   string title = 1;
 
   repeated ChecklistItem items = 2;
+
+  enum CompletionAction {
+    ACTION_DO_NOTHING = 0;
+    ACTION_GO_TO_NEXT_CHECKLIST = 1;
+    ACTION_OPEN_FLIGHT_PLAN = 2;
+    ACTION_CLOSE_FLIGHT_PLAN = 3;
+    ACTION_OPEN_TAXI_CHART = 4;
+    ACTION_OPEN_MAP = 5;
+  }
+  CompletionAction completion_action = 3;
 }
 
 message ChecklistItem {
