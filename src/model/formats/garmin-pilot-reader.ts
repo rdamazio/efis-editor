@@ -85,8 +85,9 @@ export class GarminPilotReader {
       {
         title: checklistGarmin.name,
         items,
-        // TODO: Proper translation.
-        completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
+        completionAction:
+          GarminPilotUtils.COMPLETION_ACTION_TO_EFIS.get(checklistGarmin.completionItem) ??
+          Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
       },
     ];
   }
