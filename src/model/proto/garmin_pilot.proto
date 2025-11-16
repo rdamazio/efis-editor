@@ -58,12 +58,6 @@ message GarminPilotChecklist {
   SubType subtype = 6;
 }
 
-/* This is a partial duplicate of the following message */
-message GarminPilotMetadata {
-  google.protobuf.StringValue sourceTemplateUUID = 1;
-  int32 sortOrder = 2;
-}
-
 message GarminPilotBinder {
   string uuid = 1;
   google.protobuf.StringValue sourceTemplateUUID = 2;
