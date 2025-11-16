@@ -15,6 +15,7 @@
       "checklists": [
         {
           "title": "Test group 1 checklist 1",
+          "completionAction": "ACTION_GO_TO_NEXT_CHECKLIST",
           "items": [
             {
               "prompt": "A center aligned title",
@@ -305,6 +306,7 @@
       "checklists": [
         {
           "title": "Test group 2 checklist 1",
+          "completionAction": "ACTION_DO_NOTHING",
           "items": [
             {
               "prompt": "Test group 2 checklist 1 item 1",
@@ -314,6 +316,7 @@
         },
         {
           "title": "Test group 2 checklist 2",
+          "completionAction": "ACTION_OPEN_FLIGHT_PLAN",
           "items": [
             {
               "prompt": "Test group 2 checklist 2 item 1",
@@ -323,6 +326,7 @@
         },
         {
           "title": "Test group 2 checklist 3 (default)",
+          "completionAction": "ACTION_OPEN_TAXI_CHART",
           "items": [
             {
               "prompt": "Test group 2 checklist 3 item 1",

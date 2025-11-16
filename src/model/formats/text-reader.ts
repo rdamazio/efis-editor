@@ -2,6 +2,7 @@ import escapeStringRegexp from 'escape-string-regexp';
 
 import {
   Checklist,
+  Checklist_CompletionAction,
   ChecklistFile,
   ChecklistFileMetadata,
   ChecklistGroup,
@@ -112,11 +113,14 @@ export class TextReader {
           }
         }
         if (currentGroup?.title !== groupTitle) {
-          currentGroup = { title: groupTitle, checklists: [], category: ChecklistGroup_Category.normal };
+          currentGroup = ChecklistGroup.create({ title: groupTitle, category: ChecklistGroup_Category.normal });
           outFile.groups.push(currentGroup);
         }
 
-        currentChecklist = { title: checklistTitle, items: [] };
+        currentChecklist = Checklist.create({
+          title: checklistTitle,
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
+        });
         currentGroup.checklists.push(currentChecklist);
         currentItemLineNum = 0;
         currentChecklistNum++;

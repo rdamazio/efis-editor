@@ -7,7 +7,7 @@ import { DYNON_EXPECTED_CONTENTS } from '../../../model/formats/dynon-format.spe
 import { GRT_EXPECTED_CONTENTS } from '../../../model/formats/grt-format.spec';
 import {
   EXPECTED_CONTENTS,
-  EXPECTED_CONTENTS_WITH_INDENTED_SPACE,
+  EXPECTED_CONTENTS_WITH_COMPLETION_ACTION,
   EXPECTED_FOREFLIGHT_CONTENTS,
 } from '../../../model/formats/test-data';
 import { loadFile } from '../../../model/formats/test-utils';
@@ -51,7 +51,7 @@ describe('ChecklistFileUploadComponent', () => {
   }
 
   it('should upload JSON file', async () => {
-    await expectUpload('test.json', EXPECTED_CONTENTS_WITH_INDENTED_SPACE);
+    await expectUpload('test.json', EXPECTED_CONTENTS_WITH_COMPLETION_ACTION);
   });
 
   it('should upload ACE file', async () => {

@@ -1,6 +1,7 @@
 import { inject, TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import {
+  Checklist_CompletionAction,
   ChecklistFile,
   ChecklistFileMetadata,
   ChecklistGroup_Category,
@@ -27,6 +28,7 @@ const A_CHECKLIST_FILE: ChecklistFile = {
               centered: false,
             },
           ],
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
         },
       ],
     },
