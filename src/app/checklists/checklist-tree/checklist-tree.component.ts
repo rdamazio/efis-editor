@@ -27,6 +27,7 @@ import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import {
   Checklist,
+  Checklist_CompletionAction,
   ChecklistFile,
   ChecklistGroup,
   ChecklistGroup_Category,
@@ -144,11 +145,20 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
     } else {
       if (node.group) {
         // Adding new checklist to a group.
+        checklistGroup = node.group;
+
         checklist = Checklist.create();
+
+        // Reproduce Garmin Pilot's default for actions.
+        if (checklistGroup.category === ChecklistGroup_Category.normal) {
+          checklist.completionAction = Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST;
+        }
+
+        // TODO: Make a dialog to fill title + completion action.
         if (!(await this._fillTitle(checklist, 'checklist'))) {
           return;
         }
-        checklistGroup = node.group;
+
         node.group.checklists.push(checklist);
       } else {
         // Adding new group to the file.
