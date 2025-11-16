@@ -1,6 +1,7 @@
 import { parseTarGzip } from 'nanotar';
 import {
   Checklist,
+  Checklist_CompletionAction,
   ChecklistFile,
   ChecklistFileMetadata,
   ChecklistGroup,
@@ -75,19 +76,17 @@ export class GarminPilotReader {
     checklistGarmin: GarminPilotChecklist,
     checklistItemsEFIS: Map<string, ChecklistItem[]>,
   ): [GarminChecklistGroupKey, Checklist] {
+    const items = [...checklistItemsEFIS]
+      .filter(([itemKey, _checklistItems]) => checklistGarmin.checklistItems.includes(itemKey))
+      .flatMap(([_itemKey, checklistItems]) => checklistItems);
+
     return [
       [checklistGarmin.type, checklistGarmin.subtype],
       {
         title: checklistGarmin.name,
-        items: [
-          ...[...checklistItemsEFIS]
-            .filter(([itemKey, _checklistItems]) => checklistGarmin.checklistItems.includes(itemKey))
-            .flatMap(([_itemKey, checklistItems]) => checklistItems),
-          ChecklistItem.create({
-            type: ChecklistItem_Type.ITEM_PLAINTEXT,
-            prompt: GarminPilotUtils.COMPLETION_ACTION_TO_EFIS.get(checklistGarmin.completionItem),
-          }),
-        ],
+        items,
+        // TODO: Proper translation.
+        completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
       },
     ];
   }

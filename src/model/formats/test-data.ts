@@ -1,4 +1,10 @@
-import { ChecklistFile, ChecklistGroup_Category, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import {
+  Checklist_CompletionAction,
+  ChecklistFile,
+  ChecklistGroup_Category,
+  ChecklistItem,
+  ChecklistItem_Type,
+} from '../../../gen/ts/checklist';
 
 export const EXPECTED_CONTENTS = ChecklistFile.create({
   groups: [
@@ -8,6 +14,7 @@ export const EXPECTED_CONTENTS = ChecklistFile.create({
       checklists: [
         {
           title: 'Test group 1 checklist 1',
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
           items: [
             ChecklistItem.create({ prompt: 'Challenge item', type: ChecklistItem_Type.ITEM_CHALLENGE }),
             ChecklistItem.create({
@@ -52,6 +59,7 @@ export const EXPECTED_CONTENTS = ChecklistFile.create({
       checklists: [
         {
           title: 'Test group 2 checklist 1',
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
           items: [
             ChecklistItem.create({
               prompt: 'Test group 2 checklist 1 item 1',
@@ -61,12 +69,14 @@ export const EXPECTED_CONTENTS = ChecklistFile.create({
         },
         {
           title: 'Test group 2 checklist 2',
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
           items: [
             ChecklistItem.create({ prompt: 'Test group 2 checklist 2 item 1', type: ChecklistItem_Type.ITEM_TITLE }),
           ],
         },
         {
           title: 'Test group 2 checklist 3 (default)',
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
           items: [
             ChecklistItem.create({ prompt: 'Test group 2 checklist 3 item 1', type: ChecklistItem_Type.ITEM_NOTE }),
           ],
@@ -96,13 +106,27 @@ export const EXPECTED_CONTENTS_WITH_INDENTED_SPACE: ChecklistFile = (() => {
   return expectedContents;
 })();
 
+export const EXPECTED_CONTENTS_WITH_COMPLETION_ACTION: ChecklistFile = (() => {
+  const expectedContents = ChecklistFile.clone(EXPECTED_CONTENTS_WITH_INDENTED_SPACE);
+  expectedContents.groups[1].checklists[0].completionAction = Checklist_CompletionAction.ACTION_DO_NOTHING;
+  expectedContents.groups[1].checklists[1].completionAction = Checklist_CompletionAction.ACTION_OPEN_FLIGHT_PLAN;
+  expectedContents.groups[1].checklists[2].completionAction = Checklist_CompletionAction.ACTION_OPEN_TAXI_CHART;
+  return expectedContents;
+})();
+
 export const EXPECTED_FOREFLIGHT_CONTENTS = ChecklistFile.create({
   groups: [
     { category: ChecklistGroup_Category.normal, title: 'Empty subgroup', checklists: [] },
     {
       category: ChecklistGroup_Category.normal,
       title: 'Subgroup with empty checklist',
-      checklists: [{ title: 'Empty checklist', items: [] }],
+      checklists: [
+        {
+          title: 'Empty checklist',
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
+          items: [],
+        },
+      ],
     },
     {
       category: ChecklistGroup_Category.normal,
@@ -110,6 +134,7 @@ export const EXPECTED_FOREFLIGHT_CONTENTS = ChecklistFile.create({
       checklists: [
         {
           title: 'Checklist',
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
           items: [
             ChecklistItem.create({ prompt: 'First', type: ChecklistItem_Type.ITEM_PLAINTEXT }),
             ChecklistItem.create({ prompt: 'Second', type: ChecklistItem_Type.ITEM_WARNING }),
@@ -188,6 +213,7 @@ export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
       checklists: [
         {
           title: 'New Checklist - Normal Preflight ',
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
           items: [
             ChecklistItem.create({ type: ChecklistItem_Type.ITEM_CHALLENGE }),
             ChecklistItem.create({ type: ChecklistItem_Type.ITEM_CHALLENGE, prompt: 'Call w/o action' }),
@@ -262,10 +288,6 @@ export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
               prompt: 'Center Frequency',
               expectation: '%CENTER_FREQUENCY%',
             }),
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Go to Next Checklist',
-            }),
           ],
         },
       ],
@@ -276,12 +298,8 @@ export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
       checklists: [
         {
           title: 'New Checklist - Normal Takeoff/Cruise',
-          items: [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Go to Next Checklist',
-            }),
-          ],
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
+          items: [],
         },
       ],
     },
@@ -291,12 +309,8 @@ export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
       checklists: [
         {
           title: 'New Checklist - Normal Landing ',
-          items: [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Go to Next Checklist',
-            }),
-          ],
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
+          items: [],
         },
       ],
     },
@@ -306,12 +320,8 @@ export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
       checklists: [
         {
           title: 'New Checklist - Normal Other',
-          items: [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Go to Next Checklist',
-            }),
-          ],
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
+          items: [],
         },
       ],
     },
@@ -321,57 +331,33 @@ export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
       checklists: [
         {
           title: 'New Checklist - Abnormal - Go to Next Checklist ',
-          items: [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Go to Next Checklist',
-            }),
-          ],
+          completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
+          items: [],
         },
         {
           title: 'New Checklist - Completion - Do Nothing',
-          items: [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Do Nothing',
-            }),
-          ],
+          completionAction: Checklist_CompletionAction.ACTION_DO_NOTHING,
+          items: [],
         },
         {
           title: 'New Checklist - Completion Open Flight Plan',
-          items: [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Open Flight Plan',
-            }),
-          ],
+          completionAction: Checklist_CompletionAction.ACTION_OPEN_FLIGHT_PLAN,
+          items: [],
         },
         {
           title: 'New Checklist - Completion Close Flihgh Plan',
-          items: [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Close Flight Plan',
-            }),
-          ],
+          completionAction: Checklist_CompletionAction.ACTION_CLOSE_FLIGHT_PLAN,
+          items: [],
         },
         {
           title: 'New Checklist - Completion - Open SafeTaxi',
-          items: [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Open SafeTaxi',
-            }),
-          ],
+          completionAction: Checklist_CompletionAction.ACTION_OPEN_TAXI_CHART,
+          items: [],
         },
         {
           title: 'New Checklist - Completion - Open Map',
-          items: [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Open Map',
-            }),
-          ],
+          completionAction: Checklist_CompletionAction.ACTION_OPEN_MAP,
+          items: [],
         },
       ],
     },
@@ -381,15 +367,12 @@ export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
       checklists: [
         {
           title: 'New Checklist - Emergency ',
-          items: [
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Do Nothing',
-            }),
-          ],
+          completionAction: Checklist_CompletionAction.ACTION_DO_NOTHING,
+          items: [],
         },
         {
           title: 'Notes Torture Checklist',
+          completionAction: Checklist_CompletionAction.ACTION_DO_NOTHING,
           items: [
             ChecklistItem.create({
               type: ChecklistItem_Type.ITEM_TITLE,
@@ -458,10 +441,6 @@ export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
             ChecklistItem.create({
               type: ChecklistItem_Type.ITEM_WARNING,
               prompt: 'some warning',
-            }),
-            ChecklistItem.create({
-              type: ChecklistItem_Type.ITEM_PLAINTEXT,
-              prompt: 'On Completion: Do Nothing',
             }),
           ],
         },
