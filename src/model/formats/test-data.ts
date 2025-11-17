@@ -470,11 +470,5 @@ export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
   ],
   metadata: {
     name: 'New Checklist Binder',
-    defaultGroupIndex: 0,
-    defaultChecklistIndex: 0,
-    makeAndModel: '',
-    aircraftInfo: '',
-    manufacturerInfo: '',
-    copyrightInfo: '{"sortOrder":3}',
   },
 });
