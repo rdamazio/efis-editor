@@ -92,5 +92,9 @@
       }
     }
   },
-  "cli": { "analytics": false, "schematicCollections": ["@angular-eslint/schematics"] }
+  "cli": {
+    "analytics": false,
+    "packageManager": "npm",
+    "schematicCollections": ["@angular-eslint/schematics"]
+  }
 }

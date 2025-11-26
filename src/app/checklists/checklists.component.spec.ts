@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { provideZoneChangeDetection, signal } from '@angular/core';
 import { DeferBlockState, inject, TestBed } from '@angular/core/testing';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from '@angular/material/snack-bar';
 import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
@@ -68,6 +68,7 @@ describe('ChecklistsComponent', () => {
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 0 } },
         { provide: HOTKEY_DEBOUNCE_TIME, useValue: 50 },
         provideClientHydration(withIncrementalHydration()),
+        provideZoneChangeDetection(),
       ],
       deferBlockStates: DeferBlockState.Complete,
     });

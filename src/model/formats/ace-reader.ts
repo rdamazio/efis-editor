@@ -1,4 +1,3 @@
-import crc32 from 'buffer-crc32';
 import equal from 'fast-deep-equal';
 import {
   Checklist,
@@ -9,6 +8,7 @@ import {
   ChecklistItem,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
+import crc32 from '../../../node_modules/buffer-crc32/dist/index.cjs';
 import * as AceConstants from './ace-constants';
 import { FormatError } from './error';
 import { FormatId } from './format-id';

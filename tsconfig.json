@@ -14,10 +14,10 @@
     "sourceMap": true,
     "declaration": false,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2024",
-    "module": "ES2022",
+    "module": "preserve",
     "useDefineForClassFields": false,
     "lib": ["ES2023", "dom"]
   },
@@ -28,6 +28,8 @@
     "strictStandalone": true,
     "strictTemplates": true,
     "useUnknownInCatchVariables": true,
-    "extendedDiagnostics": { "defaultCategory": "error" }
+    "extendedDiagnostics": {
+      "defaultCategory": "error"
+    }
   }
 }

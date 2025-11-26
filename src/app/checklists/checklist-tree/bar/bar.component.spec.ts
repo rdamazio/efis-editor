@@ -1,3 +1,4 @@
+import { provideZoneChangeDetection } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
@@ -24,6 +25,7 @@ describe('ChecklistTreeBarComponent', () => {
     rendered = await render(ChecklistTreeBarComponent, {
       imports: [NoopAnimationsModule],
       inputs: { tree: tree },
+      providers: [provideZoneChangeDetection()],
     });
     expandButton = screen.queryByRole('button', { name: 'Expand all checklist groups' })!;
     collapseButton = screen.queryByRole('button', { name: 'Collapse all checklist groups' })!;

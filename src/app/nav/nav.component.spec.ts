@@ -2,6 +2,7 @@ import { ComponentFixture, DeferBlockState } from '@angular/core/testing';
 
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { provideZoneChangeDetection } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
@@ -40,6 +41,7 @@ describe('NavComponent', () => {
           useValue: hotkeys,
         },
         provideClientHydration(withIncrementalHydration()),
+        provideZoneChangeDetection(),
       ],
       deferBlockStates: DeferBlockState.Complete,
     });

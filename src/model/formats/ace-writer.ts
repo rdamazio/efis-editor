@@ -1,5 +1,5 @@
-import crc32 from 'buffer-crc32';
 import { ChecklistFile, ChecklistItem_Type } from '../../../gen/ts/checklist';
+import crc32 from '../../../node_modules/buffer-crc32/dist/index.cjs';
 import * as AceConstants from './ace-constants';
 import { FormatError } from './error';
 
@@ -57,7 +57,7 @@ export class AceWriter {
     }
     this._addLine(AceConstants.FILE_END);
 
-    // _add CRC for the existing parts.
+    // Add CRC for the existing parts.
     const crc = crc32.signed(Buffer.from(await new Blob(this._parts).arrayBuffer()));
     const crcBytes = new Uint8Array(4);
     new DataView(crcBytes.buffer).setUint32(0, ~crc, true);
