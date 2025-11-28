@@ -1,7 +1,6 @@
 import { provideZoneChangeDetection, signal } from '@angular/core';
 import { DeferBlockState, inject, TestBed } from '@angular/core/testing';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from '@angular/material/snack-bar';
-import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
@@ -47,9 +46,6 @@ describe('ChecklistsComponent', () => {
   let metaKey: string;
 
   beforeEach(async () => {
-    // Avoid hydration warnings by first rendering in server mode.
-    globalThis.ngServerMode = true;
-
     // We have a lot of large tests in this file, override the timeout.
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
@@ -67,18 +63,10 @@ describe('ChecklistsComponent', () => {
         { provide: ROUTER_OUTLET_DATA, useValue: signal(navData) },
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 0 } },
         { provide: HOTKEY_DEBOUNCE_TIME, useValue: 50 },
-        provideClientHydration(withIncrementalHydration()),
         provideZoneChangeDetection(),
       ],
       deferBlockStates: DeferBlockState.Complete,
     });
-
-    globalThis.ngServerMode = false;
-  });
-
-  afterAll(() => {
-    // Clean up in case beforeEach above doesn't complete.
-    globalThis.ngServerMode = false;
   });
 
   beforeEach(inject(
@@ -786,7 +774,6 @@ describe('ChecklistsComponent', () => {
       await user.keyboard('[ArrowUp]');
 
       // Duplicate it.
-      globalThis.ngServerMode = false;
       const completed = storageCompleted();
       await user.keyboard(`[${metaKey}>]D[/${metaKey}]`);
 

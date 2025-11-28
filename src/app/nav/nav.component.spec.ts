@@ -5,7 +5,6 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { provideZoneChangeDetection } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HotkeysService } from '@ngneat/hotkeys';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
@@ -30,9 +29,6 @@ describe('NavComponent', () => {
     hotkeys.getShortcuts.and.returnValue([]);
     toggleHelp = spyOn(HelpComponent, 'toggleHelp');
 
-    // Avoid hydration warnings by first rendering in server mode.
-    globalThis.ngServerMode = true;
-
     rendered = await render(NavComponent, {
       imports: [MatDialogModule, NoopAnimationsModule],
       providers: [
@@ -40,7 +36,6 @@ describe('NavComponent', () => {
           provide: HotkeysService,
           useValue: hotkeys,
         },
-        provideClientHydration(withIncrementalHydration()),
         provideZoneChangeDetection(),
       ],
       deferBlockStates: DeferBlockState.Complete,
@@ -48,13 +43,6 @@ describe('NavComponent', () => {
     fixture = rendered.fixture;
     navData = fixture.componentInstance.navData;
     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
-
-    globalThis.ngServerMode = false;
-  });
-
-  afterAll(() => {
-    // Clean up in case beforeEach above doesn't complete.
-    globalThis.ngServerMode = false;
   });
 
   it('should render', () => {
