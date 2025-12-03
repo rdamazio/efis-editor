@@ -1,6 +1,7 @@
 import equal from 'fast-deep-equal';
 import {
   Checklist,
+  Checklist_CompletionAction,
   ChecklistFile,
   ChecklistFileMetadata,
   ChecklistGroup,
@@ -109,7 +110,10 @@ export class AceReader {
       throw new FormatError('Bad checklist header: ' + this._peekLine());
     }
 
-    const checklist: Checklist = { title: this._readLine(), items: [] };
+    const checklist = Checklist.create({
+      title: this._readLine(),
+      completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
+    });
 
     while (!this._consumeLine(AceConstants.CHECKLIST_END_HEADER)) {
       checklist.items.push(this._readItem());

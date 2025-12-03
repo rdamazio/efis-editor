@@ -27,11 +27,13 @@ import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import {
   Checklist,
+  Checklist_CompletionAction,
   ChecklistFile,
   ChecklistGroup,
   ChecklistGroup_Category,
   ChecklistItem,
 } from '../../../../gen/ts/checklist';
+import { ChecklistInfoComponent } from '../dialogs/checklist-info/checklist-info';
 import { TitleDialogComponent } from '../dialogs/title-dialog/title-dialog.component';
 import { ChecklistDragDirective } from './drag.directive';
 import { ChecklistTreeNode } from './node/node';
@@ -144,11 +146,20 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
     } else {
       if (node.group) {
         // Adding new checklist to a group.
+        checklistGroup = node.group;
+
         checklist = Checklist.create();
-        if (!(await this._fillTitle(checklist, 'checklist'))) {
+
+        // Reproduce Garmin Pilot's default for actions.
+        if (checklistGroup.category === ChecklistGroup_Category.normal) {
+          checklist.completionAction = Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST;
+        }
+
+        checklist = await ChecklistInfoComponent.showChecklistInfo(checklist, this._dialog);
+        if (!checklist) {
           return;
         }
-        checklistGroup = node.group;
+
         node.group.checklists.push(checklist);
       } else {
         // Adding new group to the file.
@@ -629,7 +640,13 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
   }
 
   async onChecklistRename(node: ChecklistTreeNode) {
-    if (await this._fillTitle(node.checklist!, 'checklist')) {
+    const checklist = node.checklist;
+    if (!checklist) return;
+
+    const updatedChecklist = await ChecklistInfoComponent.showChecklistInfo(checklist, this._dialog);
+    if (updatedChecklist) {
+      checklist.title = updatedChecklist.title;
+      checklist.completionAction = updatedChecklist.completionAction;
       this._reloadFile(true);
     }
   }

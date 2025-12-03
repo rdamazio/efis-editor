@@ -1,4 +1,4 @@
-import { ChecklistGroup_Category } from '../../../gen/ts/checklist';
+import { Checklist_CompletionAction, ChecklistGroup_Category } from '../../../gen/ts/checklist';
 import {
   GarminPilotChecklist_CompletionItem,
   GarminPilotChecklist_SubType,
@@ -94,12 +94,15 @@ export class GarminPilotUtils {
   }
 
   public static readonly COMPLETION_ACTION_TO_EFIS = new Map([
-    [GarminPilotChecklist_CompletionItem.ACTION_DO_NOTHING, 'On Completion: Do Nothing'],
-    [GarminPilotChecklist_CompletionItem.ACTION_GO_TO_NEXT_CHECKLIST, 'On Completion: Go to Next Checklist'],
-    [GarminPilotChecklist_CompletionItem.ACTION_OPEN_FLIGHT_PLAN, 'On Completion: Open Flight Plan'],
-    [GarminPilotChecklist_CompletionItem.ACTION_CLOSE_FLIGHT_PLAN, 'On Completion: Close Flight Plan'],
-    [GarminPilotChecklist_CompletionItem.ACTION_OPEN_SAFETAXI, 'On Completion: Open SafeTaxi'],
-    [GarminPilotChecklist_CompletionItem.ACTION_OPEN_MAP, 'On Completion: Open Map'],
+    [GarminPilotChecklist_CompletionItem.ACTION_DO_NOTHING, Checklist_CompletionAction.ACTION_DO_NOTHING],
+    [
+      GarminPilotChecklist_CompletionItem.ACTION_GO_TO_NEXT_CHECKLIST,
+      Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
+    ],
+    [GarminPilotChecklist_CompletionItem.ACTION_OPEN_FLIGHT_PLAN, Checklist_CompletionAction.ACTION_OPEN_FLIGHT_PLAN],
+    [GarminPilotChecklist_CompletionItem.ACTION_CLOSE_FLIGHT_PLAN, Checklist_CompletionAction.ACTION_CLOSE_FLIGHT_PLAN],
+    [GarminPilotChecklist_CompletionItem.ACTION_OPEN_SAFETAXI, Checklist_CompletionAction.ACTION_OPEN_TAXI_CHART],
+    [GarminPilotChecklist_CompletionItem.ACTION_OPEN_MAP, Checklist_CompletionAction.ACTION_OPEN_MAP],
   ]);
 
   public static readonly COMPLETION_ACTION_TO_GARMIN = new Map(

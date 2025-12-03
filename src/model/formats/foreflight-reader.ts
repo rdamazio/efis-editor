@@ -1,5 +1,6 @@
 import {
   Checklist,
+  Checklist_CompletionAction,
   ChecklistFile,
   ChecklistFileMetadata,
   ChecklistGroup,
@@ -72,12 +73,20 @@ export class ForeFlightReader {
     return {
       category: category,
       title: checklistSubgroup.title,
-      checklists: checklistSubgroup.items.map(ForeFlightReader._checklistToEFIS),
+      checklists: checklistSubgroup.items.map(ForeFlightReader._checklistToEFIS.bind(this, category)),
     };
   }
 
-  private static _checklistToEFIS(checkList: ForeFlightChecklist): Checklist {
-    return { title: checkList.title, items: checkList.items.flatMap(ForeFlightReader._checklistItemToEFIS) };
+  private static _checklistToEFIS(category: ChecklistGroup_Category, checkList: ForeFlightChecklist): Checklist {
+    const completionAction =
+      category === ChecklistGroup_Category.normal
+        ? Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST
+        : Checklist_CompletionAction.ACTION_DO_NOTHING;
+    return {
+      title: checkList.title,
+      items: checkList.items.flatMap(ForeFlightReader._checklistItemToEFIS),
+      completionAction: completionAction,
+    };
   }
 
   private static _checklistItemToEFIS(checklistItem: ForeFlightChecklistItem): ChecklistItem[] {

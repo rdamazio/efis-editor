@@ -1,13 +1,6 @@
 import { createTarGzip } from 'nanotar';
 import { v4 as uuidV4 } from 'uuid';
-import {
-  Checklist,
-  ChecklistFile,
-  ChecklistGroup,
-  ChecklistGroup_Category,
-  ChecklistItem,
-  ChecklistItem_Type,
-} from '../../../gen/ts/checklist';
+import { Checklist, ChecklistFile, ChecklistGroup, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import {
   GarminPilotChecklist,
   GarminPilotChecklist_CompletionItem,
@@ -82,10 +75,10 @@ export class GarminPilotWriter {
     const checklistGroupsGarmin = this._checklistsGarmin.get(groupKeyGarmin) ?? [];
 
     checklistGroupEFIS.checklists.forEach((checklistEFIS) => {
-      const [completionAction, itemsGarmin] = GarminPilotWriter._checklistToGarmin(
-        checklistGroupEFIS.category,
-        checklistEFIS,
-      );
+      const completionAction =
+        GarminPilotUtils.COMPLETION_ACTION_TO_GARMIN.get(checklistEFIS.completionAction) ??
+        GarminPilotChecklist_CompletionItem.ACTION_GO_TO_NEXT_CHECKLIST;
+      const itemsGarmin = GarminPilotWriter._checklistToGarmin(checklistEFIS);
 
       this._checklistItemsGarmin.push(...itemsGarmin);
 
@@ -103,15 +96,7 @@ export class GarminPilotWriter {
     this._checklistsGarmin.set(groupKeyGarmin, checklistGroupsGarmin);
   }
 
-  private static _checklistToGarmin(
-    categoryEFIS: ChecklistGroup_Category,
-    checklistEFIS: Checklist,
-  ): [GarminPilotChecklist_CompletionItem, GarminPilotChecklistItem[]] {
-    let garminCompletionAction =
-      categoryEFIS === ChecklistGroup_Category.normal
-        ? GarminPilotChecklist_CompletionItem.ACTION_GO_TO_NEXT_CHECKLIST
-        : GarminPilotChecklist_CompletionItem.ACTION_DO_NOTHING;
-
+  private static _checklistToGarmin(checklistEFIS: Checklist): GarminPilotChecklistItem[] {
     const itemsGarmin = checklistEFIS.items
       .reduce<[GarminPilotChecklistItem, ChecklistItem][]>((accumulator, itemEFIS) => {
         const itemGarmin: GarminPilotChecklistItem = {
@@ -152,13 +137,6 @@ export class GarminPilotWriter {
             itemGarmin.itemType = GarminPilotChecklistItem_ItemType.TYPE_NOTE;
             itemGarmin.title = '';
 
-            // Handle special completion action entry
-            if (GarminPilotUtils.COMPLETION_ACTION_TO_GARMIN.has(itemEFIS.prompt)) {
-              garminCompletionAction = GarminPilotUtils.COMPLETION_ACTION_TO_GARMIN.get(itemEFIS.prompt)!;
-              accumulator.pop();
-              break;
-            }
-
             // Handle EFIS note types translated as prefixes
             const text = FormatUtils.getChecklistItemPrefix(itemEFIS.type) + itemEFIS.prompt;
 
@@ -188,6 +166,6 @@ export class GarminPilotWriter {
       }, [])
       .map(([itemGarmin, _itemEFIS]) => itemGarmin);
 
-    return [garminCompletionAction, itemsGarmin];
+    return itemsGarmin;
   }
 }

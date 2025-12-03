@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Checklist metadata</h2>
+<mat-dialog-content (keyup.enter)="okbutton._elementRef.nativeElement.click()">
+  <mat-form-field>
+    <mat-label>Title</mat-label>
+    <input #title matInput cdkFocusInitial required placeholder="e.g. Before takeoff" [(ngModel)]="data.title" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>On completion</mat-label>
+    <mat-select [(value)]="data.completionAction">
+      <mat-option [value]="_completionActions.ACTION_DO_NOTHING">Do nothing</mat-option>
+      <mat-option [value]="_completionActions.ACTION_GO_TO_NEXT_CHECKLIST">Go to next checklist</mat-option>
+      <mat-option [value]="_completionActions.ACTION_OPEN_FLIGHT_PLAN">Open flight plan</mat-option>
+      <mat-option [value]="_completionActions.ACTION_CLOSE_FLIGHT_PLAN">Close flight plan</mat-option>
+      <mat-option [value]="_completionActions.ACTION_OPEN_TAXI_CHART">Open taxi chart</mat-option>
+      <mat-option [value]="_completionActions.ACTION_OPEN_MAP">Open map</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p class="note">Note: completion actions are currently only supported on Garmin Pilot™.</p>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button #okbutton mat-button [mat-dialog-close]="data" [disabled]="!title.validity.valid">Ok</button>
+  <button mat-button [mat-dialog-close]="undefined">Cancel</button>
+</mat-dialog-actions>

@@ -20,6 +20,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subject } from 'rxjs';
 import {
   Checklist,
+  Checklist_CompletionAction,
   ChecklistFile,
   ChecklistFileMetadata,
   ChecklistGroup_Category,
@@ -481,6 +482,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
           checklists: [
             {
               title: 'First checklist',
+              completionAction: Checklist_CompletionAction.ACTION_DO_NOTHING,
               items: [
                 {
                   type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
