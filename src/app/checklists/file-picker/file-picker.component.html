@@ -2,7 +2,9 @@
   <mat-form-field class="dropdown">
     <mat-label>Select checklist file</mat-label>
     <mat-select [(value)]="selectedFile" (selectionChange)="fileSelected.emit(selectedFile())">
-      {{ '' // opt-out of NG0956 warning regarding tracking by identity (non-static collection) }}
+      {{
+        '' // opt-out of NG0956 warning regarding tracking by identity (non-static collection)
+      }}
       @for (file of fileNames(); track `${file}`) {
         <mat-option [value]="file">
           {{ file }}
