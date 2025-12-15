@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Fetch prepared artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: prepared-source
       - name: Extract prepared artifacts
@@ -38,7 +38,7 @@ jobs:
     needs: buildprep
     steps:
       - name: Fetch prepared artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: prepared-source
       - name: Extract prepared artifacts
