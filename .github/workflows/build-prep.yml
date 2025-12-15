@@ -30,7 +30,7 @@ jobs:
       - name: Archive prepared artifacts
         run: tar --exclude=.jj --exclude=.git -cvf prepared-source.tar * .*
       - name: Upload prepared artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: prepared-source
           path: prepared-source.tar
