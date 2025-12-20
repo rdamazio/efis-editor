@@ -1,6 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { EditableLabelComponent } from './editable-label.component';
 
 describe('EditableLabelComponent', () => {
@@ -9,7 +7,7 @@ describe('EditableLabelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditableLabelComponent, NoopAnimationsModule],
+      imports: [EditableLabelComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(EditableLabelComponent);

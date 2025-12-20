@@ -6,7 +6,6 @@ import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistCommandBarComponent } from './command-bar.component';
 
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { FormatId } from '../../../model/formats/format-id';
 
 describe('ChecklistCommandBarComponent', () => {
@@ -39,7 +38,6 @@ describe('ChecklistCommandBarComponent', () => {
 
   async function renderComponent(hasFiles: boolean, fileIsOpen: boolean) {
     const { fixture } = await render(ChecklistCommandBarComponent, {
-      imports: [NoopAnimationsModule],
       inputs: { hasFiles: hasFiles, fileIsOpen: fileIsOpen },
       on: { newFile, openFile, uploadFile, downloadFile, deleteFile, fileInfo },
     });

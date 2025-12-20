@@ -1,4 +1,3 @@
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
@@ -23,7 +22,6 @@ describe('NodeComponent', () => {
 
   async function renderComponent(): Promise<RenderResult<ChecklistTreeNodeComponent>> {
     return render(ChecklistTreeNodeComponent, {
-      imports: [NoopAnimationsModule],
       inputs: { node: node, disableButtonHover: disableButtonHover },
       on: { nodeRename, nodeDelete },
     });

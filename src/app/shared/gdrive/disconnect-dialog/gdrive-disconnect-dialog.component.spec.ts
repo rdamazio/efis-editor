@@ -3,7 +3,6 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture, TestBed, inject } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { GoogleDriveDisconnectDialogComponent } from './gdrive-disconnect-dialog.component';
@@ -18,7 +17,7 @@ describe('GoogleDriveDisconnectDialogComponent', () => {
     user = userEvent.setup();
 
     await TestBed.configureTestingModule({
-      imports: [GoogleDriveDisconnectDialogComponent, MatDialogModule, NoopAnimationsModule],
+      imports: [GoogleDriveDisconnectDialogComponent, MatDialogModule],
       providers: [{ provide: MatDialogRef, useValue: {} }],
     }).compileComponents();
 

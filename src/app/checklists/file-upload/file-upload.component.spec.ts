@@ -1,4 +1,3 @@
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { firstValueFrom, timer } from 'rxjs';
@@ -23,7 +22,6 @@ describe('ChecklistFileUploadComponent', () => {
     fileUploaded = jasmine.createSpy('fileUploaded');
 
     await render(ChecklistFileUploadComponent, {
-      imports: [NoopAnimationsModule],
       on: { fileUploaded },
     });
     // The input is hidden and has no text, so we must fetch it directly from the document.

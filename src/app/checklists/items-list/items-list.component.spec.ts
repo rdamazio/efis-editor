@@ -1,5 +1,3 @@
-import { provideZoneChangeDetection } from '@angular/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { render, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { Checklist, ChecklistItem_Type } from '../../../../gen/ts/checklist';
@@ -19,9 +17,7 @@ describe('ChecklistItemsComponent', () => {
     });
 
     await render(ChecklistItemsComponent, {
-      imports: [NoopAnimationsModule],
       inputs: { checklist },
-      providers: [provideZoneChangeDetection()],
       on: { checklistChange },
     });
   });

@@ -1,6 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { WelcomeComponent } from './welcome.component';
 
@@ -10,7 +8,7 @@ describe('WelcomeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterModule.forRoot([]), NoopAnimationsModule],
+      imports: [RouterModule.forRoot([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(WelcomeComponent);

@@ -2,10 +2,8 @@ import { ComponentFixture, DeferBlockState } from '@angular/core/testing';
 
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { provideZoneChangeDetection } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HotkeysService } from '@ngneat/hotkeys';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
@@ -30,13 +28,12 @@ describe('NavComponent', () => {
     toggleHelp = spyOn(HelpComponent, 'toggleHelp');
 
     rendered = await render(NavComponent, {
-      imports: [MatDialogModule, NoopAnimationsModule],
+      imports: [MatDialogModule],
       providers: [
         {
           provide: HotkeysService,
           useValue: hotkeys,
         },
-        provideZoneChangeDetection(),
       ],
       deferBlockStates: DeferBlockState.Complete,
     });

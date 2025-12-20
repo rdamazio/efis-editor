@@ -1,31 +1,27 @@
-import { TestBed } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
+import { ComponentFixture, DeferBlockState } from '@angular/core/testing';
+import { render, RenderResult, screen, within } from '@testing-library/angular';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
+  let rendered: RenderResult<AppComponent>;
+  let fixture: ComponentFixture<AppComponent>;
+
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AppComponent, NoopAnimationsModule, RouterModule.forRoot([])],
-    }).compileComponents();
+    rendered = await render(AppComponent, {
+      deferBlockStates: DeferBlockState.Complete,
+    });
+    fixture = rendered.fixture;
   });
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
-  });
-
-  it(`should have the 'EFIS Editor' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
     expect(app.title).toEqual('EFIS Editor');
   });
 
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('mat-toolbar')?.textContent).toContain('EFIS Editor');
+  it('should render the title', () => {
+    const toolbar = screen.getByRole('toolbar');
+    expect(toolbar).toBeVisible();
+    expect(within(toolbar).getByRole('heading', { name: 'EFIS Editor' })).toBeVisible();
   });
 });

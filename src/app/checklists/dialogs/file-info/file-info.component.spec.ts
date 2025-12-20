@@ -4,7 +4,6 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { Component, input, output } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistFileMetadata, ChecklistGroup } from '../../../../../gen/ts/checklist';
@@ -57,7 +56,6 @@ describe('ChecklistFileInfoComponent', () => {
 
   async function openDialog() {
     const { fixture } = await render(DialogTestComponent, {
-      imports: [NoopAnimationsModule],
       inputs: { metadataIn: metadata, groupsIn: groups },
       on: { dataOut },
     });

@@ -3,7 +3,6 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture, inject, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { DeleteDialogComponent, DeleteDialogData } from './delete-dialog.component';
@@ -20,7 +19,7 @@ describe('DeleteDialogComponent', () => {
     user = userEvent.setup();
 
     await TestBed.configureTestingModule({
-      imports: [DeleteDialogComponent, MatDialogModule, NoopAnimationsModule],
+      imports: [DeleteDialogComponent, MatDialogModule],
       providers: [
         { provide: MatDialogRef, useValue: {} },
         { provide: MAT_DIALOG_DATA, useValue: DATA },
