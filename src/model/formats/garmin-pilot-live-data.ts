@@ -36,7 +36,7 @@ export class GarminPilotLiveData {
   );
 
   public static getLiveDataFieldSlug(itemType: GarminPilotChecklistItem_ItemType): string {
-    const [slug = undefined, ..._] = this.LIVE_DATA_FIELD_TO_EFIS.get(itemType) ?? [];
+    const [slug, ..._] = this.LIVE_DATA_FIELD_TO_EFIS.get(itemType) ?? [];
     if (!slug) {
       throw new GarminPilotFormatError(`unsupported item type: ${itemType}`);
     }
