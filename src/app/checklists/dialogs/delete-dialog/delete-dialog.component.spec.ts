@@ -5,17 +5,20 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { screen } from '@testing-library/angular';
-import userEvent from '@testing-library/user-event';
+import userEvent, { UserEvent } from '@testing-library/user-event';
 import { DeleteDialogComponent, DeleteDialogData } from './delete-dialog.component';
 
 const DATA: DeleteDialogData = { entityType: 'planet', entityDescription: 'planet and all its inhabitants' };
 
 describe('DeleteDialogComponent', () => {
+  let user: UserEvent;
   let fixture: ComponentFixture<DeleteDialogComponent>;
   let loader: HarnessLoader;
   let dialog: MatDialog;
 
   beforeEach(async () => {
+    user = userEvent.setup();
+
     await TestBed.configureTestingModule({
       imports: [DeleteDialogComponent, MatDialogModule, NoopAnimationsModule],
       providers: [
@@ -44,7 +47,7 @@ describe('DeleteDialogComponent', () => {
     expect(dialogs.length).toBe(1);
 
     const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
-    await userEvent.click(cancelButton);
+    await user.click(cancelButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
@@ -60,7 +63,7 @@ describe('DeleteDialogComponent', () => {
 
     const deleteButton = await screen.findByRole('button', { name: 'Delete!' });
 
-    await userEvent.click(deleteButton);
+    await user.click(deleteButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);

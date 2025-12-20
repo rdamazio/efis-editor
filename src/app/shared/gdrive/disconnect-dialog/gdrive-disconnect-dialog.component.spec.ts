@@ -5,15 +5,18 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { screen } from '@testing-library/angular';
-import userEvent from '@testing-library/user-event';
+import userEvent, { UserEvent } from '@testing-library/user-event';
 import { GoogleDriveDisconnectDialogComponent } from './gdrive-disconnect-dialog.component';
 
 describe('GoogleDriveDisconnectDialogComponent', () => {
+  let user: UserEvent;
   let fixture: ComponentFixture<GoogleDriveDisconnectDialogComponent>;
   let loader: HarnessLoader;
   let dialog: MatDialog;
 
   beforeEach(async () => {
+    user = userEvent.setup();
+
     await TestBed.configureTestingModule({
       imports: [GoogleDriveDisconnectDialogComponent, MatDialogModule, NoopAnimationsModule],
       providers: [{ provide: MatDialogRef, useValue: {} }],
@@ -39,7 +42,7 @@ describe('GoogleDriveDisconnectDialogComponent', () => {
     expect(dialogs.length).toBe(1);
 
     const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
-    await userEvent.click(cancelButton);
+    await user.click(cancelButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
@@ -57,7 +60,7 @@ describe('GoogleDriveDisconnectDialogComponent', () => {
     expect(deleteAll).not.toBeChecked();
 
     const stopButton = await screen.findByRole('button', { name: 'Stop synchronization' });
-    await userEvent.click(stopButton);
+    await user.click(stopButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
@@ -73,11 +76,11 @@ describe('GoogleDriveDisconnectDialogComponent', () => {
 
     const deleteAll = await screen.findByRole('checkbox', { name: 'Delete all EFIS Editor data from Google Drive' });
     expect(deleteAll).not.toBeChecked();
-    await userEvent.click(deleteAll);
+    await user.click(deleteAll);
     expect(deleteAll).toBeChecked();
 
     const stopButton = await screen.findByRole('button', { name: 'Stop synchronization' });
-    await userEvent.click(stopButton);
+    await user.click(stopButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);

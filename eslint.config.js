@@ -212,6 +212,7 @@ module.exports = tseslint.config(
       'testing-library/no-render-in-lifecycle': 'off',
       'testing-library/prefer-explicit-assert': 'error',
       'testing-library/prefer-user-event': 'error',
+      'testing-library/prefer-user-event-setup': 'error',
     },
   },
   {

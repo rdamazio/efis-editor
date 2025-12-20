@@ -5,15 +5,18 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { screen } from '@testing-library/angular';
-import userEvent from '@testing-library/user-event';
+import userEvent, { UserEvent } from '@testing-library/user-event';
 import { GoogleDriveConnectDialogComponent } from './gdrive-connect-dialog.component';
 
 describe('GoogleDriveConnectDialogComponent', () => {
+  let user: UserEvent;
   let fixture: ComponentFixture<GoogleDriveConnectDialogComponent>;
   let loader: HarnessLoader;
   let dialog: MatDialog;
 
   beforeEach(async () => {
+    user = userEvent.setup();
+
     await TestBed.configureTestingModule({
       imports: [GoogleDriveConnectDialogComponent, MatDialogModule, NoopAnimationsModule],
       providers: [{ provide: MatDialogRef, useValue: {} }],
@@ -39,7 +42,7 @@ describe('GoogleDriveConnectDialogComponent', () => {
     expect(dialogs.length).toBe(1);
 
     const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
-    await userEvent.click(cancelButton);
+    await user.click(cancelButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
@@ -54,7 +57,7 @@ describe('GoogleDriveConnectDialogComponent', () => {
     expect(dialogs.length).toBe(1);
 
     const syncButton = await screen.findByRole('button', { name: 'Synchronize' });
-    await userEvent.click(syncButton);
+    await user.click(syncButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
