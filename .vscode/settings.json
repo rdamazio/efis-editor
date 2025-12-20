@@ -10,5 +10,12 @@
       "--ts_out=${workspaceRoot}/gen/ts"
     ]
   },
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
   "formatFiles.excludePattern": "src/model/formats/test-foreflight.fmd,src/model/formats/test-garmin-pilot.gplt,src/model/formats/test.json,src/model/formats/test.ace"
 }
