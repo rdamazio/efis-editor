@@ -50,6 +50,7 @@ export class ChecklistItemsComponent {
   ) {
     this.checklist.subscribe(() => {
       // When we open an entirely separate checklist, get rid of selection and undo history.
+      // TODO: This is not running, and undoing after changing checklists will overwrite the other checklist.
       this._selectedIdx = null;
       this._dismissUndoSnackbar();
       this._undoState = [];
@@ -116,10 +117,10 @@ export class ChecklistItemsComponent {
       this._selectedIdx = null;
       return;
     }
-    if (this._selectedIdx === null) {
-      this._selectedIdx = 0;
-    } else if (this._selectedIdx < checklist.items.length - 1) {
+    if (this._selectedIdx !== null && this._selectedIdx < checklist.items.length - 1) {
       this._selectedIdx++;
+    } else {
+      this._selectedIdx = 0;
     }
     this.onItemsUpdated();
   }
@@ -130,10 +131,10 @@ export class ChecklistItemsComponent {
       this._selectedIdx = null;
       return;
     }
-    if (this._selectedIdx === null) {
-      this._selectedIdx = checklist.items.length - 1;
-    } else if (this._selectedIdx > 0) {
+    if (this._selectedIdx !== null && this._selectedIdx > 0) {
       this._selectedIdx--;
+    } else {
+      this._selectedIdx = checklist.items.length - 1;
     }
     this.onItemsUpdated();
   }
