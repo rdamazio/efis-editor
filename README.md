@@ -158,6 +158,10 @@ ForeFlight has partial support for checklist metadata - of the information you e
 Editor, only file name, aircraft information and make/model will be included, but not
 manufacturer or copyright info.
 
+### Garmin ACE
+
+Garmin G3X does not support empty groups or checklists, so they are skipped when exporting.
+
 ### Garmin Pilot
 
 At Garmin's request, the EFIS editor supports the `.gplt` file format (unencrypted), but not

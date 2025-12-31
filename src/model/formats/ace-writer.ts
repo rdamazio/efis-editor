@@ -27,9 +27,21 @@ export class AceWriter {
     this._addLine(metadata.copyrightInfo || ' ');
 
     for (const group of file.groups) {
+      // G3X doesn't deal well with empty groups or checklists, so we skip them.
+      if (group.checklists.length === 0 || group.checklists.every((checklist) => checklist.items.length === 0)) {
+        console.warn('ACE: Skipping empty group', group.title);
+        continue;
+      }
+
       this._addPart(AceConstants.GROUP_HEADER);
       this._addLine(group.title);
       for (const checklist of group.checklists) {
+        // G3X doesn't deal well with empty checklists, so we skip them.
+        if (checklist.items.length === 0) {
+          console.warn('ACE: Skipping empty checklist: ', checklist.title);
+          continue;
+        }
+
         this._addPart(AceConstants.CHECKLIST_HEADER);
         this._addLine(checklist.title);
         for (const item of checklist.items) {

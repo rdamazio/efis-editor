@@ -1,4 +1,4 @@
-import { ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist';
+import { Checklist, ChecklistFile, ChecklistFileMetadata, ChecklistGroup } from '../../../gen/ts/checklist';
 import { AceReader } from './ace-reader';
 import { FormatError } from './error';
 import { FormatId } from './format-id';
@@ -55,6 +55,56 @@ describe('AceWriter', () => {
 
     afterEach(() => {
       AceReader.trimMetadataFields = true;
+    });
+  });
+
+  describe('try writing a file with an empty checklist or group', () => {
+    it('empty checklist', async () => {
+      const contents = ChecklistFile.clone(EXPECTED_CONTENTS);
+      contents.groups[0].checklists.push(
+        Checklist.create({
+          title: 'Empty checklist',
+          items: [],
+        }),
+      );
+      const writtenFile = await serializeChecklistFile(contents, FormatId.ACE);
+      const readFile = await parseChecklistFile(writtenFile);
+      expect(readFile).toEqual(EXPECTED_CONTENTS);
+    });
+
+    it('empty group', async () => {
+      const contents = ChecklistFile.clone(EXPECTED_CONTENTS);
+      contents.groups.push(
+        ChecklistGroup.create({
+          title: 'Empty group',
+          checklists: [],
+        }),
+      );
+      const writtenFile = await serializeChecklistFile(contents, FormatId.ACE);
+      const readFile = await parseChecklistFile(writtenFile);
+      expect(readFile).toEqual(EXPECTED_CONTENTS);
+    });
+
+    it('group with only empty checklists', async () => {
+      const contents = ChecklistFile.clone(EXPECTED_CONTENTS);
+      contents.groups.push(
+        ChecklistGroup.create({
+          title: 'Group with empty checklists',
+          checklists: [
+            Checklist.create({
+              title: 'Empty checklist 1',
+              items: [],
+            }),
+            Checklist.create({
+              title: 'Empty checklist 2',
+              items: [],
+            }),
+          ],
+        }),
+      );
+      const writtenFile = await serializeChecklistFile(contents, FormatId.ACE);
+      const readFile = await parseChecklistFile(writtenFile);
+      expect(readFile).toEqual(EXPECTED_CONTENTS);
     });
   });
 });
