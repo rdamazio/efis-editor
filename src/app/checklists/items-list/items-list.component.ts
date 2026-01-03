@@ -126,15 +126,15 @@ export class ChecklistItemsComponent {
   }
 
   selectPreviousItem() {
-    const checklist = this.checklist();
-    if (!checklist) {
+    const current = this.checklist();
+    if (!current) {
       this._selectedIdx = null;
       return;
     }
     if (this._selectedIdx !== null && this._selectedIdx > 0) {
       this._selectedIdx--;
     } else {
-      this._selectedIdx = checklist.items.length - 1;
+      this._selectedIdx = current.items.length - 1;
     }
     this.onItemsUpdated();
   }
@@ -212,12 +212,12 @@ export class ChecklistItemsComponent {
   }
 
   private _selectedItem(): ChecklistItem | undefined {
-    const checklist = this.checklist();
-    if (!checklist || this._selectedIdx === null || this.items().length <= this._selectedIdx) {
+    const current = this.checklist();
+    if (!current || this._selectedIdx === null || this.items().length <= this._selectedIdx) {
       return undefined;
     }
 
-    return checklist.items[this._selectedIdx];
+    return current.items[this._selectedIdx];
   }
 
   private _selectedItemComponent(): ChecklistItemComponent | undefined {
