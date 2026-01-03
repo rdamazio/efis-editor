@@ -64,10 +64,13 @@ export class ChecklistItemsComponent {
     this.onItemsUpdated();
   }
 
-  onItemsUpdated() {
+  onItemsUpdated(selectedIdx?: number) {
     this.checklistChange.emit(this.checklist());
     afterNextRender(
       () => {
+        if (selectedIdx !== undefined) {
+          this._selectedIdx = selectedIdx;
+        }
         this._focusSelectedItem();
       },
       { injector: this._injector },
@@ -101,16 +104,7 @@ export class ChecklistItemsComponent {
     }
     items.splice(newIdx, 0, item);
 
-    this.onItemsUpdated();
-
-    // Set focus to the newly added item.
-    afterNextRender(
-      () => {
-        this._selectedIdx = newIdx;
-        this._focusSelectedItem();
-      },
-      { injector: this._injector },
-    );
+    this.onItemsUpdated(newIdx);
   }
 
   selectNextItem() {
@@ -174,16 +168,7 @@ export class ChecklistItemsComponent {
     const newIdx = this._selectedIdx + 1;
 
     items.splice(newIdx, 0, newItem);
-    this.onItemsUpdated();
-
-    // Set focus to the newly added item.
-    afterNextRender(
-      () => {
-        this._selectedIdx = newIdx;
-        this._focusSelectedItem();
-      },
-      { injector: this._injector },
-    );
+    this.onItemsUpdated(newIdx);
   }
 
   moveCurrentItemUp() {
