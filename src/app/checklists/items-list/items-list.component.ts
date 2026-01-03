@@ -1,5 +1,5 @@
 import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { afterNextRender, Component, Injector, input, model, output, viewChildren } from '@angular/core';
+import { afterNextRender, Component, effect, Injector, input, model, output, viewChildren } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
@@ -48,9 +48,11 @@ export class ChecklistItemsComponent {
     private readonly _injector: Injector,
     private readonly _snackBar: MatSnackBar,
   ) {
-    this.checklist.subscribe(() => {
+    effect(() => {
+      // HACK: Access the signal to track it. For some reason, checklist.subscribe() doesn't work.
+      this.checklist();
+
       // When we open an entirely separate checklist, get rid of selection and undo history.
-      // TODO: This is not running, and undoing after changing checklists will overwrite the other checklist.
       this._selectedIdx = null;
       this._dismissUndoSnackbar();
       this._undoState = [];

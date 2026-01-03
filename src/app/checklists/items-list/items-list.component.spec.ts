@@ -1,4 +1,7 @@
-import { render, screen, within } from '@testing-library/angular';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { ComponentFixture } from '@angular/core/testing';
+import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
+import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { Checklist, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../../../model/formats/test-data';
@@ -8,6 +11,8 @@ describe('ChecklistItemsComponent', () => {
   let user: UserEvent;
   let checklist: Checklist;
   let checklistChange: jasmine.Spy;
+  let rendered: RenderResult<ChecklistItemsComponent>;
+  let fixture: ComponentFixture<ChecklistItemsComponent>;
 
   beforeEach(async () => {
     user = userEvent.setup();
@@ -16,10 +21,11 @@ describe('ChecklistItemsComponent', () => {
       checklist = newChecklist;
     });
 
-    await render(ChecklistItemsComponent, {
+    rendered = await render(ChecklistItemsComponent, {
       inputs: { checklist },
       on: { checklistChange },
     });
+    fixture = rendered.fixture;
   });
 
   it('should render', async () => {
@@ -205,5 +211,27 @@ describe('ChecklistItemsComponent', () => {
     expect(checklist.items[5].prompt).toEqual('Warning item');
 
     expect(checklistChange).toHaveBeenCalledTimes(2);
+  });
+
+  it('should prevent undo after checklist changes', async () => {
+    const loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+
+    // Delete an item to trigger the undo snackbar
+    const item = screen.getByRole('listitem', { name: 'Item: Challenge item' });
+    const deleteButton = within(item).getByRole('button', { name: 'Delete Challenge item' });
+    await user.click(deleteButton);
+
+    const snackBars = await loader.getAllHarnesses(MatSnackBarHarness);
+    expect(snackBars).toHaveSize(1);
+    const snackBar = snackBars[0];
+    expect(await snackBar.getMessage()).toEqual('Item deleted');
+    expect(await snackBar.getActionDescription()).toEqual('Undo');
+
+    // Change the checklist input
+    fixture.componentRef.setInput('checklist', undefined);
+    fixture.detectChanges();
+
+    // Verify undo snackbar is dismissed
+    expect(await loader.getAllHarnesses(MatSnackBarHarness)).toHaveSize(0);
   });
 });
