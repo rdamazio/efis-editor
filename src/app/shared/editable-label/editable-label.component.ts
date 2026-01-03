@@ -1,4 +1,4 @@
-import { Component, ElementRef, input, model, output, viewChild } from '@angular/core';
+import { afterNextRender, Component, ElementRef, Injector, input, model, output, viewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
@@ -26,7 +26,7 @@ import { DynamicDataPipe } from './dynamic-data.pipe';
 })
 export class EditableLabelComponent {
   control = new FormControl('');
-  readonly input = viewChild.required<ElementRef<HTMLElement>>('promptInput');
+  readonly input = viewChild<ElementRef<HTMLElement>>('promptInput');
 
   // Must have a separate output from value's so we can output even when no change is made.
   // ('cause maybe the other editable label had changes).
@@ -40,7 +40,7 @@ export class EditableLabelComponent {
   readonly dynamicData = input(false);
   readonly isExpectation = input(false);
 
-  constructor() {
+  constructor(private readonly _injector: Injector) {
     this.editing.set(false);
   }
 
@@ -58,13 +58,16 @@ export class EditableLabelComponent {
   }
 
   focus() {
-    // setTimeout is needed to remove focusing from the execution stack and allow the input element to be created first
+    // Allow the input element to be created first so it's captured in input.
     // See https://v17.angular.io/api/core/ViewChild for the details.
-    setTimeout(() => {
-      if (this.editing()) {
-        this.input().nativeElement.focus();
-      }
-    });
+    afterNextRender(
+      () => {
+        if (this.editing()) {
+          this.input()!.nativeElement.focus();
+        }
+      },
+      { injector: this._injector },
+    );
   }
 
   cancel() {
