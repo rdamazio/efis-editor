@@ -294,6 +294,7 @@ export class ChecklistItemsComponent {
       if (c && undoTo) {
         c.title = undoTo.title;
         c.items = undoTo.items;
+        c.completionAction = undoTo.completionAction;
       }
       return c;
     });
