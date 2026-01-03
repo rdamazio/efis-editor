@@ -134,7 +134,6 @@ describe('ChecklistsComponent', () => {
 
     if (prompt) {
       const item = screen.getByRole('listitem', { name: 'Item: New item' });
-      await user.click(within(item).getByRole('button', { name: 'Edit New item' }));
       const itemPromptBox = await within(item).findByRole('textbox', { name: 'Prompt text' });
       await retype(itemPromptBox, prompt);
 
@@ -583,6 +582,8 @@ describe('ChecklistsComponent', () => {
         await debounce();
         await user.keyboard('n');
         await user.keyboard(shortcut.secondKey);
+        await debounce();
+        await user.keyboard('[Enter]');
       }
       await debounce();
 
@@ -625,8 +626,6 @@ describe('ChecklistsComponent', () => {
       await debounce();
       await user.keyboard('nw');
       await debounce();
-      await user.keyboard('[ArrowDown]');
-      await user.keyboard('[Enter]');
 
       const completed = storageCompleted();
       const promptBox2 = await screen.findByRole('textbox', { name: 'Prompt text' });
@@ -735,27 +734,29 @@ describe('ChecklistsComponent', () => {
       await debounce();
       await user.keyboard('nw');
       await debounce();
+      rendered.detectChanges(); // HACK: Wait for the item to be added.
+      await user.keyboard('[Enter]');
 
       expect(await screen.findByRole('listitem', { name: 'Item: New item' })).toBeInTheDocument();
 
       // Delete it.
       const completed = storageCompleted();
       await user.keyboard('[Delete]');
-      expect(screen.queryByRole('listitem', { name: 'Item: New item' })).not.toBeInTheDocument();
 
-      // Verify that it's gone from storage.
+      // Verify that it's gone from storage and the UI.
       await expectFile('My file', NEW_FILE, completed);
+      expect(screen.queryByRole('listitem', { name: 'Item: New item' })).not.toBeInTheDocument();
 
       // Also delete the other that was already there (it should have been selected after the other was deleted).
       const completed2 = storageCompleted();
       expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
       await user.keyboard('[Delete]');
-      expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
 
-      // Verify that it's also gone from storage.
+      // Verify that it's also gone from storage and the UI.
       const expectedFile = ChecklistFile.clone(NEW_FILE);
       expectedFile.groups[0].checklists[0].items = [];
       await expectFile('My file', expectedFile, completed2);
+      expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
     });
 
     it('should duplicate an item', async () => {

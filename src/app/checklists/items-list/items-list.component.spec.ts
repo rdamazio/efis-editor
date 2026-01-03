@@ -79,6 +79,7 @@ describe('ChecklistItemsComponent', () => {
     const origSize = checklist.items.length;
     const addButton = screen.getByRole('button', { name: 'Add a new checklist challenge' });
     await user.click(addButton);
+    await user.keyboard('[Escape]');
     expect(checklist.items).toHaveSize(origSize + 1);
 
     const newItem = checklist.items[origSize];
@@ -92,19 +93,22 @@ describe('ChecklistItemsComponent', () => {
     const origSize = checklist.items.length;
     const addButton = screen.getByRole('button', { name: 'Add a new checklist challenge/response' });
     await user.click(addButton);
+    await user.keyboard('[Enter]');
     expect(checklist.items).toHaveSize(origSize + 1);
 
     const newItem = checklist.items[origSize];
     expect(newItem.type).toEqual(ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE);
     expect(newItem.prompt).toEqual('New item');
     expect(newItem.expectation).toEqual('New expectation');
-    expect(checklistChange).toHaveBeenCalledOnceWith(checklist);
+    expect(checklistChange).toHaveBeenCalledTimes(2);
+    expect(checklistChange).toHaveBeenCalledWith(checklist);
   });
 
   it('should add a plaintext item', async () => {
     const origSize = checklist.items.length;
     const addButton = screen.getByRole('button', { name: 'Add a new checklist text' });
     await user.click(addButton);
+    await user.keyboard('[Escape]');
     expect(checklist.items).toHaveSize(origSize + 1);
 
     const newItem = checklist.items[origSize];
@@ -118,6 +122,7 @@ describe('ChecklistItemsComponent', () => {
     const origSize = checklist.items.length;
     const addButton = screen.getByRole('button', { name: 'Add a new checklist note' });
     await user.click(addButton);
+    await user.keyboard('[Escape]');
     expect(checklist.items).toHaveSize(origSize + 1);
 
     const newItem = checklist.items[origSize];
@@ -131,6 +136,7 @@ describe('ChecklistItemsComponent', () => {
     const origSize = checklist.items.length;
     const addButton = screen.getByRole('button', { name: 'Add a new checklist title' });
     await user.click(addButton);
+    await user.keyboard('[Escape]');
     expect(checklist.items).toHaveSize(origSize + 1);
 
     const newItem = checklist.items[origSize];
@@ -144,6 +150,7 @@ describe('ChecklistItemsComponent', () => {
     const origSize = checklist.items.length;
     const addButton = screen.getByRole('button', { name: 'Add a new checklist warning' });
     await user.click(addButton);
+    await user.keyboard('[Escape]');
     expect(checklist.items).toHaveSize(origSize + 1);
 
     const newItem = checklist.items[origSize];
@@ -157,6 +164,7 @@ describe('ChecklistItemsComponent', () => {
     const origSize = checklist.items.length;
     const addButton = screen.getByRole('button', { name: 'Add a new checklist caution' });
     await user.click(addButton);
+    await user.keyboard('[Escape]');
     expect(checklist.items).toHaveSize(origSize + 1);
 
     const newItem = checklist.items[origSize];

@@ -64,7 +64,7 @@ export class ChecklistItemsComponent {
     this.onItemsUpdated();
   }
 
-  onItemsUpdated(selectedIdx?: number) {
+  onItemsUpdated(selectedIdx?: number, editSelectedItem = false) {
     this.checklistChange.emit(this.checklist());
     afterNextRender(
       () => {
@@ -72,6 +72,9 @@ export class ChecklistItemsComponent {
           this._selectedIdx = selectedIdx;
         }
         this._focusSelectedItem();
+        if (editSelectedItem) {
+          this.editCurrentItem();
+        }
       },
       { injector: this._injector },
     );
@@ -104,7 +107,7 @@ export class ChecklistItemsComponent {
     }
     items.splice(newIdx, 0, item);
 
-    this.onItemsUpdated(newIdx);
+    this.onItemsUpdated(newIdx, true);
   }
 
   selectNextItem() {
