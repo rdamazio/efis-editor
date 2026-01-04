@@ -108,8 +108,10 @@ export class ForeFlightWriter {
               // If this is an indented text item, then...
               const appendNote = (field: string, appendText: string) => {
                 const typedField = field as keyof typeof lastItemFF;
+                // @ts-expect-error "note" and "detail" fields are always strings
                 lastItemFF[typedField] = lastItemFF[typedField]
-                  ? lastItemFF[typedField] + '\n' + appendText
+                  ? // eslint-disable-next-line @typescript-eslint/no-base-to-string
+                    String(lastItemFF[typedField]) + '\n' + appendText
                   : appendText;
               };
 
