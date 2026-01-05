@@ -1174,4 +1174,54 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile);
     });
   });
+
+  describe('Search functionality', () => {
+    it('should locate and navigate matches', async () => {
+      await newFile('Search test');
+      expectFragment('Search test');
+
+      // Create some search data
+      await addGroup('Group 1');
+      await addChecklist('Group 1', 'Checklist 1');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: Checklist 1' }));
+      await addItem('caution', 'Find me 1');
+      await addItem('note', 'Ignore me');
+      await addItem('text', 'Also find me 2');
+
+      await addGroup('Group 2');
+      await addChecklist('Group 2', 'Checklist 2');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: Checklist 2' }));
+      await addItem('title', 'Find me 3');
+
+      // Perform search
+      navData.searchQuery.set('find me');
+      rendered.detectChanges();
+      await rendered.fixture.whenStable();
+
+      expect(navData.searchMatchTotal()).toBe(3);
+      expect(navData.searchMatchCurrent()).toBe(0);
+      expectFragment('Search test/0/0');
+
+      // Next
+      navData.searchNext.next();
+      rendered.detectChanges();
+      await rendered.fixture.whenStable();
+      expect(navData.searchMatchCurrent()).toBe(1);
+      expectFragment('Search test/0/0'); // Still in the same checklist
+
+      // Next again (wrap)
+      navData.searchNext.next();
+      rendered.detectChanges();
+      await rendered.fixture.whenStable();
+      expect(navData.searchMatchCurrent()).toBe(2);
+      expectFragment('Search test/1/0'); // Moved to second checklist
+
+      // Prev
+      navData.searchPrev.next();
+      rendered.detectChanges();
+      await rendered.fixture.whenStable();
+      expect(navData.searchMatchCurrent()).toBe(1);
+      expectFragment('Search test/0/0');
+    });
+  });
 });
