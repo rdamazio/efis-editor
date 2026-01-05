@@ -106,24 +106,13 @@ export class ForeFlightWriter {
             const [lastItemFF, lastItemEFIS] = accumulator.at(-2) ?? [];
             if (lastItemFF && lastItemEFIS && FormatUtils.shouldMergeNotes(itemEFIS, lastItemEFIS)) {
               // If this is an indented text item, then...
-              const appendNote = (field: string, appendText: string) => {
-                const typedField = field as keyof typeof lastItemFF;
-                // @ts-expect-error "note" and "detail" fields are always strings
-                lastItemFF[typedField] = lastItemFF[typedField]
-                  ? // eslint-disable-next-line @typescript-eslint/no-base-to-string
-                    String(lastItemFF[typedField]) + '\n' + appendText
-                  : appendText;
-              };
-
-              appendNote(
-                lastItemFF.type !== ForeFlightUtils.ITEM_HEADER
-                  ? // ...append note to the previous Check...
-                    'note'
-                  : // ...or Detail Item
-                    'detail',
-                text,
-              );
-
+              if (lastItemFF.type !== ForeFlightUtils.ITEM_HEADER) {
+                // ...append note to the previous Check...
+                lastItemFF.note = lastItemFF.note ? lastItemFF.note + '\n' + text : text;
+              } else {
+                // ...or Detail Item
+                lastItemFF.detail = lastItemFF.detail ? lastItemFF.detail + '\n' + text : text;
+              }
               accumulator.pop();
               break;
             }
