@@ -1,4 +1,4 @@
-import { WritableSignal } from '@angular/core';
+import { EventEmitter, WritableSignal } from '@angular/core';
 
 export interface NavData {
   // Signal that, when written to, will be reflected on the displayed navigation title.
@@ -8,4 +8,17 @@ export interface NavData {
   // Renaming can also happen from the navigation side, and the component is expected
   // to listen for that.
   fileName: WritableSignal<string | undefined>;
+
+  // When true is sent to this emitter, the search box will be shown and/or focused.
+  // When false is sent, it will be hidden.
+  showSearch: WritableSignal<boolean>;
+
+  // Search state.
+  searchQuery: WritableSignal<string>;
+  searchMatchCurrent: WritableSignal<number>;
+  searchMatchTotal: WritableSignal<number>;
+
+  // Events to trigger search actions.
+  searchNext: EventEmitter<void>;
+  searchPrev: EventEmitter<void>;
 }
