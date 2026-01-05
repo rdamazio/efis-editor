@@ -222,7 +222,6 @@ export class GrtLiveData {
     return undefined;
   }
 
-  // eslint-disable-next-line @typescript-eslint/typedef
   private static _randomRange(min: number, max: number, decimals = 0): string {
     const val = min + Math.random() * (max - min);
     return val.toFixed(decimals);

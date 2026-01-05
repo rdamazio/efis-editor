@@ -103,7 +103,6 @@ module.exports = tseslint.config(
       '@typescript-eslint/require-array-sort-compare': ['error', { ignoreStringArrays: true }],
       '@typescript-eslint/restrict-template-expressions': 'off',
       '@typescript-eslint/switch-exhaustiveness-check': ['error', { considerDefaultExhaustiveForUnions: true }],
-      '@typescript-eslint/typedef': ['error', { parameter: true, propertyDeclaration: true }],
       '@typescript-eslint/unbound-method': ['error', { ignoreStatic: true }],
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
       'accessor-pairs': 'error',
