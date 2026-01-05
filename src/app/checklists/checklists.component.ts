@@ -219,6 +219,39 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       .subscribe(() => {
         this.tree().selectPreviousGroup();
       });
+    hotkeys
+      .addShortcut({
+        keys: 'meta.F',
+        description: 'Find in file',
+        preventDefault: true,
+        group: 'Navigation',
+      })
+      .subscribe(() => {
+        if (!this.selectedFile) return;
+        this._navData().showSearch.set(true);
+      });
+    hotkeys
+      .addShortcut({
+        keys: 'meta.G',
+        description: 'Find next',
+        preventDefault: true,
+        group: 'Navigation',
+      })
+      .subscribe(() => {
+        if (!this.selectedFile) return;
+        this._navData().searchNext.emit();
+      });
+    hotkeys
+      .addShortcut({
+        keys: 'meta.shift.G',
+        description: 'Find previous',
+        preventDefault: true,
+        group: 'Navigation',
+      })
+      .subscribe(() => {
+        if (!this.selectedFile) return;
+        this._navData().searchPrev.emit();
+      });
 
     hotkeys
       .addShortcut({
@@ -643,7 +676,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     this.selectedFile = file;
     this.tree().file.set(file);
 
-    if (file?.metadata) {
+    if (!file) {
+      this._navData().showSearch.set(false);
+    } else if (file.metadata) {
       this._snackBar.open(`Loaded checklist "${file.metadata.name}".`, '');
     }
 
