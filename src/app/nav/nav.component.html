@@ -32,7 +32,30 @@
       </span>
     }
   </div>
+
   <span class="topbar-spacer"></span>
+
+  @if (navData.showSearch()) {
+    <search-box
+      #searchBox
+      [(query)]="navData.searchQuery"
+      (searchCancelled)="navData.showSearch.set(false)"
+      [totalMatches]="navData.searchMatchTotal()"
+      [(currentMatch)]="navData.searchMatchCurrent"
+    />
+
+    <span class="topbar-spacer"></span>
+  } @else {
+    <button
+      mat-icon-button
+      matTooltip="Find in file"
+      aria-label="Find in file"
+      [disabled]="!navData.fileName()"
+      (click)="navData.showSearch.set(true)"
+    >
+      <mat-icon>search</mat-icon>
+    </button>
+  }
 
   @defer (hydrate on idle) {
     <gdrive-nav />

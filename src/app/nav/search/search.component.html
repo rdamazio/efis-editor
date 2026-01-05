@@ -1,0 +1,47 @@
+<div class="container">
+  <mat-form-field appearance="outline" class="form-field">
+    <mat-label>Search terms</mat-label>
+    <input
+      #queryInput
+      matInput
+      type="text"
+      placeholder="Landing gear"
+      class="search-input"
+      [(ngModel)]="query"
+      (keydown.escape)="searchCancelled.emit()"
+      (keydown.enter)="$event.preventDefault(); next()"
+      (keydown.shift.enter)="$event.preventDefault(); prev()"
+    />
+    @if (query()) {
+      <div matSuffix class="search-counts">{{ currentMatchToDisplay() }} / {{ totalMatches() }}<br /></div>
+    }
+    <!-- Only one matSuffix can be used per @if -->
+    @if (query()) {
+      <button
+        mat-icon-button
+        matIconSuffix
+        type="button"
+        aria-label="Previous match"
+        [disabled]="totalMatches() === 0 || currentMatch() === 0"
+        (click)="prev()"
+      >
+        <mat-icon>keyboard_arrow_up</mat-icon>
+      </button>
+    }
+    @if (query()) {
+      <button
+        mat-icon-button
+        matIconSuffix
+        type="button"
+        aria-label="Next match"
+        [disabled]="totalMatches() === 0 || currentMatch() === totalMatches() - 1"
+        (click)="next()"
+      >
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </button>
+    }
+    <button mat-icon-button matIconSuffix type="button" aria-label="Close search" (click)="searchCancelled.emit()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+</div>
