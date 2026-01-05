@@ -5,7 +5,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { HotkeysService } from '@ngneat/hotkeys';
-import { render, RenderResult, screen, within } from '@testing-library/angular';
+import { render, RenderResult, screen, waitForElementToBeRemoved, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { Mock } from 'vitest';
 import { mock, MockProxy } from 'vitest-mock-extended';
@@ -150,5 +150,91 @@ describe('NavComponent', () => {
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
 
     expect(dialogs).toHaveLength(0);
+  });
+
+  it('should show or hide search based on navData', async () => {
+    navData.showSearch.set(true);
+    const searchBox = await screen.findByRole('textbox', { name: 'Search terms' });
+
+    expect(searchBox).toBeVisible();
+
+    navData.showSearch.set(false);
+    await waitForElementToBeRemoved(searchBox);
+  });
+
+  it('should pass search query and match counts to SearchComponent', async () => {
+    navData.showSearch.set(true);
+    navData.searchQuery.set('My search query');
+    navData.searchMatchTotal.set(10);
+    navData.searchMatchCurrent.set(2); // 0-indexed, so 3rd match
+
+    const searchBox = await screen.findByRole('textbox', { name: 'Search terms' });
+
+    expect(searchBox).toBeVisible();
+
+    const countsText = screen.getByText('3 / 10');
+
+    expect(countsText).toBeVisible();
+  });
+
+  it('should move to the next search result based on navData events', async () => {
+    navData.showSearch.set(true);
+    navData.searchQuery.set('My search query');
+    navData.searchMatchTotal.set(10);
+    navData.searchMatchCurrent.set(2);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    navData.searchNext.emit();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(navData.searchMatchCurrent()).toEqual(3);
+  });
+
+  it('should move to the previous search result based on navData events', async () => {
+    navData.showSearch.set(true);
+    navData.searchQuery.set('My search query');
+    navData.searchMatchTotal.set(10);
+    navData.searchMatchCurrent.set(2);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    navData.searchPrev.emit();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(navData.searchMatchCurrent()).toEqual(1);
+  });
+
+  it('should update the search query in navData when user types in the search box', async () => {
+    navData.showSearch.set(true);
+    const searchBox = await screen.findByRole('textbox', { name: 'Search terms' });
+
+    expect(searchBox).toBeVisible();
+
+    await user.type(searchBox, 'My search query');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(navData.searchQuery()).toEqual('My search query');
+  });
+
+  it('should update the current match in navData when the user clicks the Next button', async () => {
+    navData.showSearch.set(true);
+    navData.searchQuery.set('My search query');
+    navData.searchMatchTotal.set(10);
+    navData.searchMatchCurrent.set(2);
+
+    const nextButton = await screen.findByRole('button', { name: 'Next match' });
+
+    expect(nextButton).toBeVisible();
+
+    await user.click(nextButton);
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(navData.searchMatchCurrent()).toEqual(3);
   });
 });
