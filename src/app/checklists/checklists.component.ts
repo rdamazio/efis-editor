@@ -177,6 +177,29 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       { injector: this._injector },
     );
 
+    effect(
+      () => {
+        const query = this._navData().searchQuery();
+        this._updateSearchMatches(query);
+        if (query) {
+          this._jumpToMatch(0);
+        }
+      },
+      { injector: this._injector },
+    );
+
+    this._navData()
+      .searchNext.pipe(untilDestroyed(this))
+      .subscribe(() => {
+        this._jumpToMatch(1);
+      });
+
+    this._navData()
+      .searchPrev.pipe(untilDestroyed(this))
+      .subscribe(() => {
+        this._jumpToMatch(-1);
+      });
+
     this._route.fragment.pipe(untilDestroyed(this)).subscribe((fragment: string | null) => {
       const fn = async () => {
         // We use fragment-based navigation because of the routing limitations associated with GH Pages.
@@ -741,6 +764,8 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       this._snackBar.open(`Loaded checklist "${file.metadata.name}".`, '');
     }
 
+    this._updateSearchMatches(this._navData().searchQuery());
+
     await this._updateNavigation();
   }
 
@@ -768,5 +793,27 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     if (completed$) {
       completed$.next(true);
     }
+  }
+
+  private _jumpToMatch(direction: number) {
+    const total = this._searchMatches.length;
+    if (total === 0) return;
+
+    let current = this._navData().searchMatchCurrent();
+    current = (current + direction + total) % total;
+    this._navData().searchMatchCurrent.set(current);
+
+    const match = this._searchMatches[current];
+    const group = this.selectedFile!.groups[match.groupIdx];
+    const checklist = group.checklists[match.checklistIdx];
+
+    this.tree().selectedChecklist.set(checklist);
+
+    afterNextRender(
+      () => {
+        this.items().highlightItem(match.itemIdx);
+      },
+      { injector: this._injector },
+    );
   }
 }
