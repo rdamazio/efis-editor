@@ -1,0 +1,42 @@
+@use '@angular/material' as mat;
+@use '../../../theme' as theme;
+
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.form-field {
+  @include mat.all-component-densities(-4);
+  @include mat.form-field-overrides(
+    (
+      container-vertical-padding: 0,
+      outlined-container-shape: 20px,
+      outlined-input-text-placeholder-color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 35),
+    )
+  );
+  padding-top: 22px;
+  min-width: 400px;
+
+  // Add some padding to account for the border radius.
+  ::ng-deep .mat-mdc-form-field-icon-suffix {
+    padding-right: 8px;
+  }
+
+  // Properly align text and icon suffixes.
+  ::ng-deep .mat-mdc-form-field-icon-suffix {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.search-input {
+  padding: 10px 0 8px 0;
+}
+
+.search-counts {
+  font-size: 1.2em;
+  padding: 2px 8px 0 4px;
+  opacity: 0.8;
+  text-wrap: nowrap;
+}

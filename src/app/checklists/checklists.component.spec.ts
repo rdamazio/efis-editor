@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { EventEmitter, signal } from '@angular/core';
 import { DeferBlockState, inject, TestBed } from '@angular/core/testing';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
@@ -56,7 +56,16 @@ describe('ChecklistsComponent', () => {
 
     user = userEvent.setup({ delay: null });
 
-    navData = { routeTitle: signal(undefined), fileName: signal(undefined) };
+    navData = {
+      routeTitle: signal(undefined),
+      fileName: signal(undefined),
+      showSearch: signal(false),
+      searchQuery: signal(''),
+      searchMatchCurrent: signal(0),
+      searchMatchTotal: signal(0),
+      searchNext: new EventEmitter<void>(),
+      searchPrev: new EventEmitter<void>(),
+    };
 
     window.location.hash = '';
 
