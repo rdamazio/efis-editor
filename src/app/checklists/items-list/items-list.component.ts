@@ -66,6 +66,7 @@ export class ChecklistItemsComponent {
   readonly groupDropListIds = input<string[]>([]);
   readonly items = viewChildren(ChecklistItemComponent);
   private _selectedIdx: number | null = null;
+  protected readonly _highlightedIdx = signal<number | undefined>(undefined);
   // Whether to keep the intended selected item even if it loses focus.
   // This is used when DOM reconstruction is expected (e.g. reordering items).
   private _keepSelectedIdx = false;
@@ -111,6 +112,27 @@ export class ChecklistItemsComponent {
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
     moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     this.onItemsUpdated();
+  }
+
+  highlightItem(idx: number | undefined) {
+    this._highlightedIdx.set(idx);
+    if (idx !== undefined) {
+      afterNextRender(
+        () => {
+          const item = this.items().at(idx);
+          const containerRef = item?.containerRef();
+          if (containerRef) {
+            scrollIntoView(containerRef.nativeElement, {
+              scrollMode: 'if-needed',
+              behavior: 'smooth',
+              block: 'nearest',
+              inline: 'nearest',
+            });
+          }
+        },
+        { injector: this._injector },
+      );
+    }
   }
 
   onItemsUpdated(selectedIdx?: number, editSelectedItem = false) {

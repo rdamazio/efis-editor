@@ -3,6 +3,7 @@
 <div
   #container
   class="item-container"
+  [class.item-highlight]="highlightItem()"
   tabindex="0"
   (focus)="itemFocused.emit(true)"
   (blur)="itemBlurred.emit(true)"
@@ -99,7 +100,7 @@
           [value]="it.prompt"
           [dynamicData]="true"
           [highlightedTerms]="highlightedTerms()"
-          highlightClass="highlight"
+          [highlightClass]="highlightItem() ? 'highlight' : 'soft-highlight'"
           [disableSave]="it.type === itemType.ITEM_CHALLENGE_RESPONSE && !expectationInput.isValid()"
           (saved)="onSavePrompt($event)"
           (cancelled)="onCancelEdit()"
@@ -120,7 +121,7 @@
             [value]="it.expectation"
             [dynamicData]="true"
             [highlightedTerms]="highlightedTerms()"
-            highlightClass="highlight"
+            [highlightClass]="highlightItem() ? 'highlight' : 'soft-highlight'"
             [isExpectation]="true"
             [disableSave]="!promptInput.isValid()"
             (saved)="onSaveExpectation($event)"

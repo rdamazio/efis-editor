@@ -23,6 +23,7 @@
           <checklist-item
             #item
             [item]="item"
+            [highlightItem]="$index === _highlightedIdx()"
             (itemChange)="onItemsUpdated()"
             (itemDeleted)="onItemDeleted($index)"
             (itemFocused)="onItemFocused($index)"
