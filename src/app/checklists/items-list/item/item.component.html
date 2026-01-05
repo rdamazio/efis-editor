@@ -3,6 +3,7 @@
 <div
   #container
   class="item-container"
+  [class.highlighted]="highlighted()"
   tabindex="0"
   (focus)="itemFocused.emit(true)"
   (blur)="itemBlurred.emit(true)"

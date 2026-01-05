@@ -11,6 +11,11 @@
   box-shadow: 0 0 3px 5px mat.get-theme-color(theme.$efis-editor-theme, primary);
 }
 
+.item-container.highlighted {
+  background-color: rgba(255, 235, 59, 0.2); // Yellow highlight with opacity for dark mode compatibility
+  border-radius: 5px;
+}
+
 .actions {
   float: left;
   flex: none;
