@@ -53,7 +53,7 @@
     "mat-icon-button-sizes": "^1.0.6",
     "nanotar": "^0.2.0",
     "ngx-file-drop": "^16.0.0",
-    "ngx-spinner": "^19.0.0",
+    "ngx-spinner": "^21.0.0",
     "rxjs": "~7.8.2",
     "scroll-into-view-if-needed": "^3.1.0",
     "svg2pdf.js": "^2.7.0",
