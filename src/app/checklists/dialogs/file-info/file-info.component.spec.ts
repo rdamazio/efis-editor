@@ -10,6 +10,8 @@ import { ChecklistFileMetadata, ChecklistGroup } from '../../../../../gen/ts/che
 import { EXPECTED_CONTENTS } from '../../../../model/formats/test-data';
 import { ChecklistFileInfoComponent } from './file-info.component';
 
+type OutputType = ChecklistFileMetadata | undefined;
+
 @Component({
   selector: 'test-info-dialog',
   imports: [MatDialogModule],
@@ -19,7 +21,7 @@ import { ChecklistFileInfoComponent } from './file-info.component';
 export class DialogTestComponent {
   public readonly metadataIn = input.required<ChecklistFileMetadata>();
   public readonly groupsIn = input.required<ChecklistGroup[]>();
-  public readonly dataOut = output<ChecklistFileMetadata | undefined>();
+  public readonly dataOut = output<OutputType>();
 
   constructor(private readonly _dialog: MatDialog) {}
 
@@ -36,7 +38,7 @@ describe('ChecklistFileInfoComponent', () => {
   let loader: HarnessLoader;
   let metadata: ChecklistFileMetadata;
   let groups: ChecklistGroup[];
-  let dataOut: jasmine.Spy;
+  let dataOut: jasmine.Spy<(value: OutputType) => void>;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
   let nameBox: HTMLInputElement;

@@ -5,8 +5,8 @@ import { ChecklistItemComponent } from './item.component';
 
 describe('ChecklistItemComponent', () => {
   let user: UserEvent;
-  let itemChange: jasmine.Spy;
-  let itemDeleted: jasmine.Spy;
+  let itemChange: jasmine.Spy<(value: ChecklistItem) => void>;
+  let itemDeleted: jasmine.Spy<(value: boolean) => void>;
   let editButton: HTMLButtonElement;
   let deleteButton: HTMLButtonElement;
   let indentLeftButton: HTMLButtonElement;

@@ -11,6 +11,8 @@ import { LazyBrowserStorage } from '../../../../model/storage/browser-storage';
 import { PreferenceStorage } from '../../../../model/storage/preference-storage';
 import { PrintDialogComponent } from './print-dialog.component';
 
+type OutputType = PdfWriterOptions | undefined;
+
 @Component({
   selector: 'test-print-dialog',
   imports: [MatDialogModule],
@@ -18,7 +20,7 @@ import { PrintDialogComponent } from './print-dialog.component';
   template: '<button (click)="openDialog()">Open dialog</button>',
 })
 export class DialogTestComponent {
-  public readonly dataOut = output<PdfWriterOptions | undefined>();
+  public readonly dataOut = output<OutputType>();
 
   constructor(
     private readonly _dialog: MatDialog,
@@ -38,7 +40,7 @@ describe('PrintDialogComponent', () => {
   let loader: HarnessLoader;
   let prefs: PreferenceStorage;
   let fixture: ComponentFixture<DialogTestComponent>;
-  let dataOut: jasmine.Spy;
+  let dataOut: jasmine.Spy<(value: OutputType) => void>;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
 

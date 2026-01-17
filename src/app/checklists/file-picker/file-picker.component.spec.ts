@@ -5,7 +5,7 @@ import { ChecklistFilePickerComponent } from './file-picker.component';
 
 describe('FilePickerComponent', () => {
   let user: UserEvent;
-  let fileSelected: jasmine.Spy;
+  let fileSelected: jasmine.Spy<(value: string) => void>;
 
   beforeEach(() => {
     user = userEvent.setup();

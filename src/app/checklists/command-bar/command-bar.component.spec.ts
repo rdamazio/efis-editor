@@ -17,12 +17,12 @@ describe('ChecklistCommandBarComponent', () => {
   let printButton: HTMLButtonElement;
   let deleteButton: HTMLButtonElement;
   let infoButton: HTMLButtonElement;
-  let newFile: jasmine.Spy;
-  let openFile: jasmine.Spy;
-  let uploadFile: jasmine.Spy;
-  let downloadFile: jasmine.Spy;
-  let deleteFile: jasmine.Spy;
-  let fileInfo: jasmine.Spy;
+  let newFile: jasmine.Spy<(value: string) => void>;
+  let openFile: jasmine.Spy<(value: boolean) => void>;
+  let uploadFile: jasmine.Spy<(value: boolean) => void>;
+  let downloadFile: jasmine.Spy<(value: FormatId) => void>;
+  let deleteFile: jasmine.Spy<(value: boolean) => void>;
+  let fileInfo: jasmine.Spy<(value: boolean) => void>;
   let user: UserEvent;
 
   beforeEach(() => {
@@ -112,7 +112,7 @@ describe('ChecklistCommandBarComponent', () => {
   it('should emit when Print is clicked', async () => {
     await renderComponent(true, true);
     await user.click(printButton);
-    expect(downloadFile).toHaveBeenCalledOnceWith('pdf');
+    expect(downloadFile).toHaveBeenCalledOnceWith(FormatId.PDF);
   });
 
   it('should emit when Info is clicked', async () => {

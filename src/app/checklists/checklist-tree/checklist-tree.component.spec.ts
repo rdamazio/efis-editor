@@ -1,6 +1,6 @@
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
-import { Checklist, ChecklistFile } from '../../../../gen/ts/checklist';
+import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS, EXPECTED_FOREFLIGHT_CONTENTS } from '../../../model/formats/test-data';
 import { ChecklistTreeComponent } from './checklist-tree.component';
 
@@ -8,9 +8,9 @@ describe('ChecklistTreeComponent', () => {
   let user: UserEvent;
   let file: ChecklistFile;
   let selectedChecklistInput: Checklist | undefined;
-  let fileModified: jasmine.Spy;
-  let selectedChecklist: jasmine.Spy;
-  let selectedChecklistGroup: jasmine.Spy;
+  let fileModified: jasmine.Spy<(value: ChecklistFile) => void>;
+  let selectedChecklist: jasmine.Spy<(value: Checklist | undefined) => void>;
+  let selectedChecklistGroup: jasmine.Spy<(value: ChecklistGroup | undefined) => void>;
 
   beforeEach(() => {
     user = userEvent.setup();

@@ -14,7 +14,7 @@ import { ChecklistFileUploadComponent } from './file-upload.component';
 
 describe('ChecklistFileUploadComponent', () => {
   let user: UserEvent;
-  let fileUploaded: jasmine.Spy;
+  let fileUploaded: jasmine.Spy<(file: ChecklistFile) => void>;
   let uploadInput: HTMLInputElement;
 
   beforeEach(async () => {

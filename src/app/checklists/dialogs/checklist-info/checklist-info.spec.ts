@@ -14,6 +14,8 @@ import {
 } from '../../../../../gen/ts/checklist';
 import { ChecklistInfoComponent } from './checklist-info';
 
+type OutputType = Checklist | undefined;
+
 @Component({
   selector: 'test-info-dialog',
   imports: [MatDialogModule],
@@ -22,7 +24,7 @@ import { ChecklistInfoComponent } from './checklist-info';
 })
 export class DialogTestComponent {
   public readonly dataIn = input.required<Checklist>();
-  public readonly dataOut = output<Checklist | undefined>();
+  public readonly dataOut = output<OutputType>();
 
   constructor(private readonly _dialog: MatDialog) {}
 
@@ -51,7 +53,7 @@ describe('ChecklistInfoComponent', () => {
   let user: UserEvent;
   let loader: HarnessLoader;
   let dataIn: Checklist;
-  let dataOut: jasmine.Spy;
+  let dataOut: jasmine.Spy<(value: OutputType) => void>;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
   let titleBox: HTMLInputElement;

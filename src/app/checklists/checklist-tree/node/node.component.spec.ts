@@ -8,8 +8,8 @@ describe('NodeComponent', () => {
   let user: UserEvent;
   let node: ChecklistTreeNode;
   let disableButtonHover: boolean;
-  let nodeRename: jasmine.Spy;
-  let nodeDelete: jasmine.Spy;
+  let nodeRename: jasmine.Spy<(value: ChecklistTreeNode) => void>;
+  let nodeDelete: jasmine.Spy<(value: ChecklistTreeNode) => void>;
 
   beforeEach(() => {
     user = userEvent.setup();
