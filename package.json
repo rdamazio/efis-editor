@@ -84,7 +84,7 @@
     "eslint-plugin-depend": "^1.4.0",
     "eslint-plugin-jasmine": "^4.2.2",
     "eslint-plugin-no-secrets": "^2.2.1",
-    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-promise": "^7.1.0",
     "eslint-plugin-rxjs-x": "^0.8.4",
     "eslint-plugin-testing-library": "^7.15.4",
@@ -97,10 +97,10 @@
     "karma-jasmine-order-reporter": "^1.2.0",
     "karma-spec-reporter": "^0.0.36",
     "pdfjs-dist": "^5.4.530",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.0",
     "prettier-eslint": "^16.4.2",
     "prettier-plugin-organize-imports": "^4.3.0",
     "typescript": "~5.9.3",
-    "typescript-eslint": "8.52.0"
+    "typescript-eslint": "8.53.0"
   }
 }
