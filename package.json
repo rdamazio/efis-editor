@@ -21,7 +21,7 @@
     "format:fix": "npm run format -- --write",
     "spell": "codespell src/",
     "spell:fix": "codespell -w -i 3 src/",
-    "prepush": "npm install && npm run genproto && npm run lint && npm run format && npm run spell && npm run test:coverage && npx -y @bugron/validate-dependabot-yaml@latest",
+    "prepush": "npm clean-install && npm run genproto && npm run lint && npm run format && npm run spell && npm run test:coverage && npx -y @bugron/validate-dependabot-yaml@latest",
     "prepush:fix": "npm run format:fix && npm run spell:fix",
     "push": "jj bookmark move main --to @- && jj git push -b main"
   },
