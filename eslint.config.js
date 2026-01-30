@@ -190,6 +190,7 @@ module.exports = tseslint.config(
       radix: 'error',
       'require-atomic-updates': 'error',
       'rxjs-x/finnish': ['error', { functions: false, methods: false }],
+      'rxjs-x/no-explicit-generics': 'error',
       'rxjs-x/no-ignored-error': 'off',
       'rxjs-x/no-ignored-subscribe': 'error',
       'rxjs-x/no-ignored-subscription': [
