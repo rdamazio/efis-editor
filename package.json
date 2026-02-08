@@ -97,7 +97,7 @@
     "karma-jasmine-html-reporter": "~2.2.0",
     "karma-jasmine-order-reporter": "^1.2.0",
     "karma-spec-reporter": "^0.0.36",
-    "pdfjs-dist": "^5.4.530",
+    "pdfjs-dist": "^5.4.624",
     "prettier": "^3.8.1",
     "prettier-eslint": "^16.4.2",
     "prettier-plugin-organize-imports": "^4.3.0",
