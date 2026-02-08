@@ -6,6 +6,9 @@ import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import JasmineDOM from '@testing-library/jasmine-dom';
 
+// Needed by pdfjs
+import 'core-js/actual/promise/try';
+
 @NgModule({
   providers: [provideZoneChangeDetection()],
 })
