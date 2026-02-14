@@ -35,23 +35,18 @@ updates:
         patterns:
           - 'tslib'
           - 'typescript'
-      minor-and-patch:
-        applies-to: security-updates
-        patterns:
-          - '@angular*'
       lint:
         applies-to: version-updates
         patterns:
           - '*eslint*'
           - '*prettier*'
-      pdf:
+      libs:
         applies-to: version-updates
         patterns:
+          - 'buffer*'
+          - 'file-saver'
           - '*pdf*'
-      sweetalert:
-        applies-to: version-updates
-        patterns:
-          - '*sweetalert*'
+          - 'scroll*'
 
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: 'github-actions'
