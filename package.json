@@ -84,10 +84,10 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-depend": "^1.4.0",
     "eslint-plugin-jasmine": "^4.2.2",
-    "eslint-plugin-no-secrets": "^2.2.1",
+    "eslint-plugin-no-secrets": "^2.2.2",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-promise": "^7.1.0",
-    "eslint-plugin-rxjs-x": "^0.8.5",
+    "eslint-plugin-rxjs-x": "^0.9.4",
     "eslint-plugin-testing-library": "^7.15.4",
     "jasmine-core": "~6.0.1",
     "karma": "~6.4.4",
@@ -102,6 +102,6 @@
     "prettier-eslint": "^16.4.2",
     "prettier-plugin-organize-imports": "^4.3.0",
     "typescript": "~5.9.3",
-    "typescript-eslint": "8.54.0"
+    "typescript-eslint": "8.55.0"
   }
 }
