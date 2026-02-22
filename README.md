@@ -57,7 +57,7 @@ Different checklist file formats support different subsets of all the features i
 | Default checklist/group    | :x:                | :x:                | :white_check_mark: | :x:                | :x:                | :x:                |
 | Checklist metadata         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
 | Live data                  | :x:                | :x:                | :x:                | :white_check_mark: | :white_check_mark: | :x:                |
-| Completion actions         | :x:                | :x:                | :x:                | :white_check_mark: | :x:                | :x:                |
+| Completion actions         | :x:                | :x:                | :x:                | :white_check_mark: | :x:                | :white_check_mark: |
 
 > [!NOTE]
 > See sections below on format-specific details to understand how data from the editor gets translated to those formats.

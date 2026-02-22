@@ -4,7 +4,7 @@ import { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { FormatId } from './format-id';
 import { serializeChecklistFile } from './format-registry';
 import { PdfWriter, PdfWriterOptions } from './pdf-writer';
-import { EXPECTED_CONTENTS } from './test-data';
+import { EXPECTED_CONTENTS_WITH_COMPLETION_ACTION } from './test-data';
 
 describe('PdfWriter', () => {
   it('should create an instance', () => {
@@ -19,7 +19,7 @@ describe('PdfWriter', () => {
     // Check that the contents of all the groups and items are present.
     // This won't verify that it's laid out properly, but at least verifies that
     // the content was actually output to the PDF.
-    for (const group of EXPECTED_CONTENTS.groups) {
+    for (const group of EXPECTED_CONTENTS_WITH_COMPLETION_ACTION.groups) {
       expect(allText).toContain(group.title);
       for (const checklist of group.checklists) {
         expect(allText).toContain(checklist.title);
@@ -34,8 +34,15 @@ describe('PdfWriter', () => {
       }
     }
 
+    // Check that completion actions are present.
+    expect(allText).toContain('(Continue to the next checklist)');
+    expect(allText).toContain('Flight plan screen');
+    expect(allText).toContain('OPEN');
+    expect(allText).not.toContain('CLOSE');
+    expect(allText).toContain('Taxi chart screen');
+
     // Cover page was NOT requested - it shouldn't be present.
-    const metadata = EXPECTED_CONTENTS.metadata!;
+    const metadata = EXPECTED_CONTENTS_WITH_COMPLETION_ACTION.metadata!;
     expect(allText).not.toContain(metadata.aircraftInfo);
     expect(allText).not.toContain(metadata.makeAndModel);
     expect(allText).not.toContain(metadata.manufacturerInfo);
@@ -63,7 +70,7 @@ describe('PdfWriter', () => {
     expect(pdf.numPages).toBeGreaterThan(2);
 
     // Check that all the metadata is present this time.
-    const metadata = EXPECTED_CONTENTS.metadata!;
+    const metadata = EXPECTED_CONTENTS_WITH_COMPLETION_ACTION.metadata!;
     const coverText = await pageToText(pdf, 1);
     expect(coverText).toContain(metadata.aircraftInfo);
     expect(coverText).toContain(metadata.makeAndModel);
@@ -83,13 +90,15 @@ describe('PdfWriter', () => {
     expect(pdf.numPages).toBeGreaterThan(3);
 
     const coverText = await pageToText(pdf, 1);
-    expect(coverText).toContain(EXPECTED_CONTENTS.metadata!.aircraftInfo);
+    expect(coverText).toContain(EXPECTED_CONTENTS_WITH_COMPLETION_ACTION.metadata!.aircraftInfo);
 
     const groupCoverText = await pageToText(pdf, 2);
-    expect(groupCoverText).toContain(EXPECTED_CONTENTS.groups[0].title);
+    expect(groupCoverText).toContain(EXPECTED_CONTENTS_WITH_COMPLETION_ACTION.groups[0].title);
 
     const groupContentsText = await pageToText(pdf, 3);
-    expect(groupContentsText).toContain(EXPECTED_CONTENTS.groups[0].checklists[0].items[0].prompt);
+    expect(groupContentsText).toContain(
+      EXPECTED_CONTENTS_WITH_COMPLETION_ACTION.groups[0].checklists[0].items[0].prompt,
+    );
   });
 
   it('generates a PDF with a custom page size', async () => {
@@ -103,7 +112,7 @@ describe('PdfWriter', () => {
   });
 
   async function writeAndParsePdf(options: PdfWriterOptions): Promise<pdfjs.PDFDocumentProxy> {
-    const writtenFile = await serializeChecklistFile(EXPECTED_CONTENTS, FormatId.PDF, options);
+    const writtenFile = await serializeChecklistFile(EXPECTED_CONTENTS_WITH_COMPLETION_ACTION, FormatId.PDF, options);
     const writtenData = await writtenFile.arrayBuffer();
     expect(writtenData.byteLength).toBeGreaterThan(1000);
     return parsePdf(writtenData);

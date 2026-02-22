@@ -3,6 +3,7 @@ import autoTable, { CellDef, CellHookData, FontStyle, MarginPadding, RowInput, U
 import 'svg2pdf.js';
 import {
   Checklist,
+  Checklist_CompletionAction,
   ChecklistFile,
   ChecklistFileMetadata,
   ChecklistGroup,
@@ -443,7 +444,15 @@ export class PdfWriter {
   }
 
   private _checklistTableBody(checklist: Checklist): RowInput[] {
-    return checklist.items.map((item: ChecklistItem) => this._itemToCells(item));
+    const rows = checklist.items.map((item: ChecklistItem) => this._itemToCells(item));
+
+    // Output completion actions as a regular item.
+    const completionItem = this._completionActionItem(checklist.completionAction);
+    if (completionItem) {
+      rows.push(this._itemToCells(completionItem));
+    }
+
+    return rows;
   }
 
   private _itemToCells(item: ChecklistItem): CellDef[] {
@@ -507,6 +516,45 @@ export class PdfWriter {
     console.debug('PDF:', cells);
 
     return cells;
+  }
+
+  private _completionActionItem(action: Checklist_CompletionAction): ChecklistItem | undefined {
+    let screenName: string;
+    let screenAction = 'OPEN';
+    switch (action) {
+      case Checklist_CompletionAction.ACTION_DO_NOTHING:
+        return undefined;
+
+      case Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST:
+        return ChecklistItem.create({
+          type: ChecklistItem_Type.ITEM_PLAINTEXT,
+          prompt: '(Continue to the next checklist)',
+          centered: true,
+        });
+
+      case Checklist_CompletionAction.ACTION_OPEN_FLIGHT_PLAN:
+        screenName = 'Flight plan';
+        break;
+
+      case Checklist_CompletionAction.ACTION_CLOSE_FLIGHT_PLAN:
+        screenName = 'Flight plan';
+        screenAction = 'CLOSE';
+        break;
+
+      case Checklist_CompletionAction.ACTION_OPEN_TAXI_CHART:
+        screenName = 'Taxi chart';
+        break;
+
+      case Checklist_CompletionAction.ACTION_OPEN_MAP:
+        screenName = 'Map';
+        break;
+    }
+
+    return ChecklistItem.create({
+      type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+      prompt: screenName + ' screen',
+      expectation: screenAction,
+    });
   }
 
   private _drawPrefixedCell(data: CellHookData, firstPageNumber: number) {
