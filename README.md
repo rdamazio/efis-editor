@@ -37,7 +37,7 @@ You can try it out directly in the link above, but here's what it currently look
   - Advanced Flight Systems (AFS)
   - Dynon SkyView
   - Jeppesen ForeFlight (.fmd file format)<sup>†</sup>
-  - Garmin Pilot (.gplt file format) <sup>ᶢ†</sup>
+  - Garmin Pilot (.gplt file format) <sup>†</sup>
   - Garmin G3X / G3X Touch / GTN (.ace file format)
   - Grand Rapids (GRT)
   - Printable (PDF) - export only, selectable page size
