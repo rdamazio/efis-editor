@@ -146,6 +146,7 @@ describe('PrintDialogComponent', () => {
       outputCoverPage: true,
       outputPageNumbers: false,
       outputCompletionActions: false,
+      checklistNewPage: false,
     };
     expect(dataOut).toHaveBeenCalledOnceWith(expectedOpts);
     const newOpts = await prefs.getPrintOptions();

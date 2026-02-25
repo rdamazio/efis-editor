@@ -49,6 +49,9 @@ export interface PdfWriterOptions extends ExportOptions {
   outputGroupCoverPages?: boolean;
   outputPageNumbers?: boolean;
   outputCompletionActions?: boolean;
+
+  // Whether each checklist should start on a new page.
+  checklistNewPage?: boolean;
 }
 
 export const DEFAULT_OPTIONS: PdfWriterOptions = {
@@ -66,6 +69,7 @@ export const DEFAULT_OPTIONS: PdfWriterOptions = {
   outputGroupCoverPages: false,
   outputPageNumbers: true,
   outputCompletionActions: true,
+  checklistNewPage: false,
 };
 
 interface IconToDraw {
@@ -405,16 +409,18 @@ export class PdfWriter {
       // Calculate where to start the next table.
       let startY = this._tableMargin.top;
       if (first) {
+        // First checklist in the group - offset by the group title height if needed.
         startY = titleOffset || this._tableMargin.top;
         first = false;
+      } else if (this._options.checklistNewPage) {
+        // User requested a new page for each checklist.
+        this._newPage();
+      } else if (this._doc.lastAutoTable.finalY - this._tableMargin.top > this._innerPageHeight / 2) {
+        // More than half the page is already used, start on the next page.
+        this._newPage();
       } else {
-        const lastY = this._doc.lastAutoTable.finalY;
-        if (lastY - this._tableMargin.top > this._innerPageHeight / 2) {
-          // More than half the page is already used, start on the next page.
-          this._newPage();
-        } else {
-          startY = lastY + 2;
-        }
+        // Start on the same page, after the previous checklist.
+        startY = this._doc.lastAutoTable.finalY + 2;
       }
 
       const firstPageNumber = this._doc.getCurrentPageInfo().pageNumber;

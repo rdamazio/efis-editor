@@ -18,6 +18,7 @@ const NON_DEFAULT_OPTS: PdfWriterOptions = {
   outputGroupCoverPages: true,
   outputPageNumbers: false,
   outputCompletionActions: false,
+  checklistNewPage: true,
 };
 
 describe('PreferenceStorage', () => {

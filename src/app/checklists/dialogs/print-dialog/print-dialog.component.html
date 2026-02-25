@@ -141,7 +141,8 @@
   <mat-checkbox [(ngModel)]="options.marginOffsetsGroupTitle"
     >Offset group title by top margin<br />
     (for top spiral binding)</mat-checkbox
-  >
+  ><br />
+  <mat-checkbox [(ngModel)]="options.checklistNewPage">Output at most one checklist per page</mat-checkbox><br />
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button [mat-dialog-close]="options">Ok</button>
