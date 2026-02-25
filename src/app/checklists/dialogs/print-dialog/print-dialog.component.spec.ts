@@ -47,6 +47,7 @@ describe('PrintDialogComponent', () => {
   let paperSize: HTMLElement;
   let landscape: HTMLElement;
   let pageNumbers: HTMLElement;
+  let completionActions: HTMLElement;
 
   beforeEach(async () => {
     user = userEvent.setup();
@@ -77,6 +78,7 @@ describe('PrintDialogComponent', () => {
     paperSize = await screen.findByRole('combobox', { name: /.*paper size.*/ });
     landscape = await screen.findByRole('radio', { name: 'Landscape' });
     pageNumbers = await screen.findByRole('checkbox', { name: 'Output page numbers' });
+    completionActions = await screen.findByRole('checkbox', { name: 'Output completion actions' });
   }
 
   it('should open and cancel the dialog', async () => {
@@ -133,6 +135,7 @@ describe('PrintDialogComponent', () => {
     await user.click(a1);
     await user.click(landscape);
     await user.click(pageNumbers);
+    await user.click(completionActions);
 
     await user.click(okButton);
 
@@ -142,6 +145,7 @@ describe('PrintDialogComponent', () => {
       orientation: 'landscape',
       outputCoverPage: true,
       outputPageNumbers: false,
+      outputCompletionActions: false,
     };
     expect(dataOut).toHaveBeenCalledOnceWith(expectedOpts);
     const newOpts = await prefs.getPrintOptions();

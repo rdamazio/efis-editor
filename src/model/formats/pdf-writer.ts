@@ -48,6 +48,7 @@ export interface PdfWriterOptions extends ExportOptions {
   outputCoverPage?: boolean;
   outputGroupCoverPages?: boolean;
   outputPageNumbers?: boolean;
+  outputCompletionActions?: boolean;
 }
 
 export const DEFAULT_OPTIONS: PdfWriterOptions = {
@@ -64,6 +65,7 @@ export const DEFAULT_OPTIONS: PdfWriterOptions = {
   outputCoverPage: true,
   outputGroupCoverPages: false,
   outputPageNumbers: true,
+  outputCompletionActions: true,
 };
 
 interface IconToDraw {
@@ -446,10 +448,12 @@ export class PdfWriter {
   private _checklistTableBody(checklist: Checklist): RowInput[] {
     const rows = checklist.items.map((item: ChecklistItem) => this._itemToCells(item));
 
-    // Output completion actions as a regular item.
-    const completionItem = this._completionActionItem(checklist.completionAction);
-    if (completionItem) {
-      rows.push(this._itemToCells(completionItem));
+    if (this._options.outputCompletionActions) {
+      // Output completion actions as a regular item.
+      const completionItem = this._completionActionItem(checklist.completionAction);
+      if (completionItem) {
+        rows.push(this._itemToCells(completionItem));
+      }
     }
 
     return rows;

@@ -12,7 +12,7 @@ describe('PdfWriter', () => {
   });
 
   it('generates a valid PDF', async () => {
-    const pdf = await writeAndParsePdf({ outputPageNumbers: true });
+    const pdf = await writeAndParsePdf({ outputPageNumbers: true, outputCompletionActions: true });
     expect(pdf.numPages).toBeGreaterThan(1);
     const allText = await pdfToText(pdf);
 
@@ -99,6 +99,15 @@ describe('PdfWriter', () => {
     expect(groupContentsText).toContain(
       EXPECTED_CONTENTS_WITH_COMPLETION_ACTION.groups[0].checklists[0].items[0].prompt,
     );
+  });
+
+  it('generates a PDF without completion actions', async () => {
+    const pdf = await writeAndParsePdf({ outputCompletionActions: false });
+    const allText = await pdfToText(pdf);
+    expect(allText).not.toContain('(Continue to the next checklist)');
+    expect(allText).not.toContain('Flight plan screen');
+    expect(allText).not.toContain('OPEN');
+    expect(allText).not.toContain('Taxi chart screen');
   });
 
   it('generates a PDF with a custom page size', async () => {
