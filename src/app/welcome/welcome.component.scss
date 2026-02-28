@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use '../../theme' as theme;
 
 .container {
   padding: 20px;
@@ -20,25 +21,25 @@
   padding: 10px;
   border-radius: 10px;
   display: inline-flex;
-  color: #222;
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface);
   @include mat.elevation(1);
 }
 
 .callout a:link {
-  color: #43a047;
+  color: mat.get-theme-color(theme.$efis-editor-theme, primary);
 }
 
 .callout a:visited {
-  color: #616161;
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface-variant);
 }
 
 .danger {
-  background-color: #faa; // Pun intended.
+  background-color: mat.get-theme-color(theme.$efis-editor-theme, error-container); // Pun intended.
 }
 
 .important {
-  background-color: #ffa;
-  color: #222;
+  background-color: mat.get-theme-color(theme.$efis-editor-theme, tertiary-container);
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-tertiary-container);
 }
 
 .callout-title {

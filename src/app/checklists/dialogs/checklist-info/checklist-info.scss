@@ -1,3 +1,6 @@
+@use '@angular/material' as mat;
+@use '../../../../theme' as theme;
+
 mat-dialog-content {
   display: flex;
   flex-direction: column;
@@ -8,7 +11,7 @@ mat-form-field {
 }
 
 .note {
-  color: var(--mat-sys-on-surface-variant);
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface-variant);
   font-size: small;
   padding-left: 1em;
 }

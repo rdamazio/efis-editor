@@ -1,28 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
-@use './theme-colors' as theme-colors;
+@use './theme' as theme;
 
 @import 'mat-icon-button-sizes/style.css';
 @import '../node_modules/ngx-spinner/animations/ball-fussion.css';
 
-$efis-editor-theme: mat.define-theme(
-  (
-    color: (
-      theme-type: dark,
-      primary: theme-colors.$primary-palette,
-      tertiary: theme-colors.$tertiary-palette,
-    ),
-    typography: (
-      brand-family: 'Roboto',
-      plain-family: 'Roboto',
-    ),
-  )
-);
-
 html {
-  @include mat.all-component-themes($efis-editor-theme);
-  @include mat.system-level-colors($efis-editor-theme);
-  @include mat.system-level-typography($efis-editor-theme);
+  @include mat.all-component-themes(theme.$efis-editor-theme);
+  @include mat.system-level-colors(theme.$efis-editor-theme);
+  @include mat.system-level-typography(theme.$efis-editor-theme);
 }
 html,
 body {
@@ -31,8 +17,8 @@ body {
 
 body {
   margin: 0;
-  background-color: var(--mat-sys-background);
-  color: var(--mat-sys-on-background);
+  background-color: mat.get-theme-color(theme.$efis-editor-theme, background);
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-background);
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
@@ -41,9 +27,9 @@ hr {
 }
 
 a:link {
-  color: #00e676;
+  color: mat.get-theme-color(theme.$efis-editor-theme, primary);
 }
 
 a:visited {
-  color: #686868;
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface-variant);
 }

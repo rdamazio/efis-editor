@@ -1,12 +1,15 @@
+@use '@angular/material' as mat;
+@use '../../../../theme' as theme;
+
 :host {
   table {
-    border: 1px solid #e1e4e8;
+    border: 1px solid mat.get-theme-color(theme.$efis-editor-theme, outline-variant);
     border-collapse: collapse;
     margin-bottom: 2em;
   }
 
   th {
-    background-color: #f6f8fa;
-    color: #212529;
+    background-color: mat.get-theme-color(theme.$efis-editor-theme, surface-container-low);
+    color: mat.get-theme-color(theme.$efis-editor-theme, on-surface);
   }
 }

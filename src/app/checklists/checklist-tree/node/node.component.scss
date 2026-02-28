@@ -1,3 +1,6 @@
+@use '@angular/material' as mat;
+@use '../../../../theme' as theme;
+
 .checklist-tree-node {
   display: flex;
   min-height: 48px;
@@ -41,13 +44,13 @@
 
 // Category IDs match the ChecklistGroup_Category proto definition
 .checklist-tree-node-title-category-1 {
-  color: white !important;
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface) !important;
 }
 
 .checklist-tree-node-title-category-2 {
-  color: yellow !important;
+  color: mat.get-theme-color(theme.$efis-editor-theme, primary) !important;
 }
 
 .checklist-tree-node-title-category-3 {
-  color: red !important;
+  color: mat.get-theme-color(theme.$efis-editor-theme, error) !important;
 }

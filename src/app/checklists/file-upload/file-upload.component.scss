@@ -1,3 +1,6 @@
+@use '@angular/material' as mat;
+@use '../../../theme' as theme;
+
 .file-upload {
   min-height: 40px;
   padding-bottom: 20px;
@@ -14,5 +17,5 @@
 
 .file-drop-content {
   text-align: center;
-  color: white;
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface);
 }

@@ -1,0 +1,16 @@
+@use '@angular/material' as mat;
+@use './theme-colors' as theme-colors;
+
+$efis-editor-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: dark,
+      primary: theme-colors.$primary-palette,
+      tertiary: theme-colors.$tertiary-palette,
+    ),
+    typography: (
+      brand-family: 'Roboto',
+      plain-family: 'Roboto',
+    ),
+  )
+);

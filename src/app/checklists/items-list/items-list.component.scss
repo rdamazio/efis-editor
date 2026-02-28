@@ -1,3 +1,6 @@
+@use '@angular/material' as mat;
+@use '../../../theme' as theme;
+
 .container {
   display: block;
   border-radius: 8px;
@@ -6,8 +9,8 @@
   height: calc(100% - 60px);
   overflow-y: auto;
 
-  color: #bbb;
-  background: black;
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface-variant);
+  background: mat.get-theme-color(theme.$efis-editor-theme, primary, 0);
 }
 
 .list {
@@ -68,9 +71,9 @@
 }
 
 .cdk-drag-placeholder {
-  background: #333;
+  background: mat.get-theme-color(theme.$efis-editor-theme, surface-container);
   // color: #333;
-  border: dotted 3px #777;
+  border: dotted 3px mat.get-theme-color(theme.$efis-editor-theme, outline);
   min-height: 60px;
   opacity: 10;
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);

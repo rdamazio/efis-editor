@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use '../../../theme' as theme;
 
 .editable-input-field {
   width: 100%;
@@ -17,16 +18,14 @@
 mat-form-field {
   @include mat.form-field-overrides(
     (
-      outlined-caret-color: white,
-
-      outlined-label-text-color: var(--mat-sys-on-surface-variant),
-      outlined-hover-label-text-color: var(--mat-sys-on-surface),
-      outlined-focus-label-text-color: white,
-
-      outlined-focus-outline-color: white,
+      outlined-caret-color: mat.get-theme-color(theme.$efis-editor-theme, primary),
+      outlined-label-text-color: mat.get-theme-color(theme.$efis-editor-theme, on-surface-variant),
+      outlined-hover-label-text-color: mat.get-theme-color(theme.$efis-editor-theme, on-surface),
+      outlined-focus-label-text-color: mat.get-theme-color(theme.$efis-editor-theme, primary),
+      outlined-focus-outline-color: mat.get-theme-color(theme.$efis-editor-theme, primary),
       outlined-focus-outline-width: 2px,
 
-      outlined-error-hover-outline-color: orange,
+      outlined-error-hover-outline-color: mat.get-theme-color(theme.$efis-editor-theme, error),
     )
   );
 }

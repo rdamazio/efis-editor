@@ -1,3 +1,6 @@
+@use '@angular/material' as mat;
+@use '../../../../theme' as theme;
+
 .item-container {
   display: flex;
 }
@@ -5,7 +8,7 @@
 .item-container:focus {
   outline: none;
   border-radius: 5px;
-  box-shadow: 0 0 3px 5px #303f9f;
+  box-shadow: 0 0 3px 5px mat.get-theme-color(theme.$efis-editor-theme, primary);
 }
 
 .actions {
@@ -23,7 +26,7 @@
 }
 
 .item {
-  color: #eee;
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-background);
   display: flex;
   width: 100%;
   padding-left: 10px;
@@ -48,7 +51,7 @@
 .item-title .prompt {
   font-size: 18px;
   font-weight: bold;
-  color: white;
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-background);
 }
 
 .item-challenge .indentable-container:before,
@@ -57,7 +60,7 @@
   position: absolute;
   top: 5px;
   left: 0px;
-  background: #000;
+  background: mat.get-theme-color(theme.$efis-editor-theme, primary, 0);
   width: 20px;
 }
 
@@ -84,7 +87,7 @@
 }
 
 .item-warning .prompt {
-  color: yellow;
+  color: mat.get-theme-color(theme.$efis-editor-theme, error);
 }
 
 .item-warning .prompt:before {
@@ -92,7 +95,7 @@
 }
 
 .item-note .prompt {
-  color: gray;
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface-variant);
 }
 
 .item-note .prompt:before {
@@ -108,15 +111,15 @@
 }
 
 .expectation {
-  color: cyan;
+  color: mat.get-theme-color(theme.$efis-editor-theme, tertiary);
   margin-top: 1px;
   padding-left: 5px;
-  background-color: #000;
+  background: mat.get-theme-color(theme.$efis-editor-theme, primary, 0);
   text-align: right;
 }
 
 .prompt-input {
-  background: #000;
+  background: mat.get-theme-color(theme.$efis-editor-theme, primary, 0);
   padding-right: 5px;
 }
 

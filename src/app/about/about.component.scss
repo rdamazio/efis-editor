@@ -1,9 +1,11 @@
+@use '@angular/material' as mat;
+@use '../../theme' as theme;
+
 .title {
   text-align: center;
 }
 
 .contents {
-  // background-color: #eee;
   width: 500px;
 
   text-align: center;
@@ -16,7 +18,7 @@
 .github-logo-container {
   display: inline-block;
   padding: 10px;
-  background-color: #999;
+  background-color: mat.get-theme-color(theme.$efis-editor-theme, surface-variant);
   border-radius: 16px;
 }
 
