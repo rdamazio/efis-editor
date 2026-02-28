@@ -53,6 +53,7 @@
     "jspdf-autotable": "^5.0.7",
     "mat-icon-button-sizes": "^1.0.6",
     "nanotar": "^0.3.0",
+    "ngx-device-detector": "^11.0.0",
     "ngx-file-drop": "^16.0.0",
     "ngx-spinner": "^21.0.0",
     "rxjs": "~7.8.2",
