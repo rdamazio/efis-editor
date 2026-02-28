@@ -12,7 +12,7 @@
 .filetype-card {
   max-width: 400px;
   border-radius: 8px;
-  @include mat.elevation(10);
+  @include mat.elevation(3);
 }
 
 .callout {
@@ -21,7 +21,7 @@
   border-radius: 10px;
   display: inline-flex;
   color: #222;
-  @include mat.elevation(5);
+  @include mat.elevation(1);
 }
 
 .callout a:link {

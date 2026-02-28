@@ -19,8 +19,8 @@ mat-form-field {
     (
       outlined-caret-color: white,
 
-      outlined-label-text-color: --sys-on-surface-variant,
-      outlined-hover-label-text-color: --sys-on-surface,
+      outlined-label-text-color: var(--mat-sys-on-surface-variant),
+      outlined-hover-label-text-color: var(--mat-sys-on-surface),
       outlined-focus-label-text-color: white,
 
       outlined-focus-outline-color: white,

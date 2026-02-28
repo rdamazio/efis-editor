@@ -1,7 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@use './theme-colors' as theme-colors;
+
 @import 'mat-icon-button-sizes/style.css';
 @import '../node_modules/ngx-spinner/animations/ball-fussion.css';
 
+$efis-editor-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: dark,
+      primary: theme-colors.$primary-palette,
+      tertiary: theme-colors.$tertiary-palette,
+    ),
+    typography: (
+      brand-family: 'Roboto',
+      plain-family: 'Roboto',
+    ),
+  )
+);
+
+html {
+  @include mat.all-component-themes($efis-editor-theme);
+  @include mat.system-level-colors($efis-editor-theme);
+  @include mat.system-level-typography($efis-editor-theme);
+}
 html,
 body {
   height: 100%;
@@ -9,6 +31,8 @@ body {
 
 body {
   margin: 0;
+  background-color: var(--mat-sys-background);
+  color: var(--mat-sys-on-background);
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
