@@ -62,17 +62,19 @@
 
   <br />
 
-  <div class="callout important">
-    <div class="callout-title">IMPORTANT:</div>
-    <div>
-      By default, this app does not save your files on any server - they're only stored on your browser's local
-      storage.<br />
-      This means that if you clear your browser's storage, or lose your computer, they'll be gone. Forever.<br />
-      <br />
-      It is thus recommended to either enable Google Drive synchronization (icon at the top-right of this page), or to
-      download a copy of your data and keep it somewhere safe.
+  @if (showStorageWarning()) {
+    <div class="callout important">
+      <div class="callout-title">IMPORTANT:</div>
+      <div>
+        By default, this app does not save your files on any server - they're only stored on your browser's local
+        storage.<br />
+        This means that if you clear your browser's storage, or lose your computer, they'll be gone. Forever.<br />
+        <br />
+        It is thus recommended to either enable Google Drive synchronization (icon at the top-right of this page), or to
+        download a copy of your data and keep it somewhere safe.
+      </div>
     </div>
-  </div>
+  }
 
   <div class="callout important">
     <div class="callout-title">IMPORTANT:</div>

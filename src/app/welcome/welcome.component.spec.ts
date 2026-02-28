@@ -1,17 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { DeviceDetectorService } from 'ngx-device-detector';
+import { BehaviorSubject } from 'rxjs';
+import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
 import { WelcomeComponent } from './welcome.component';
 
 describe('WelcomeComponent', () => {
   let component: WelcomeComponent;
   let fixture: ComponentFixture<WelcomeComponent>;
   let deviceService: DeviceDetectorService;
+  let gdrive: jasmine.SpyObj<GoogleDriveStorage>;
+  let state$: BehaviorSubject<DriveSyncState>;
 
   beforeEach(async () => {
+    gdrive = jasmine.createSpyObj<GoogleDriveStorage>('GoogleDriveStorage', ['getState']);
+    state$ = new BehaviorSubject<DriveSyncState>(DriveSyncState.DISCONNECTED);
+    gdrive.getState.and.returnValue(state$);
+
     await TestBed.configureTestingModule({
       imports: [RouterModule.forRoot([])],
-      providers: [DeviceDetectorService],
+      providers: [
+        {
+          provide: GoogleDriveStorage,
+          useValue: gdrive,
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(WelcomeComponent);
@@ -22,6 +35,26 @@ describe('WelcomeComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('showStorageWarning', () => {
+    it('should show warning when Google Drive is disconnected', async () => {
+      state$.next(DriveSyncState.DISCONNECTED);
+      await fixture.whenStable();
+      expect(component.showStorageWarning()).toBeTrue();
+    });
+
+    it('should not show warning when Google Drive is in sync', async () => {
+      state$.next(DriveSyncState.IN_SYNC);
+      await fixture.whenStable();
+      expect(component.showStorageWarning()).toBeFalse();
+    });
+
+    it('should not show warning when Google Drive is syncing', async () => {
+      state$.next(DriveSyncState.SYNCING);
+      await fixture.whenStable();
+      expect(component.showStorageWarning()).toBeFalse();
+    });
   });
 
   describe('installUrl', () => {
