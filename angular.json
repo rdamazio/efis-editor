@@ -25,7 +25,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": ["src/theme.scss", "src/styles.scss"],
             "scripts": [],
             "server": "src/main.server.ts",
             "prerender": true,
@@ -80,7 +80,7 @@
               "src/model/formats/test-foreflight.fmd",
               "src/model/formats/test-garmin-pilot.gplt"
             ],
-            "styles": ["src/styles.scss"],
+            "styles": ["src/theme.scss", "src/styles.scss"],
             "scripts": [],
             "karmaConfig": "karma.conf.js"
           }

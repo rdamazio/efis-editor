@@ -13,6 +13,12 @@
 
 .checklist-tree .checklist-node {
   display: block;
+  color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 95);
+}
+
+.checklist-tree .checklist-node-group .mat-tree-node {
+  color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 99);
+  font-weight: bold;
 }
 
 .checklist-tree .checklist-node:hover {

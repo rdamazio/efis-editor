@@ -26,7 +26,7 @@
 }
 
 .item {
-  color: mat.get-theme-color(theme.$efis-editor-theme, on-background);
+  color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 95);
   display: flex;
   width: 100%;
   padding-left: 10px;
@@ -51,7 +51,7 @@
 .item-title .prompt {
   font-size: 18px;
   font-weight: bold;
-  color: mat.get-theme-color(theme.$efis-editor-theme, on-background);
+  color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 99);
 }
 
 .item-challenge .indentable-container:before,
@@ -87,7 +87,7 @@
 }
 
 .item-warning .prompt {
-  color: mat.get-theme-color(theme.$efis-editor-theme, error);
+  color: mat.get-theme-color(theme.$efis-editor-theme, tertiary, 95);
 }
 
 .item-warning .prompt:before {
@@ -95,7 +95,7 @@
 }
 
 .item-note .prompt {
-  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface-variant);
+  color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 60);
 }
 
 .item-note .prompt:before {
@@ -111,7 +111,7 @@
 }
 
 .expectation {
-  color: mat.get-theme-color(theme.$efis-editor-theme, tertiary);
+  color: mat.get-theme-color(theme.$efis-editor-theme, secondary, 90);
   margin-top: 1px;
   padding-left: 5px;
   background: mat.get-theme-color(theme.$efis-editor-theme, primary, 0);

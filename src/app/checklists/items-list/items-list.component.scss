@@ -52,7 +52,7 @@
 
 /* Highlight the list item that is being dragged. */
 .cdk-drag-preview {
-  color: white;
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface);
   border-radius: 4px;
   box-shadow:
     0 5px 5px -3px rgba(0, 0, 0, 0.2),
@@ -72,7 +72,6 @@
 
 .cdk-drag-placeholder {
   background: mat.get-theme-color(theme.$efis-editor-theme, surface-container);
-  // color: #333;
   border: dotted 3px mat.get-theme-color(theme.$efis-editor-theme, outline);
   min-height: 60px;
   opacity: 10;

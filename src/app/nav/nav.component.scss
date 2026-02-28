@@ -1,3 +1,6 @@
+@use '@angular/material' as mat;
+@use '../../theme' as theme;
+
 .sidenav-container {
   position: absolute;
   top: 64px;
@@ -5,6 +8,7 @@
   left: 0;
   right: 0;
   overflow-y: auto;
+  color: inherit;
 }
 
 .sidenav {
@@ -31,6 +35,12 @@
   top: 0;
   left: 0;
   right: 0;
+
+  @include mat.toolbar-overrides(
+    (
+      container-background-color: mat.get-theme-color(theme.$efis-editor-theme, primary, 10),
+    )
+  );
 }
 
 .topbar-spacer {

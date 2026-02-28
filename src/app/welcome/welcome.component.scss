@@ -14,6 +14,12 @@
   max-width: 400px;
   border-radius: 8px;
   @include mat.elevation(3);
+  @include mat.card-overrides(
+    (
+      elevated-container-color: mat.get-theme-color(theme.$efis-editor-theme, surface-container-high),
+      subtitle-text-color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 70),
+    )
+  );
 }
 
 .callout {
@@ -34,7 +40,7 @@
 }
 
 .danger {
-  background-color: mat.get-theme-color(theme.$efis-editor-theme, error-container); // Pun intended.
+  background-color: mat.get-theme-color(theme.$efis-editor-theme, error-container);
 }
 
 .important {
@@ -49,6 +55,7 @@
 }
 
 .skull-icon {
+  line-height: 20px;
   font-size: 80px;
 }
 

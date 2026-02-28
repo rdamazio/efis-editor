@@ -17,8 +17,8 @@ body {
 
 body {
   margin: 0;
-  background-color: mat.get-theme-color(theme.$efis-editor-theme, background);
-  color: mat.get-theme-color(theme.$efis-editor-theme, on-background);
+  background-color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 10);
+  color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 95);
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
@@ -27,9 +27,9 @@ hr {
 }
 
 a:link {
-  color: mat.get-theme-color(theme.$efis-editor-theme, primary);
+  color: mat.get-theme-color(theme.$efis-editor-theme, primary, 70);
 }
 
 a:visited {
-  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface-variant);
+  color: mat.get-theme-color(theme.$efis-editor-theme, primary, 50);
 }

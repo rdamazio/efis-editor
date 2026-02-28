@@ -44,13 +44,13 @@
 
 // Category IDs match the ChecklistGroup_Category proto definition
 .checklist-tree-node-title-category-1 {
-  color: mat.get-theme-color(theme.$efis-editor-theme, on-surface) !important;
+  color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 95) !important;
 }
 
 .checklist-tree-node-title-category-2 {
-  color: mat.get-theme-color(theme.$efis-editor-theme, primary) !important;
+  color: mat.get-theme-color(theme.$efis-editor-theme, tertiary, 95) !important;
 }
 
 .checklist-tree-node-title-category-3 {
-  color: mat.get-theme-color(theme.$efis-editor-theme, error) !important;
+  color: mat.get-theme-color(theme.$efis-editor-theme, error, 60) !important;
 }
