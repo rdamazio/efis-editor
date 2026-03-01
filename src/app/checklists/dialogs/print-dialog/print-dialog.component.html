@@ -134,15 +134,17 @@
     </mat-grid-list>
   </div>
 
-  <mat-checkbox [(ngModel)]="options.outputCoverPage">Output cover page</mat-checkbox><br />
-  <mat-checkbox [(ngModel)]="options.outputGroupCoverPages">Output group cover pages</mat-checkbox><br />
-  <mat-checkbox [(ngModel)]="options.outputPageNumbers">Output page numbers</mat-checkbox><br />
-  <mat-checkbox [(ngModel)]="options.outputCompletionActions">Output completion actions</mat-checkbox><br />
-  <mat-checkbox [(ngModel)]="options.marginOffsetsGroupTitle"
-    >Offset group title by top margin<br />
-    (for top spiral binding)</mat-checkbox
-  ><br />
-  <mat-checkbox [(ngModel)]="options.checklistNewPage">Output at most one checklist per page</mat-checkbox><br />
+  <div class="checkbox-group">
+    <mat-checkbox [(ngModel)]="options.outputCoverPage">Output cover page</mat-checkbox>
+    <mat-checkbox [(ngModel)]="options.outputGroupCoverPages">Output group cover pages</mat-checkbox>
+    <mat-checkbox [(ngModel)]="options.outputPageNumbers">Output page numbers</mat-checkbox>
+    <mat-checkbox [(ngModel)]="options.outputCompletionActions">Output completion actions</mat-checkbox>
+    <mat-checkbox [(ngModel)]="options.marginOffsetsGroupTitle"
+      >Offset group title by top margin<br />
+      (for top spiral binding)</mat-checkbox
+    >
+    <mat-checkbox [(ngModel)]="options.checklistNewPage">Output at most one checklist per page</mat-checkbox>
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button [mat-dialog-close]="options">Ok</button>

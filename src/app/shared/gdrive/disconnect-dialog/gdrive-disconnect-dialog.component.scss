@@ -4,20 +4,24 @@
 .content {
   display: flex;
   flex-direction: column;
+  padding-bottom: 8px;
+  padding-left: 4px;
+  margin-left: 25px;
 }
 
 .main-content {
   display: flex;
   flex-direction: row;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
 
 .warning-icon {
   color: mat.get-theme-color(theme.$efis-editor-theme, error, 60);
-  transform: scale(2);
-  margin-top: 15px;
-  margin-left: 10px;
-  margin-right: 30px;
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  margin: 15px 30px 0 10px;
 }
 
 .disconnect-ok {

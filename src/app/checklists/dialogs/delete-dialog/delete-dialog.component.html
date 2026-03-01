@@ -1,8 +1,10 @@
 <h2 mat-dialog-title>Delete {{ data.entityType }}?</h2>
-<mat-dialog-content class="content">
-  <mat-icon class="warning-icon" inline>warning</mat-icon>
+<mat-dialog-content>
+  <div class="content">
+    <mat-icon class="warning-icon">warning</mat-icon>
 
-  Are you sure you'd like to delete {{ data.entityDescription }}?
+    <span>Are you sure you'd like to delete {{ data.entityDescription }}?</span>
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions>

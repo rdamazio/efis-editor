@@ -3,13 +3,16 @@
 
 .content {
   display: flex;
+  align-items: center;
 }
 
 .warning-icon {
   color: mat.get-theme-color(theme.$efis-editor-theme, error, 60);
-  transform: scale(2);
-  margin-left: 10px;
-  margin-right: 15px;
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  margin: 0 15px 10px 10px;
 }
 
 .delete-ok {
