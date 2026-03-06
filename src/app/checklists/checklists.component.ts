@@ -547,7 +547,6 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
                 await this._spinner.hide(this._downloadSpinner);
               }
             };
-            // eslint-disable-next-line promise/no-nesting
             fn().catch(console.error.bind(console));
           },
           { injector: this._injector },

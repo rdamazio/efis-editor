@@ -6,7 +6,8 @@ const angular = require('angular-eslint');
 const jasmine = require('eslint-plugin-jasmine');
 const nosecrets = require('eslint-plugin-no-secrets');
 const prettierRecommended = require('eslint-plugin-prettier/recommended');
-const promise = require('eslint-plugin-promise');
+// TODO: Re-enable once https://github.com/eslint-community/eslint-plugin-promise/issues/616 is fixed.
+// const promise = require('eslint-plugin-promise');
 const rxjsX = require('eslint-plugin-rxjs-x');
 const testing = require('eslint-plugin-testing-library');
 const tseslint = require('typescript-eslint');
@@ -23,7 +24,7 @@ module.exports = tseslint.config(
       ...angular.configs.tsAll,
       prettierRecommended,
       depend.configs['flat/recommended'],
-      promise.configs['flat/recommended'],
+      // promise.configs['flat/recommended'],
       rxjsX.configs.strict,
       jasmine.configs.recommended,
     ],

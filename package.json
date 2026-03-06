@@ -87,7 +87,6 @@
     "eslint-plugin-jasmine": "^4.2.2",
     "eslint-plugin-no-secrets": "^2.2.2",
     "eslint-plugin-prettier": "^5.5.5",
-    "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-rxjs-x": "^0.9.5",
     "eslint-plugin-testing-library": "^7.16.0",
     "jasmine-core": "~6.1.0",
