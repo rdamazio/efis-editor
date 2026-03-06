@@ -1,4 +1,7 @@
 // @ts-check
+const { defineConfig, globalIgnores } = require('eslint/config');
+const globals = require('globals');
+
 const depend = require('eslint-plugin-depend');
 const css = require('@eslint/css');
 const eslint = require('@eslint/js');
@@ -8,15 +11,32 @@ const nosecrets = require('eslint-plugin-no-secrets');
 const prettierRecommended = require('eslint-plugin-prettier/recommended');
 // TODO: Re-enable once https://github.com/eslint-community/eslint-plugin-promise/issues/616 is fixed.
 // const promise = require('eslint-plugin-promise');
-const rxjsX = require('eslint-plugin-rxjs-x');
+const rxjsX = require('eslint-plugin-rxjs-x').default || require('eslint-plugin-rxjs-x');
 const testing = require('eslint-plugin-testing-library');
 const tseslint = require('typescript-eslint');
 
-module.exports = tseslint.config(
+module.exports = defineConfig(
+  // Global options that apply to all sections.
+  globalIgnores(['.angular/', '.jj/', 'coverage/', 'dist/', 'docs/', 'gen/', 'server.ts']),
+  {
+    linterOptions: {
+      reportUnusedDisableDirectives: 'error',
+    },
+  },
+
+  // TypeScript rules.
   {
     files: ['**/*.ts'],
     ignores: ['src/environments/dev-keys.ts'],
-    languageOptions: { parser: tseslint.parser, parserOptions: { projectService: true } },
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: { projectService: true },
+      globals: {
+        ...globals.node,
+        ...globals.jasmine,
+        ...globals.browser,
+      },
+    },
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.strictTypeChecked,
@@ -28,7 +48,10 @@ module.exports = tseslint.config(
       rxjsX.configs.strict,
       jasmine.configs.recommended,
     ],
-    plugins: { jasmine: jasmine, 'no-secrets': nosecrets },
+    plugins: {
+      jasmine: jasmine,
+      'no-secrets': nosecrets,
+    },
     processor: angular.processInlineTemplates,
     rules: {
       '@angular-eslint/directive-selector': [
@@ -203,6 +226,8 @@ module.exports = tseslint.config(
       ],
     },
   },
+
+  // Test-specific rules.
   {
     files: ['**/*.spec.ts'],
     extends: [testing.configs['flat/angular']],
@@ -217,6 +242,8 @@ module.exports = tseslint.config(
       'testing-library/prefer-user-event-setup': 'error',
     },
   },
+
+  // HTML rules.
   {
     files: ['**/*.html'],
     extends: [...angular.configs.templateAll, prettierRecommended],
@@ -232,6 +259,8 @@ module.exports = tseslint.config(
       '@angular-eslint/template/no-inline-styles': ['error', { allowBindToStyle: true }],
     },
   },
+
+  // CSS rules.
   {
     files: ['**/*.scss'],
     extends: [css.default.configs.recommended],
