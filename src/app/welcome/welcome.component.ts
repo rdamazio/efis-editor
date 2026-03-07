@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -14,16 +14,13 @@ import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
   styleUrl: './welcome.component.scss',
 })
 export class WelcomeComponent {
+  private readonly _gdrive = inject(GoogleDriveStorage);
+  private readonly _deviceService = inject(DeviceDetectorService);
   private readonly _gdriveState = toSignal(this._gdrive.getState());
   protected readonly _formatRegistry = FORMAT_REGISTRY;
 
   public readonly installUrl = computed(() => this._getInstallUrl());
   public readonly showStorageWarning = computed(() => this._gdriveState() === DriveSyncState.DISCONNECTED);
-
-  constructor(
-    private readonly _gdrive: GoogleDriveStorage,
-    private readonly _deviceService: DeviceDetectorService,
-  ) {}
 
   private _getInstallUrl(): string {
     const device = this._deviceService.deviceInfo();

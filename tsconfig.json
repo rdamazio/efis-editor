@@ -16,10 +16,10 @@
     "experimentalDecorators": true,
     "moduleResolution": "bundler",
     "importHelpers": true,
-    "target": "ES2024",
+    "target": "ESNext",
     "module": "preserve",
-    "useDefineForClassFields": false,
-    "lib": ["ES2023", "dom"]
+    "useDefineForClassFields": true,
+    "lib": ["ESNext", "dom"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
@@ -27,9 +27,11 @@
     "strictInputAccessModifiers": true,
     "strictStandalone": true,
     "strictTemplates": true,
-    "useUnknownInCatchVariables": true,
     "extendedDiagnostics": {
-      "defaultCategory": "error"
+      "defaultCategory": "error",
+      "checks": {
+        "unusedStandaloneImports": "error"
+      }
     }
   }
 }
