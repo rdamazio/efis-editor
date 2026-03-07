@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { DeferBlockState, inject, TestBed } from '@angular/core/testing';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from '@angular/material/snack-bar';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
@@ -47,7 +48,7 @@ describe('ChecklistsComponent', () => {
 
   beforeEach(async () => {
     // We have a lot of large tests in this file, override the timeout.
-    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+    originalTimeout = 5000;
     vi.setConfig({ testTimeout: 20000 });
 
     // ngneat/hotkeys uses different keys for Meta on PC vs Mac - detect where we're running tests.
@@ -59,6 +60,7 @@ describe('ChecklistsComponent', () => {
     navData = { routeTitle: signal(undefined), fileName: signal(undefined) };
     rendered = await render(ChecklistsComponent, {
       providers: [
+        provideNoopAnimations(),
         { provide: ROUTER_OUTLET_DATA, useValue: signal(navData) },
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 0 } },
         { provide: HOTKEY_DEBOUNCE_TIME, useValue: 50 },
@@ -159,7 +161,7 @@ describe('ChecklistsComponent', () => {
   }
 
   function expectFragment(fragment: string) {
-    const extras = vi.mocked(navigate).mock.lastCall[1] as NavigationExtras;
+    const extras = vi.mocked(navigate).mock.lastCall?.[1] as NavigationExtras;
     expect(extras.fragment).toEqual(fragment);
   }
 
@@ -188,7 +190,7 @@ describe('ChecklistsComponent', () => {
   }
 
   function lastSnackMessage(): string {
-    return vi.mocked(showSnack).mock.lastCall[0] as string;
+    return vi.mocked(showSnack).mock.lastCall?.[0] as string;
   }
 
   it('should create a new checklist and populate it', async () => {

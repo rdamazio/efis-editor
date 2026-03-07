@@ -1,6 +1,6 @@
-import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { filter, firstValueFrom, Subscription } from 'rxjs';
-import type { MockedObject } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChecklistFile, ChecklistGroup } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../formats/test-data';
 import { LazyBrowserStorage } from './browser-storage';
@@ -25,21 +25,30 @@ function fileIdForName(name: string) {
 }
 
 describe('GoogleDriveApi', () => {
-  let clock: jasmine.Clock;
-  let store: ChecklistStorage;
-  let lazyBrowserStore: LazyBrowserStorage;
-  let browserStore: Storage;
-  let gdrive: GoogleDriveStorage;
-  let gdriveApi: MockedObject<GoogleDriveApi>;
   let allStates: DriveSyncState[];
   let allDownloads: string[];
   let stateSub: Subscription | undefined;
   let downloadSub: Subscription | undefined;
+  let gdriveApi: any;
+  let store: ChecklistStorage;
+  let lazyBrowserStore: LazyBrowserStorage;
+  let browserStore: any;
+  let gdrive: GoogleDriveStorage;
 
   beforeEach(() => {
-    clock = jasmine.clock();
-    clock.install();
-    clock.mockDate(FAKE_NOW);
+    vi.useFakeTimers({
+      toFake: [
+        'setTimeout',
+        'clearTimeout',
+        'setInterval',
+        'clearInterval',
+        'Date',
+        'performance',
+        'requestAnimationFrame',
+        'cancelAnimationFrame',
+      ],
+    });
+    vi.setSystemTime(FAKE_NOW);
     gdriveApi = {
       load: vi.fn().mockName('GoogleDriveApi.load'),
       authenticate: vi.fn().mockName('GoogleDriveApi.authenticate'),
@@ -57,30 +66,27 @@ describe('GoogleDriveApi', () => {
     gdriveApi.authenticate.mockResolvedValue('some_token');
   });
 
-  beforeEach(inject(
-    [ChecklistStorage, LazyBrowserStorage, GoogleDriveStorage],
-    async (s: ChecklistStorage, bs: LazyBrowserStorage, gds: GoogleDriveStorage) => {
-      store = s;
-      lazyBrowserStore = bs;
-      gdrive = gds;
+  beforeEach(async () => {
+    store = TestBed.inject(ChecklistStorage);
+    lazyBrowserStore = TestBed.inject(LazyBrowserStorage);
+    gdrive = TestBed.inject(GoogleDriveStorage);
 
-      lazyBrowserStore.forceBrowserStorage();
-      browserStore = await lazyBrowserStore.storage;
-      await store.clear();
+    lazyBrowserStore.forceBrowserStorage();
+    browserStore = await lazyBrowserStore.storage;
+    await store.clear();
 
-      await gdrive.init();
-      allStates = [];
-      stateSub = gdrive.getState().subscribe((state: DriveSyncState) => {
-        allStates.push(state);
-      });
-      allDownloads = [];
-      downloadSub = gdrive.onDownloads().subscribe((name: string) => {
-        allDownloads.push(name);
-      });
-    },
-  ));
+    await gdrive.init();
+    allStates = [];
+    stateSub = gdrive.getState().subscribe((state: DriveSyncState) => {
+      allStates.push(state);
+    });
+    allDownloads = [];
+    downloadSub = gdrive.onDownloads().subscribe((name: string) => {
+      allDownloads.push(name);
+    });
+  });
 
-  afterEach(waitForAsync(async () => {
+  afterEach(async () => {
     stateSub?.unsubscribe();
     downloadSub?.unsubscribe();
     await gdrive.disableSync(false);
@@ -88,8 +94,8 @@ describe('GoogleDriveApi', () => {
     gdrive.destroy();
     await store.clear();
     browserStore.clear();
-    clock.uninstall();
-  }));
+    vi.useRealTimers();
+  });
 
   async function expectState(state: DriveSyncState) {
     const currentState = await firstValueFrom(gdrive.getState(), { defaultValue: DriveSyncState.FAILED });
@@ -101,8 +107,7 @@ describe('GoogleDriveApi', () => {
   }
 
   function expectStates(states: DriveSyncState[]) {
-    // TODO: vitest-migration: Cannot transform jasmine.arrayWithExactContents with a dynamic variable. Please migrate this manually.
-    expect(allStates).toEqual(jasmine.arrayWithExactContents(states));
+    expect(allStates).toEqual(states);
   }
 
   function expectUpload(checklist: ChecklistFile, mtime: Date, existingFile?: boolean) {
@@ -238,7 +243,12 @@ describe('GoogleDriveApi', () => {
 
     // Verify that the download happened.
     gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, NEWER_MTIME)]);
-    gdriveApi.downloadFile.withArgs(FILE_ID).mockResolvedValue(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+    gdriveApi.downloadFile.mockImplementation((id: string) => {
+      if (id === FILE_ID) {
+        return Promise.resolve(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+      }
+      return Promise.reject(new Error('Unknown file ID'));
+    });
     await gdrive.synchronize();
     // Saving the downloaded checklist keeps the state in "need sync" until the next sync.
     await gdrive.synchronize();
@@ -269,7 +279,12 @@ describe('GoogleDriveApi', () => {
 
     // Verify that the download happened.
     gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, NEWER_MTIME)]);
-    gdriveApi.downloadFile.withArgs(FILE_ID).mockResolvedValue(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+    gdriveApi.downloadFile.mockImplementation((id: string) => {
+      if (id === FILE_ID) {
+        return Promise.resolve(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+      }
+      return Promise.reject(new Error('Unknown file ID'));
+    });
     await gdrive.synchronize();
     // Saving the downloaded checklist keeps the state in "need sync" until the next sync.
     await gdrive.synchronize();
@@ -330,7 +345,12 @@ describe('GoogleDriveApi', () => {
     await store.deleteChecklistFile(FILE_NAME);
     await awaitState(DriveSyncState.NEEDS_SYNC);
 
-    gdriveApi.trashFile.withArgs(FILE_ID).mockResolvedValue();
+    gdriveApi.trashFile.mockImplementation((id: string) => {
+      if (id === FILE_ID) {
+        return Promise.resolve();
+      }
+      return Promise.reject(new Error('Unknown file ID'));
+    });
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
@@ -355,7 +375,12 @@ describe('GoogleDriveApi', () => {
     await store.deleteChecklistFile(FILE_NAME);
 
     // Connect and sync again - file should be downloaded, not deleted.
-    gdriveApi.downloadFile.withArgs(FILE_ID).mockResolvedValue(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+    gdriveApi.downloadFile.mockImplementation((id: string) => {
+      if (id === FILE_ID) {
+        return Promise.resolve(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+      }
+      return Promise.reject(new Error('Unknown file ID'));
+    });
     await gdrive.synchronize();
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
@@ -386,7 +411,12 @@ describe('GoogleDriveApi', () => {
     // Verify that the download happened.
     // The local deletion will get the current timestamp, so pretend the remote file is modified later.
     gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, NOW_PLUS_10M)]);
-    gdriveApi.downloadFile.withArgs(FILE_ID).mockResolvedValue(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+    gdriveApi.downloadFile.mockImplementation((id: string) => {
+      if (id === FILE_ID) {
+        return Promise.resolve(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+      }
+      return Promise.reject(new Error('Unknown file ID'));
+    });
     await gdrive.synchronize();
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
@@ -450,7 +480,12 @@ describe('GoogleDriveApi', () => {
     await store.saveChecklistFile(EXPECTED_CONTENTS, NOW_PLUS_10M);
 
     gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, OLDER_MTIME)]);
-    gdriveApi.trashFile.withArgs(FILE_ID).mockResolvedValue();
+    gdriveApi.trashFile.mockImplementation((id: string) => {
+      if (id === FILE_ID) {
+        return Promise.resolve();
+      }
+      return Promise.reject(new Error('Unknown file ID'));
+    });
 
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
@@ -473,8 +508,12 @@ describe('GoogleDriveApi', () => {
     file2.trashed = true;
     gdriveApi.listFiles.mockResolvedValue([file1, file2]);
 
-    gdriveApi.deleteFile.withArgs(file1.id!).mockResolvedValue();
-    gdriveApi.deleteFile.withArgs(file2.id!).mockResolvedValue();
+    gdriveApi.deleteFile.mockImplementation((id: string) => {
+      if (id === file1.id || id === file2.id) {
+        return Promise.resolve();
+      }
+      return Promise.reject(new Error('Unknown file ID'));
+    });
     await gdrive.deleteAllData();
     expect(gdriveApi.deleteFile).toHaveBeenCalledTimes(2);
 
@@ -494,10 +533,10 @@ describe('GoogleDriveApi', () => {
     expect(checklist).toEqual(expectedWithMtime);
   });
 
-  it('should periodically sync every 60s when no new changes exist', fakeAsync(async () => {
+  it('should periodically sync every 60s when no new changes exist', async () => {
     gdriveApi.listFiles.mockResolvedValue([]);
     await gdrive.synchronize();
-    tick();
+    await vi.advanceTimersByTimeAsync(0);
     expectStates([
       DriveSyncState.DISCONNECTED,
       DriveSyncState.NEEDS_SYNC,
@@ -510,25 +549,25 @@ describe('GoogleDriveApi', () => {
       GoogleDriveStorage.LONG_SYNC_INTERVAL_MS / GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS,
     );
     for (let i = 0; i < numIntervals - 1; i++) {
-      tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+      await vi.advanceTimersByTimeAsync(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
       expectStates([]);
     }
-    tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
     expectStates([DriveSyncState.SYNCING, DriveSyncState.IN_SYNC]);
     allStates = [];
 
-    tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
     expectStates([]);
 
     // Must happen earlier to clean up for fakeAsync.
     gdrive.destroy();
-  }));
+  });
 
-  it('should periodically sync every 10s when new changes exist', fakeAsync(async () => {
+  it('should periodically sync every 10s when new changes exist', async () => {
     gdriveApi.listFiles.mockResolvedValue([]);
 
     await gdrive.synchronize();
-    tick();
+    await vi.advanceTimersByTimeAsync(0);
     expectStates([
       DriveSyncState.DISCONNECTED,
       DriveSyncState.NEEDS_SYNC,
@@ -537,24 +576,24 @@ describe('GoogleDriveApi', () => {
     ]);
     allStates = [];
 
-    tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
     expectStates([]);
 
     // Make a change that will need synchronization.
     // Note: store.saveChecklistFile doesn't work well with fakeAsync: https://github.com/angular/angular/issues/31702
     await store.clear();
-    tick();
+    await vi.advanceTimersByTimeAsync(0);
     await expectState(DriveSyncState.NEEDS_SYNC);
 
     // Check that synchronization happened.
-    tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
     expectStates([DriveSyncState.NEEDS_SYNC, DriveSyncState.SYNCING, DriveSyncState.IN_SYNC]);
     allStates = [];
 
-    tick(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(GoogleDriveStorage.SHORT_SYNC_INTERVAL_MS);
     expectStates([]);
 
     // Must happen earlier to clean up for fakeAsync.
     gdrive.destroy();
-  }));
+  });
 });

@@ -1,4 +1,4 @@
-import { v4 as uuidV4 } from 'uuid';
+const uuidV4 = () => globalThis.crypto.randomUUID();
 import { CryptoUtils } from './crypto-utils';
 
 export class ForeFlightUtils {

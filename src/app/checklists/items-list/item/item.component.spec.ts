@@ -1,3 +1,4 @@
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -25,6 +26,7 @@ describe('ChecklistItemComponent', () => {
 
   async function renderComponent() {
     await render(ChecklistItemComponent, {
+      providers: [provideNoopAnimations()],
       inputs: { item: item },
       on: { itemChange, itemDeleted },
     });

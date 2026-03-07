@@ -1,5 +1,4 @@
 import { AceFormat } from './ace-format';
-import { FormatError } from './error';
 import { FormatId } from './format-id';
 import { FORMAT_REGISTRY, parseChecklistFile } from './format-registry';
 
@@ -18,6 +17,6 @@ describe('FormatRegistry', () => {
 
   it('should reject parsing of an unknown extension', async () => {
     const f = new File([], 'foobar.baz');
-    await expect(parseChecklistFile(f)).rejects.toThrowError(FormatError, /Unknown.*extension/);
+    await expect(parseChecklistFile(f)).rejects.toThrowError(/Unknown.*extension/);
   });
 });

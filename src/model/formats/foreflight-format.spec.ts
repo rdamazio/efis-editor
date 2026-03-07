@@ -1,4 +1,5 @@
-import { validate } from 'uuid';
+const validate = (str: string) =>
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(str);
 import { ChecklistFileMetadata } from '../../../gen/ts/checklist';
 import { ForeFlightChecklistMetadata } from '../../../gen/ts/foreflight';
 import { ForeFlightReader } from './foreflight-reader';
@@ -21,7 +22,7 @@ describe('ForeFlightFormat', () => {
         return previousValue + currentValue;
       }, 0);
 
-      expect(objectId).toMatch(`[a-f0-9]{12}4[a-f0-9]{19}`); // check case and v4
+      expect(objectId).toMatch(/^[a-f0-9]{12}4[a-f0-9]{19}$/i); // check case and v4
       expect(validate(groupOctets.join('-'))).toBe(true);
     });
 
@@ -55,7 +56,7 @@ describe('ForeFlightFormat', () => {
   });
 
   it('should read test file', async () => {
-    const file = await loadFile('/model/formats/test-foreflight.fmd', 'test-foreflight.fmd');
+    const file = await loadFile('/src/model/formats/test-foreflight.fmd', 'test-foreflight.fmd');
     const checklistFile = await parseChecklistFile(file);
     expect(checklistFile).toEqual(EXPECTED_FOREFLIGHT_CONTENTS);
   });

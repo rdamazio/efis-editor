@@ -34,7 +34,7 @@ describe('DynonFormat', () => {
   });
 
   async function testWriteRead(fileName: string, formatId: FormatId): Promise<void> {
-    const f = await loadFile('/model/formats/' + fileName, 'test.txt');
+    const f = await loadFile('/src/model/formats/' + fileName, 'test.txt');
     const readFile = await parseChecklistFile(f);
     expect(readFile).toEqual(DYNON_EXPECTED_CONTENTS);
 

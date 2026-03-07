@@ -21,7 +21,7 @@ describe('GrtFormat', () => {
 
   it('read then write back test file', async () => {
     // Read file and check the proto contents.
-    const f = await loadFile('/model/formats/test-grt.txt', 'test.txt');
+    const f = await loadFile('/src/model/formats/test-grt.txt', 'test.txt');
     const readFile = await parseChecklistFile(f);
     expect(readFile).toEqual(GRT_EXPECTED_CONTENTS);
 

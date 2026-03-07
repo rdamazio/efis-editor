@@ -5,7 +5,11 @@
   "projects": {
     "efis-editor": {
       "projectType": "application",
-      "schematics": { "@schematics/angular:component": { "style": "scss" } },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -29,65 +33,71 @@
             "scripts": [],
             "server": "src/main.server.ts",
             "prerender": true,
-            "ssr": { "entry": "server.ts" }
+            "ssr": {
+              "entry": "server.ts"
+            }
           },
           "configurations": {
             "production": {
               "budgets": [
-                { "type": "initial", "maximumWarning": "1mb", "maximumError": "2mb" },
-                { "type": "anyComponentStyle", "maximumWarning": "20kb", "maximumError": "40kb" }
+                {
+                  "type": "initial",
+                  "maximumWarning": "1mb",
+                  "maximumError": "2mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "20kb",
+                  "maximumError": "40kb"
+                }
               ],
               "outputHashing": "all",
               "fileReplacements": [
-                { "replace": "src/environments/environment.ts", "with": "src/environments/environment.prod.ts" }
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
               ],
               "serviceWorker": "ngsw-config.json"
             },
-            "development": { "optimization": false, "extractLicenses": false, "sourceMap": true }
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
           },
           "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "production": { "buildTarget": "efis-editor:build:production" },
-            "development": { "buildTarget": "efis-editor:build:development" }
+            "production": {
+              "buildTarget": "efis-editor:build:production"
+            },
+            "development": {
+              "buildTarget": "efis-editor:build:development"
+            }
           },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n",
-          "options": { "buildTarget": "efis-editor:build" }
+          "options": {
+            "buildTarget": "efis-editor:build"
+          }
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "src/test.ts",
-            "polyfills": ["src/polyfills.ts", "zone.js", "zone.js/testing"],
-            "tsConfig": "tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              },
-              "src/model/formats/test.ace",
-              "src/model/formats/test.json",
-              "src/model/formats/test-dynon.txt",
-              "src/model/formats/test-dynon31.txt",
-              "src/model/formats/test-dynon40.txt",
-              "src/model/formats/test-grt.txt",
-              "src/model/formats/test-foreflight.fmd",
-              "src/model/formats/test-garmin-pilot.gplt"
-            ],
-            "styles": ["src/theme.scss", "src/styles.scss"],
-            "scripts": [],
-            "karmaConfig": "karma.conf.js"
+            "setupFiles": ["src/test-polyfill.ts", "src/test-setup.ts"],
+            "tsConfig": "tsconfig.spec.json"
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
-          "options": { "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"] }
+          "options": {
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+          }
         }
       }
     }

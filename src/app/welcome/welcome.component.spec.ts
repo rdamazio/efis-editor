@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { DeviceDetectorService } from 'ngx-device-detector';
 import { BehaviorSubject } from 'rxjs';
-import type { MockedObject } from 'vitest';
 import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
 import { WelcomeComponent } from './welcome.component';
 
@@ -10,7 +9,7 @@ describe('WelcomeComponent', () => {
   let component: WelcomeComponent;
   let fixture: ComponentFixture<WelcomeComponent>;
   let deviceService: DeviceDetectorService;
-  let gdrive: MockedObject<GoogleDriveStorage>;
+  let gdrive: any;
   let state$: BehaviorSubject<DriveSyncState>;
 
   beforeEach(async () => {
@@ -65,8 +64,8 @@ describe('WelcomeComponent', () => {
       deviceService.setDeviceInfo(
         'Mozilla/5.0 (iPad; CPU OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1',
       );
-      vi.spyOn(globalThis.navigator, 'maxTouchPoints').mockReturnValue(5);
-      vi.spyOn(globalThis.navigator, 'platform').mockReturnValue('iPad');
+      vi.spyOn(globalThis.navigator, 'maxTouchPoints', 'get').mockReturnValue(5);
+      vi.spyOn(globalThis.navigator, 'platform', 'get').mockReturnValue('iPad');
 
       const url = component.installUrl();
       expect(url).toContain('support.apple.com');

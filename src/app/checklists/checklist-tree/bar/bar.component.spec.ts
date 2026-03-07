@@ -1,11 +1,10 @@
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
-import type { MockedObject } from 'vitest';
-import { ChecklistTreeComponent } from '../checklist-tree.component';
 import { ChecklistTreeBarComponent } from './bar.component';
 
 describe('ChecklistTreeBarComponent', () => {
-  let tree: MockedObject<ChecklistTreeComponent>;
+  let tree: any;
   let rendered: RenderResult<ChecklistTreeBarComponent>;
   let expandButton: HTMLElement;
   let collapseButton: HTMLElement;
@@ -22,6 +21,7 @@ describe('ChecklistTreeBarComponent', () => {
     };
 
     rendered = await render(ChecklistTreeBarComponent, {
+      providers: [provideNoopAnimations()],
       inputs: { tree: tree },
     });
     expandButton = screen.queryByRole('button', { name: 'Expand all checklist groups' })!;

@@ -32,6 +32,8 @@ export class LazyBrowserStorage {
 
   // For testing only.
   forceBrowserStorage() {
-    this._storageResolveFunc!();
+    if (this._storageResolveFunc) {
+      this._storageResolveFunc();
+    }
   }
 }

@@ -10,7 +10,7 @@ describe('AceWriter', () => {
   it('read then write back test file', async () => {
     // Read the test file.
     // The correctness of the reading is already checked in ace-reader.spec.ts
-    const f = await loadFile('/model/formats/test.ace', 'test.ace');
+    const f = await loadFile('/src/model/formats/test.ace', 'test.ace');
     const readFile = await parseChecklistFile(f);
 
     // Now write the file back.

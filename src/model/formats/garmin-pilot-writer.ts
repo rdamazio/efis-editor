@@ -1,5 +1,4 @@
 import { createTarGzip } from 'nanotar';
-import { v4 as uuidV4 } from 'uuid';
 import { Checklist, ChecklistFile, ChecklistGroup, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import {
   GarminPilotChecklist,
@@ -11,6 +10,7 @@ import { NullValue } from '../../../gen/ts/google/protobuf/struct';
 import { FormatUtils } from './format-utils';
 import { GarminPilotLiveData } from './garmin-pilot-live-data';
 import { GarminChecklistGroupKey, GarminPilotFormatError, GarminPilotUtils } from './garmin-pilot-utils';
+const uuidV4 = () => globalThis.crypto.randomUUID();
 
 export class GarminPilotWriter {
   private readonly _checklistsGarmin = new Map<GarminChecklistGroupKey, GarminPilotChecklist[]>();

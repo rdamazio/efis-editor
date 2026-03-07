@@ -1,5 +1,6 @@
 import { ComponentFixture, DeferBlockState } from '@angular/core/testing';
-import type { Mock, MockedObject } from 'vitest';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import type { Mock } from 'vitest';
 
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -18,7 +19,7 @@ describe('NavComponent', () => {
   let fixture: ComponentFixture<NavComponent>;
   let loader: HarnessLoader;
   let navData: NavData;
-  let hotkeys: MockedObject<HotkeysService>;
+  let hotkeys: any;
   let toggleHelp: Mock;
 
   beforeEach(async () => {
@@ -34,6 +35,7 @@ describe('NavComponent', () => {
     rendered = await render(NavComponent, {
       imports: [MatDialogModule],
       providers: [
+        provideNoopAnimations(),
         {
           provide: HotkeysService,
           useValue: hotkeys,
