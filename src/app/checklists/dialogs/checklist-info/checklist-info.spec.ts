@@ -1,4 +1,5 @@
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import type { Mock } from 'vitest';
 
 import { HarnessLoader } from '@angular/cdk/testing';
 import { Component, input, output } from '@angular/core';
@@ -53,7 +54,7 @@ describe('ChecklistInfoComponent', () => {
   let user: UserEvent;
   let loader: HarnessLoader;
   let dataIn: Checklist;
-  let dataOut: jasmine.Spy<(value: OutputType) => void>;
+  let dataOut: Mock;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
   let titleBox: HTMLInputElement;
@@ -61,7 +62,7 @@ describe('ChecklistInfoComponent', () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    dataOut = jasmine.createSpy('dataOut');
+    dataOut = vi.fn();
 
     dataIn = Checklist.clone(DEFAULT_DATA_IN);
   });
@@ -96,7 +97,9 @@ describe('ChecklistInfoComponent', () => {
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
-    expect(dataOut).toHaveBeenCalledOnceWith(undefined);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+
+    expect(dataOut).toHaveBeenCalledWith(undefined);
     expect(dataIn).toEqual(DEFAULT_DATA_IN);
   });
 
@@ -113,7 +116,9 @@ describe('ChecklistInfoComponent', () => {
     const modifiedData = Checklist.clone(DEFAULT_DATA_IN);
     modifiedData.title = 'New title';
 
-    expect(dataOut).toHaveBeenCalledOnceWith(modifiedData);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+
+    expect(dataOut).toHaveBeenCalledWith(modifiedData);
   });
 
   it('should require title to be non-empty', async () => {
@@ -140,6 +145,8 @@ describe('ChecklistInfoComponent', () => {
     const modifiedData = Checklist.clone(DEFAULT_DATA_IN);
     modifiedData.completionAction = Checklist_CompletionAction.ACTION_OPEN_FLIGHT_PLAN;
 
-    expect(dataOut).toHaveBeenCalledOnceWith(modifiedData);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+
+    expect(dataOut).toHaveBeenCalledWith(modifiedData);
   });
 });

@@ -1,4 +1,5 @@
 import { ComponentFixture, DeferBlockState } from '@angular/core/testing';
+import type { Mock, MockedObject } from 'vitest';
 
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -17,15 +18,18 @@ describe('NavComponent', () => {
   let fixture: ComponentFixture<NavComponent>;
   let loader: HarnessLoader;
   let navData: NavData;
-  let hotkeys: jasmine.SpyObj<HotkeysService>;
-  let toggleHelp: jasmine.Spy;
+  let hotkeys: MockedObject<HotkeysService>;
+  let toggleHelp: Mock;
 
   beforeEach(async () => {
     user = userEvent.setup();
-    hotkeys = jasmine.createSpyObj<HotkeysService>('HotkeysService', ['getHotkeys', 'getShortcuts']);
-    hotkeys.getHotkeys.and.returnValue([]);
-    hotkeys.getShortcuts.and.returnValue([]);
-    toggleHelp = spyOn(HelpComponent, 'toggleHelp');
+    hotkeys = {
+      getHotkeys: vi.fn().mockName('HotkeysService.getHotkeys'),
+      getShortcuts: vi.fn().mockName('HotkeysService.getShortcuts'),
+    };
+    hotkeys.getHotkeys.mockReturnValue([]);
+    hotkeys.getShortcuts.mockReturnValue([]);
+    toggleHelp = vi.spyOn(HelpComponent, 'toggleHelp');
 
     rendered = await render(NavComponent, {
       imports: [MatDialogModule],
@@ -88,14 +92,14 @@ describe('NavComponent', () => {
   });
 
   it('should show shortcuts help when they exist and are clicked', async () => {
-    hotkeys.getHotkeys.and.returnValue([
+    hotkeys.getHotkeys.mockReturnValue([
       {
         keys: 'shift.right',
         description: 'Shift something right',
         group: 'Main group',
       },
     ]);
-    hotkeys.getShortcuts.and.returnValue([
+    hotkeys.getShortcuts.mockReturnValue([
       {
         group: 'Main group',
         hotkeys: [
@@ -112,7 +116,8 @@ describe('NavComponent', () => {
     expect(button).toBeVisible();
 
     await user.click(button);
-    expect(toggleHelp).toHaveBeenCalledOnceWith(jasmine.any(MatDialog));
+    expect(toggleHelp).toHaveBeenCalledTimes(1);
+    expect(toggleHelp).toHaveBeenCalledWith(expect.any(MatDialog));
   });
 
   it('should show About dialog', async () => {
@@ -125,7 +130,7 @@ describe('NavComponent', () => {
     await user.click(aboutLink);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs).toHaveSize(1);
+    expect(dialogs).toHaveLength(1);
 
     expect(screen.getByRole('img', { name: 'GitHub logo' })).toBeVisible();
 
@@ -134,6 +139,6 @@ describe('NavComponent', () => {
     await user.click(okButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs).toHaveSize(0);
+    expect(dialogs).toHaveLength(0);
   });
 });

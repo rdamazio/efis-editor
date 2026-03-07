@@ -28,7 +28,7 @@ describe('AceWriter', () => {
       ChecklistFile.create({ metadata: ChecklistFileMetadata.create({ name: '' }) }),
     ].forEach((file: ChecklistFile) => {
       it('write nameless file', async () => {
-        await expectAsync(serializeChecklistFile(file, FormatId.ACE)).toBeRejectedWithError(FormatError);
+        await expect(serializeChecklistFile(file, FormatId.ACE)).rejects.toThrowError(FormatError);
       });
     });
   });

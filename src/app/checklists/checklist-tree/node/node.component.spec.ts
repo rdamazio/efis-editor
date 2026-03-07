@@ -1,5 +1,6 @@
 import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
 import { ChecklistTreeNode } from './node';
 import { ChecklistTreeNodeComponent } from './node.component';
@@ -8,16 +9,16 @@ describe('NodeComponent', () => {
   let user: UserEvent;
   let node: ChecklistTreeNode;
   let disableButtonHover: boolean;
-  let nodeRename: jasmine.Spy<(value: ChecklistTreeNode) => void>;
-  let nodeDelete: jasmine.Spy<(value: ChecklistTreeNode) => void>;
+  let nodeRename: Mock;
+  let nodeDelete: Mock;
 
   beforeEach(() => {
     user = userEvent.setup();
 
     node = { isAddNew: false, title: 'Node title' };
     disableButtonHover = false;
-    nodeRename = jasmine.createSpy('nodeRename');
-    nodeDelete = jasmine.createSpy('nodeDelete');
+    nodeRename = vi.fn();
+    nodeDelete = vi.fn();
   });
 
   async function renderComponent(): Promise<RenderResult<ChecklistTreeNodeComponent>> {
@@ -77,7 +78,9 @@ describe('NodeComponent', () => {
     expect(renameButton).toBeInTheDocument();
     await user.click(renameButton);
 
-    expect(nodeRename).toHaveBeenCalledOnceWith(node);
+    expect(nodeRename).toHaveBeenCalledTimes(1);
+
+    expect(nodeRename).toHaveBeenCalledWith(node);
   });
 
   it('should output when delete is clicked and user confirms', async () => {
@@ -92,7 +95,8 @@ describe('NodeComponent', () => {
     await user.click(confirmButton);
 
     expect(screen.queryByRole('button', { name: 'Delete!' })).not.toBeInTheDocument();
-    expect(nodeDelete).toHaveBeenCalledOnceWith(node);
+    expect(nodeDelete).toHaveBeenCalledTimes(1);
+    expect(nodeDelete).toHaveBeenCalledWith(node);
   });
 
   it('should not output when delete is clicked and user cancels', async () => {

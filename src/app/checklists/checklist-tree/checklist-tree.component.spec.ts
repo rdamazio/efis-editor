@@ -1,6 +1,7 @@
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
-import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
+import type { Mock } from 'vitest';
+import { Checklist, ChecklistFile } from '../../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS, EXPECTED_FOREFLIGHT_CONTENTS } from '../../../model/formats/test-data';
 import { ChecklistTreeComponent } from './checklist-tree.component';
 
@@ -8,18 +9,18 @@ describe('ChecklistTreeComponent', () => {
   let user: UserEvent;
   let file: ChecklistFile;
   let selectedChecklistInput: Checklist | undefined;
-  let fileModified: jasmine.Spy<(value: ChecklistFile) => void>;
-  let selectedChecklist: jasmine.Spy<(value: Checklist | undefined) => void>;
-  let selectedChecklistGroup: jasmine.Spy<(value: ChecklistGroup | undefined) => void>;
+  let fileModified: Mock;
+  let selectedChecklist: Mock;
+  let selectedChecklistGroup: Mock;
 
   beforeEach(() => {
     user = userEvent.setup();
     file = ChecklistFile.clone(EXPECTED_CONTENTS);
     selectedChecklistInput = undefined;
 
-    fileModified = jasmine.createSpy('fileModified');
-    selectedChecklist = jasmine.createSpy('selectedChecklist');
-    selectedChecklistGroup = jasmine.createSpy('selectedChecklistGroup');
+    fileModified = vi.fn();
+    selectedChecklist = vi.fn();
+    selectedChecklistGroup = vi.fn();
   });
 
   async function renderComponent(): Promise<RenderResult<ChecklistTreeComponent>> {
@@ -58,8 +59,11 @@ describe('ChecklistTreeComponent', () => {
     const checklist = await screen.findByRole('treeitem', { name: 'Checklist: Test group 2 checklist 2' });
     await user.click(checklist);
 
-    expect(selectedChecklist).toHaveBeenCalledOnceWith(file.groups[1].checklists[1]);
-    expect(selectedChecklistGroup).toHaveBeenCalledOnceWith(file.groups[1]);
+    expect(selectedChecklist).toHaveBeenCalledTimes(1);
+
+    expect(selectedChecklist).toHaveBeenCalledWith(file.groups[1].checklists[1]);
+    expect(selectedChecklistGroup).toHaveBeenCalledTimes(1);
+    expect(selectedChecklistGroup).toHaveBeenCalledWith(file.groups[1]);
   });
 
   it('should create a new checklist', async () => {
@@ -74,12 +78,17 @@ describe('ChecklistTreeComponent', () => {
 
     expect(await screen.findByRole('treeitem', { name: 'Checklist: My new checklist' })).toBeVisible();
 
-    expect(fileModified).toHaveBeenCalledOnceWith(file);
-    expect(file.groups[1].checklists).toHaveSize(4);
+    expect(fileModified).toHaveBeenCalledTimes(1);
+
+    expect(fileModified).toHaveBeenCalledWith(file);
+    expect(file.groups[1].checklists).toHaveLength(4);
     expect(file.groups[1].checklists[3].title).toEqual('My new checklist');
 
-    expect(selectedChecklist).toHaveBeenCalledOnceWith(file.groups[1].checklists[3]);
-    expect(selectedChecklistGroup).toHaveBeenCalledOnceWith(file.groups[1]);
+    expect(selectedChecklist).toHaveBeenCalledTimes(1);
+
+    expect(selectedChecklist).toHaveBeenCalledWith(file.groups[1].checklists[3]);
+    expect(selectedChecklistGroup).toHaveBeenCalledTimes(1);
+    expect(selectedChecklistGroup).toHaveBeenCalledWith(file.groups[1]);
   });
 
   it('should create a new group', async () => {
@@ -98,8 +107,10 @@ describe('ChecklistTreeComponent', () => {
 
     expect(await screen.findByRole('treeitem', { name: 'Group: My new group' })).toBeVisible();
 
-    expect(fileModified).toHaveBeenCalledOnceWith(file);
-    expect(file.groups).toHaveSize(3);
+    expect(fileModified).toHaveBeenCalledTimes(1);
+
+    expect(fileModified).toHaveBeenCalledWith(file);
+    expect(file.groups).toHaveLength(3);
     expect(file.groups[2].title).toEqual('My new group');
 
     expect(selectedChecklist).toHaveBeenCalledWith(undefined);
@@ -124,7 +135,8 @@ describe('ChecklistTreeComponent', () => {
     expect(screen.queryByRole('treeitem', { name: 'Checklist: Renamed checklist' })).toBeVisible();
 
     expect(file.groups[0].checklists[0].title).toEqual('Renamed checklist');
-    expect(fileModified).toHaveBeenCalledOnceWith(file);
+    expect(fileModified).toHaveBeenCalledTimes(1);
+    expect(fileModified).toHaveBeenCalledWith(file);
   });
 
   it('should rename a group', async () => {
@@ -145,7 +157,8 @@ describe('ChecklistTreeComponent', () => {
     expect(screen.queryByRole('treeitem', { name: 'Group: Renamed group' })).toBeVisible();
 
     expect(file.groups[1].title).toEqual('Renamed group');
-    expect(fileModified).toHaveBeenCalledOnceWith(file);
+    expect(fileModified).toHaveBeenCalledTimes(1);
+    expect(fileModified).toHaveBeenCalledWith(file);
   });
 
   it('should delete a checklist', async () => {
@@ -154,8 +167,10 @@ describe('ChecklistTreeComponent', () => {
     // Select the checklist to make sure it gets deselected.
     const checklist = await screen.findByRole('treeitem', { name: 'Checklist: Test group 2 checklist 2' });
     await user.click(checklist);
-    expect(selectedChecklist).toHaveBeenCalledOnceWith(file.groups[1].checklists[1]);
-    expect(selectedChecklistGroup).toHaveBeenCalledOnceWith(file.groups[1]);
+    expect(selectedChecklist).toHaveBeenCalledTimes(1);
+    expect(selectedChecklist).toHaveBeenCalledWith(file.groups[1].checklists[1]);
+    expect(selectedChecklistGroup).toHaveBeenCalledTimes(1);
+    expect(selectedChecklistGroup).toHaveBeenCalledWith(file.groups[1]);
 
     await user.hover(await screen.findByText('Test group 2 checklist 2'));
 
@@ -168,9 +183,10 @@ describe('ChecklistTreeComponent', () => {
 
     expect(screen.queryByRole('treeitem', { name: 'Checklist: Test group 2 checklist 2' })).not.toBeInTheDocument();
 
-    expect(file.groups[1].checklists).toHaveSize(2);
+    expect(file.groups[1].checklists).toHaveLength(2);
     expect(file.groups[1].checklists[1].title).toEqual(EXPECTED_CONTENTS.groups[1].checklists[2].title);
-    expect(fileModified).toHaveBeenCalledOnceWith(file);
+    expect(fileModified).toHaveBeenCalledTimes(1);
+    expect(fileModified).toHaveBeenCalledWith(file);
     expect(selectedChecklist).toHaveBeenCalledWith(undefined);
   });
 
@@ -180,8 +196,10 @@ describe('ChecklistTreeComponent', () => {
     // Select a checklist in the group to make sure it gets deselected.
     const checklist = await screen.findByText('Test group 2 checklist 2');
     await user.click(checklist);
-    expect(selectedChecklist).toHaveBeenCalledOnceWith(file.groups[1].checklists[1]);
-    expect(selectedChecklistGroup).toHaveBeenCalledOnceWith(file.groups[1]);
+    expect(selectedChecklist).toHaveBeenCalledTimes(1);
+    expect(selectedChecklist).toHaveBeenCalledWith(file.groups[1].checklists[1]);
+    expect(selectedChecklistGroup).toHaveBeenCalledTimes(1);
+    expect(selectedChecklistGroup).toHaveBeenCalledWith(file.groups[1]);
 
     const group = await screen.findByRole('treeitem', { name: 'Group: Test group 2 (default)' });
     // If we hover over the group itself, that may be on top of a leaf node and reveal the wrong
@@ -198,9 +216,10 @@ describe('ChecklistTreeComponent', () => {
 
     expect(screen.queryByRole('treeitem', { name: 'Group: Test group 2 (default)' })).not.toBeInTheDocument();
 
-    expect(file.groups).toHaveSize(1);
-    expect(file.groups[0].checklists).toHaveSize(1);
-    expect(fileModified).toHaveBeenCalledOnceWith(file);
+    expect(file.groups).toHaveLength(1);
+    expect(file.groups[0].checklists).toHaveLength(1);
+    expect(fileModified).toHaveBeenCalledTimes(1);
+    expect(fileModified).toHaveBeenCalledWith(file);
     expect(selectedChecklist).toHaveBeenCalledWith(undefined);
     expect(selectedChecklistGroup).toHaveBeenCalledWith(undefined);
   });

@@ -5,6 +5,7 @@ import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { firstValueFrom, Subject, take } from 'rxjs';
+import type { Mock } from 'vitest';
 import { ChecklistFile, ChecklistGroup_Category, ChecklistItem, ChecklistItem_Type } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../../model/formats/test-data';
 import { LazyBrowserStorage } from '../../model/storage/browser-storage';
@@ -36,8 +37,8 @@ describe('ChecklistsComponent', () => {
   let user: UserEvent;
   let rendered: RenderResult<ChecklistsComponent>;
   let storage: ChecklistStorage;
-  let navigate: jasmine.Spy;
-  let showSnack: jasmine.Spy;
+  let navigate: Mock;
+  let showSnack: Mock;
   let navData: NavData;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,7 +48,7 @@ describe('ChecklistsComponent', () => {
   beforeEach(async () => {
     // We have a lot of large tests in this file, override the timeout.
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+    vi.setConfig({ testTimeout: 20000 });
 
     // ngneat/hotkeys uses different keys for Meta on PC vs Mac - detect where we're running tests.
     const isPC = !navigator.userAgent.includes('Macintosh');
@@ -70,13 +71,13 @@ describe('ChecklistsComponent', () => {
     [ChecklistStorage, LazyBrowserStorage, MatSnackBar, Router],
     async (s: ChecklistStorage, browserStore: LazyBrowserStorage, snack: MatSnackBar, router: Router) => {
       realNavigate = router.navigate.bind(router);
-      navigate = spyOn(router, 'navigate');
-      navigate.and.callThrough();
+      navigate = vi.spyOn(router, 'navigate');
+      navigate;
 
       // Verifying snackbars with durations doesn't work with MatSnackBarHarness, so use a spy instead.
       // https://github.com/angular/components/issues/19290
-      showSnack = spyOn(snack, 'open');
-      showSnack.and.callThrough();
+      showSnack = vi.spyOn(snack, 'open');
+      showSnack;
 
       storage = s;
       browserStore.forceBrowserStorage();
@@ -87,7 +88,7 @@ describe('ChecklistsComponent', () => {
 
   afterEach(async () => {
     await storage.clear();
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+    vi.setConfig({ testTimeout: originalTimeout });
   });
 
   async function newFile(fileName: string) {
@@ -158,7 +159,7 @@ describe('ChecklistsComponent', () => {
   }
 
   function expectFragment(fragment: string) {
-    const extras = navigate.calls.mostRecent().args[1] as NavigationExtras;
+    const extras = vi.mocked(navigate).mock.lastCall[1] as NavigationExtras;
     expect(extras.fragment).toEqual(fragment);
   }
 
@@ -177,7 +178,7 @@ describe('ChecklistsComponent', () => {
 
   async function expectFile(name: string, expectedFile: ChecklistFile, completed?: Promise<boolean>) {
     if (completed) {
-      expect(await completed).toBeTrue();
+      expect(await completed).toBe(true);
     }
 
     const storedFile = await storage.getChecklistFile(name);
@@ -187,7 +188,7 @@ describe('ChecklistsComponent', () => {
   }
 
   function lastSnackMessage(): string {
-    return showSnack.calls.mostRecent().args[0] as string;
+    return vi.mocked(showSnack).mock.lastCall[0] as string;
   }
 
   it('should create a new checklist and populate it', async () => {
@@ -227,7 +228,7 @@ describe('ChecklistsComponent', () => {
               // Spaces don't have a unique name to look for - find the last one instead.
               const allBlanks = await screen.findAllByRole('listitem', { name: 'Blank item' });
               numBlanks++;
-              expect(allBlanks).toHaveSize(numBlanks);
+              expect(allBlanks).toHaveLength(numBlanks);
               itemEl = allBlanks[numBlanks - 1];
             } else {
               itemEl = await screen.findByRole('listitem', { name: `Item: ${item.prompt}` });
@@ -286,7 +287,7 @@ describe('ChecklistsComponent', () => {
     expect(confirmButton).toBeVisible();
     await user.click(confirmButton);
 
-    expect(await completed).toBeTrue();
+    expect(await completed).toBe(true);
     expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
     expect(await storage.getChecklistFile('My file')).toBeNull();
     expectFragment('');
@@ -307,7 +308,7 @@ describe('ChecklistsComponent', () => {
     const okButton = await screen.findByRole('button', { name: 'Ok' });
     await user.click(okButton);
 
-    expect(await completed).toBeTrue();
+    expect(await completed).toBe(true);
     expect(await storage.getChecklistFile('My file')).toBeNull();
     expect(await storage.getChecklistFile('Renamed file')).not.toBeNull();
 
@@ -328,7 +329,7 @@ describe('ChecklistsComponent', () => {
     rendered.detectChanges();
     TestBed.tick();
     await rendered.fixture.whenStable();
-    expect(await completed).toBeTrue();
+    expect(await completed).toBe(true);
 
     expectFragment('Renamed file');
     expect(await storage.getChecklistFile('My file')).toBeNull();
@@ -598,7 +599,7 @@ describe('ChecklistsComponent', () => {
 
       // Check that all the items were rendered.
       expect(await screen.findByRole('listitem', { name: 'Blank item' })).toBeVisible();
-      expect(screen.getAllByRole('listitem', { name: 'Item: New item' })).toHaveSize(
+      expect(screen.getAllByRole('listitem', { name: 'Item: New item' })).toHaveLength(
         ChecklistsComponent.NEW_ITEM_SHORTCUTS.length - 1,
       );
 
@@ -775,7 +776,7 @@ describe('ChecklistsComponent', () => {
       const completed = storageCompleted();
       await user.keyboard(`[${metaKey}>]D[/${metaKey}]`);
 
-      expect(await screen.findAllByRole('listitem', { name: 'Item: Checklist created' })).toHaveSize(2);
+      expect(await screen.findAllByRole('listitem', { name: 'Item: Checklist created' })).toHaveLength(2);
 
       // Check storage.
       const expectedFile = ChecklistFile.clone(NEW_FILE);

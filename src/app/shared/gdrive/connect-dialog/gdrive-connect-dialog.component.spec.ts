@@ -46,7 +46,7 @@ describe('GoogleDriveConnectDialogComponent', () => {
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
-    expect(await confirmPromise).toBeFalse();
+    expect(await confirmPromise).toBe(false);
   });
 
   it('should open and confirm the dialog', async () => {
@@ -61,6 +61,6 @@ describe('GoogleDriveConnectDialogComponent', () => {
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
-    expect(await confirmPromise).toBeTrue();
+    expect(await confirmPromise).toBe(true);
   });
 });

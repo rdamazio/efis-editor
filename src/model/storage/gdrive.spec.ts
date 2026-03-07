@@ -1,5 +1,6 @@
 import { fakeAsync, inject, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { filter, firstValueFrom, Subscription } from 'rxjs';
+import type { MockedObject } from 'vitest';
 import { ChecklistFile, ChecklistGroup } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../formats/test-data';
 import { LazyBrowserStorage } from './browser-storage';
@@ -29,7 +30,7 @@ describe('GoogleDriveApi', () => {
   let lazyBrowserStore: LazyBrowserStorage;
   let browserStore: Storage;
   let gdrive: GoogleDriveStorage;
-  let gdriveApi: jasmine.SpyObj<GoogleDriveApi>;
+  let gdriveApi: MockedObject<GoogleDriveApi>;
   let allStates: DriveSyncState[];
   let allDownloads: string[];
   let stateSub: Subscription | undefined;
@@ -39,21 +40,21 @@ describe('GoogleDriveApi', () => {
     clock = jasmine.clock();
     clock.install();
     clock.mockDate(FAKE_NOW);
-    gdriveApi = jasmine.createSpyObj<GoogleDriveApi>('GoogleDriveApi', [
-      'load',
-      'authenticate',
-      'revokeAccessToken',
-      'listFiles',
-      'downloadFile',
-      'uploadFile',
-      'trashFile',
-      'deleteFile',
-    ]);
+    gdriveApi = {
+      load: vi.fn().mockName('GoogleDriveApi.load'),
+      authenticate: vi.fn().mockName('GoogleDriveApi.authenticate'),
+      revokeAccessToken: vi.fn().mockName('GoogleDriveApi.revokeAccessToken'),
+      listFiles: vi.fn().mockName('GoogleDriveApi.listFiles'),
+      downloadFile: vi.fn().mockName('GoogleDriveApi.downloadFile'),
+      uploadFile: vi.fn().mockName('GoogleDriveApi.uploadFile'),
+      trashFile: vi.fn().mockName('GoogleDriveApi.trashFile'),
+      deleteFile: vi.fn().mockName('GoogleDriveApi.deleteFile'),
+    };
 
     TestBed.configureTestingModule({ providers: [{ provide: GoogleDriveApi, useValue: gdriveApi }] });
 
-    gdriveApi.load.and.resolveTo();
-    gdriveApi.authenticate.and.resolveTo('some_token');
+    gdriveApi.load.mockResolvedValue();
+    gdriveApi.authenticate.mockResolvedValue('some_token');
   });
 
   beforeEach(inject(
@@ -100,6 +101,7 @@ describe('GoogleDriveApi', () => {
   }
 
   function expectStates(states: DriveSyncState[]) {
+    // TODO: vitest-migration: Cannot transform jasmine.arrayWithExactContents with a dynamic variable. Please migrate this manually.
     expect(allStates).toEqual(jasmine.arrayWithExactContents(states));
   }
 
@@ -134,7 +136,7 @@ describe('GoogleDriveApi', () => {
   });
 
   it('should authenticate on first sync request', async () => {
-    gdriveApi.listFiles.and.resolveTo([]);
+    gdriveApi.listFiles.mockResolvedValue([]);
     await gdrive.synchronize();
     expectStates([
       DriveSyncState.DISCONNECTED,
@@ -145,10 +147,11 @@ describe('GoogleDriveApi', () => {
   });
 
   it('should preserve tokens and not re-authenticate', async () => {
-    gdriveApi.listFiles.and.resolveTo([]);
+    gdriveApi.listFiles.mockResolvedValue([]);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
-    expect(gdriveApi.authenticate).toHaveBeenCalledOnceWith();
+    expect(gdriveApi.authenticate).toHaveBeenCalledTimes(1);
+    expect(gdriveApi.authenticate).toHaveBeenCalledWith();
 
     // Create it again, it should just load up the original token and run a sync with it.
     const oldGdrive = gdrive;
@@ -158,7 +161,8 @@ describe('GoogleDriveApi', () => {
     await expectState(DriveSyncState.IN_SYNC);
 
     expect(gdriveApi.load).toHaveBeenCalledTimes(2);
-    expect(gdriveApi.authenticate).toHaveBeenCalledOnceWith();
+    expect(gdriveApi.authenticate).toHaveBeenCalledTimes(1);
+    expect(gdriveApi.authenticate).toHaveBeenCalledWith();
     expect(gdriveApi.accessToken).toEqual('some_token');
 
     await oldGdrive.disableSync(false);
@@ -166,7 +170,7 @@ describe('GoogleDriveApi', () => {
   });
 
   it('should forget token when disabled', async () => {
-    gdriveApi.listFiles.and.resolveTo([]);
+    gdriveApi.listFiles.mockResolvedValue([]);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
     await gdrive.disableSync(false);
@@ -177,28 +181,30 @@ describe('GoogleDriveApi', () => {
     await expectState(DriveSyncState.DISCONNECTED);
     await gdrive.init();
     await expectState(DriveSyncState.DISCONNECTED);
-    expect(gdriveApi.authenticate).toHaveBeenCalledOnceWith();
+    expect(gdriveApi.authenticate).toHaveBeenCalledTimes(1);
+    expect(gdriveApi.authenticate).toHaveBeenCalledWith();
     expect(gdriveApi.accessToken).toBeUndefined();
     expect(gdriveApi.revokeAccessToken).not.toHaveBeenCalled();
   });
 
   it('should revoke token when requested', async () => {
-    gdriveApi.revokeAccessToken.and.resolveTo();
-    gdriveApi.listFiles.and.resolveTo([]);
+    gdriveApi.revokeAccessToken.mockResolvedValue();
+    gdriveApi.listFiles.mockResolvedValue([]);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
     await gdrive.disableSync(true);
     await expectState(DriveSyncState.DISCONNECTED);
-    expect(gdriveApi.revokeAccessToken).toHaveBeenCalledOnceWith();
+    expect(gdriveApi.revokeAccessToken).toHaveBeenCalledTimes(1);
+    expect(gdriveApi.revokeAccessToken).toHaveBeenCalledWith();
     expect(gdriveApi.accessToken).toBeUndefined();
   });
 
   it('should upload a new local file', async () => {
     await store.saveChecklistFile(EXPECTED_CONTENTS, NEWER_MTIME);
 
-    gdriveApi.listFiles.and.resolveTo([]);
-    gdriveApi.uploadFile.and.resolveTo();
+    gdriveApi.listFiles.mockResolvedValue([]);
+    gdriveApi.uploadFile.mockResolvedValue();
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
@@ -208,8 +214,8 @@ describe('GoogleDriveApi', () => {
   it('should upload a changed local file', async () => {
     await store.saveChecklistFile(EXPECTED_CONTENTS, NEWER_MTIME);
 
-    gdriveApi.listFiles.and.resolveTo([newFile(EXPECTED_CONTENTS.metadata!.name, OLDER_MTIME)]);
-    gdriveApi.uploadFile.and.resolveTo();
+    gdriveApi.listFiles.mockResolvedValue([newFile(EXPECTED_CONTENTS.metadata!.name, OLDER_MTIME)]);
+    gdriveApi.uploadFile.mockResolvedValue();
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
@@ -217,7 +223,7 @@ describe('GoogleDriveApi', () => {
   });
 
   it('should not upload an unchanged local file', async () => {
-    gdriveApi.listFiles.and.resolveTo([newFile(EXPECTED_CONTENTS.metadata!.name, OLDER_MTIME)]);
+    gdriveApi.listFiles.mockResolvedValue([newFile(EXPECTED_CONTENTS.metadata!.name, OLDER_MTIME)]);
 
     await store.saveChecklistFile(EXPECTED_CONTENTS, OLDER_MTIME);
     await gdrive.synchronize();
@@ -231,17 +237,20 @@ describe('GoogleDriveApi', () => {
     expect(await store.getChecklistFile(FILE_NAME)).toBeNull();
 
     // Verify that the download happened.
-    gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, NEWER_MTIME)]);
-    gdriveApi.downloadFile.withArgs(FILE_ID).and.resolveTo(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+    gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, NEWER_MTIME)]);
+    gdriveApi.downloadFile.withArgs(FILE_ID).mockResolvedValue(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
     await gdrive.synchronize();
     // Saving the downloaded checklist keeps the state in "need sync" until the next sync.
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
-    expect(gdriveApi.downloadFile).toHaveBeenCalledOnceWith(FILE_ID);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
-    expect(allDownloads).toEqual(jasmine.arrayWithExactContents([FILE_NAME]));
+    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
+    expect(allDownloads).toHaveLength(1);
+    expect(allDownloads).toEqual(expect.arrayContaining([FILE_NAME]));
 
     // Verify that the download was saved locally.
     const savedChecklist = await store.getChecklistFile(FILE_NAME);
@@ -259,17 +268,20 @@ describe('GoogleDriveApi', () => {
     await store.saveChecklistFile(localChecklist, OLDER_MTIME);
 
     // Verify that the download happened.
-    gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, NEWER_MTIME)]);
-    gdriveApi.downloadFile.withArgs(FILE_ID).and.resolveTo(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+    gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, NEWER_MTIME)]);
+    gdriveApi.downloadFile.withArgs(FILE_ID).mockResolvedValue(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
     await gdrive.synchronize();
     // Saving the downloaded checklist keeps the state in "need sync" until the next sync.
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
-    expect(gdriveApi.downloadFile).toHaveBeenCalledOnceWith(FILE_ID);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
-    expect(allDownloads).toEqual(jasmine.arrayWithExactContents([FILE_NAME]));
+    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
+    expect(allDownloads).toHaveLength(1);
+    expect(allDownloads).toEqual(expect.arrayContaining([FILE_NAME]));
 
     // Verify that the download was saved locally.
     const savedChecklist = await store.getChecklistFile(FILE_NAME);
@@ -283,7 +295,7 @@ describe('GoogleDriveApi', () => {
     const file = newFile(FILE_NAME, NEWER_MTIME);
     file.trashed = true;
 
-    gdriveApi.listFiles.and.resolveTo([file]);
+    gdriveApi.listFiles.mockResolvedValue([file]);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
@@ -295,7 +307,7 @@ describe('GoogleDriveApi', () => {
   it('should deal with a remote name collision by considering the newest one', async () => {
     await store.saveChecklistFile(EXPECTED_CONTENTS, NEWER_MTIME);
 
-    gdriveApi.listFiles.and.resolveTo([
+    gdriveApi.listFiles.mockResolvedValue([
       newFile(EXPECTED_CONTENTS.metadata!.name, OLDER_MTIME),
       newFile(EXPECTED_CONTENTS.metadata!.name, NEWER_MTIME),
     ]);
@@ -309,7 +321,7 @@ describe('GoogleDriveApi', () => {
 
   it('should delete a remote file when locally deleted more recently', async () => {
     // Start with a synced-up state.
-    gdriveApi.listFiles.and.resolveTo([newFile(EXPECTED_CONTENTS.metadata!.name, OLDER_MTIME)]);
+    gdriveApi.listFiles.mockResolvedValue([newFile(EXPECTED_CONTENTS.metadata!.name, OLDER_MTIME)]);
     await store.saveChecklistFile(EXPECTED_CONTENTS, OLDER_MTIME);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
@@ -318,19 +330,20 @@ describe('GoogleDriveApi', () => {
     await store.deleteChecklistFile(FILE_NAME);
     await awaitState(DriveSyncState.NEEDS_SYNC);
 
-    gdriveApi.trashFile.withArgs(FILE_ID).and.resolveTo();
+    gdriveApi.trashFile.withArgs(FILE_ID).mockResolvedValue();
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
     expect(gdriveApi.downloadFile).not.toHaveBeenCalled();
-    expect(gdriveApi.trashFile).toHaveBeenCalledOnceWith(FILE_ID);
+    expect(gdriveApi.trashFile).toHaveBeenCalledTimes(1);
+    expect(gdriveApi.trashFile).toHaveBeenCalledWith(FILE_ID);
   });
 
   it('should not delete a remote file when locally deleted while disconnected', async () => {
     // Sync first.
     await store.saveChecklistFile(EXPECTED_CONTENTS, OLDER_MTIME);
-    gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, OLDER_MTIME)]);
+    gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, OLDER_MTIME)]);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
@@ -342,12 +355,14 @@ describe('GoogleDriveApi', () => {
     await store.deleteChecklistFile(FILE_NAME);
 
     // Connect and sync again - file should be downloaded, not deleted.
-    gdriveApi.downloadFile.withArgs(FILE_ID).and.resolveTo(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+    gdriveApi.downloadFile.withArgs(FILE_ID).mockResolvedValue(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
     await gdrive.synchronize();
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
-    expect(gdriveApi.downloadFile).toHaveBeenCalledOnceWith(FILE_ID);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
+
+    expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
   });
 
@@ -355,7 +370,7 @@ describe('GoogleDriveApi', () => {
     await store.saveChecklistFile(EXPECTED_CONTENTS, NEWER_MTIME);
     await store.deleteChecklistFile(FILE_NAME);
 
-    gdriveApi.listFiles.and.resolveTo([]);
+    gdriveApi.listFiles.mockResolvedValue([]);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
@@ -370,16 +385,19 @@ describe('GoogleDriveApi', () => {
 
     // Verify that the download happened.
     // The local deletion will get the current timestamp, so pretend the remote file is modified later.
-    gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, NOW_PLUS_10M)]);
-    gdriveApi.downloadFile.withArgs(FILE_ID).and.resolveTo(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
+    gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, NOW_PLUS_10M)]);
+    gdriveApi.downloadFile.withArgs(FILE_ID).mockResolvedValue(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
     await gdrive.synchronize();
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
-    expect(gdriveApi.downloadFile).toHaveBeenCalledOnceWith(FILE_ID);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
-    expect(allDownloads).toEqual(jasmine.arrayWithExactContents([FILE_NAME]));
+    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
+    expect(allDownloads).toHaveLength(1);
+    expect(allDownloads).toEqual(expect.arrayContaining([FILE_NAME]));
 
     // Verify that the download was saved locally.
     const savedChecklist = await store.getChecklistFile(FILE_NAME);
@@ -395,7 +413,7 @@ describe('GoogleDriveApi', () => {
     await store.saveChecklistFile(EXPECTED_CONTENTS, OLDER_MTIME);
     expect(await store.getChecklistFile(FILE_NAME)).not.toBeNull();
 
-    gdriveApi.listFiles.and.resolveTo([file]);
+    gdriveApi.listFiles.mockResolvedValue([file]);
     await gdrive.synchronize();
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
@@ -412,7 +430,7 @@ describe('GoogleDriveApi', () => {
   it('should ignore a file that was deleted both locally and remotely', async () => {
     const file = newFile(FILE_NAME, NEWER_MTIME);
     file.trashed = true;
-    gdriveApi.listFiles.and.resolveTo([file]);
+    gdriveApi.listFiles.mockResolvedValue([file]);
 
     await store.saveChecklistFile(EXPECTED_CONTENTS, NEWER_MTIME);
     await store.deleteChecklistFile(FILE_NAME);
@@ -431,8 +449,8 @@ describe('GoogleDriveApi', () => {
     // Use mtime newer than the deletion.
     await store.saveChecklistFile(EXPECTED_CONTENTS, NOW_PLUS_10M);
 
-    gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, OLDER_MTIME)]);
-    gdriveApi.trashFile.withArgs(FILE_ID).and.resolveTo();
+    gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, OLDER_MTIME)]);
+    gdriveApi.trashFile.withArgs(FILE_ID).mockResolvedValue();
 
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
@@ -445,7 +463,7 @@ describe('GoogleDriveApi', () => {
   it('should delete all gDrive data when requested', async () => {
     // Perform an initial sync just to set up state.
     await store.saveChecklistFile(EXPECTED_CONTENTS, OLDER_MTIME);
-    gdriveApi.listFiles.and.resolveTo([newFile(FILE_NAME, OLDER_MTIME)]);
+    gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, OLDER_MTIME)]);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
@@ -453,10 +471,10 @@ describe('GoogleDriveApi', () => {
     const file1 = newFile('f1', NEWER_MTIME);
     const file2 = newFile('f2', OLDER_MTIME);
     file2.trashed = true;
-    gdriveApi.listFiles.and.resolveTo([file1, file2]);
+    gdriveApi.listFiles.mockResolvedValue([file1, file2]);
 
-    gdriveApi.deleteFile.withArgs(file1.id!).and.resolveTo();
-    gdriveApi.deleteFile.withArgs(file2.id!).and.resolveTo();
+    gdriveApi.deleteFile.withArgs(file1.id!).mockResolvedValue();
+    gdriveApi.deleteFile.withArgs(file2.id!).mockResolvedValue();
     await gdrive.deleteAllData();
     expect(gdriveApi.deleteFile).toHaveBeenCalledTimes(2);
 
@@ -466,7 +484,9 @@ describe('GoogleDriveApi', () => {
 
     // Local storage should be untouched.
     const localChecklists = await firstValueFrom(store.listChecklistFiles(), { defaultValue: [] });
-    expect(localChecklists).toEqual(jasmine.arrayWithExactContents([FILE_NAME]));
+    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
+    expect(localChecklists).toHaveLength(1);
+    expect(localChecklists).toEqual(expect.arrayContaining([FILE_NAME]));
     const checklist = await store.getChecklistFile(FILE_NAME);
     expect(checklist).toBeTruthy();
     const expectedWithMtime = ChecklistFile.clone(EXPECTED_CONTENTS);
@@ -475,7 +495,7 @@ describe('GoogleDriveApi', () => {
   });
 
   it('should periodically sync every 60s when no new changes exist', fakeAsync(async () => {
-    gdriveApi.listFiles.and.resolveTo([]);
+    gdriveApi.listFiles.mockResolvedValue([]);
     await gdrive.synchronize();
     tick();
     expectStates([
@@ -505,7 +525,7 @@ describe('GoogleDriveApi', () => {
   }));
 
   it('should periodically sync every 10s when new changes exist', fakeAsync(async () => {
-    gdriveApi.listFiles.and.resolveTo([]);
+    gdriveApi.listFiles.mockResolvedValue([]);
 
     await gdrive.synchronize();
     tick();

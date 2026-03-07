@@ -1,4 +1,5 @@
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import type { Mock } from 'vitest';
 
 import { HarnessLoader } from '@angular/cdk/testing';
 import { Component, input, output } from '@angular/core';
@@ -38,7 +39,7 @@ describe('ChecklistFileInfoComponent', () => {
   let loader: HarnessLoader;
   let metadata: ChecklistFileMetadata;
   let groups: ChecklistGroup[];
-  let dataOut: jasmine.Spy<(value: OutputType) => void>;
+  let dataOut: Mock;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
   let nameBox: HTMLInputElement;
@@ -50,7 +51,7 @@ describe('ChecklistFileInfoComponent', () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    dataOut = jasmine.createSpy('dataOut');
+    dataOut = vi.fn();
 
     metadata = ChecklistFileMetadata.create({ name: 'Name' });
     groups = [];
@@ -90,7 +91,9 @@ describe('ChecklistFileInfoComponent', () => {
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
-    expect(dataOut).toHaveBeenCalledOnceWith(undefined);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+
+    expect(dataOut).toHaveBeenCalledWith(undefined);
     expect(metadata.name).toEqual('Name');
   });
 
@@ -115,7 +118,8 @@ describe('ChecklistFileInfoComponent', () => {
 
     // Original object must be unmodified, but new one must have been returned.
     expect(metadata.name).toEqual('Name');
-    expect(dataOut).toHaveBeenCalledOnceWith(newMetadata);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+    expect(dataOut).toHaveBeenCalledWith(newMetadata);
   });
 
   it('should require name to be non-empty', async () => {
@@ -149,6 +153,7 @@ describe('ChecklistFileInfoComponent', () => {
     const expectedMetadata = ChecklistFileMetadata.clone(metadata);
     expectedMetadata.defaultChecklistIndex = 0;
     expectedMetadata.defaultGroupIndex = 0;
-    expect(dataOut).toHaveBeenCalledOnceWith(expectedMetadata);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+    expect(dataOut).toHaveBeenCalledWith(expectedMetadata);
   });
 });

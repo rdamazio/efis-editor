@@ -1,12 +1,13 @@
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 import { ChecklistItem, ChecklistItem_Type } from '../../../../../gen/ts/checklist';
 import { ChecklistItemComponent } from './item.component';
 
 describe('ChecklistItemComponent', () => {
   let user: UserEvent;
-  let itemChange: jasmine.Spy<(value: ChecklistItem) => void>;
-  let itemDeleted: jasmine.Spy<(value: boolean) => void>;
+  let itemChange: Mock;
+  let itemDeleted: Mock;
   let editButton: HTMLButtonElement;
   let deleteButton: HTMLButtonElement;
   let indentLeftButton: HTMLButtonElement;
@@ -16,8 +17,8 @@ describe('ChecklistItemComponent', () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    itemChange = jasmine.createSpy('itemChange');
-    itemDeleted = jasmine.createSpy('itemDeleted');
+    itemChange = vi.fn();
+    itemDeleted = vi.fn();
 
     item = ChecklistItem.create({ prompt: 'My prompt', type: ChecklistItem_Type.ITEM_PLAINTEXT });
   });
@@ -57,7 +58,9 @@ describe('ChecklistItemComponent', () => {
     expect(editBox).toHaveValue('My prompt was modified');
     await user.type(editBox, '[Enter]');
 
-    expect(itemChange).toHaveBeenCalledOnceWith(item);
+    expect(itemChange).toHaveBeenCalledTimes(1);
+
+    expect(itemChange).toHaveBeenCalledWith(item);
     expect(item.prompt).toEqual('My prompt was modified');
   });
 
@@ -73,7 +76,9 @@ describe('ChecklistItemComponent', () => {
     expect(editBox).toHaveValue('My prompt had  as an invalid character');
     await user.type(editBox, '[Enter]');
 
-    expect(itemChange).toHaveBeenCalledOnceWith(item);
+    expect(itemChange).toHaveBeenCalledTimes(1);
+
+    expect(itemChange).toHaveBeenCalledWith(item);
     expect(item.prompt).toEqual('My prompt had  as an invalid character');
   });
 
@@ -150,7 +155,9 @@ describe('ChecklistItemComponent', () => {
     expect(deleteButton).toBeEnabled();
     await user.click(deleteButton!);
 
-    expect(itemDeleted).toHaveBeenCalledOnceWith(true);
+    expect(itemDeleted).toHaveBeenCalledTimes(1);
+
+    expect(itemDeleted).toHaveBeenCalledWith(true);
   });
 
   it('should toggle centered', async () => {
@@ -169,8 +176,10 @@ describe('ChecklistItemComponent', () => {
     expect(indentLeftButton).toBeDisabled();
     expect(indentRightButton).toBeDisabled();
 
-    expect(itemChange).toHaveBeenCalledOnceWith(item);
-    expect(item.centered).toBeTrue();
+    expect(itemChange).toHaveBeenCalledTimes(1);
+
+    expect(itemChange).toHaveBeenCalledWith(item);
+    expect(item.centered).toBe(true);
     expect(item.indent).toEqual(0);
 
     await user.click(centerButton);
@@ -181,7 +190,7 @@ describe('ChecklistItemComponent', () => {
     expect(indentRightButton).toBeEnabled();
 
     expect(itemChange).toHaveBeenCalledTimes(2);
-    expect(item.centered).toBeFalse();
+    expect(item.centered).toBe(false);
   });
 
   it('should indent left/right', async () => {

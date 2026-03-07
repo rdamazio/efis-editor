@@ -69,7 +69,7 @@ describe('ChecklistStorage', () => {
   });
 
   it('should be empty at the start', async () => {
-    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: [123] })).toEqual(jasmine.empty());
+    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: [123] })).toHaveLength(0);
   });
 
   async function getChecklistFile(name: string): Promise<ChecklistFile | null> {
@@ -107,8 +107,10 @@ describe('ChecklistStorage', () => {
     await store.saveChecklistFile(A_CHECKLIST_FILE);
     await store.saveChecklistFile(ANOTHER_CHECKLIST_FILE);
     await store.saveChecklistFile(YET_ANOTHER_CHECKLIST_FILE);
+    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
+    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toHaveLength(3);
     expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toEqual(
-      jasmine.arrayWithExactContents([
+      expect.arrayContaining([
         A_CHECKLIST_FILE.metadata!.name,
         ANOTHER_CHECKLIST_FILE.metadata!.name,
         YET_ANOTHER_CHECKLIST_FILE.metadata!.name,
@@ -119,8 +121,10 @@ describe('ChecklistStorage', () => {
     expect(await getChecklistFile(YET_ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(YET_ANOTHER_CHECKLIST_FILE);
 
     await store.deleteChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name);
+    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
+    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toHaveLength(2);
     expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toEqual(
-      jasmine.arrayWithExactContents([A_CHECKLIST_FILE.metadata!.name, YET_ANOTHER_CHECKLIST_FILE.metadata!.name]),
+      expect.arrayContaining([A_CHECKLIST_FILE.metadata!.name, YET_ANOTHER_CHECKLIST_FILE.metadata!.name]),
     );
     expect(await getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).toBeNull();
   });

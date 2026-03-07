@@ -2,7 +2,7 @@ import { GrtLiveData } from './grt-live-data';
 
 describe('GrtLiveData', () => {
   beforeEach(() => {
-    spyOn(Math, 'random').and.returnValue(0.1);
+    vi.spyOn(Math, 'random').mockReturnValue(0.1);
   });
 
   it('GRT string replacements', () => {

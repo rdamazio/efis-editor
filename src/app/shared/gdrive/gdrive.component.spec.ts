@@ -4,6 +4,7 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { BehaviorSubject, Subject } from 'rxjs';
+import type { MockedObject } from 'vitest';
 import { DriveSyncState, GoogleDriveStorage } from '../../../model/storage/gdrive';
 import { GoogleDriveComponent } from './gdrive.component';
 
@@ -11,7 +12,7 @@ describe('GoogleDriveComponent', () => {
   let user: UserEvent;
   let fixture: ComponentFixture<GoogleDriveComponent>;
   let syncButton: HTMLElement;
-  let gdrive: jasmine.SpyObj<GoogleDriveStorage>;
+  let gdrive: MockedObject<GoogleDriveStorage>;
   let state$: BehaviorSubject<DriveSyncState>;
   let downloads$: Subject<string>;
   let errors$: Subject<string>;
@@ -19,24 +20,24 @@ describe('GoogleDriveComponent', () => {
   beforeEach(async () => {
     user = userEvent.setup();
 
-    gdrive = jasmine.createSpyObj<GoogleDriveStorage>('GoogleDriveStorage', [
-      'init',
-      'destroy',
-      'deleteAllData',
-      'getState',
-      'synchronize',
-      'disableSync',
-      'onDownloads',
-      'onErrors',
-    ]);
+    gdrive = {
+      init: vi.fn().mockName('GoogleDriveStorage.init'),
+      destroy: vi.fn().mockName('GoogleDriveStorage.destroy'),
+      deleteAllData: vi.fn().mockName('GoogleDriveStorage.deleteAllData'),
+      getState: vi.fn().mockName('GoogleDriveStorage.getState'),
+      synchronize: vi.fn().mockName('GoogleDriveStorage.synchronize'),
+      disableSync: vi.fn().mockName('GoogleDriveStorage.disableSync'),
+      onDownloads: vi.fn().mockName('GoogleDriveStorage.onDownloads'),
+      onErrors: vi.fn().mockName('GoogleDriveStorage.onErrors'),
+    };
     state$ = new BehaviorSubject<DriveSyncState>(DriveSyncState.DISCONNECTED);
     downloads$ = new Subject<string>();
     errors$ = new Subject<string>();
-    gdrive.getState.and.returnValue(state$.asObservable());
-    gdrive.onDownloads.and.returnValue(downloads$.asObservable());
-    gdrive.onErrors.and.returnValue(errors$.asObservable());
-    gdrive.init.and.resolveTo();
-    gdrive.synchronize.and.resolveTo();
+    gdrive.getState.mockReturnValue(state$.asObservable());
+    gdrive.onDownloads.mockReturnValue(downloads$.asObservable());
+    gdrive.onErrors.mockReturnValue(errors$.asObservable());
+    gdrive.init.mockResolvedValue();
+    gdrive.synchronize.mockResolvedValue();
 
     ({ fixture } = await render(GoogleDriveComponent, {
       providers: [
@@ -58,7 +59,8 @@ describe('GoogleDriveComponent', () => {
   }
 
   it('should start in disconnected state', async () => {
-    expect(gdrive.init).toHaveBeenCalledOnceWith();
+    expect(gdrive.init).toHaveBeenCalledTimes(1);
+    expect(gdrive.init).toHaveBeenCalledWith();
     expect(gdrive.synchronize).not.toHaveBeenCalled();
     expect(syncButton).toBeVisible();
     expect(syncButton).toBeEnabled();
@@ -89,7 +91,9 @@ describe('GoogleDriveComponent', () => {
     expect(await screen.findByText('Google Drive synchronization')).toBeVisible();
     await user.click(await screen.findByRole('button', { name: 'Synchronize' }));
 
-    expect(gdrive.synchronize).toHaveBeenCalledOnceWith();
+    expect(gdrive.synchronize).toHaveBeenCalledTimes(1);
+
+    expect(gdrive.synchronize).toHaveBeenCalledWith();
   });
 
   it('should force sync even when connected', async () => {
@@ -100,7 +104,9 @@ describe('GoogleDriveComponent', () => {
     expect(connect).toBeEnabled();
     await user.click(connect);
 
-    expect(gdrive.synchronize).toHaveBeenCalledOnceWith();
+    expect(gdrive.synchronize).toHaveBeenCalledTimes(1);
+
+    expect(gdrive.synchronize).toHaveBeenCalledWith();
   });
 
   it('should not disconnect if cancelled', async () => {
@@ -139,7 +145,8 @@ describe('GoogleDriveComponent', () => {
     await user.click(await screen.findByRole('button', { name: 'Stop synchronization' }));
 
     expect(gdrive.deleteAllData).not.toHaveBeenCalled();
-    expect(gdrive.disableSync).toHaveBeenCalledOnceWith(true);
+    expect(gdrive.disableSync).toHaveBeenCalledTimes(1);
+    expect(gdrive.disableSync).toHaveBeenCalledWith(true);
   });
 
   it('should disconnect and delete data', async () => {
@@ -162,8 +169,11 @@ describe('GoogleDriveComponent', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Stop synchronization' }));
 
-    expect(gdrive.deleteAllData).toHaveBeenCalledOnceWith();
-    expect(gdrive.disableSync).toHaveBeenCalledOnceWith(true);
+    expect(gdrive.deleteAllData).toHaveBeenCalledTimes(1);
+
+    expect(gdrive.deleteAllData).toHaveBeenCalledWith();
+    expect(gdrive.disableSync).toHaveBeenCalledTimes(1);
+    expect(gdrive.disableSync).toHaveBeenCalledWith(true);
   });
 
   it('should render all states properly', async () => {
@@ -210,12 +220,13 @@ describe('GoogleDriveComponent', () => {
     expect(await screen.findByText('Oopsie')).toBeVisible();
 
     const snackBars = await loader.getAllHarnesses(MatSnackBarHarness);
-    expect(snackBars).toHaveSize(1);
+    expect(snackBars).toHaveLength(1);
     const snackBar = snackBars[0];
     expect(await snackBar.getMessage()).toEqual('Oopsie');
     expect(gdrive.synchronize).not.toHaveBeenCalled();
 
     await snackBar.dismissWithAction();
-    expect(gdrive.synchronize).toHaveBeenCalledOnceWith();
+    expect(gdrive.synchronize).toHaveBeenCalledTimes(1);
+    expect(gdrive.synchronize).toHaveBeenCalledWith();
   });
 });

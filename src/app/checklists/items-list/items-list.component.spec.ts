@@ -3,6 +3,7 @@ import { ComponentFixture } from '@angular/core/testing';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 import { Checklist, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../../../model/formats/test-data';
 import { ChecklistItemsComponent } from './items-list.component';
@@ -10,15 +11,15 @@ import { ChecklistItemsComponent } from './items-list.component';
 describe('ChecklistItemsComponent', () => {
   let user: UserEvent;
   let checklist: Checklist | undefined;
-  let checklistChange: jasmine.Spy<typeof onChecklistChanged>;
+  let checklistChange: Mock;
   let rendered: RenderResult<ChecklistItemsComponent>;
   let fixture: ComponentFixture<ChecklistItemsComponent>;
 
   beforeEach(async () => {
     user = userEvent.setup();
     checklist = Checklist.clone(EXPECTED_CONTENTS.groups[0].checklists[0]);
-    checklistChange = jasmine.createSpy('checklistChange');
-    checklistChange.and.callFake(onChecklistChanged);
+    checklistChange = vi.fn();
+    checklistChange.mockImplementation(onChecklistChanged);
 
     rendered = await render(ChecklistItemsComponent, {
       inputs: { checklist },
@@ -42,7 +43,7 @@ describe('ChecklistItemsComponent', () => {
     const textContents = items.map((item: HTMLElement) =>
       item.textContent.replace(/drag_.*format_align_[a-z]+/, '').trim(),
     );
-    expect(textContents).toHaveSize(18);
+    expect(textContents).toHaveLength(18);
     expect(textContents[0]).toEqual('Challenge item');
     expect(textContents[1]).toMatch(/Challenge item 2\s+Item response/);
     expect(textContents[2]).toEqual('Plain text item');
@@ -75,7 +76,8 @@ describe('ChecklistItemsComponent', () => {
 
     expect(await screen.findByRole('listitem', { name: 'Item: Caution item modified' })).toBeVisible();
     expect(checklist!.items[6].prompt).toEqual('Caution item modified');
-    expect(checklistChange).toHaveBeenCalledOnceWith(checklist);
+    expect(checklistChange).toHaveBeenCalledTimes(1);
+    expect(checklistChange).toHaveBeenCalledWith(checklist);
   });
 
   it('should add a challenge item', async () => {
@@ -83,13 +85,14 @@ describe('ChecklistItemsComponent', () => {
     const addButton = screen.getByRole('button', { name: 'Add a new checklist challenge' });
     await user.click(addButton);
     await user.keyboard('[Escape]');
-    expect(checklist!.items).toHaveSize(origSize + 1);
+    expect(checklist!.items).toHaveLength(origSize + 1);
 
     const newItem = checklist!.items[origSize];
     expect(newItem.type).toEqual(ChecklistItem_Type.ITEM_CHALLENGE);
     expect(newItem.prompt).toEqual('New item');
     expect(newItem.expectation).toEqual('');
-    expect(checklistChange).toHaveBeenCalledOnceWith(checklist);
+    expect(checklistChange).toHaveBeenCalledTimes(1);
+    expect(checklistChange).toHaveBeenCalledWith(checklist);
   });
 
   it('should add a challenge/response item', async () => {
@@ -97,7 +100,7 @@ describe('ChecklistItemsComponent', () => {
     const addButton = screen.getByRole('button', { name: 'Add a new checklist challenge/response' });
     await user.click(addButton);
     await user.keyboard('[Enter]');
-    expect(checklist!.items).toHaveSize(origSize + 1);
+    expect(checklist!.items).toHaveLength(origSize + 1);
 
     const newItem = checklist!.items[origSize];
     expect(newItem.type).toEqual(ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE);
@@ -112,13 +115,14 @@ describe('ChecklistItemsComponent', () => {
     const addButton = screen.getByRole('button', { name: 'Add a new checklist text' });
     await user.click(addButton);
     await user.keyboard('[Escape]');
-    expect(checklist!.items).toHaveSize(origSize + 1);
+    expect(checklist!.items).toHaveLength(origSize + 1);
 
     const newItem = checklist!.items[origSize];
     expect(newItem.type).toEqual(ChecklistItem_Type.ITEM_PLAINTEXT);
     expect(newItem.prompt).toEqual('New item');
     expect(newItem.expectation).toEqual('');
-    expect(checklistChange).toHaveBeenCalledOnceWith(checklist);
+    expect(checklistChange).toHaveBeenCalledTimes(1);
+    expect(checklistChange).toHaveBeenCalledWith(checklist);
   });
 
   it('should add a note item', async () => {
@@ -126,13 +130,14 @@ describe('ChecklistItemsComponent', () => {
     const addButton = screen.getByRole('button', { name: 'Add a new checklist note' });
     await user.click(addButton);
     await user.keyboard('[Escape]');
-    expect(checklist!.items).toHaveSize(origSize + 1);
+    expect(checklist!.items).toHaveLength(origSize + 1);
 
     const newItem = checklist!.items[origSize];
     expect(newItem.type).toEqual(ChecklistItem_Type.ITEM_NOTE);
     expect(newItem.prompt).toEqual('New item');
     expect(newItem.expectation).toEqual('');
-    expect(checklistChange).toHaveBeenCalledOnceWith(checklist);
+    expect(checklistChange).toHaveBeenCalledTimes(1);
+    expect(checklistChange).toHaveBeenCalledWith(checklist);
   });
 
   it('should add a title item', async () => {
@@ -140,13 +145,14 @@ describe('ChecklistItemsComponent', () => {
     const addButton = screen.getByRole('button', { name: 'Add a new checklist title' });
     await user.click(addButton);
     await user.keyboard('[Escape]');
-    expect(checklist!.items).toHaveSize(origSize + 1);
+    expect(checklist!.items).toHaveLength(origSize + 1);
 
     const newItem = checklist!.items[origSize];
     expect(newItem.type).toEqual(ChecklistItem_Type.ITEM_TITLE);
     expect(newItem.prompt).toEqual('New item');
     expect(newItem.expectation).toEqual('');
-    expect(checklistChange).toHaveBeenCalledOnceWith(checklist);
+    expect(checklistChange).toHaveBeenCalledTimes(1);
+    expect(checklistChange).toHaveBeenCalledWith(checklist);
   });
 
   it('should add a warning item', async () => {
@@ -154,13 +160,14 @@ describe('ChecklistItemsComponent', () => {
     const addButton = screen.getByRole('button', { name: 'Add a new checklist warning' });
     await user.click(addButton);
     await user.keyboard('[Escape]');
-    expect(checklist!.items).toHaveSize(origSize + 1);
+    expect(checklist!.items).toHaveLength(origSize + 1);
 
     const newItem = checklist!.items[origSize];
     expect(newItem.type).toEqual(ChecklistItem_Type.ITEM_WARNING);
     expect(newItem.prompt).toEqual('New item');
     expect(newItem.expectation).toEqual('');
-    expect(checklistChange).toHaveBeenCalledOnceWith(checklist);
+    expect(checklistChange).toHaveBeenCalledTimes(1);
+    expect(checklistChange).toHaveBeenCalledWith(checklist);
   });
 
   it('should add a caution item', async () => {
@@ -168,26 +175,28 @@ describe('ChecklistItemsComponent', () => {
     const addButton = screen.getByRole('button', { name: 'Add a new checklist caution' });
     await user.click(addButton);
     await user.keyboard('[Escape]');
-    expect(checklist!.items).toHaveSize(origSize + 1);
+    expect(checklist!.items).toHaveLength(origSize + 1);
 
     const newItem = checklist!.items[origSize];
     expect(newItem.type).toEqual(ChecklistItem_Type.ITEM_CAUTION);
     expect(newItem.prompt).toEqual('New item');
     expect(newItem.expectation).toEqual('');
-    expect(checklistChange).toHaveBeenCalledOnceWith(checklist);
+    expect(checklistChange).toHaveBeenCalledTimes(1);
+    expect(checklistChange).toHaveBeenCalledWith(checklist);
   });
 
   it('should add a blank item', async () => {
     const origSize = checklist!.items.length;
     const addButton = screen.getByRole('button', { name: 'Add a new checklist blank row' });
     await user.click(addButton);
-    expect(checklist!.items).toHaveSize(origSize + 1);
+    expect(checklist!.items).toHaveLength(origSize + 1);
 
     const newItem = checklist!.items[origSize];
     expect(newItem.type).toEqual(ChecklistItem_Type.ITEM_SPACE);
     expect(newItem.prompt).toEqual('');
     expect(newItem.expectation).toEqual('');
-    expect(checklistChange).toHaveBeenCalledOnceWith(checklist);
+    expect(checklistChange).toHaveBeenCalledTimes(1);
+    expect(checklistChange).toHaveBeenCalledWith(checklist);
   });
 
   it('should delete an item', async () => {
@@ -198,9 +207,10 @@ describe('ChecklistItemsComponent', () => {
 
     expect(screen.queryByRole('listitem', { name: 'Item: Warning item' })).not.toBeInTheDocument();
 
-    expect(checklist!.items).toHaveSize(17);
+    expect(checklist!.items).toHaveLength(17);
     expect(checklist!.items[5].prompt).toEqual('Caution item');
-    expect(checklistChange).toHaveBeenCalledOnceWith(checklist);
+    expect(checklistChange).toHaveBeenCalledTimes(1);
+    expect(checklistChange).toHaveBeenCalledWith(checklist);
   });
 
   it('should undo item deletion', async () => {
@@ -210,7 +220,7 @@ describe('ChecklistItemsComponent', () => {
     await user.click(deleteButton);
 
     expect(screen.queryByRole('listitem', { name: 'Item: Warning item' })).not.toBeInTheDocument();
-    expect(checklist!.items).toHaveSize(17);
+    expect(checklist!.items).toHaveLength(17);
 
     const undoButton = await screen.findByRole('button', { name: 'Undo', hidden: true });
     expect(undoButton).toBeVisible();
@@ -219,7 +229,7 @@ describe('ChecklistItemsComponent', () => {
     expect(await screen.findByRole('listitem', { name: 'Item: Warning item' })).toBeVisible();
 
     expect(checklist).toBeDefined();
-    expect(checklist!.items).toHaveSize(18);
+    expect(checklist!.items).toHaveLength(18);
     expect(checklist!.items[5].prompt).toEqual('Warning item');
 
     expect(checklistChange).toHaveBeenCalledTimes(2);
@@ -234,7 +244,7 @@ describe('ChecklistItemsComponent', () => {
     await user.click(deleteButton);
 
     const snackBars = await loader.getAllHarnesses(MatSnackBarHarness);
-    expect(snackBars).toHaveSize(1);
+    expect(snackBars).toHaveLength(1);
     const snackBar = snackBars[0];
     expect(await snackBar.getMessage()).toEqual('Item deleted');
     expect(await snackBar.getActionDescription()).toEqual('Undo');
@@ -244,6 +254,6 @@ describe('ChecklistItemsComponent', () => {
     fixture.detectChanges();
 
     // Verify undo snackbar is dismissed
-    expect(await loader.getAllHarnesses(MatSnackBarHarness)).toHaveSize(0);
+    expect(await loader.getAllHarnesses(MatSnackBarHarness)).toHaveLength(0);
   });
 });

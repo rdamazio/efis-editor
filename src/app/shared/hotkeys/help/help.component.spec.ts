@@ -35,18 +35,18 @@ describe('HelpComponent', () => {
     dialog.open(HelpComponent);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs).toHaveSize(1);
+    expect(dialogs).toHaveLength(1);
 
     await dialogs[0].close();
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs).toHaveSize(0);
+    expect(dialogs).toHaveLength(0);
   });
 
   it('should toggle the dialog', async () => {
     const openedDialog = HelpComponent.toggleHelp(dialog);
     expect(openedDialog).toBeDefined();
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs).toHaveSize(1);
+    expect(dialogs).toHaveLength(1);
 
     const closedDialog = HelpComponent.toggleHelp(dialog);
     expect(closedDialog).toBeUndefined();
@@ -55,13 +55,13 @@ describe('HelpComponent', () => {
     const openedDialog2 = HelpComponent.toggleHelp(dialog);
     expect(openedDialog2).toBeDefined();
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs).toHaveSize(1);
+    expect(dialogs).toHaveLength(1);
 
     const closedDialog2 = HelpComponent.toggleHelp(dialog);
     expect(closedDialog2).toBeUndefined();
     await firstValueFrom(openedDialog2!.afterClosed(), { defaultValue: null });
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs).toHaveSize(0);
+    expect(dialogs).toHaveLength(0);
   });
 });

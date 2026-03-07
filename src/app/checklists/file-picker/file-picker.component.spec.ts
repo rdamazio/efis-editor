@@ -1,15 +1,16 @@
 import { ComponentFixture } from '@angular/core/testing';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 import { ChecklistFilePickerComponent } from './file-picker.component';
 
 describe('FilePickerComponent', () => {
   let user: UserEvent;
-  let fileSelected: jasmine.Spy<(value: string) => void>;
+  let fileSelected: Mock;
 
   beforeEach(() => {
     user = userEvent.setup();
-    fileSelected = jasmine.createSpy('fileSelected');
+    fileSelected = vi.fn();
   });
 
   async function setupPicker(
@@ -46,7 +47,9 @@ describe('FilePickerComponent', () => {
     expect(file1).toBeVisible();
     await user.click(file1);
 
-    expect(fileSelected).toHaveBeenCalledOnceWith('File 1');
+    expect(fileSelected).toHaveBeenCalledTimes(1);
+
+    expect(fileSelected).toHaveBeenCalledWith('File 1');
     expect(fixture.componentInstance.selectedFile()).toEqual('File 1');
   });
 });

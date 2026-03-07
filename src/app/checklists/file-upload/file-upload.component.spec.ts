@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { firstValueFrom, timer } from 'rxjs';
+import type { Mock } from 'vitest';
 import { ChecklistFile } from '../../../../gen/ts/checklist';
 import { DYNON_EXPECTED_CONTENTS } from '../../../model/formats/dynon-format.spec';
 import { GRT_EXPECTED_CONTENTS } from '../../../model/formats/grt-format.spec';
@@ -14,12 +15,12 @@ import { ChecklistFileUploadComponent } from './file-upload.component';
 
 describe('ChecklistFileUploadComponent', () => {
   let user: UserEvent;
-  let fileUploaded: jasmine.Spy<(file: ChecklistFile) => void>;
+  let fileUploaded: Mock;
   let uploadInput: HTMLInputElement;
 
   beforeEach(async () => {
     user = userEvent.setup();
-    fileUploaded = jasmine.createSpy('fileUploaded');
+    fileUploaded = vi.fn();
 
     await render(ChecklistFileUploadComponent, {
       on: { fileUploaded },
@@ -45,7 +46,9 @@ describe('ChecklistFileUploadComponent', () => {
 
     await forUpload();
 
-    expect(fileUploaded).toHaveBeenCalledOnceWith(expectedContents);
+    expect(fileUploaded).toHaveBeenCalledTimes(1);
+
+    expect(fileUploaded).toHaveBeenCalledWith(expectedContents);
   }
 
   it('should upload JSON file', async () => {

@@ -18,6 +18,6 @@ describe('FormatRegistry', () => {
 
   it('should reject parsing of an unknown extension', async () => {
     const f = new File([], 'foobar.baz');
-    await expectAsync(parseChecklistFile(f)).toBeRejectedWithError(FormatError, /Unknown.*extension/);
+    await expect(parseChecklistFile(f)).rejects.toThrowError(FormatError, /Unknown.*extension/);
   });
 });

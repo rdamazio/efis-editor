@@ -6,6 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 import { DEFAULT_OPTIONS, PdfWriterOptions } from '../../../../model/formats/pdf-writer';
 import { LazyBrowserStorage } from '../../../../model/storage/browser-storage';
 import { PreferenceStorage } from '../../../../model/storage/preference-storage';
@@ -40,7 +41,7 @@ describe('PrintDialogComponent', () => {
   let loader: HarnessLoader;
   let prefs: PreferenceStorage;
   let fixture: ComponentFixture<DialogTestComponent>;
-  let dataOut: jasmine.Spy<(value: OutputType) => void>;
+  let dataOut: Mock;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
 
@@ -51,7 +52,7 @@ describe('PrintDialogComponent', () => {
 
   beforeEach(async () => {
     user = userEvent.setup();
-    dataOut = jasmine.createSpy('dataOut');
+    dataOut = vi.fn();
 
     fixture = (await render(DialogTestComponent, { on: { dataOut } })).fixture;
   });
@@ -89,7 +90,9 @@ describe('PrintDialogComponent', () => {
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
-    expect(dataOut).toHaveBeenCalledOnceWith(undefined);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+
+    expect(dataOut).toHaveBeenCalledWith(undefined);
   });
 
   it('should open, modify and cancel the dialog, without changing stored settings', async () => {
@@ -108,7 +111,9 @@ describe('PrintDialogComponent', () => {
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
-    expect(dataOut).toHaveBeenCalledOnceWith(undefined);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+
+    expect(dataOut).toHaveBeenCalledWith(undefined);
 
     const newOpts = await prefs.getPrintOptions();
     expect(newOpts).not.toBeNull();
@@ -124,7 +129,10 @@ describe('PrintDialogComponent', () => {
     expect(dialogs.length).toBe(0);
 
     // Original object must be unmodified, but new one must have been returned.
-    expect(dataOut).toHaveBeenCalledOnceWith(DEFAULT_OPTIONS);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+
+    // Original object must be unmodified, but new one must have been returned.
+    expect(dataOut).toHaveBeenCalledWith(DEFAULT_OPTIONS);
   });
 
   it('should emit and store changed options', async () => {
@@ -148,7 +156,8 @@ describe('PrintDialogComponent', () => {
       outputCompletionActions: false,
       checklistNewPage: false,
     };
-    expect(dataOut).toHaveBeenCalledOnceWith(expectedOpts);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+    expect(dataOut).toHaveBeenCalledWith(expectedOpts);
     const newOpts = await prefs.getPrintOptions();
     expect(newOpts).toEqual(expectedOpts);
   });
@@ -168,7 +177,9 @@ describe('PrintDialogComponent', () => {
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
-    expect(dataOut).toHaveBeenCalledOnceWith(expectedOpts);
+    expect(dataOut).toHaveBeenCalledTimes(1);
+
+    expect(dataOut).toHaveBeenCalledWith(expectedOpts);
     const newOpts = await prefs.getPrintOptions();
     expect(newOpts).toEqual(expectedOpts);
   });

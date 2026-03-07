@@ -1,10 +1,11 @@
 import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
+import type { MockedObject } from 'vitest';
 import { ChecklistTreeComponent } from '../checklist-tree.component';
 import { ChecklistTreeBarComponent } from './bar.component';
 
 describe('ChecklistTreeBarComponent', () => {
-  let tree: jasmine.SpyObj<ChecklistTreeComponent>;
+  let tree: MockedObject<ChecklistTreeComponent>;
   let rendered: RenderResult<ChecklistTreeBarComponent>;
   let expandButton: HTMLElement;
   let collapseButton: HTMLElement;
@@ -13,12 +14,12 @@ describe('ChecklistTreeBarComponent', () => {
   beforeEach(async () => {
     user = userEvent.setup();
 
-    tree = jasmine.createSpyObj<ChecklistTreeComponent>('ChecklistTreeComponent', [
-      'isAllExpanded',
-      'expandAll',
-      'isAllCollapsed',
-      'collapseAll',
-    ]);
+    tree = {
+      isAllExpanded: vi.fn().mockName('ChecklistTreeComponent.isAllExpanded'),
+      expandAll: vi.fn().mockName('ChecklistTreeComponent.expandAll'),
+      isAllCollapsed: vi.fn().mockName('ChecklistTreeComponent.isAllCollapsed'),
+      collapseAll: vi.fn().mockName('ChecklistTreeComponent.collapseAll'),
+    };
 
     rendered = await render(ChecklistTreeBarComponent, {
       inputs: { tree: tree },
@@ -32,36 +33,40 @@ describe('ChecklistTreeBarComponent', () => {
   });
 
   it('should disable expand button when all expanded', () => {
-    tree.isAllExpanded.and.returnValue(true);
-    tree.isAllCollapsed.and.returnValue(false);
+    tree.isAllExpanded.mockReturnValue(true);
+    tree.isAllCollapsed.mockReturnValue(false);
     rendered.detectChanges();
     expect(expandButton).toBeDisabled();
     expect(collapseButton).toBeEnabled();
   });
 
   it('should disable collapse button when all collapsed', () => {
-    tree.isAllExpanded.and.returnValue(false);
-    tree.isAllCollapsed.and.returnValue(true);
+    tree.isAllExpanded.mockReturnValue(false);
+    tree.isAllCollapsed.mockReturnValue(true);
     rendered.detectChanges();
     expect(expandButton).toBeEnabled();
     expect(collapseButton).toBeDisabled();
   });
 
   it('should expand all when that button is clicked', async () => {
-    tree.isAllExpanded.and.returnValue(false);
+    tree.isAllExpanded.mockReturnValue(false);
     rendered.detectChanges();
 
     await user.click(expandButton);
 
-    expect(tree.expandAll).toHaveBeenCalledOnceWith();
+    expect(tree.expandAll).toHaveBeenCalledTimes(1);
+
+    expect(tree.expandAll).toHaveBeenCalledWith();
   });
 
   it('should collapse all when that button is clicked', async () => {
-    tree.isAllCollapsed.and.returnValue(false);
+    tree.isAllCollapsed.mockReturnValue(false);
     rendered.detectChanges();
 
     await user.click(collapseButton);
 
-    expect(tree.collapseAll).toHaveBeenCalledOnceWith();
+    expect(tree.collapseAll).toHaveBeenCalledTimes(1);
+
+    expect(tree.collapseAll).toHaveBeenCalledWith();
   });
 });

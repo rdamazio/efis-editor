@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { DeviceDetectorService } from 'ngx-device-detector';
 import { BehaviorSubject } from 'rxjs';
+import type { MockedObject } from 'vitest';
 import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
 import { WelcomeComponent } from './welcome.component';
 
@@ -9,13 +10,15 @@ describe('WelcomeComponent', () => {
   let component: WelcomeComponent;
   let fixture: ComponentFixture<WelcomeComponent>;
   let deviceService: DeviceDetectorService;
-  let gdrive: jasmine.SpyObj<GoogleDriveStorage>;
+  let gdrive: MockedObject<GoogleDriveStorage>;
   let state$: BehaviorSubject<DriveSyncState>;
 
   beforeEach(async () => {
-    gdrive = jasmine.createSpyObj<GoogleDriveStorage>('GoogleDriveStorage', ['getState']);
+    gdrive = {
+      getState: vi.fn().mockName('GoogleDriveStorage.getState'),
+    };
     state$ = new BehaviorSubject<DriveSyncState>(DriveSyncState.DISCONNECTED);
-    gdrive.getState.and.returnValue(state$);
+    gdrive.getState.mockReturnValue(state$);
 
     await TestBed.configureTestingModule({
       imports: [RouterModule.forRoot([])],
@@ -41,19 +44,19 @@ describe('WelcomeComponent', () => {
     it('should show warning when Google Drive is disconnected', async () => {
       state$.next(DriveSyncState.DISCONNECTED);
       await fixture.whenStable();
-      expect(component.showStorageWarning()).toBeTrue();
+      expect(component.showStorageWarning()).toBe(true);
     });
 
     it('should not show warning when Google Drive is in sync', async () => {
       state$.next(DriveSyncState.IN_SYNC);
       await fixture.whenStable();
-      expect(component.showStorageWarning()).toBeFalse();
+      expect(component.showStorageWarning()).toBe(false);
     });
 
     it('should not show warning when Google Drive is syncing', async () => {
       state$.next(DriveSyncState.SYNCING);
       await fixture.whenStable();
-      expect(component.showStorageWarning()).toBeFalse();
+      expect(component.showStorageWarning()).toBe(false);
     });
   });
 
@@ -62,8 +65,8 @@ describe('WelcomeComponent', () => {
       deviceService.setDeviceInfo(
         'Mozilla/5.0 (iPad; CPU OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1',
       );
-      spyOnProperty(globalThis.navigator, 'maxTouchPoints').and.returnValue(5);
-      spyOnProperty(globalThis.navigator, 'platform').and.returnValue('iPad');
+      vi.spyOn(globalThis.navigator, 'maxTouchPoints').mockReturnValue(5);
+      vi.spyOn(globalThis.navigator, 'platform').mockReturnValue('iPad');
 
       const url = component.installUrl();
       expect(url).toContain('support.apple.com');
