@@ -2,7 +2,6 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatMenuHarness } from '@angular/material/menu/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -40,7 +39,6 @@ describe('ChecklistCommandBarComponent', () => {
 
   async function renderComponent(hasFiles: boolean, fileIsOpen: boolean) {
     const { fixture } = await render(ChecklistCommandBarComponent, {
-      providers: [provideNoopAnimations()],
       inputs: { hasFiles: hasFiles, fileIsOpen: fileIsOpen },
       on: { newFile, openFile, uploadFile, downloadFile, deleteFile, fileInfo },
     });

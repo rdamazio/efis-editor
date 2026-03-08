@@ -1,4 +1,3 @@
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { ChecklistTreeBarComponent } from './bar.component';
@@ -21,7 +20,6 @@ describe('ChecklistTreeBarComponent', () => {
     };
 
     rendered = await render(ChecklistTreeBarComponent, {
-      providers: [provideNoopAnimations()],
       inputs: { tree: tree },
     });
     expandButton = screen.queryByRole('button', { name: 'Expand all checklist groups' })!;

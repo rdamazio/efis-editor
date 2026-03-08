@@ -1,5 +1,4 @@
 import { ComponentFixture, DeferBlockState } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import { AppComponent } from './app.component';
 
@@ -9,7 +8,6 @@ describe('AppComponent', () => {
 
   beforeEach(async () => {
     rendered = await render(AppComponent, {
-      providers: [provideNoopAnimations()],
       deferBlockStates: DeferBlockState.Complete,
     });
     fixture = rendered.fixture;

@@ -5,6 +5,6 @@
     "outDir": "./out-tsc/spec",
     "types": ["vitest/globals", "node"]
   },
-  "files": ["src/test-polyfill.ts", "src/test-setup.ts", "src/polyfills.ts"],
+  "files": ["src/test-polyfill.ts", "src/test-providers.ts", "src/test-setup.ts", "src/polyfills.ts"],
   "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
 }

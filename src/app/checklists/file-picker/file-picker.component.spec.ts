@@ -1,5 +1,4 @@
 import { ComponentFixture } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -19,7 +18,6 @@ describe('FilePickerComponent', () => {
     selectedFile?: string,
   ): Promise<ComponentFixture<ChecklistFilePickerComponent>> {
     const { fixture } = await render(ChecklistFilePickerComponent, {
-      providers: [provideNoopAnimations()],
       inputs: { fileNames: fileNames, selectedFile: selectedFile },
       on: { fileSelected },
     });

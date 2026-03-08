@@ -1,7 +1,6 @@
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture } from '@angular/core/testing';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -23,7 +22,6 @@ describe('ChecklistItemsComponent', () => {
     checklistChange.mockImplementation(onChecklistChanged);
 
     rendered = await render(ChecklistItemsComponent, {
-      providers: [provideNoopAnimations()],
       inputs: { checklist },
       on: { checklistChange },
     });

@@ -1,5 +1,4 @@
 import { ComponentFixture, DeferBlockState } from '@angular/core/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import type { Mock } from 'vitest';
 
 import { HarnessLoader } from '@angular/cdk/testing';
@@ -35,7 +34,6 @@ describe('NavComponent', () => {
     rendered = await render(NavComponent, {
       imports: [MatDialogModule],
       providers: [
-        provideNoopAnimations(),
         {
           provide: HotkeysService,
           useValue: hotkeys,

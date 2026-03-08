@@ -4,7 +4,6 @@ import { Component, output } from '@angular/core';
 import { ComponentFixture, inject } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -55,7 +54,7 @@ describe('PrintDialogComponent', () => {
     user = userEvent.setup();
     dataOut = vi.fn();
 
-    fixture = (await render(DialogTestComponent, { providers: [provideNoopAnimations()], on: { dataOut } })).fixture;
+    fixture = (await render(DialogTestComponent, { on: { dataOut } })).fixture;
   });
 
   beforeEach(inject(

@@ -1,7 +1,6 @@
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture } from '@angular/core/testing';
 import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -41,7 +40,6 @@ describe('GoogleDriveComponent', () => {
 
     ({ fixture } = await render(GoogleDriveComponent, {
       providers: [
-        provideNoopAnimations(),
         {
           provide: GoogleDriveStorage,
           useValue: gdrive,

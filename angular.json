@@ -99,6 +99,7 @@
               ]
             ],
             "setupFiles": ["src/test-polyfill.ts", "src/test-setup.ts"],
+            "providersFile": "src/test-providers.ts",
             "tsConfig": "tsconfig.spec.json",
             "watch": false,
             "browsers": ["chromium"],

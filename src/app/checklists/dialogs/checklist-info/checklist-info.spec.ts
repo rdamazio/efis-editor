@@ -1,5 +1,4 @@
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import type { Mock } from 'vitest';
 
 import { HarnessLoader } from '@angular/cdk/testing';
@@ -70,7 +69,6 @@ describe('ChecklistInfoComponent', () => {
 
   async function openDialog() {
     const { fixture } = await render(DialogTestComponent, {
-      providers: [provideNoopAnimations()],
       inputs: { dataIn },
       on: { dataOut },
     });
