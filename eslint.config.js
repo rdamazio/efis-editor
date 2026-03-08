@@ -6,7 +6,6 @@ const depend = require('eslint-plugin-depend');
 const css = require('@eslint/css');
 const eslint = require('@eslint/js');
 const angular = require('angular-eslint');
-const jasmine = require('eslint-plugin-jasmine');
 const nosecrets = require('eslint-plugin-no-secrets');
 const prettierRecommended = require('eslint-plugin-prettier/recommended');
 // TODO: Re-enable once https://github.com/eslint-community/eslint-plugin-promise/issues/616 is fixed.
@@ -27,13 +26,16 @@ module.exports = defineConfig(
   // TypeScript rules.
   {
     files: ['**/*.ts'],
-    ignores: ['src/environments/dev-keys.ts'],
+    ignores: ['src/environments/dev-keys.ts', 'src/environments/environment.prod.ts'],
     languageOptions: {
       parser: tseslint.parser,
-      parserOptions: { projectService: true },
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ['*.js'],
+        },
+      },
       globals: {
         ...globals.node,
-        ...globals.jasmine,
         ...globals.browser,
       },
     },
@@ -46,10 +48,8 @@ module.exports = defineConfig(
       depend.configs['flat/recommended'],
       // promise.configs['flat/recommended'],
       rxjsX.configs.strict,
-      jasmine.configs.recommended,
     ],
     plugins: {
-      jasmine: jasmine,
       'no-secrets': nosecrets,
     },
     processor: angular.processInlineTemplates,
@@ -141,7 +141,6 @@ module.exports = defineConfig(
       'func-name-matching': 'error',
       'func-names': ['error', 'as-needed'],
       'grouped-accessor-pairs': 'error',
-      'jasmine/new-line-before-expect': 'off',
       'logical-assignment-operators': 'error',
       'max-nested-callbacks': ['error', { max: 5 }],
       'no-alert': 'error',
@@ -232,8 +231,6 @@ module.exports = defineConfig(
     files: ['**/*.spec.ts'],
     extends: [testing.configs['flat/angular']],
     rules: {
-      // jasmine spy expectations are expressed unbound
-      '@typescript-eslint/unbound-method': 'off',
       'no-await-in-loop': 'off',
       'no-restricted-imports': ['error', '@testing-library/dom'],
       'testing-library/no-render-in-lifecycle': 'off',
