@@ -89,8 +89,20 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
+            "reporters": [
+              "tree",
+              [
+                "html",
+                {
+                  "outputFile": "test-results/index.html"
+                }
+              ]
+            ],
             "setupFiles": ["src/test-polyfill.ts", "src/test-setup.ts"],
             "tsConfig": "tsconfig.spec.json",
+            "watch": false,
+            "browsers": ["chromium"],
+            "browserViewport": "1280x1024",
             "coverageThresholds": {
               "statements": 80,
               "functions": 85,
