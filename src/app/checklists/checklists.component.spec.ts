@@ -73,12 +73,10 @@ describe('ChecklistsComponent', () => {
     async (s: ChecklistStorage, browserStore: LazyBrowserStorage, snack: MatSnackBar, router: Router) => {
       realNavigate = router.navigate.bind(router);
       navigate = vi.spyOn(router, 'navigate');
-      navigate;
 
       // Verifying snackbars with durations doesn't work with MatSnackBarHarness, so use a spy instead.
       // https://github.com/angular/components/issues/19290
       showSnack = vi.spyOn(snack, 'open');
-      showSnack;
 
       storage = s;
       browserStore.forceBrowserStorage();

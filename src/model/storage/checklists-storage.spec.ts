@@ -107,7 +107,6 @@ describe('ChecklistStorage', () => {
     await store.saveChecklistFile(A_CHECKLIST_FILE);
     await store.saveChecklistFile(ANOTHER_CHECKLIST_FILE);
     await store.saveChecklistFile(YET_ANOTHER_CHECKLIST_FILE);
-    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
     expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toHaveLength(3);
     expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toEqual(
       expect.arrayContaining([
@@ -121,7 +120,6 @@ describe('ChecklistStorage', () => {
     expect(await getChecklistFile(YET_ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(YET_ANOTHER_CHECKLIST_FILE);
 
     await store.deleteChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name);
-    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
     expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toHaveLength(2);
     expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toEqual(
       expect.arrayContaining([A_CHECKLIST_FILE.metadata!.name, YET_ANOTHER_CHECKLIST_FILE.metadata!.name]),

@@ -54,7 +54,7 @@ describe('ChecklistInfoComponent', () => {
   let user: UserEvent;
   let loader: HarnessLoader;
   let dataIn: Checklist;
-  let dataOut: Mock;
+  let dataOut: Mock<(value: OutputType) => void>;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
   let titleBox: HTMLInputElement;
@@ -62,7 +62,7 @@ describe('ChecklistInfoComponent', () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    dataOut = vi.fn();
+    dataOut = vi.fn().mockName('ChecklistInfoComponent.dataOut');
 
     dataIn = Checklist.clone(DEFAULT_DATA_IN);
   });

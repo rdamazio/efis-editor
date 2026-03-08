@@ -6,11 +6,11 @@ import { ChecklistFilePickerComponent } from './file-picker.component';
 
 describe('FilePickerComponent', () => {
   let user: UserEvent;
-  let fileSelected: Mock;
+  let fileSelected: Mock<(value: string) => void>;
 
   beforeEach(() => {
     user = userEvent.setup();
-    fileSelected = vi.fn();
+    fileSelected = vi.fn().mockName('FilePickerComponent.fileSelected');
   });
 
   async function setupPicker(

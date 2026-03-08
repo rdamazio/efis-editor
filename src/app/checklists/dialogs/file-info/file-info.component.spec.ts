@@ -39,7 +39,7 @@ describe('ChecklistFileInfoComponent', () => {
   let loader: HarnessLoader;
   let metadata: ChecklistFileMetadata;
   let groups: ChecklistGroup[];
-  let dataOut: Mock;
+  let dataOut: Mock<(value: OutputType) => void>;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
   let nameBox: HTMLInputElement;
@@ -51,7 +51,7 @@ describe('ChecklistFileInfoComponent', () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    dataOut = vi.fn();
+    dataOut = vi.fn().mockName('ChecklistFileInfoComponent.dataOut');
 
     metadata = ChecklistFileMetadata.create({ name: 'Name' });
     groups = [];

@@ -15,12 +15,12 @@ import { ChecklistFileUploadComponent } from './file-upload.component';
 
 describe('ChecklistFileUploadComponent', () => {
   let user: UserEvent;
-  let fileUploaded: Mock;
+  let fileUploaded: Mock<(value: ChecklistFile) => void>;
   let uploadInput: HTMLInputElement;
 
   beforeEach(async () => {
     user = userEvent.setup();
-    fileUploaded = vi.fn();
+    fileUploaded = vi.fn().mockName('ChecklistFileUploadComponent.fileUploaded');
 
     await render(ChecklistFileUploadComponent, { on: { fileUploaded } });
     // The input is hidden and has no text, so we must fetch it directly from the document.

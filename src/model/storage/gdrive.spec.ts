@@ -258,7 +258,6 @@ describe('GoogleDriveApi', () => {
     expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
     expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
-    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
     expect(allDownloads).toHaveLength(1);
     expect(allDownloads).toEqual(expect.arrayContaining([FILE_NAME]));
 
@@ -294,7 +293,6 @@ describe('GoogleDriveApi', () => {
     expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
     expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
-    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
     expect(allDownloads).toHaveLength(1);
     expect(allDownloads).toEqual(expect.arrayContaining([FILE_NAME]));
 
@@ -425,7 +423,6 @@ describe('GoogleDriveApi', () => {
     expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
     expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
-    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
     expect(allDownloads).toHaveLength(1);
     expect(allDownloads).toEqual(expect.arrayContaining([FILE_NAME]));
 
@@ -523,7 +520,6 @@ describe('GoogleDriveApi', () => {
 
     // Local storage should be untouched.
     const localChecklists = await firstValueFrom(store.listChecklistFiles(), { defaultValue: [] });
-    // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
     expect(localChecklists).toHaveLength(1);
     expect(localChecklists).toEqual(expect.arrayContaining([FILE_NAME]));
     const checklist = await store.getChecklistFile(FILE_NAME);

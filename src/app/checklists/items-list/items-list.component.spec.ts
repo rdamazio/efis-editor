@@ -11,14 +11,14 @@ import { ChecklistItemsComponent } from './items-list.component';
 describe('ChecklistItemsComponent', () => {
   let user: UserEvent;
   let checklist: Checklist | undefined;
-  let checklistChange: Mock;
+  let checklistChange: Mock<typeof onChecklistChanged>;
   let rendered: RenderResult<ChecklistItemsComponent>;
   let fixture: ComponentFixture<ChecklistItemsComponent>;
 
   beforeEach(async () => {
     user = userEvent.setup();
     checklist = Checklist.clone(EXPECTED_CONTENTS.groups[0].checklists[0]);
-    checklistChange = vi.fn();
+    checklistChange = vi.fn().mockName('ChecklistItemsComponent.checklistChange');
     checklistChange.mockImplementation(onChecklistChanged);
 
     rendered = await render(ChecklistItemsComponent, {

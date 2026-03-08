@@ -1,4 +1,4 @@
-import { render, RenderResult, screen, waitFor } from '@testing-library/angular';
+import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
@@ -9,16 +9,16 @@ describe('NodeComponent', () => {
   let user: UserEvent;
   let node: ChecklistTreeNode;
   let disableButtonHover: boolean;
-  let nodeRename: Mock;
-  let nodeDelete: Mock;
+  let nodeRename: Mock<(value: ChecklistTreeNode) => void>;
+  let nodeDelete: Mock<(value: ChecklistTreeNode) => void>;
 
   beforeEach(() => {
     user = userEvent.setup();
 
     node = { isAddNew: false, title: 'Node title' };
     disableButtonHover = false;
-    nodeRename = vi.fn();
-    nodeDelete = vi.fn();
+    nodeRename = vi.fn().mockName('NodeComponent.nodeRename');
+    nodeDelete = vi.fn().mockName('NodeComponent.nodeDelete');
   });
 
   async function renderComponent(): Promise<RenderResult<ChecklistTreeNodeComponent>> {
@@ -94,7 +94,7 @@ describe('NodeComponent', () => {
     expect(confirmButton).toBeInTheDocument();
     await user.click(confirmButton);
 
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Delete!' })).not.toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: 'Delete!' })).not.toBeInTheDocument();
     expect(nodeDelete).toHaveBeenCalledTimes(1);
     expect(nodeDelete).toHaveBeenCalledWith(node);
   });
@@ -110,7 +110,7 @@ describe('NodeComponent', () => {
     expect(cancelButton).toBeInTheDocument();
     await user.click(cancelButton);
 
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
     expect(nodeDelete).not.toHaveBeenCalled();
   });
 
@@ -125,10 +125,10 @@ describe('NodeComponent', () => {
     // Change to normal category.
     await user.click(categoryIcon);
     const normalOption = await screen.findByText('🄽ormal');
-    await waitFor(() => expect(normalOption).toBeVisible());
+    expect(normalOption).toBeVisible();
     await user.click(normalOption);
 
-    await waitFor(() => expect(screen.queryByText(/🄰.*/)).not.toBeInTheDocument());
+    expect(screen.queryByText(/🄰.*/)).not.toBeInTheDocument();
 
     // Verify that model was changed.
     expect(node.group.category).toEqual(ChecklistGroup_Category.normal);

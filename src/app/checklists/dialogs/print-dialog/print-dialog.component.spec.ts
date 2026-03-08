@@ -41,7 +41,7 @@ describe('PrintDialogComponent', () => {
   let loader: HarnessLoader;
   let prefs: PreferenceStorage;
   let fixture: ComponentFixture<DialogTestComponent>;
-  let dataOut: Mock;
+  let dataOut: Mock<(value: OutputType) => void>;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
 
@@ -52,7 +52,7 @@ describe('PrintDialogComponent', () => {
 
   beforeEach(async () => {
     user = userEvent.setup();
-    dataOut = vi.fn();
+    dataOut = vi.fn().mockName('PrintDialogComponent.dataOut');
 
     fixture = (await render(DialogTestComponent, { on: { dataOut } })).fixture;
   });

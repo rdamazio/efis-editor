@@ -18,21 +18,21 @@ describe('ChecklistCommandBarComponent', () => {
   let printButton: HTMLButtonElement;
   let deleteButton: HTMLButtonElement;
   let infoButton: HTMLButtonElement;
-  let newFile: Mock;
-  let openFile: Mock;
-  let uploadFile: Mock;
-  let downloadFile: Mock;
-  let deleteFile: Mock;
-  let fileInfo: Mock;
+  let newFile: Mock<(value: string) => void>;
+  let openFile: Mock<(value: boolean) => void>;
+  let uploadFile: Mock<(value: boolean) => void>;
+  let downloadFile: Mock<(value: FormatId) => void>;
+  let deleteFile: Mock<(value: boolean) => void>;
+  let fileInfo: Mock<(value: boolean) => void>;
   let user: UserEvent;
 
   beforeEach(() => {
-    newFile = vi.fn();
-    openFile = vi.fn();
-    uploadFile = vi.fn();
-    downloadFile = vi.fn();
-    deleteFile = vi.fn();
-    fileInfo = vi.fn();
+    newFile = vi.fn().mockName('ChecklistCommandBarComponent.newFile');
+    openFile = vi.fn().mockName('ChecklistCommandBarComponent.openFile');
+    uploadFile = vi.fn().mockName('ChecklistCommandBarComponent.uploadFile');
+    downloadFile = vi.fn().mockName('ChecklistCommandBarComponent.downloadFile');
+    deleteFile = vi.fn().mockName('ChecklistCommandBarComponent.deleteFile');
+    fileInfo = vi.fn().mockName('ChecklistCommandBarComponent.fileInfo');
 
     user = userEvent.setup();
   });

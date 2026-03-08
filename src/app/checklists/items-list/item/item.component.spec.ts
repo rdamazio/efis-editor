@@ -6,8 +6,8 @@ import { ChecklistItemComponent } from './item.component';
 
 describe('ChecklistItemComponent', () => {
   let user: UserEvent;
-  let itemChange: Mock;
-  let itemDeleted: Mock;
+  let itemChange: Mock<(value: ChecklistItem) => void>;
+  let itemDeleted: Mock<(value: boolean) => void>;
   let editButton: HTMLButtonElement;
   let deleteButton: HTMLButtonElement;
   let indentLeftButton: HTMLButtonElement;
@@ -17,8 +17,8 @@ describe('ChecklistItemComponent', () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    itemChange = vi.fn();
-    itemDeleted = vi.fn();
+    itemChange = vi.fn().mockName('ChecklistItemComponent.itemChange');
+    itemDeleted = vi.fn().mockName('ChecklistItemComponent.itemDeleted');
 
     item = ChecklistItem.create({ prompt: 'My prompt', type: ChecklistItem_Type.ITEM_PLAINTEXT });
   });

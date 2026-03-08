@@ -1,15 +1,14 @@
-import { ChecklistFile } from '../../../gen/ts/checklist';
 import { FormatId } from './format-id';
 import { parseChecklistFile, serializeChecklistFile } from './format-registry';
 import { GarminPilotReader } from './garmin-pilot-reader';
 import { EXPECTED_GARMIN_PILOT_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
 
-describe('GarminPilotFormat', () => {
+describe.only('GarminPilotFormat', () => {
   it('should read test file', async () => {
     const file = await loadFile('/src/model/formats/test-garmin-pilot.gplt', 'test-garmin-pilot.gplt');
     const checklistFile = await parseChecklistFile(file);
-    expect(ChecklistFile.toJson(checklistFile)).toEqual(ChecklistFile.toJson(EXPECTED_GARMIN_PILOT_CONTENTS));
+    expect(checklistFile).toEqual(EXPECTED_GARMIN_PILOT_CONTENTS);
   });
 
   it('should pass a round-trip test', async () => {

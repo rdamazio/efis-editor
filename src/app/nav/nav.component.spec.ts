@@ -19,7 +19,7 @@ describe('NavComponent', () => {
   let loader: HarnessLoader;
   let navData: NavData;
   let hotkeys: any;
-  let toggleHelp: Mock;
+  let toggleHelp: Mock<typeof HelpComponent.toggleHelp>;
 
   beforeEach(async () => {
     user = userEvent.setup();
