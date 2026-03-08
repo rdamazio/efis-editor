@@ -6,6 +6,7 @@ const depend = require('eslint-plugin-depend');
 const css = require('@eslint/css');
 const eslint = require('@eslint/js');
 const angular = require('angular-eslint');
+const vitest = require('@vitest/eslint-plugin');
 const nosecrets = require('eslint-plugin-no-secrets');
 const prettierRecommended = require('eslint-plugin-prettier/recommended');
 // TODO: Re-enable once https://github.com/eslint-community/eslint-plugin-promise/issues/616 is fixed.
@@ -35,8 +36,9 @@ module.exports = defineConfig(
         },
       },
       globals: {
-        ...globals.node,
         ...globals.browser,
+        ...globals.node,
+        ...globals.vitest,
       },
     },
     extends: [
@@ -44,6 +46,7 @@ module.exports = defineConfig(
       ...tseslint.configs.strictTypeChecked,
       ...tseslint.configs.stylisticTypeChecked,
       ...angular.configs.tsAll,
+      ...[vitest.configs.recommended],
       prettierRecommended,
       depend.configs['flat/recommended'],
       // promise.configs['flat/recommended'],
@@ -53,6 +56,11 @@ module.exports = defineConfig(
       'no-secrets': nosecrets,
     },
     processor: angular.processInlineTemplates,
+    settings: {
+      vitest: {
+        typecheck: true,
+      },
+    },
     rules: {
       '@angular-eslint/directive-selector': [
         'error',
@@ -237,6 +245,8 @@ module.exports = defineConfig(
       'testing-library/prefer-explicit-assert': 'error',
       'testing-library/prefer-user-event': 'error',
       'testing-library/prefer-user-event-setup': 'error',
+      'vitest/expect-expect': ['error', { assertFunctionNames: ['expect', 'expect.*', 'expect*'] }],
+      'vitest/no-conditional-expect': 'off',
     },
   },
 

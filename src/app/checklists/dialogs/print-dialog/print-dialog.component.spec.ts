@@ -121,7 +121,7 @@ describe('PrintDialogComponent', () => {
     expect(newOpts.pageSize).toEqual('a6');
   });
 
-  it('should accept defaults ', async () => {
+  it('should accept defaults', async () => {
     await openDialog();
 
     await user.click(okButton);

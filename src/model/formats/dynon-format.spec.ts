@@ -21,19 +21,19 @@ describe('DynonFormat', () => {
 
   describe('read then write back test file', () => {
     it('with no wrapping', async () => {
-      await testWriteRead('test-dynon.txt', FormatId.DYNON);
+      await expectWriteRead('test-dynon.txt', FormatId.DYNON);
     });
 
     it('with 31-column wrapping', async () => {
-      await testWriteRead('test-dynon31.txt', FormatId.DYNON31);
+      await expectWriteRead('test-dynon31.txt', FormatId.DYNON31);
     });
 
     it('with 40-column wrapping', async () => {
-      await testWriteRead('test-dynon40.txt', FormatId.DYNON40);
+      await expectWriteRead('test-dynon40.txt', FormatId.DYNON40);
     });
   });
 
-  async function testWriteRead(fileName: string, formatId: FormatId): Promise<void> {
+  async function expectWriteRead(fileName: string, formatId: FormatId): Promise<void> {
     const f = await loadFile('/src/model/formats/' + fileName, 'test.txt');
     const readFile = await parseChecklistFile(f);
     expect(readFile).toEqual(DYNON_EXPECTED_CONTENTS);
