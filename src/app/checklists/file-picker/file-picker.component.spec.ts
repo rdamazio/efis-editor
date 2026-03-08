@@ -6,7 +6,7 @@ import { ChecklistFilePickerComponent } from './file-picker.component';
 
 describe('FilePickerComponent', () => {
   let user: UserEvent;
-  let fileSelected: Mock<(value: string) => void>;
+  let fileSelected: Mock<(value: string) => undefined>;
 
   beforeEach(() => {
     user = userEvent.setup();

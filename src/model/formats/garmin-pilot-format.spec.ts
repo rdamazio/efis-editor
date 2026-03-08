@@ -4,7 +4,7 @@ import { GarminPilotReader } from './garmin-pilot-reader';
 import { EXPECTED_GARMIN_PILOT_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
 
-describe.only('GarminPilotFormat', () => {
+describe('GarminPilotFormat', () => {
   it('should read test file', async () => {
     const file = await loadFile('/src/model/formats/test-garmin-pilot.gplt', 'test-garmin-pilot.gplt');
     const checklistFile = await parseChecklistFile(file);

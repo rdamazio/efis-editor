@@ -15,7 +15,7 @@ import { ChecklistFileUploadComponent } from './file-upload.component';
 
 describe('ChecklistFileUploadComponent', () => {
   let user: UserEvent;
-  let fileUploaded: Mock<(value: ChecklistFile) => void>;
+  let fileUploaded: Mock<(value: ChecklistFile) => undefined>;
   let uploadInput: HTMLInputElement;
 
   beforeEach(async () => {

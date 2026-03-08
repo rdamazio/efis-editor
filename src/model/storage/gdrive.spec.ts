@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { filter, firstValueFrom, Subscription } from 'rxjs';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { ChecklistFile, ChecklistGroup } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../formats/test-data';
 import { LazyBrowserStorage } from './browser-storage';
@@ -29,10 +29,10 @@ describe('GoogleDriveApi', () => {
   let allDownloads: string[];
   let stateSub: Subscription | undefined;
   let downloadSub: Subscription | undefined;
-  let gdriveApi: any;
+  let gdriveApi: Record<keyof GoogleDriveApi, Mock> & { accessToken?: string };
   let store: ChecklistStorage;
   let lazyBrowserStore: LazyBrowserStorage;
-  let browserStore: any;
+  let browserStore: Storage;
   let gdrive: GoogleDriveStorage;
 
   beforeEach(() => {
@@ -58,11 +58,12 @@ describe('GoogleDriveApi', () => {
       uploadFile: vi.fn().mockName('GoogleDriveApi.uploadFile'),
       trashFile: vi.fn().mockName('GoogleDriveApi.trashFile'),
       deleteFile: vi.fn().mockName('GoogleDriveApi.deleteFile'),
+      accessToken: '',
     };
 
     TestBed.configureTestingModule({ providers: [{ provide: GoogleDriveApi, useValue: gdriveApi }] });
 
-    gdriveApi.load.mockResolvedValue();
+    gdriveApi.load.mockResolvedValue(undefined);
     gdriveApi.authenticate.mockResolvedValue('some_token');
   });
 
@@ -160,7 +161,7 @@ describe('GoogleDriveApi', () => {
 
     // Create it again, it should just load up the original token and run a sync with it.
     const oldGdrive = gdrive;
-    gdrive = new GoogleDriveStorage(gdriveApi, store, lazyBrowserStore);
+    gdrive = new GoogleDriveStorage(gdriveApi as unknown as GoogleDriveApi, store, lazyBrowserStore);
     await expectState(DriveSyncState.DISCONNECTED);
     await gdrive.init();
     await expectState(DriveSyncState.IN_SYNC);
@@ -182,7 +183,7 @@ describe('GoogleDriveApi', () => {
     gdrive.destroy();
 
     // Create it again, it should NOT load up the original token or try to sync.
-    gdrive = new GoogleDriveStorage(gdriveApi, store, lazyBrowserStore);
+    gdrive = new GoogleDriveStorage(gdriveApi as unknown as GoogleDriveApi, store, lazyBrowserStore);
     await expectState(DriveSyncState.DISCONNECTED);
     await gdrive.init();
     await expectState(DriveSyncState.DISCONNECTED);
@@ -193,7 +194,7 @@ describe('GoogleDriveApi', () => {
   });
 
   it('should revoke token when requested', async () => {
-    gdriveApi.revokeAccessToken.mockResolvedValue();
+    gdriveApi.revokeAccessToken.mockResolvedValue(undefined);
     gdriveApi.listFiles.mockResolvedValue([]);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
@@ -209,7 +210,7 @@ describe('GoogleDriveApi', () => {
     await store.saveChecklistFile(EXPECTED_CONTENTS, NEWER_MTIME);
 
     gdriveApi.listFiles.mockResolvedValue([]);
-    gdriveApi.uploadFile.mockResolvedValue();
+    gdriveApi.uploadFile.mockResolvedValue(undefined);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
@@ -220,7 +221,7 @@ describe('GoogleDriveApi', () => {
     await store.saveChecklistFile(EXPECTED_CONTENTS, NEWER_MTIME);
 
     gdriveApi.listFiles.mockResolvedValue([newFile(EXPECTED_CONTENTS.metadata!.name, OLDER_MTIME)]);
-    gdriveApi.uploadFile.mockResolvedValue();
+    gdriveApi.uploadFile.mockResolvedValue(undefined);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
@@ -243,7 +244,7 @@ describe('GoogleDriveApi', () => {
 
     // Verify that the download happened.
     gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, NEWER_MTIME)]);
-    gdriveApi.downloadFile.mockImplementation((id: string) => {
+    gdriveApi.downloadFile.mockImplementation(async (id: string) => {
       if (id === FILE_ID) {
         return Promise.resolve(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
       }
@@ -278,7 +279,7 @@ describe('GoogleDriveApi', () => {
 
     // Verify that the download happened.
     gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, NEWER_MTIME)]);
-    gdriveApi.downloadFile.mockImplementation((id: string) => {
+    gdriveApi.downloadFile.mockImplementation(async (id: string) => {
       if (id === FILE_ID) {
         return Promise.resolve(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
       }
@@ -343,7 +344,7 @@ describe('GoogleDriveApi', () => {
     await store.deleteChecklistFile(FILE_NAME);
     await awaitState(DriveSyncState.NEEDS_SYNC);
 
-    gdriveApi.trashFile.mockImplementation((id: string) => {
+    gdriveApi.trashFile.mockImplementation(async (id: string) => {
       if (id === FILE_ID) {
         return Promise.resolve();
       }
@@ -373,7 +374,7 @@ describe('GoogleDriveApi', () => {
     await store.deleteChecklistFile(FILE_NAME);
 
     // Connect and sync again - file should be downloaded, not deleted.
-    gdriveApi.downloadFile.mockImplementation((id: string) => {
+    gdriveApi.downloadFile.mockImplementation(async (id: string) => {
       if (id === FILE_ID) {
         return Promise.resolve(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
       }
@@ -409,7 +410,7 @@ describe('GoogleDriveApi', () => {
     // Verify that the download happened.
     // The local deletion will get the current timestamp, so pretend the remote file is modified later.
     gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, NOW_PLUS_10M)]);
-    gdriveApi.downloadFile.mockImplementation((id: string) => {
+    gdriveApi.downloadFile.mockImplementation(async (id: string) => {
       if (id === FILE_ID) {
         return Promise.resolve(ChecklistFile.toJsonString(EXPECTED_CONTENTS));
       }
@@ -477,7 +478,7 @@ describe('GoogleDriveApi', () => {
     await store.saveChecklistFile(EXPECTED_CONTENTS, NOW_PLUS_10M);
 
     gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, OLDER_MTIME)]);
-    gdriveApi.trashFile.mockImplementation((id: string) => {
+    gdriveApi.trashFile.mockImplementation(async (id: string) => {
       if (id === FILE_ID) {
         return Promise.resolve();
       }
@@ -505,7 +506,7 @@ describe('GoogleDriveApi', () => {
     file2.trashed = true;
     gdriveApi.listFiles.mockResolvedValue([file1, file2]);
 
-    gdriveApi.deleteFile.mockImplementation((id: string) => {
+    gdriveApi.deleteFile.mockImplementation(async (id: string) => {
       if (id === file1.id || id === file2.id) {
         return Promise.resolve();
       }

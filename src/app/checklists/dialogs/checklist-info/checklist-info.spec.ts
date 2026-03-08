@@ -54,7 +54,7 @@ describe('ChecklistInfoComponent', () => {
   let user: UserEvent;
   let loader: HarnessLoader;
   let dataIn: Checklist;
-  let dataOut: Mock<(value: OutputType) => void>;
+  let dataOut: Mock<(value: OutputType) => undefined>;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
   let titleBox: HTMLInputElement;

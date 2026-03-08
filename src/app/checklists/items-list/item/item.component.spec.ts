@@ -6,8 +6,8 @@ import { ChecklistItemComponent } from './item.component';
 
 describe('ChecklistItemComponent', () => {
   let user: UserEvent;
-  let itemChange: Mock<(value: ChecklistItem) => void>;
-  let itemDeleted: Mock<(value: boolean) => void>;
+  let itemChange: Mock<(value: ChecklistItem) => undefined>;
+  let itemDeleted: Mock<(value: boolean) => undefined>;
   let editButton: HTMLButtonElement;
   let deleteButton: HTMLButtonElement;
   let indentLeftButton: HTMLButtonElement;

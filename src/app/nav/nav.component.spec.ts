@@ -18,7 +18,7 @@ describe('NavComponent', () => {
   let fixture: ComponentFixture<NavComponent>;
   let loader: HarnessLoader;
   let navData: NavData;
-  let hotkeys: any;
+  let hotkeys: { getHotkeys: Mock; getShortcuts: Mock };
   let toggleHelp: Mock<typeof HelpComponent.toggleHelp>;
 
   beforeEach(async () => {

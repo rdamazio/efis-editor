@@ -41,8 +41,7 @@ describe('ChecklistsComponent', () => {
   let showSnack: Mock;
   let navData: NavData;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let realNavigate: (commands: any[], extras?: NavigationExtras) => Promise<boolean>;
+  let realNavigate: (commands: unknown[], extras?: NavigationExtras) => Promise<boolean>;
   let metaKey: string;
 
   beforeEach(async () => {

@@ -51,7 +51,8 @@ describe('ChecklistFileInfoComponent', () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    dataOut = vi.fn().mockName('ChecklistFileInfoComponent.dataOut');
+    dataOut = vi.fn();
+    dataOut.mockName('FileInfo.dataOut');
 
     metadata = ChecklistFileMetadata.create({ name: 'Name' });
     groups = [];

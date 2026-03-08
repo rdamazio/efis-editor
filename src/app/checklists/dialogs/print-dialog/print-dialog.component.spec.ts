@@ -52,9 +52,10 @@ describe('PrintDialogComponent', () => {
 
   beforeEach(async () => {
     user = userEvent.setup();
-    dataOut = vi.fn().mockName('PrintDialogComponent.dataOut');
+    dataOut = vi.fn();
+    dataOut.mockName('PrintDialogComponent.dataOut');
 
-    fixture = (await render(DialogTestComponent, { on: { dataOut } })).fixture;
+    fixture = (await render(DialogTestComponent, { on: { dataOut: dataOut } })).fixture;
   });
 
   beforeEach(inject(

@@ -4,6 +4,7 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { BehaviorSubject, Subject } from 'rxjs';
+import type { Mock } from 'vitest';
 import { DriveSyncState, GoogleDriveStorage } from '../../../model/storage/gdrive';
 import { GoogleDriveComponent } from './gdrive.component';
 
@@ -11,7 +12,7 @@ describe('GoogleDriveComponent', () => {
   let user: UserEvent;
   let fixture: ComponentFixture<GoogleDriveComponent>;
   let syncButton: HTMLElement;
-  let gdrive: any;
+  let gdrive: Record<keyof GoogleDriveStorage, Mock>;
   let state$: BehaviorSubject<DriveSyncState>;
   let downloads$: Subject<string>;
   let errors$: Subject<string>;

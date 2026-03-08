@@ -9,8 +9,8 @@ describe('NodeComponent', () => {
   let user: UserEvent;
   let node: ChecklistTreeNode;
   let disableButtonHover: boolean;
-  let nodeRename: Mock<(value: ChecklistTreeNode) => void>;
-  let nodeDelete: Mock<(value: ChecklistTreeNode) => void>;
+  let nodeRename: Mock<(value: ChecklistTreeNode) => undefined>;
+  let nodeDelete: Mock<(value: ChecklistTreeNode) => undefined>;
 
   beforeEach(() => {
     user = userEvent.setup();

@@ -1,3 +1,3 @@
 if (typeof process === 'undefined') {
-  (globalThis as any).process = { env: {} };
+  (globalThis as { process: unknown }).process = { env: {} };
 }

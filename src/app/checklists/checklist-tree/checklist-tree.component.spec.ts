@@ -1,6 +1,6 @@
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
-import { Mock } from 'vitest';
+import { type Mock, vi } from 'vitest';
 import { Checklist, ChecklistFile, ChecklistGroup } from '../../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS, EXPECTED_FOREFLIGHT_CONTENTS } from '../../../model/formats/test-data';
 import { ChecklistTreeComponent } from './checklist-tree.component';
@@ -18,15 +18,22 @@ describe('ChecklistTreeComponent', () => {
     file = ChecklistFile.clone(EXPECTED_CONTENTS);
     selectedChecklistInput = undefined;
 
-    fileModified = vi.fn().mockName('ChecklistTreeComponent.fileModified');
-    selectedChecklist = vi.fn().mockName('ChecklistTreeComponent.selectedChecklist');
-    selectedChecklistGroup = vi.fn().mockName('ChecklistTreeComponent.selectedChecklistGroup');
+    fileModified = vi.fn();
+    fileModified.mockName('ChecklistTreeComponent.fileModified');
+    selectedChecklist = vi.fn();
+    selectedChecklist.mockName('ChecklistTreeComponent.selectedChecklist');
+    selectedChecklistGroup = vi.fn();
+    selectedChecklistGroup.mockName('ChecklistTreeComponent.selectedChecklistGroup');
   });
 
   async function renderComponent(): Promise<RenderResult<ChecklistTreeComponent>> {
     return render(ChecklistTreeComponent, {
       inputs: { file: file, selectedChecklist: selectedChecklistInput },
-      on: { fileModified, selectedChecklist, selectedChecklistGroup },
+      on: {
+        fileModified: fileModified,
+        selectedChecklist: selectedChecklist,
+        selectedChecklistGroup: selectedChecklistGroup,
+      },
     });
   }
 

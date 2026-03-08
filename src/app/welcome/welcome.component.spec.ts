@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { DeviceDetectorService } from 'ngx-device-detector';
 import { BehaviorSubject } from 'rxjs';
+import type { Mock } from 'vitest';
 import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
 import { WelcomeComponent } from './welcome.component';
 
@@ -9,7 +10,7 @@ describe('WelcomeComponent', () => {
   let component: WelcomeComponent;
   let fixture: ComponentFixture<WelcomeComponent>;
   let deviceService: DeviceDetectorService;
-  let gdrive: any;
+  let gdrive: { getState: Mock };
   let state$: BehaviorSubject<DriveSyncState>;
 
   beforeEach(async () => {

@@ -18,8 +18,7 @@ describe('ChecklistItemsComponent', () => {
   beforeEach(async () => {
     user = userEvent.setup();
     checklist = Checklist.clone(EXPECTED_CONTENTS.groups[0].checklists[0]);
-    checklistChange = vi.fn().mockName('ChecklistItemsComponent.checklistChange');
-    checklistChange.mockImplementation(onChecklistChanged);
+    checklistChange = vi.fn(onChecklistChanged).mockName('ChecklistItemsComponent.checklistChange');
 
     rendered = await render(ChecklistItemsComponent, {
       inputs: { checklist },

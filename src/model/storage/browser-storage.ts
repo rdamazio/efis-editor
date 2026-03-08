@@ -9,7 +9,7 @@ export class LazyBrowserStorage {
     this.storage = new Promise<Storage>((resolve, reject) => {
       this._storageResolveFunc = () => {
         this._storageResolveFunc = undefined;
-        if (Object.hasOwn(global, 'localStorage')) {
+        if (typeof localStorage !== 'undefined') {
           console.debug('Initialized local storage');
           resolve(localStorage);
         } else {

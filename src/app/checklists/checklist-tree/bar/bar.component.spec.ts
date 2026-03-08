@@ -1,9 +1,10 @@
 import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 import { ChecklistTreeBarComponent } from './bar.component';
 
 describe('ChecklistTreeBarComponent', () => {
-  let tree: any;
+  let tree: { isAllExpanded: Mock; expandAll: Mock; isAllCollapsed: Mock; collapseAll: Mock };
   let rendered: RenderResult<ChecklistTreeBarComponent>;
   let expandButton: HTMLElement;
   let collapseButton: HTMLElement;
@@ -13,6 +14,7 @@ describe('ChecklistTreeBarComponent', () => {
     user = userEvent.setup();
 
     tree = {
+      // eslint-disable-next-line no-secrets/no-secrets
       isAllExpanded: vi.fn().mockName('ChecklistTreeComponent.isAllExpanded'),
       expandAll: vi.fn().mockName('ChecklistTreeComponent.expandAll'),
       isAllCollapsed: vi.fn().mockName('ChecklistTreeComponent.isAllCollapsed'),
