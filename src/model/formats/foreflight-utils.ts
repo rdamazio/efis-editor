@@ -1,4 +1,3 @@
-const uuidV4 = () => globalThis.crypto.randomUUID();
 import { CryptoUtils } from './crypto-utils';
 
 export class ForeFlightUtils {
@@ -23,6 +22,6 @@ export class ForeFlightUtils {
    * Object IDs appear to be UUID V4 without dashes, and are presumably used for checklist synchronization
    */
   public static getObjectId(): string {
-    return uuidV4().replaceAll('-', '');
+    return crypto.randomUUID().replaceAll('-', '');
   }
 }

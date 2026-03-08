@@ -10,7 +10,6 @@ import { NullValue } from '../../../gen/ts/google/protobuf/struct';
 import { FormatUtils } from './format-utils';
 import { GarminPilotLiveData } from './garmin-pilot-live-data';
 import { GarminChecklistGroupKey, GarminPilotFormatError, GarminPilotUtils } from './garmin-pilot-utils';
-const uuidV4 = () => globalThis.crypto.randomUUID();
 
 export class GarminPilotWriter {
   private readonly _checklistsGarmin = new Map<GarminChecklistGroupKey, GarminPilotChecklist[]>();
@@ -48,7 +47,7 @@ export class GarminPilotWriter {
           checklists: ([] as GarminPilotChecklist[]).concat(...this._checklistsGarmin.values()),
           binders: [
             {
-              uuid: uuidV4(),
+              uuid: crypto.randomUUID(),
               // TODO: if we ever start importing GPLTS files, we'll want to preserve sortOrder and
               // sourceTemplateUUID on import and re-export them instead.
               sourceTemplateUUID: undefined,
@@ -82,7 +81,7 @@ export class GarminPilotWriter {
       const [checklistTypeGarmin, checklistSubTypeGarmin] = groupKeyGarmin;
       checklistGroupsGarmin.push({
         completionItem: completionAction,
-        uuid: uuidV4(),
+        uuid: crypto.randomUUID(),
         checklistItems: itemsGarmin.map((itemGarmin) => itemGarmin.uuid),
         name: checklistEFIS.title,
         type: checklistTypeGarmin,
@@ -100,7 +99,7 @@ export class GarminPilotWriter {
           checked: false,
           itemType: GarminPilotChecklistItem_ItemType.TYPE_PLAIN_TEXT,
           title: itemEFIS.prompt,
-          uuid: uuidV4(),
+          uuid: crypto.randomUUID(),
           action: itemEFIS.expectation,
         };
         accumulator.push([itemGarmin, itemEFIS]);
