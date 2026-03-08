@@ -48,8 +48,9 @@ describe('ChecklistsComponent', () => {
 
   beforeEach(async () => {
     // We have a lot of large tests in this file, override the timeout.
+    // Give even more time to avoid hitting slow coverage instrumentation timeouts.
     originalTimeout = 5000;
-    vi.setConfig({ testTimeout: 20000 });
+    vi.setConfig({ testTimeout: 60000 });
 
     // ngneat/hotkeys uses different keys for Meta on PC vs Mac - detect where we're running tests.
     const isPC = !navigator.userAgent.includes('Macintosh');
