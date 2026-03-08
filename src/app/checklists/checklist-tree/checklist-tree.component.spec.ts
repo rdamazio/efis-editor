@@ -1,4 +1,4 @@
-import { render, RenderResult, screen, within } from '@testing-library/angular';
+import { render, RenderResult, screen, waitFor, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 import { Checklist, ChecklistFile } from '../../../../gen/ts/checklist';
@@ -131,8 +131,10 @@ describe('ChecklistTreeComponent', () => {
     await user.clear(titleBox);
     await user.type(titleBox, 'Renamed checklist[Enter]');
 
-    expect(screen.queryByRole('treeitem', { name: 'Checklist: Test group 1 checklist 1' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('treeitem', { name: 'Checklist: Renamed checklist' })).toBeVisible();
+    await waitFor(() =>
+      expect(screen.queryByRole('treeitem', { name: 'Checklist: Test group 1 checklist 1' })).not.toBeInTheDocument(),
+    );
+    await waitFor(() => expect(screen.queryByRole('treeitem', { name: 'Checklist: Renamed checklist' })).toBeVisible());
 
     expect(file.groups[0].checklists[0].title).toEqual('Renamed checklist');
     expect(fileModified).toHaveBeenCalledTimes(1);
@@ -153,8 +155,10 @@ describe('ChecklistTreeComponent', () => {
     await user.clear(titleBox);
     await user.type(titleBox, 'Renamed group[Enter]');
 
-    expect(screen.queryByRole('treeitem', { name: 'Group: Test group 2 (default)' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('treeitem', { name: 'Group: Renamed group' })).toBeVisible();
+    await waitFor(() =>
+      expect(screen.queryByRole('treeitem', { name: 'Group: Test group 2 (default)' })).not.toBeInTheDocument(),
+    );
+    await waitFor(() => expect(screen.queryByRole('treeitem', { name: 'Group: Renamed group' })).toBeVisible());
 
     expect(file.groups[1].title).toEqual('Renamed group');
     expect(fileModified).toHaveBeenCalledTimes(1);
@@ -181,7 +185,9 @@ describe('ChecklistTreeComponent', () => {
     const confirmButton = await screen.findByRole('button', { name: 'Delete!' });
     await user.click(confirmButton);
 
-    expect(screen.queryByRole('treeitem', { name: 'Checklist: Test group 2 checklist 2' })).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByRole('treeitem', { name: 'Checklist: Test group 2 checklist 2' })).not.toBeInTheDocument(),
+    );
 
     expect(file.groups[1].checklists).toHaveLength(2);
     expect(file.groups[1].checklists[1].title).toEqual(EXPECTED_CONTENTS.groups[1].checklists[2].title);
@@ -214,7 +220,9 @@ describe('ChecklistTreeComponent', () => {
     const confirmButton = await screen.findByRole('button', { name: 'Delete!' });
     await user.click(confirmButton);
 
-    expect(screen.queryByRole('treeitem', { name: 'Group: Test group 2 (default)' })).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByRole('treeitem', { name: 'Group: Test group 2 (default)' })).not.toBeInTheDocument(),
+    );
 
     expect(file.groups).toHaveLength(1);
     expect(file.groups[0].checklists).toHaveLength(1);

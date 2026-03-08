@@ -3,6 +3,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture, TestBed, inject } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { TitleDialogComponent, TitleDialogData } from './title-dialog.component';
@@ -19,7 +20,7 @@ describe('TitleDialogComponent', () => {
     user = userEvent.setup();
 
     await TestBed.configureTestingModule({
-      imports: [TitleDialogComponent, MatDialogModule],
+      imports: [TitleDialogComponent, MatDialogModule, NoopAnimationsModule],
       providers: [
         { provide: MatDialogRef, useValue: {} },
         { provide: MAT_DIALOG_DATA, useValue: DATA },

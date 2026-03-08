@@ -1,4 +1,4 @@
-import { render, RenderResult, screen } from '@testing-library/angular';
+import { render, RenderResult, screen, waitFor } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 import { ChecklistGroup_Category } from '../../../../../gen/ts/checklist';
@@ -94,7 +94,7 @@ describe('NodeComponent', () => {
     expect(confirmButton).toBeInTheDocument();
     await user.click(confirmButton);
 
-    expect(screen.queryByRole('button', { name: 'Delete!' })).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Delete!' })).not.toBeInTheDocument());
     expect(nodeDelete).toHaveBeenCalledTimes(1);
     expect(nodeDelete).toHaveBeenCalledWith(node);
   });
@@ -110,7 +110,7 @@ describe('NodeComponent', () => {
     expect(cancelButton).toBeInTheDocument();
     await user.click(cancelButton);
 
-    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument());
     expect(nodeDelete).not.toHaveBeenCalled();
   });
 
@@ -125,10 +125,10 @@ describe('NodeComponent', () => {
     // Change to normal category.
     await user.click(categoryIcon);
     const normalOption = await screen.findByText('🄽ormal');
-    expect(normalOption).toBeVisible();
+    await waitFor(() => expect(normalOption).toBeVisible());
     await user.click(normalOption);
 
-    expect(screen.queryByText(/🄰.*/)).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText(/🄰.*/)).not.toBeInTheDocument());
 
     // Verify that model was changed.
     expect(node.group.category).toEqual(ChecklistGroup_Category.normal);
