@@ -36,8 +36,8 @@ describe('GoogleDriveComponent', () => {
     gdrive.getState.mockReturnValue(state$.asObservable());
     gdrive.onDownloads.mockReturnValue(downloads$.asObservable());
     gdrive.onErrors.mockReturnValue(errors$.asObservable());
-    gdrive.init.mockResolvedValue();
-    gdrive.synchronize.mockResolvedValue();
+    gdrive.init.mockResolvedValue(undefined);
+    gdrive.synchronize.mockResolvedValue(undefined);
 
     ({ fixture } = await render(GoogleDriveComponent, {
       providers: [

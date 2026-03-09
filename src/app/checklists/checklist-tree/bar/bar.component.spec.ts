@@ -1,6 +1,7 @@
 import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
+import { ChecklistTreeComponent } from '../checklist-tree.component';
 import { ChecklistTreeBarComponent } from './bar.component';
 
 describe('ChecklistTreeBarComponent', () => {
@@ -22,7 +23,7 @@ describe('ChecklistTreeBarComponent', () => {
     };
 
     rendered = await render(ChecklistTreeBarComponent, {
-      inputs: { tree: tree },
+      inputs: { tree: tree as unknown as ChecklistTreeComponent },
     });
     expandButton = screen.queryByRole('button', { name: 'Expand all checklist groups' })!;
     collapseButton = screen.queryByRole('button', { name: 'Collapse all checklist groups' })!;

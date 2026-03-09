@@ -29,7 +29,7 @@ describe('GoogleDriveApi', () => {
   let allDownloads: string[];
   let stateSub: Subscription | undefined;
   let downloadSub: Subscription | undefined;
-  let gdriveApi: Record<keyof GoogleDriveApi, Mock> & { accessToken?: string };
+  let gdriveApi: Record<Exclude<keyof GoogleDriveApi, 'accessToken'>, Mock> & { accessToken?: string };
   let store: ChecklistStorage;
   let lazyBrowserStore: LazyBrowserStorage;
   let browserStore: Storage;
@@ -58,7 +58,7 @@ describe('GoogleDriveApi', () => {
       uploadFile: vi.fn().mockName('GoogleDriveApi.uploadFile'),
       trashFile: vi.fn().mockName('GoogleDriveApi.trashFile'),
       deleteFile: vi.fn().mockName('GoogleDriveApi.deleteFile'),
-      accessToken: '',
+      accessToken: undefined,
     };
 
     TestBed.configureTestingModule({ providers: [{ provide: GoogleDriveApi, useValue: gdriveApi }] });
@@ -194,7 +194,9 @@ describe('GoogleDriveApi', () => {
   });
 
   it('should revoke token when requested', async () => {
-    gdriveApi.revokeAccessToken.mockResolvedValue(undefined);
+    gdriveApi.revokeAccessToken.mockImplementation(() => {
+      gdriveApi.accessToken = undefined;
+    });
     gdriveApi.listFiles.mockResolvedValue([]);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
