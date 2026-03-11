@@ -500,7 +500,6 @@ export class PdfWriter {
         startY = this._doc.lastAutoTable.finalY + 2;
       }
 
-      const firstPageNumber = this._doc.getCurrentPageInfo().pageNumber;
       autoTable(this._doc, {
         // Actual columns are: prompt, spacer, expectation
         head: [
@@ -535,7 +534,7 @@ export class PdfWriter {
             (this._columns - 1 - nextColumn) * (this._availableColumnWidth + this._gutterWidth);
         },
         didDrawCell: (data: CellHookData) => {
-          this._drawPrefixedCell(data, firstPageNumber);
+          this._drawPrefixedCell(data);
         },
       });
     }
@@ -657,7 +656,7 @@ export class PdfWriter {
     });
   }
 
-  private _drawPrefixedCell(data: CellHookData, firstPageNumber: number) {
+  private _drawPrefixedCell(data: CellHookData) {
     if (data.section !== 'body') return;
     if (data.column.index !== 0) return;
 
@@ -758,7 +757,7 @@ export class PdfWriter {
       // drawn, for now.
       this._icons.push({
         name: icon,
-        page: firstPageNumber + data.pageNumber - 1,
+        page: this._doc!.getCurrentPageInfo().pageNumber,
         // Position to the left of the text.
         x: margin.left + leftPadding,
         // Position at the top of the cell.
