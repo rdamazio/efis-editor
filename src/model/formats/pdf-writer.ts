@@ -432,8 +432,13 @@ export class PdfWriter {
     const usableHeight = height - marginOffset;
     const usableCenterY = marginOffset + usableHeight / 2;
     console.debug(`PDF: Title height=${height}; usable=${usableHeight}; usableCenter=${usableCenterY}`);
+
+    this._doc.setFontSize(PdfWriter.GROUP_TITLE_FONT_SIZE);
+    const maxWidth = width - this._defaultPadding * 4;
+    const lines = this._doc.splitTextToSize(group.title, maxWidth) as string[];
+
     this._setCurrentY(usableCenterY);
-    this._addCenteredText(group.title, {
+    this._addCenteredText(lines, {
       advanceY: usableCenterY,
       fontSize: PdfWriter.GROUP_TITLE_FONT_SIZE,
       fontStyle: PdfWriter.BOLD_FONT_STYLE,
@@ -456,7 +461,12 @@ export class PdfWriter {
       }
       this._newPage(true);
     } else {
-      titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2;
+      this._doc.setFontSize(PdfWriter.GROUP_TITLE_FONT_SIZE);
+      const maxWidth = this._availableColumnWidth - this._defaultPadding * 4;
+      const lines = this._doc.splitTextToSize(group.title, maxWidth) as string[];
+      const addedHeight = ((lines.length - 1) * (PdfWriter.GROUP_TITLE_FONT_SIZE * 1.5)) / this._scaleFactor;
+
+      titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2 + addedHeight;
       if (this._options.marginOffsetsGroupTitle) {
         titleOffset += this._tableMargin.top;
       } else if (titleOffset < this._tableMargin.top) {
@@ -936,7 +946,7 @@ export class PdfWriter {
     this._currentColumn = 0;
   }
 
-  private _addCenteredText(txt: string, options: CenteredTextOptions) {
+  private _addCenteredText(txt: string | string[], options: CenteredTextOptions) {
     if (!this._doc) return;
 
     const { advanceY, fontSize, fontStyle, baseline, useColumnWidth } = options;
