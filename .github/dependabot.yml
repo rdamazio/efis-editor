@@ -22,10 +22,10 @@ updates:
           - '@testing-library/*'
           - '@types/node'
           - '*express*'
-          - '*jasmine*'
-          - 'karma*'
+          - '*playwright*'
           - '*protobuf*'
           - 'rxjs'
+          - '*vitest*'
           - 'zone.js'
         exclude-patterns:
           - '*eslint*'
