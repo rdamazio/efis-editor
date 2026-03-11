@@ -129,6 +129,8 @@ export class PdfWriter {
   };
 
   private _doc?: AutoTabledPDF;
+  private _addPhysicalPage?: typeof jsPDF.prototype.addPage;
+
   private _pageWidth = 0;
   private _pageHeight = 0;
   private _scaleFactor = 0;
@@ -160,6 +162,14 @@ export class PdfWriter {
   public async write(file: ChecklistFile): Promise<Blob> {
     const doc = new jsPDF(this._pdfOptions());
     this._doc = doc as AutoTabledPDF;
+
+    // Because autotable directly calls addPage, we need to wrap it to
+    // support multiple columns.
+    this._addPhysicalPage = this._doc.addPage.bind(this._doc);
+    this._doc.addPage = () => {
+      this._newPage();
+      return this._doc as jsPDF;
+    };
 
     // Letter gives 51x66, A4 gives 49.6077x70.1575
     this._pageHeight = this._doc.internal.pageSize.getHeight();
@@ -357,7 +367,7 @@ export class PdfWriter {
       PdfWriter.FOOTNOTE_HEIGHT,
       PdfWriter.FOOTNOTE_FONT_SIZE,
     );
-    this._newPage();
+    this._newPage(true);
   }
 
   private _addGroups(groups: ChecklistGroup[]) {
@@ -367,7 +377,7 @@ export class PdfWriter {
       this._addGroup(group);
 
       // Force starting a new page for each group.
-      this._newPage();
+      this._newPage(true);
     }
 
     this._doc.deletePage(this._doc.internal.pages.length - 1);
@@ -425,7 +435,7 @@ export class PdfWriter {
       if (usedDarkBackground) {
         this._darkBackgroundPages.push(this._doc.getCurrentPageInfo().pageNumber);
       }
-      this._newPage();
+      this._newPage(true);
     } else {
       titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2;
       if (this._options.marginOffsetsGroupTitle) {
@@ -450,6 +460,8 @@ export class PdfWriter {
         first = false;
       } else if (this._options.checklistNewPage) {
         // User requested a new page for each checklist.
+        // TODO: Differentiate new page vs new column for each checklist in the options.
+        //       (perhaps radio to choose "Checklist starts on: new page | new column | same column")
         this._newPage();
       } else if (this._doc.lastAutoTable.finalY - this._tableMargin.top > this._innerPageHeight / 2) {
         // More than half the page is already used, start on the next page.
@@ -873,9 +885,33 @@ export class PdfWriter {
     this._currentY = y;
   }
 
-  private _newPage() {
-    this._doc?.addPage();
+  private _newPage(forceNewPhysicalPage = false) {
+    if (!this._doc) return;
+
+    this._currentColumn++;
+    if (!forceNewPhysicalPage && this._currentColumn < this._columns) {
+      console.debug(`PDF: New column ${this._currentColumn}`);
+      this._setCurrentY(0);
+      return;
+    }
+
+    // Draw the layout debugging *after* the other contents so it's not obscured.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (PdfWriter.DEBUG_LAYOUT) {
+      this._doc.setLineWidth(0.01);
+      for (
+        let x = this._tableMargin.left - this._gutterWidth / 2;
+        x < this._pageWidth - this._tableMargin.right;
+        x += this._columnWidth
+      ) {
+        this._doc.rect(x, 0, this._columnWidth, this._pageHeight, 'S');
+      }
+    }
+
+    console.debug(`PDF: New page`);
+    this._addPhysicalPage!();
     this._setCurrentY(0);
+    this._currentColumn = 0;
   }
 
   private _addCenteredText(
