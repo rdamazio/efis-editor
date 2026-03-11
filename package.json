@@ -95,7 +95,6 @@
     "pdfjs-dist": "^5.5.207",
     "playwright": "^1.58.2",
     "prettier": "^3.8.1",
-    "prettier-eslint": "^16.4.2",
     "prettier-plugin-organize-imports": "^4.3.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "8.56.1",
