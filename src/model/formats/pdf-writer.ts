@@ -1,5 +1,13 @@
 import { jsPDF, jsPDFOptions, TextOptionsLight } from 'jspdf';
-import autoTable, { CellDef, CellHookData, FontStyle, MarginPadding, RowInput, UserOptions } from 'jspdf-autotable';
+import autoTable, {
+  CellDef,
+  CellHookData,
+  FontStyle,
+  HookData,
+  MarginPadding,
+  RowInput,
+  UserOptions,
+} from 'jspdf-autotable';
 import 'svg2pdf.js';
 import {
   Checklist,
@@ -130,7 +138,12 @@ export class PdfWriter {
   private _defaultPadding = 0;
   private _defaultCellPadding?: CellPaddingInputStructured;
 
+  private _currentColumn = 0;
   private _columns = 1;
+  private _columnWidth = 0;
+  private _availableColumnWidth = 0;
+  private _gutterWidth = 0;
+
   // Persistent cache so icons are only fetched once.
   private static readonly ICON_CACHE = new Map<string, Element>();
   // Per-instance promise of icons being fetched.
@@ -156,6 +169,12 @@ export class PdfWriter {
     this._tableMargin = this._tableMarginFromOptions();
 
     this._columns = this._options.columns ?? 1;
+    this._gutterWidth = this._pageWidth * 0.02; // 2% gutter
+    const totalGutterWidth = this._gutterWidth * (this._columns - 1);
+    const availableWidth = this._pageWidth - this._tableMargin.left - this._tableMargin.right - totalGutterWidth;
+    this._availableColumnWidth = availableWidth / this._columns;
+    this._columnWidth = this._availableColumnWidth + this._gutterWidth;
+
     this._innerPageHeight = this._pageHeight - this._tableMargin.top - this._tableMargin.bottom;
     this._footNoteY = this._pageHeight - this._tableMargin.bottom / 2;
 
@@ -262,6 +281,17 @@ export class PdfWriter {
           bottom: PdfWriter.MM_TO_EM * bottom,
         };
     }
+  }
+
+  private _getColumnMarginLeft(): number {
+    return this._tableMargin.left + this._currentColumn * (this._availableColumnWidth + this._gutterWidth);
+  }
+
+  private _getColumnMarginRight(): number {
+    return (
+      this._tableMargin.right +
+      (this._columns - 1 - this._currentColumn) * (this._availableColumnWidth + this._gutterWidth)
+    );
   }
 
   private _addCover(metadata: ChecklistFileMetadata) {
@@ -443,13 +473,26 @@ export class PdfWriter {
         ],
         body: this._checklistTableBody(checklist),
         showHead: 'firstPage',
-        margin: this._tableMargin,
+        margin: {
+          left: this._getColumnMarginLeft(),
+          right: this._getColumnMarginRight(),
+          top: this._tableMargin.top,
+          bottom: this._tableMargin.bottom,
+        },
         startY: startY,
         rowPageBreak: 'avoid',
         styles: PdfWriter.DEBUG_LAYOUT // eslint-disable-line @typescript-eslint/no-unnecessary-condition
           ? { lineWidth: 0.1 }
           : undefined,
         bodyStyles: { fontSize: PdfWriter.CONTENT_FONT_SIZE, valign: 'top' },
+        didDrawPage: (data: HookData) => {
+          const nextColumn = (this._currentColumn + 1) % this._columns;
+          data.settings.margin.left =
+            this._tableMargin.left + nextColumn * (this._availableColumnWidth + this._gutterWidth);
+          data.settings.margin.right =
+            this._tableMargin.right +
+            (this._columns - 1 - nextColumn) * (this._availableColumnWidth + this._gutterWidth);
+        },
         didDrawCell: (data: CellHookData) => {
           this._drawPrefixedCell(data, firstPageNumber);
         },
@@ -610,7 +653,11 @@ export class PdfWriter {
 
     let leftPadding = data.cell.padding('left');
     let tableWidth = data.cell.width;
-    const margin = { ...this._tableMargin };
+    const margin = {
+      ...this._tableMargin,
+      left: this._getColumnMarginLeft(),
+      right: this._getColumnMarginRight(),
+    };
 
     if (data.cell.styles.halign === 'center') {
       // We'll center the entire table instead of the content cell.
@@ -618,10 +665,9 @@ export class PdfWriter {
       leftPadding = 0;
       const textWidth = this._textWidth(data.cell.text);
       tableWidth = PdfWriter.PREFIX_CELL_WIDTH + textWidth + 2 * this._defaultPadding;
-      const outerTableWidth = this._pageWidth - this._tableMargin.left - this._tableMargin.right;
-      const innerMargins = (outerTableWidth - tableWidth) / 2;
+      const innerTableWidth = this._availableColumnWidth;
+      const innerMargins = (innerTableWidth - tableWidth) / 2;
       margin.left += innerMargins;
-      margin.right += innerMargins;
 
       console.debug(`PDF: Centered: textW=${textWidth}, tableWidth=${tableWidth}, text="${contents}"`);
     }
@@ -782,11 +828,8 @@ export class PdfWriter {
 
     // Calculate the cell width that's available for the text contents
     return (
-      // The whole page:
-      this._pageWidth -
-      // The whole table:
-      this._tableMargin.left -
-      this._tableMargin.right -
+      // The available column width (accounting for margins and gutters):
+      this._availableColumnWidth -
       // The prefix + content (with padding):
       indentWidth -
       // The content (with padding):
