@@ -28,17 +28,10 @@ jobs:
           name: prepared-source
       - name: Extract prepared artifacts
         run: tar xf prepared-source.tar
-
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps
       - name: Run tests
-        # Before release, test on more browsers.
-        # TODO: Make tests pass on webkit too.
-        run: npm run test:headless -- --browsers chromium --browsers firefox
-
+        run: npm run test:headless
       - name: Build
         run: npm run build:prod
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
