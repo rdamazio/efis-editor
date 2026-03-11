@@ -416,7 +416,11 @@ export class PdfWriter {
     }
     this._doc.setFillColor(rectColor);
     this._doc.setTextColor(textColor);
-    this._doc.rect(0, 0, this._pageWidth, height, PdfWriter.RECT_FILL_STYLE);
+    // Draw the background rectable over the whole column, even the margin and gutter.
+    const width = this._options.outputGroupCoverPages
+      ? this._pageWidth
+      : this._tableMargin.left + this._columnWidth - this._gutterWidth / 2;
+    this._doc.rect(0, 0, width, height, PdfWriter.RECT_FILL_STYLE);
 
     // ---------------------------
     // Margin                    | marginOffset  \
@@ -434,6 +438,7 @@ export class PdfWriter {
       fontSize: PdfWriter.GROUP_TITLE_FONT_SIZE,
       fontStyle: PdfWriter.BOLD_FONT_STYLE,
       baseline: 'middle',
+      useColumnWidth: !this._options.outputGroupCoverPages,
     });
 
     this._doc.restoreGraphicsState();
