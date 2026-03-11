@@ -6,6 +6,12 @@ import { serializeChecklistFile } from './format-registry';
 import { PdfWriter, PdfWriterOptions } from './pdf-writer';
 import { EXPECTED_CONTENTS_WITH_COMPLETION_ACTION } from './test-data';
 
+interface PositionedText {
+  text: string;
+  x: number;
+  y: number;
+}
+
 describe('PdfWriter', () => {
   it('should create an instance', () => {
     expect(new PdfWriter()).toBeTruthy();
@@ -120,6 +126,40 @@ describe('PdfWriter', () => {
     }
   });
 
+  it('generates a multi-column PDF', async () => {
+    // We use a small custom page height to guarantee the content wraps
+    // into the second column. Otherwise, a regular letter page might
+    // fit it all in the first column easily.
+    const pdf = await writeAndParsePdf({
+      columns: 3,
+      pageSize: 'custom',
+      customPageHeight: 3,
+      customPageWidth: 12,
+    });
+    expect(pdf.numPages).toBeGreaterThan(0);
+    const allText = await pdfToText(pdf);
+
+    // Make sure we still output all content
+    for (const group of EXPECTED_CONTENTS_WITH_COMPLETION_ACTION.groups) {
+      expect(allText).toContain(group.title);
+      for (const checklist of group.checklists) {
+        expect(allText).toContain(checklist.title);
+      }
+    }
+
+    const coords = await getTextCoordinates(pdf);
+    // Page width is 12 inches = 864 points.
+    // The columns should be around 0-288, 288-576, and 576-864.
+    const leftItems = coords.filter((c) => c.x < 288 && c.text.trim().length > 0);
+    const middleItems = coords.filter((c) => c.x >= 288 && c.x < 576 && c.text.trim().length > 0);
+    const rightItems = coords.filter((c) => c.x >= 576 && c.text.trim().length > 0);
+
+    // We expect some content to fall into each of the 3 columns
+    expect(leftItems.length).toBeGreaterThan(0);
+    expect(middleItems.length).toBeGreaterThan(0);
+    expect(rightItems.length).toBeGreaterThan(0);
+  });
+
   async function writeAndParsePdf(options: PdfWriterOptions): Promise<pdfjs.PDFDocumentProxy> {
     const writtenFile = await serializeChecklistFile(EXPECTED_CONTENTS_WITH_COMPLETION_ACTION, FormatId.PDF, options);
     const writtenData = await writtenFile.arrayBuffer();
@@ -152,5 +192,18 @@ describe('PdfWriter', () => {
       pageText += ' ';
     }
     return pageText;
+  }
+
+  async function getTextCoordinates(pdf: pdfjs.PDFDocumentProxy): Promise<PositionedText[]> {
+    const coords: PositionedText[] = [];
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+      for (const item of content.items) {
+        const textItem = item as TextItem;
+        coords.push({ text: textItem.str, x: textItem.transform[4] as number, y: textItem.transform[5] as number });
+      }
+    }
+    return coords;
   }
 });
