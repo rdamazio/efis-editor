@@ -1,14 +1,8 @@
-import { DYNON_FORMAT_OPTIONS } from './dynon-format';
 import { FormatId } from './format-id';
 import { parseChecklistFile, serializeChecklistFile } from './format-registry';
-import { EXPECTED_CONTENTS } from './test-data';
+import { DYNON_EXPECTED_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
-import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
-
-export const DYNON_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), DYNON_FORMAT_OPTIONS).testCaseify(
-  EXPECTED_CONTENTS,
-);
 
 describe('DynonFormat', () => {
   beforeAll(() => {

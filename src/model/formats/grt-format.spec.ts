@@ -1,14 +1,8 @@
 import { FormatId } from './format-id';
 import { parseChecklistFile, serializeChecklistFile } from './format-registry';
-import { GRT_FORMAT_OPTIONS } from './grt-format';
-import { EXPECTED_CONTENTS } from './test-data';
+import { GRT_EXPECTED_CONTENTS } from './test-data';
 import { loadFile } from './test-utils';
-import { TextReader } from './text-reader';
 import { TextWriter } from './text-writer';
-
-export const GRT_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), GRT_FORMAT_OPTIONS).testCaseify(
-  EXPECTED_CONTENTS,
-);
 
 describe('GrtFormat', () => {
   beforeAll(() => {

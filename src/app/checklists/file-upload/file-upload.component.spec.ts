@@ -3,12 +3,12 @@ import userEvent, { UserEvent } from '@testing-library/user-event';
 import { firstValueFrom, timer } from 'rxjs';
 import type { Mock } from 'vitest';
 import { ChecklistFile } from '../../../../gen/ts/checklist';
-import { DYNON_EXPECTED_CONTENTS } from '../../../model/formats/dynon-format.spec';
-import { GRT_EXPECTED_CONTENTS } from '../../../model/formats/grt-format.spec';
 import {
+  DYNON_EXPECTED_CONTENTS,
   EXPECTED_CONTENTS,
   EXPECTED_CONTENTS_WITH_COMPLETION_ACTION,
   EXPECTED_FOREFLIGHT_CONTENTS,
+  GRT_EXPECTED_CONTENTS,
 } from '../../../model/formats/test-data';
 import { loadFile } from '../../../model/formats/test-utils';
 import { ChecklistFileUploadComponent } from './file-upload.component';

@@ -5,6 +5,9 @@ import {
   ChecklistItem,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
+import { DYNON_FORMAT_OPTIONS } from './dynon-format';
+import { GRT_FORMAT_OPTIONS } from './grt-format';
+import { TextReader } from './text-reader';
 
 export const EXPECTED_CONTENTS = ChecklistFile.create({
   groups: [
@@ -451,3 +454,11 @@ export const EXPECTED_GARMIN_PILOT_CONTENTS = ChecklistFile.create({
     name: 'New Checklist Binder',
   },
 });
+
+export const DYNON_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), DYNON_FORMAT_OPTIONS).testCaseify(
+  EXPECTED_CONTENTS,
+);
+
+export const GRT_EXPECTED_CONTENTS = new TextReader(new File([], 'fake'), GRT_FORMAT_OPTIONS).testCaseify(
+  EXPECTED_CONTENTS,
+);
