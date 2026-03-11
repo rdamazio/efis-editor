@@ -19,6 +19,7 @@ const NON_DEFAULT_OPTS: PdfWriterOptions = {
   outputPageNumbers: false,
   outputCompletionActions: false,
   checklistNewPage: true,
+  columns: 2,
 };
 
 describe('PreferenceStorage', () => {

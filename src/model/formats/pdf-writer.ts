@@ -52,6 +52,9 @@ export interface PdfWriterOptions extends ExportOptions {
 
   // Whether each checklist should start on a new page.
   checklistNewPage?: boolean;
+
+  // Number of columns to lay out consecutive checklists internally on the page.
+  columns?: number;
 }
 
 export const DEFAULT_OPTIONS: PdfWriterOptions = {
@@ -70,6 +73,7 @@ export const DEFAULT_OPTIONS: PdfWriterOptions = {
   outputPageNumbers: true,
   outputCompletionActions: true,
   checklistNewPage: false,
+  columns: 1,
 };
 
 interface IconToDraw {
@@ -126,6 +130,7 @@ export class PdfWriter {
   private _defaultPadding = 0;
   private _defaultCellPadding?: CellPaddingInputStructured;
 
+  private _columns = 1;
   // Persistent cache so icons are only fetched once.
   private static readonly ICON_CACHE = new Map<string, Element>();
   // Per-instance promise of icons being fetched.
@@ -150,11 +155,12 @@ export class PdfWriter {
     this._defaultPadding = 5 / this._scaleFactor;
     this._tableMargin = this._tableMarginFromOptions();
 
+    this._columns = this._options.columns ?? 1;
     this._innerPageHeight = this._pageHeight - this._tableMargin.top - this._tableMargin.bottom;
     this._footNoteY = this._pageHeight - this._tableMargin.bottom / 2;
 
     console.debug(
-      `PDF: page w=${this._pageWidth}, h=${this._pageHeight}, innerH=${this._innerPageHeight}, sf=${this._scaleFactor}, margin=${JSON.stringify(this._tableMargin)}, footnote=${this._footNoteY}, pad=${this._defaultPadding}`,
+      `PDF: page w=${this._pageWidth}, h=${this._pageHeight}, innerH=${this._innerPageHeight}, sf=${this._scaleFactor}, margin=${JSON.stringify(this._tableMargin)}, footnote=${this._footNoteY}, pad=${this._defaultPadding}, cols=${this._columns}`,
     );
     this._defaultCellPadding = {
       left: this._defaultPadding,

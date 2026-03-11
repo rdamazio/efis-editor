@@ -1,27 +1,43 @@
 <h2 mat-dialog-title>PDF export options</h2>
 <mat-dialog-content>
-  <mat-form-field>
-    <mat-label>Paper size</mat-label>
-    <mat-select required [(value)]="options.pageSize" aria-label="Select the paper size">
-      <mat-optgroup label="Imperial">
-        <mat-option value="letter">Letter (8.5 x 11)</mat-option>
-        <mat-option value="government-letter">Government letter (8 x 10.5)</mat-option>
-        <mat-option value="legal">Legal (8.5 x 14)</mat-option>
-        <mat-option value="junior-legal">Junior legal (5 x 8)</mat-option>
-        <mat-option value="tabloid">Tabloid (17 x 11)</mat-option>
-      </mat-optgroup>
-      <mat-optgroup label="Metric">
-        <mat-option value="a6">A6</mat-option>
-        <mat-option value="a5">A5</mat-option>
-        <mat-option value="a4">A4</mat-option>
-        <mat-option value="a3">A3</mat-option>
-        <mat-option value="a2">A2</mat-option>
-        <mat-option value="a1">A1</mat-option>
-        <mat-option value="a0">A0</mat-option>
-      </mat-optgroup>
-      <mat-option value="custom">Custom...</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <div>
+    <mat-form-field>
+      <mat-label>Paper size</mat-label>
+      <mat-select required [(value)]="options.pageSize" aria-label="Select the paper size">
+        <mat-optgroup label="Imperial">
+          <mat-option value="letter">Letter (8.5 x 11)</mat-option>
+          <mat-option value="government-letter">Government letter (8 x 10.5)</mat-option>
+          <mat-option value="legal">Legal (8.5 x 14)</mat-option>
+          <mat-option value="junior-legal">Junior legal (5 x 8)</mat-option>
+          <mat-option value="tabloid">Tabloid (17 x 11)</mat-option>
+        </mat-optgroup>
+        <mat-optgroup label="Metric">
+          <mat-option value="a6">A6</mat-option>
+          <mat-option value="a5">A5</mat-option>
+          <mat-option value="a4">A4</mat-option>
+          <mat-option value="a3">A3</mat-option>
+          <mat-option value="a2">A2</mat-option>
+          <mat-option value="a1">A1</mat-option>
+          <mat-option value="a0">A0</mat-option>
+        </mat-optgroup>
+        <mat-option value="custom">Custom...</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="columns-input">
+      <mat-label id="columns-label">Columns</mat-label>
+      <input
+        matInput
+        type="number"
+        min="1"
+        max="10"
+        required
+        aria-labelledby="columns-label"
+        placeholder="1"
+        [(ngModel)]="options.columns"
+      />
+    </mat-form-field>
+  </div>
 
   @if (options.pageSize === 'custom') {
     <div>
