@@ -146,6 +146,9 @@ describe('PrintDialogComponent', () => {
     await user.click(pageNumbers);
     await user.click(completionActions);
 
+    const checklistStartPage = await screen.findByRole('radio', { name: 'New page' });
+    await user.click(checklistStartPage);
+
     await user.click(okButton);
 
     const expectedOpts: PdfWriterOptions = {
@@ -155,7 +158,7 @@ describe('PrintDialogComponent', () => {
       outputCoverPage: true,
       outputPageNumbers: false,
       outputCompletionActions: false,
-      checklistNewPage: false,
+      checklistStart: 'page',
     };
     expect(dataOut).toHaveBeenCalledTimes(1);
     expect(dataOut).toHaveBeenCalledWith(expectedOpts);
@@ -168,6 +171,7 @@ describe('PrintDialogComponent', () => {
       ...DEFAULT_OPTIONS,
       pageSize: 'a6',
       orientation: 'landscape',
+      checklistStart: 'page',
     };
     await prefs.setPrintOptions(expectedOpts);
 
@@ -178,10 +182,49 @@ describe('PrintDialogComponent', () => {
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
     expect(dialogs.length).toBe(0);
 
+    expect(dataOut).toHaveBeenCalledWith({
+      ...expectedOpts,
+      checklistStart: 'page', // Clamped due to columns=1 overriding 'below' which was copied from DEFAULT_OPTIONS
+    });
+    const newOpts = await prefs.getPrintOptions();
+    expect(newOpts).toEqual({
+      ...expectedOpts,
+      checklistStart: 'page',
+    });
+  });
+
+  it('should automatically select "New page" when columns is set to 1 and "New column" is selected', async () => {
+    // Start with a state where columns > 1 and checklistStart is not 'page'
+    await prefs.setPrintOptions({
+      columns: 2,
+      checklistStart: 'column',
+    });
+
+    await openDialog();
+
+    // Verify initial state is reflected in the UI
+    const columnsInput = await screen.findByRole('spinbutton', { name: 'Columns' });
+    expect(columnsInput).toHaveValue(2);
+
+    // The "New column" radio should be checked initially
+    const checklistStartColumn = await screen.findByRole('radio', { name: 'New column' });
+    expect(checklistStartColumn).toBeChecked();
+
+    // Change columns to 1
+    await user.clear(columnsInput);
+    await user.type(columnsInput, '1');
+
+    // The "New page" radio should now be automatically selected
+    const checklistStartPage = await screen.findByRole('radio', { name: 'New page' });
+    expect(checklistStartPage).toBeChecked();
+    expect(checklistStartColumn).toBeDisabled();
+
+    // The logic should also correctly emit the clamped value
+    await user.click(okButton);
     expect(dataOut).toHaveBeenCalledTimes(1);
 
-    expect(dataOut).toHaveBeenCalledWith(expectedOpts);
-    const newOpts = await prefs.getPrintOptions();
-    expect(newOpts).toEqual(expectedOpts);
+    const emittedOpts = dataOut.mock.calls[0][0]!;
+    expect(emittedOpts.columns).toBe(1);
+    expect(emittedOpts.checklistStart).toBe('page');
   });
 });

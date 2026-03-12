@@ -66,8 +66,8 @@ export interface PdfWriterOptions extends ExportOptions {
   outputPageNumbers?: boolean;
   outputCompletionActions?: boolean;
 
-  // Whether each checklist should start on a new page.
-  checklistNewPage?: boolean;
+  // Where each checklist should start.
+  checklistStart?: 'page' | 'column' | 'below';
 
   // Number of columns to lay out consecutive checklists internally on the page.
   columns?: number;
@@ -88,7 +88,7 @@ export const DEFAULT_OPTIONS: PdfWriterOptions = {
   outputGroupCoverPages: false,
   outputPageNumbers: true,
   outputCompletionActions: true,
-  checklistNewPage: false,
+  checklistStart: 'below',
   columns: 1,
 };
 
@@ -487,16 +487,17 @@ export class PdfWriter {
         // First checklist in the group - offset by the group title height if needed.
         startY = titleOffset || this._tableMargin.top;
         first = false;
-      } else if (this._options.checklistNewPage) {
-        // User requested a new page for each checklist.
-        // TODO: Differentiate new page vs new column for each checklist in the options.
-        //       (perhaps radio to choose "Checklist starts on: new page | new column | same column")
-        this._newPage();
+      } else if (this._options.checklistStart === 'page') {
+        // User requested a new physical page for each checklist.
+        this._newPage(true);
+      } else if (this._options.checklistStart === 'column') {
+        // User requested a new column for each checklist.
+        this._newPage(false);
       } else if (this._doc.lastAutoTable.finalY - this._tableMargin.top > this._innerPageHeight / 2) {
-        // More than half the page is already used, start on the next page.
-        this._newPage();
+        // More than half the page is already used, start on the next column.
+        this._newPage(false);
       } else {
-        // Start on the same page, after the previous checklist.
+        // Start on the same column, after the previous checklist.
         startY = this._doc.lastAutoTable.finalY + 2;
       }
 

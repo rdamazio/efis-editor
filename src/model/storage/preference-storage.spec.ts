@@ -18,7 +18,7 @@ const NON_DEFAULT_OPTS: PdfWriterOptions = {
   outputGroupCoverPages: true,
   outputPageNumbers: false,
   outputCompletionActions: false,
-  checklistNewPage: true,
+  checklistStart: 'page',
   columns: 2,
 };
 
@@ -73,5 +73,29 @@ describe('PreferenceStorage', () => {
       ...DEFAULT_OPTIONS,
       ...opts,
     });
+  });
+
+  it('should translate legacy checklistNewPage into checklistStart', async () => {
+    // Write old-style options directly to browser storage
+    const oldOpts = {
+      ...DEFAULT_OPTIONS,
+      checklistNewPage: true,
+      checklistStart: undefined,
+    };
+    browserStore.setItem('prefs:print', JSON.stringify(oldOpts));
+
+    const storedOpts = await store.getPrintOptions();
+    expect(storedOpts.checklistStart).toEqual('page');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    expect((storedOpts as any).checklistNewPage).toBeUndefined();
+
+    // Now test with checklistNewPage = false
+    oldOpts.checklistNewPage = false;
+    browserStore.setItem('prefs:print', JSON.stringify(oldOpts));
+
+    const storedOpts2 = await store.getPrintOptions();
+    expect(storedOpts2.checklistStart).toEqual('below');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    expect((storedOpts2 as any).checklistNewPage).toBeUndefined();
   });
 });

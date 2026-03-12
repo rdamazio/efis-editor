@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -39,8 +39,18 @@ import { PreferenceStorage } from '../../../../model/storage/preference-storage'
   templateUrl: './print-dialog.component.html',
   styleUrl: './print-dialog.component.scss',
 })
-export class PrintDialogComponent {
+export class PrintDialogComponent implements OnInit {
   public options = inject(MAT_DIALOG_DATA) as PdfWriterOptions;
+
+  ngOnInit(): void {
+    this.onColumnsChange();
+  }
+
+  onColumnsChange(): void {
+    if (this.options.columns === 1 && this.options.checklistStart === 'column') {
+      this.options.checklistStart = 'page';
+    }
+  }
 
   public static async show(dialog: MatDialog, prefs: PreferenceStorage): Promise<PdfWriterOptions | undefined> {
     const data = await prefs.getPrintOptions();

@@ -35,6 +35,7 @@
         aria-labelledby="columns-label"
         placeholder="1"
         [(ngModel)]="options.columns"
+        (ngModelChange)="onColumnsChange()"
       />
     </mat-form-field>
   </div>
@@ -159,7 +160,17 @@
       >Offset group title by top margin<br />
       (for top spiral binding)</mat-checkbox
     >
-    <mat-checkbox [(ngModel)]="options.checklistNewPage">Output at most one checklist per page</mat-checkbox>
+  </div>
+
+  <div class="radio-group-spaced">
+    <mat-label>Start each checklist on a:</mat-label><br />
+    <mat-radio-group required [(ngModel)]="options.checklistStart" aria-label="Select where new checklists start">
+      <mat-radio-button value="page">New page</mat-radio-button>
+      <mat-radio-button value="column" [disabled]="options.columns !== undefined && options.columns <= 1"
+        >New column</mat-radio-button
+      >
+      <mat-radio-button value="below">Below the previous checklist</mat-radio-button>
+    </mat-radio-group>
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>

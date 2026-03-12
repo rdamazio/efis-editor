@@ -24,10 +24,21 @@ export class PreferenceStorage {
     const opts = JSON.parse(optsStr) as PdfWriterOptions;
 
     // If any fields are missing (because they were added later), add them from the defaults.
-    return {
+    const finalOpts = {
       ...DEFAULT_OPTIONS,
       ...opts,
     };
+
+    // Backward compatibility for checklistNewPage.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    if ((finalOpts as any).checklistNewPage !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+      finalOpts.checklistStart = (finalOpts as any).checklistNewPage ? 'page' : 'below';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+      delete (finalOpts as any).checklistNewPage;
+    }
+
+    return finalOpts;
   }
 
   public async setPrintOptions(opts: PdfWriterOptions) {
