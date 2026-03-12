@@ -23,6 +23,9 @@ jobs:
         run: npm ci
       - name: Install ProtoC
         uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
+        # TODO: Remove after this action migrates
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       - name: Generate protos
         run: npm run genproto
       - name: Generate dev keys
