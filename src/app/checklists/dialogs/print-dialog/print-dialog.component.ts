@@ -10,6 +10,7 @@ import {
   MatDialogContent,
   MatDialogTitle,
 } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatInputModule } from '@angular/material/input';
@@ -29,6 +30,7 @@ import { PreferenceStorage } from '../../../../model/storage/preference-storage'
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
+    MatDividerModule,
     MatFormFieldModule,
     MatGridListModule,
     MatInputModule,

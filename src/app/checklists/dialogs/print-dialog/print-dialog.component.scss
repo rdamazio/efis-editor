@@ -17,7 +17,21 @@
   margin-top: 10px;
 }
 
-.checkbox-group {
+.radio-group-spaced {
+  margin-top: 20px;
+}
+
+.divider {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.section-header {
+  font-size: large;
+  font-weight: bold;
+}
+
+.options-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
