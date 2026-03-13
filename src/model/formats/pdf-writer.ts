@@ -164,9 +164,9 @@ export class PdfWriter {
   private _contentFontSize = PdfWriter.CONTENT_BASE_FONT_SIZE;
 
   private _iconSize = PdfWriter.BASE_ICON_SIZE;
-  private _iconMargin = PdfWriter.BASE_ICON_MARGIN;
   private _iconTotalSize = PdfWriter.BASE_ICON_TOTAL_SIZE;
   private _prefixCellWidth = 0;
+  private _prefixCellLineHeight = 0;
 
   // Persistent cache so icons are only fetched once.
   private static readonly ICON_CACHE = new Map<string, Element>();
@@ -216,7 +216,6 @@ export class PdfWriter {
     this._contentFontSize *= this._fontSizeScale;
 
     this._iconSize *= this._fontSizeScale;
-    this._iconMargin *= this._fontSizeScale;
     this._iconTotalSize *= this._fontSizeScale;
 
     console.debug(
@@ -303,6 +302,7 @@ export class PdfWriter {
     const warningWidth = this._textWidth([PdfWriter.WARNING_PREFIX]);
     this._prefixCellWidth =
       warningWidth + this._iconTotalSize + this._defaultCellPadding.right! + this._defaultCellPadding.left!;
+    this._prefixCellLineHeight = this._doc.getLineHeight() / this._scaleFactor;
   }
 
   private _tableMarginFromOptions(): MarginPadding {
@@ -791,13 +791,14 @@ export class PdfWriter {
     if (icon) {
       // Icon drawing is asynchronous, and we're in a synchronous autotable callback, so just collect what needs to be
       // drawn, for now.
+
       this._icons.push({
         name: icon,
         page: this._doc!.getCurrentPageInfo().pageNumber,
         // Position to the left of the text.
         x: margin.left + leftPadding,
-        // Position at the top of the cell.
-        y: data.cell.y + this._iconMargin / 2,
+        // Position centered with the first line of text.
+        y: data.cell.y + this._defaultCellPadding.top! + (this._prefixCellLineHeight - this._iconSize) / 2,
       });
     }
 
