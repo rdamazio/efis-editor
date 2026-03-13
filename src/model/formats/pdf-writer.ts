@@ -71,6 +71,10 @@ export interface PdfWriterOptions extends ExportOptions {
 
   // Number of columns to lay out consecutive checklists internally on the page.
   columns?: number;
+
+  // Percentage multiplier for checklist content and group headers font sizes.
+  // E.g., 100 is normal size, 150 is 50% larger.
+  fontSizePercent?: number;
 }
 
 export const DEFAULT_OPTIONS: PdfWriterOptions = {
@@ -90,6 +94,7 @@ export const DEFAULT_OPTIONS: PdfWriterOptions = {
   outputCompletionActions: true,
   checklistStart: 'below',
   columns: 1,
+  fontSizePercent: 100,
 };
 
 interface IconToDraw {
@@ -104,14 +109,14 @@ export class PdfWriter {
   private static readonly INCHES_TO_EM = 6;
   private static readonly MM_TO_EM = this.INCHES_TO_EM / 25.4;
   private static readonly GROUP_TITLE_HEIGHT = 3;
-  private static readonly GROUP_TITLE_FONT_SIZE = 20;
+  private static readonly GROUP_TITLE_BASE_FONT_SIZE = 20;
   private static readonly MAIN_TITLE_FONT_SIZE = 30;
   private static readonly METADATA_HEADER_FONT_SIZE = 12;
   private static readonly METADATA_HEADER_HEIGHT = 2;
   private static readonly METADATA_VALUE_FONT_SIZE = 20;
   private static readonly METADATA_VALUE_HEIGHT = 3;
-  private static readonly HEADER_FONT_SIZE = 16;
-  private static readonly CONTENT_FONT_SIZE = 12;
+  private static readonly HEADER_BASE_FONT_SIZE = 16;
+  private static readonly CONTENT_BASE_FONT_SIZE = 12;
   private static readonly FOOTNOTE_HEIGHT = 1;
   private static readonly FOOTNOTE_FONT_SIZE = 8;
   private static readonly DEFAULT_FONT_NAME = 'Roboto-Regular';
@@ -154,6 +159,11 @@ export class PdfWriter {
   private _availableColumnWidth = 0;
   private _gutterWidth = 0;
 
+  private _fontSizeScale = 1;
+  private _groupTitleFontSize = PdfWriter.GROUP_TITLE_BASE_FONT_SIZE;
+  private _headerFontSize = PdfWriter.HEADER_BASE_FONT_SIZE;
+  private _contentFontSize = PdfWriter.CONTENT_BASE_FONT_SIZE;
+
   // Persistent cache so icons are only fetched once.
   private static readonly ICON_CACHE = new Map<string, Element>();
   // Per-instance promise of icons being fetched.
@@ -195,6 +205,11 @@ export class PdfWriter {
 
     this._innerPageHeight = this._pageHeight - this._tableMargin.top - this._tableMargin.bottom;
     this._footNoteY = this._pageHeight - this._tableMargin.bottom / 2;
+
+    this._fontSizeScale = (this._options.fontSizePercent ?? 100) / 100;
+    this._groupTitleFontSize *= this._fontSizeScale;
+    this._headerFontSize *= this._fontSizeScale;
+    this._contentFontSize *= this._fontSizeScale;
 
     console.debug(
       `PDF: page w=${this._pageWidth}, h=${this._pageHeight}, innerH=${this._innerPageHeight}, sf=${this._scaleFactor}, margin=${JSON.stringify(this._tableMargin)}, footnote=${this._footNoteY}, pad=${this._defaultPadding}, cols=${this._columns}`,
@@ -433,14 +448,14 @@ export class PdfWriter {
     const usableCenterY = marginOffset + usableHeight / 2;
     console.debug(`PDF: Title height=${height}; usable=${usableHeight}; usableCenter=${usableCenterY}`);
 
-    this._doc.setFontSize(PdfWriter.GROUP_TITLE_FONT_SIZE);
+    this._doc.setFontSize(this._groupTitleFontSize);
     const maxWidth = width - this._defaultPadding * 4;
     const lines = this._doc.splitTextToSize(group.title, maxWidth) as string[];
 
     this._setCurrentY(usableCenterY);
     this._addCenteredText(lines, {
       advanceY: usableCenterY,
-      fontSize: PdfWriter.GROUP_TITLE_FONT_SIZE,
+      fontSize: this._groupTitleFontSize,
       fontStyle: PdfWriter.BOLD_FONT_STYLE,
       baseline: 'middle',
       useColumnWidth: !this._options.outputGroupCoverPages,
@@ -461,10 +476,10 @@ export class PdfWriter {
       }
       this._newPage(true);
     } else {
-      this._doc.setFontSize(PdfWriter.GROUP_TITLE_FONT_SIZE);
+      this._doc.setFontSize(this._groupTitleFontSize);
       const maxWidth = this._availableColumnWidth - this._defaultPadding * 4;
       const lines = this._doc.splitTextToSize(group.title, maxWidth) as string[];
-      const addedHeight = ((lines.length - 1) * (PdfWriter.GROUP_TITLE_FONT_SIZE * 1.5)) / this._scaleFactor;
+      const addedHeight = ((lines.length - 1) * (this._groupTitleFontSize * 1.5)) / this._scaleFactor;
 
       titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2 + addedHeight;
       if (this._options.marginOffsetsGroupTitle) {
@@ -508,7 +523,7 @@ export class PdfWriter {
             {
               content: checklist.title,
               colSpan: 3,
-              styles: { halign: 'center', fontSize: PdfWriter.HEADER_FONT_SIZE },
+              styles: { halign: 'center', fontSize: this._headerFontSize },
             },
           ],
         ],
@@ -525,7 +540,7 @@ export class PdfWriter {
         styles: PdfWriter.DEBUG_LAYOUT // eslint-disable-line @typescript-eslint/no-unnecessary-condition
           ? { lineWidth: 0.1 }
           : undefined,
-        bodyStyles: { fontSize: PdfWriter.CONTENT_FONT_SIZE, valign: 'top' },
+        bodyStyles: { fontSize: this._contentFontSize, valign: 'top' },
         didDrawPage: (data: HookData) => {
           const nextColumn = (this._currentColumn + 1) % this._columns;
           data.settings.margin.left =
@@ -841,7 +856,7 @@ export class PdfWriter {
 
     // splitTextToSize needs the correct font setting for calculation.
     // We could pass it through its options param, but options.font would have to come from jspdf's getFont anyway.
-    this._doc.setFontSize(PdfWriter.CONTENT_FONT_SIZE);
+    this._doc.setFontSize(this._contentFontSize);
     this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
 
     // Actually calculate the text wrapping so we know how many lines the cell will take.
@@ -889,7 +904,7 @@ export class PdfWriter {
       console.debug(`PDF: Width=${width} for line "${line}"`);
       return Math.max(max, width);
     }, 0);
-    return (unitWidth * (fontSize ?? PdfWriter.CONTENT_FONT_SIZE)) / this._scaleFactor;
+    return (unitWidth * (fontSize ?? this._contentFontSize)) / this._scaleFactor;
   }
 
   private _addPageFooters() {

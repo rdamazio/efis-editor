@@ -44,6 +44,7 @@ describe('PrintDialogComponent', () => {
   let dataOut: Mock<(value: OutputType) => void>;
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
+  let fontSize: HTMLInputElement;
 
   let paperSize: HTMLElement;
   let landscape: HTMLElement;
@@ -81,6 +82,7 @@ describe('PrintDialogComponent', () => {
     landscape = await screen.findByRole('radio', { name: 'Landscape' });
     pageNumbers = await screen.findByRole('checkbox', { name: 'Output page numbers' });
     completionActions = await screen.findByRole('checkbox', { name: 'Output completion actions' });
+    fontSize = await screen.findByRole('spinbutton', { name: 'Font size (%)' });
   }
 
   it('should open and cancel the dialog', async () => {
@@ -149,6 +151,9 @@ describe('PrintDialogComponent', () => {
     const checklistStartPage = await screen.findByRole('radio', { name: 'New page' });
     await user.click(checklistStartPage);
 
+    await user.clear(fontSize);
+    await user.type(fontSize, '90');
+
     await user.click(okButton);
 
     const expectedOpts: PdfWriterOptions = {
@@ -159,6 +164,7 @@ describe('PrintDialogComponent', () => {
       outputPageNumbers: false,
       outputCompletionActions: false,
       checklistStart: 'page',
+      fontSizePercent: 90,
     };
     expect(dataOut).toHaveBeenCalledTimes(1);
     expect(dataOut).toHaveBeenCalledWith(expectedOpts);
@@ -172,6 +178,7 @@ describe('PrintDialogComponent', () => {
       pageSize: 'a6',
       orientation: 'landscape',
       checklistStart: 'page',
+      fontSizePercent: 150,
     };
     await prefs.setPrintOptions(expectedOpts);
 

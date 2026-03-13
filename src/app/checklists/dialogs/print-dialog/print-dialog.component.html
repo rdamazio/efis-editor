@@ -40,6 +40,20 @@
         (ngModelChange)="onColumnsChange()"
       />
     </mat-form-field>
+
+    <mat-form-field class="font-size-input">
+      <mat-label id="font-size-label">Font size (%)</mat-label>
+      <input
+        matInput
+        required
+        type="number"
+        min="10"
+        max="500"
+        placeholder="100"
+        aria-labelledby="font-size-label"
+        [(ngModel)]="options.fontSizePercent"
+      />
+    </mat-form-field>
   </div>
 
   @if (options.pageSize === 'custom') {
