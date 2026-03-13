@@ -124,9 +124,9 @@ export class PdfWriter {
   private static readonly BOLD_FONT_STYLE = 'bold';
   private static readonly RECT_FILL_STYLE = 'F';
 
-  private static readonly ICON_SIZE = 1.5;
-  private static readonly ICON_MARGIN = 0.3;
-  private static readonly ICON_TOTAL_SIZE = this.ICON_SIZE + this.ICON_MARGIN;
+  private static readonly BASE_ICON_SIZE = 1.5;
+  private static readonly BASE_ICON_MARGIN = 0.3;
+  private static readonly BASE_ICON_TOTAL_SIZE = PdfWriter.BASE_ICON_SIZE + PdfWriter.BASE_ICON_MARGIN;
   private static readonly WARNING_ICON = 'warning-icon.svg';
   private static readonly CAUTION_ICON = 'caution-icon.svg';
   private static readonly ALL_ICONS = [this.WARNING_ICON, this.CAUTION_ICON];
@@ -134,7 +134,7 @@ export class PdfWriter {
   private static readonly WARNING_PREFIX = 'WARNING: ';
   private static readonly CAUTION_PREFIX = 'CAUTION: ';
   private static readonly NOTE_PREFIX = 'NOTE: ';
-  private static readonly PREFIX_CELL_WIDTH = 5.6 + this.ICON_TOTAL_SIZE;
+  private static readonly BASE_PREFIX_CELL_WIDTH = 5.6 + PdfWriter.BASE_ICON_TOTAL_SIZE;
 
   private static readonly SPACER_CELL: CellDef = {
     content: '. '.repeat(100),
@@ -163,6 +163,11 @@ export class PdfWriter {
   private _groupTitleFontSize = PdfWriter.GROUP_TITLE_BASE_FONT_SIZE;
   private _headerFontSize = PdfWriter.HEADER_BASE_FONT_SIZE;
   private _contentFontSize = PdfWriter.CONTENT_BASE_FONT_SIZE;
+
+  private _iconSize = PdfWriter.BASE_ICON_SIZE;
+  private _iconMargin = PdfWriter.BASE_ICON_MARGIN;
+  private _iconTotalSize = PdfWriter.BASE_ICON_TOTAL_SIZE;
+  private _prefixCellWidth = PdfWriter.BASE_PREFIX_CELL_WIDTH;
 
   // Persistent cache so icons are only fetched once.
   private static readonly ICON_CACHE = new Map<string, Element>();
@@ -210,6 +215,11 @@ export class PdfWriter {
     this._groupTitleFontSize *= this._fontSizeScale;
     this._headerFontSize *= this._fontSizeScale;
     this._contentFontSize *= this._fontSizeScale;
+
+    this._iconSize *= this._fontSizeScale;
+    this._iconMargin *= this._fontSizeScale;
+    this._iconTotalSize *= this._fontSizeScale;
+    this._prefixCellWidth *= this._fontSizeScale;
 
     console.debug(
       `PDF: page w=${this._pageWidth}, h=${this._pageHeight}, innerH=${this._innerPageHeight}, sf=${this._scaleFactor}, margin=${JSON.stringify(this._tableMargin)}, footnote=${this._footNoteY}, pad=${this._defaultPadding}, cols=${this._columns}`,
@@ -720,7 +730,7 @@ export class PdfWriter {
       data.cell.styles.halign = 'left';
       leftPadding = 0;
       const textWidth = this._textWidth(data.cell.text);
-      tableWidth = PdfWriter.PREFIX_CELL_WIDTH + textWidth + 2 * this._defaultPadding;
+      tableWidth = this._prefixCellWidth + textWidth + 2 * this._defaultPadding;
       const innerTableWidth = this._availableColumnWidth;
       const innerMargins = (innerTableWidth - tableWidth) / 2;
       margin.left += innerMargins;
@@ -742,8 +752,8 @@ export class PdfWriter {
           {
             content: prefix.trim(),
             styles: {
-              cellWidth: PdfWriter.PREFIX_CELL_WIDTH,
-              cellPadding: { ...this._defaultCellPadding, left: PdfWriter.ICON_TOTAL_SIZE },
+              cellWidth: this._prefixCellWidth,
+              cellPadding: { ...this._defaultCellPadding, left: this._iconTotalSize },
               halign: 'right',
               fontStyle: prefixFontStyle,
               textColor: prefixColor,
@@ -777,7 +787,7 @@ export class PdfWriter {
         // Position to the left of the text.
         x: margin.left + leftPadding,
         // Position at the top of the cell.
-        y: data.cell.y + PdfWriter.ICON_MARGIN / 2,
+        y: data.cell.y + this._iconMargin / 2,
       });
     }
 
@@ -799,7 +809,7 @@ export class PdfWriter {
       // svg2pdf relies on jspdf's state machine, so we have to await for each one instead of
       // letting them work in parallel.
       // eslint-disable-next-line no-await-in-loop
-      await this._doc.svg(iconEl, { x: icon.x, y: icon.y, width: PdfWriter.ICON_SIZE, height: PdfWriter.ICON_SIZE });
+      await this._doc.svg(iconEl, { x: icon.x, y: icon.y, width: this._iconSize, height: this._iconSize });
     }
   }
 
@@ -879,7 +889,7 @@ export class PdfWriter {
     const roundWidth = 1.0 / this._scaleFactor;
 
     console.debug(
-      `PDF: Prefixed width: page=${this._pageWidth}; indent=${indentWidth}; prefix=${PdfWriter.PREFIX_CELL_WIDTH}; padding=${this._defaultPadding}`,
+      `PDF: Prefixed width: page=${this._pageWidth}; indent=${indentWidth}; prefix=${this._prefixCellWidth}; padding=${this._defaultPadding}`,
     );
 
     // Calculate the cell width that's available for the text contents
@@ -889,7 +899,7 @@ export class PdfWriter {
       // The prefix + content (with padding):
       indentWidth -
       // The content (with padding):
-      PdfWriter.PREFIX_CELL_WIDTH -
+      this._prefixCellWidth -
       // The content (no padding):
       2 * this._defaultPadding +
       // The content (with rounding):
