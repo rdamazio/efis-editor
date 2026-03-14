@@ -1,6 +1,12 @@
 @let chklist = checklist();
 
-<div class="container" data-testid="items-list">
+<div
+  #scrollContainer
+  class="container"
+  data-testid="items-list"
+  (scroll)="updateScrollShadow()"
+  (onResize)="updateScrollShadow()"
+>
   @if (chklist) {
     <div
       id="items-drop-list"
@@ -25,7 +31,7 @@
         </div>
       }
     </div>
-    <div class="list-item add-bar">
+    <div class="list-item add-bar" [class.at-bottom]="isAtBottom()">
       @for (item_type of itemTypes; track item_type.type) {
         <div class="action-button">
           <button

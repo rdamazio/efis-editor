@@ -52,6 +52,11 @@
     height: 20px;
     background: linear-gradient(to bottom, transparent, mat.get-theme-color(theme.$efis-editor-theme, neutral, 10));
     pointer-events: none;
+    transition: opacity 0.2s ease-out;
+  }
+
+  &.at-bottom::before {
+    opacity: 0;
   }
 }
 
