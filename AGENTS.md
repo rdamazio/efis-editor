@@ -62,6 +62,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 - Use the `vitest` framework for unit testing
 - Execute tests with `npm run test:headless`
+- To run only a specific test, use `npm run test:headless -- --include <test-file-name>`
 - Do not use `npm run test`
 - Do not invoke vitest directly (e.g. `npx vitest`)
 - Code coverage can be checked with `npm run test:coverage`
