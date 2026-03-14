@@ -134,7 +134,6 @@ export class PdfWriter {
   private static readonly WARNING_PREFIX = 'WARNING: ';
   private static readonly CAUTION_PREFIX = 'CAUTION: ';
   private static readonly NOTE_PREFIX = 'NOTE: ';
-  private static readonly BASE_PREFIX_CELL_WIDTH = 5.6 + PdfWriter.BASE_ICON_TOTAL_SIZE;
 
   private static readonly SPACER_CELL: CellDef = {
     content: '. '.repeat(100),
@@ -151,7 +150,7 @@ export class PdfWriter {
   private _innerPageHeight = 0;
   private _footNoteY = 0;
   private _defaultPadding = 0;
-  private _defaultCellPadding?: CellPaddingInputStructured;
+  private _defaultCellPadding: CellPaddingInputStructured = { top: 0, right: 0, bottom: 0, left: 0 };
 
   private _currentColumn = 0;
   private _columns = 1;
@@ -167,7 +166,7 @@ export class PdfWriter {
   private _iconSize = PdfWriter.BASE_ICON_SIZE;
   private _iconMargin = PdfWriter.BASE_ICON_MARGIN;
   private _iconTotalSize = PdfWriter.BASE_ICON_TOTAL_SIZE;
-  private _prefixCellWidth = PdfWriter.BASE_PREFIX_CELL_WIDTH;
+  private _prefixCellWidth = 0;
 
   // Persistent cache so icons are only fetched once.
   private static readonly ICON_CACHE = new Map<string, Element>();
@@ -219,7 +218,6 @@ export class PdfWriter {
     this._iconSize *= this._fontSizeScale;
     this._iconMargin *= this._fontSizeScale;
     this._iconTotalSize *= this._fontSizeScale;
-    this._prefixCellWidth *= this._fontSizeScale;
 
     console.debug(
       `PDF: page w=${this._pageWidth}, h=${this._pageHeight}, innerH=${this._innerPageHeight}, sf=${this._scaleFactor}, margin=${JSON.stringify(this._tableMargin)}, footnote=${this._footNoteY}, pad=${this._defaultPadding}, cols=${this._columns}`,
@@ -237,7 +235,8 @@ export class PdfWriter {
       this._registerFont('Roboto-Regular.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE),
       this._registerFont('Roboto-Bold.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE),
     ]);
-    this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
+
+    this._initPrefixCellDimensions();
 
     if (file.metadata && this._options.outputCoverPage) {
       this._addCover(file.metadata);
@@ -293,6 +292,17 @@ export class PdfWriter {
       unit: 'em',
       putOnlyUsedFonts: true,
     };
+  }
+
+  private _initPrefixCellDimensions() {
+    if (!this._doc) throw new FormatError('No document created');
+
+    this._doc.setFontSize(this._contentFontSize);
+    this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
+    // We know that "WARNING:" will be the widest prefix.
+    const warningWidth = this._textWidth([PdfWriter.WARNING_PREFIX]);
+    this._prefixCellWidth =
+      warningWidth + this._iconTotalSize + this._defaultCellPadding.right! + this._defaultCellPadding.left!;
   }
 
   private _tableMarginFromOptions(): MarginPadding {
