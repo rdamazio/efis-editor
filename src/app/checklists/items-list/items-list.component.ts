@@ -1,9 +1,22 @@
 import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { afterNextRender, Component, effect, Injector, input, model, output, viewChildren } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  effect,
+  ElementRef,
+  Injector,
+  input,
+  model,
+  output,
+  signal,
+  viewChild,
+  viewChildren,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { NgxResizeObserverModule } from 'ngx-resize-observer';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { Checklist, ChecklistItem, ChecklistItem_Type } from '../../../../gen/ts/checklist';
 import { ChecklistItemComponent } from './item/item.component';
@@ -11,7 +24,15 @@ import { ChecklistItemComponent } from './item/item.component';
 @UntilDestroy()
 @Component({
   selector: 'checklist-items',
-  imports: [CdkDrag, CdkDragPlaceholder, CdkDropList, ChecklistItemComponent, MatButtonModule, MatIconModule],
+  imports: [
+    CdkDrag,
+    CdkDragPlaceholder,
+    CdkDropList,
+    ChecklistItemComponent,
+    MatButtonModule,
+    MatIconModule,
+    NgxResizeObserverModule,
+  ],
   templateUrl: './items-list.component.html',
   styleUrl: './items-list.component.scss',
 })
@@ -44,6 +65,9 @@ export class ChecklistItemsComponent {
   private _undoState: Checklist[] = [];
   private _undoSnackbar?: MatSnackBarRef<TextOnlySnackBar>;
 
+  readonly isAtBottom = signal(false);
+  readonly scrollContainer = viewChild.required<ElementRef<HTMLElement>>('scrollContainer');
+
   constructor(
     private readonly _injector: Injector,
     private readonly _snackBar: MatSnackBar,
@@ -56,7 +80,15 @@ export class ChecklistItemsComponent {
       this._selectedIdx = null;
       this._dismissUndoSnackbar();
       this._undoState = [];
+
+      this.updateScrollShadow();
     });
+  }
+
+  updateScrollShadow() {
+    const el = this.scrollContainer().nativeElement;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 5;
+    this.isAtBottom.set(atBottom);
   }
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
@@ -68,6 +100,8 @@ export class ChecklistItemsComponent {
     this.checklistChange.emit(this.checklist());
     afterNextRender(
       () => {
+        this.updateScrollShadow();
+
         if (selectedIdx !== undefined) {
           this._selectedIdx = selectedIdx;
         }
