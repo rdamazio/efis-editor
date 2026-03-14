@@ -19,6 +19,6 @@ describe('FormatUtils', () => {
   it('should reject unknown checklist item types', () => {
     expect(() => {
       FormatUtils.getChecklistItemPrefix(ChecklistItem_Type.ITEM_SPACE);
-    }).toThrowError(/unsupported item prefix type/);
+    }).toThrow(/unsupported item prefix type/);
   });
 });

@@ -6,17 +6,17 @@ describe('FormatRegistry', () => {
   it('should refuse to register duplicate format', () => {
     expect(() => {
       FORMAT_REGISTRY.register(AceFormat, FormatId.ACE, 'Duplicate format');
-    }).toThrowError(/already registered/);
+    }).toThrow(/already registered/);
   });
 
   it('should reject getting an unknown format', () => {
     expect(() => {
       FORMAT_REGISTRY.getFormat('foobar' as FormatId);
-    }).toThrowError(/not registered/);
+    }).toThrow(/not registered/);
   });
 
   it('should reject parsing of an unknown extension', async () => {
     const f = new File([], 'foobar.baz');
-    await expect(parseChecklistFile(f)).rejects.toThrowError(/Unknown.*extension/);
+    await expect(parseChecklistFile(f)).rejects.toThrow(/Unknown.*extension/);
   });
 });
