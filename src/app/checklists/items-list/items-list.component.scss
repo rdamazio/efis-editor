@@ -31,6 +31,12 @@
 }
 
 .add-bar {
+  position: sticky;
+  bottom: -10px; /* Accounts for container padding */
+  padding-bottom: 20px;
+  background: mat.get-theme-color(theme.$efis-editor-theme, primary, 0);
+  z-index: 10;
+
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
