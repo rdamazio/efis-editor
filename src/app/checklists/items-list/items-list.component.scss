@@ -31,15 +31,38 @@
 }
 
 .add-bar {
+  position: sticky;
+  bottom: -10px; /* Accounts for container padding */
+  margin-top: 10px; /* Replaces the space covered by the gradient */
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background: mat.get-theme-color(theme.$efis-editor-theme, primary, 0);
+  z-index: 10;
+
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(to bottom, transparent, mat.get-theme-color(theme.$efis-editor-theme, neutral, 10));
+    pointer-events: none;
+    transition: opacity 0.2s ease-out;
+  }
+
+  &.at-bottom::before {
+    opacity: 0;
+  }
 }
 
 .action-button {
   display: inline;
   white-space: nowrap;
-  margin-top: 10px;
 }
 
 .action-icon {

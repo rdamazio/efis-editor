@@ -1,6 +1,12 @@
 @let chklist = checklist();
 
-<div class="container" data-testid="items-list">
+<div
+  #scrollContainer
+  class="container"
+  data-testid="items-list"
+  (scroll)="updateScrollShadow()"
+  (onResize)="updateScrollShadow()"
+>
   @if (chklist) {
     <div
       id="items-drop-list"
@@ -24,22 +30,22 @@
           <div *cdkDragPlaceholder></div>
         </div>
       }
-      <div class="list-item add-bar">
-        @for (item_type of itemTypes; track item_type.type) {
-          <div class="action-button">
-            <button
-              mat-fab
-              extended
-              class="action-button"
-              [attr.aria-label]="`Add a new checklist ${item_type.label}`"
-              (click)="onNewItem(item_type.type)"
-            >
-              <mat-icon class="action-icon">add</mat-icon>
-              <span class="action-label">Add {{ item_type.label }}</span>
-            </button>
-          </div>
-        }
-      </div>
+    </div>
+    <div class="list-item add-bar" [class.at-bottom]="isAtBottom()">
+      @for (item_type of itemTypes; track item_type.type) {
+        <div class="action-button">
+          <button
+            mat-fab
+            extended
+            class="action-button"
+            [attr.aria-label]="`Add a new checklist ${item_type.label}`"
+            (click)="onNewItem(item_type.type)"
+          >
+            <mat-icon class="action-icon">add</mat-icon>
+            <span class="action-label">Add {{ item_type.label }}</span>
+          </button>
+        </div>
+      }
     </div>
   } @else {
     <div>Select or create a checklist from the left-side bar.</div>
