@@ -123,8 +123,6 @@ interface DrawingDimensions {
   iconSize: number;
   iconTotalSize: number;
   prefixCellWidth: number;
-  prefixCellLineHeight: number;
-  prefixContentLineHeight: number;
 }
 
 interface IconToDraw {
@@ -176,10 +174,11 @@ export class PdfWriter {
   // Per-instance promise of icons being fetched.
   private readonly _allIcons: Promise<Map<string, Element>>;
 
-  private _doc?: AutoTabledPDF;
-  private _addPhysicalPage?: typeof jsPDF.prototype.addPage;
+  private readonly _init: Promise<void>;
+  private readonly _doc: AutoTabledPDF;
+  private readonly _addPhysicalPage?: typeof jsPDF.prototype.addPage;
 
-  private _dims?: DrawingDimensions;
+  private readonly _dims: DrawingDimensions;
 
   // Drawing state
   private _currentColumn = 0;
@@ -190,9 +189,7 @@ export class PdfWriter {
 
   constructor(private readonly _options: PdfWriterOptions = DEFAULT_OPTIONS) {
     this._allIcons = this._fetchIcons();
-  }
 
-  public async write(file: ChecklistFile): Promise<Blob> {
     const doc = new jsPDF(this._pdfOptions());
     this._doc = doc as AutoTabledPDF;
 
@@ -204,14 +201,22 @@ export class PdfWriter {
       return this._doc as jsPDF;
     };
 
+    this._dims = this._initStaticDimensions();
+
     // We have to fetch the font files ourselves to support offline mode, else jspdf will use its own
     // service worker and skip our cache.
-    await Promise.all([
+    this._init = Promise.all([
       this._registerFont('Roboto-Regular.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE),
       this._registerFont('Roboto-Bold.ttf', PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE),
-    ]);
+    ]).then(() => {
+      this._initFontDimensions();
+    });
+  }
 
-    this._dims = this._initDimensions();
+  public async write(file: ChecklistFile): Promise<Blob> {
+    await this._init;
+
+    console.debug(`PDF: dimensions=${JSON.stringify(this._dims)}`);
 
     if (file.metadata && this._options.outputCoverPage) {
       this._addCover(file.metadata);
@@ -228,8 +233,6 @@ export class PdfWriter {
   }
 
   private async _registerFont(fileName: string, fontName: string, fontStyle: string) {
-    if (!this._doc) return;
-
     const contents = await fetch(fileName).then(async (resp: Response) => {
       if (!resp.ok) {
         throw new Error(`Failed to fetch font'${fileName}'`);
@@ -269,9 +272,7 @@ export class PdfWriter {
     };
   }
 
-  private _initDimensions(): DrawingDimensions {
-    if (!this._doc) throw new FormatError('No document created');
-
+  private _initStaticDimensions(): DrawingDimensions {
     const dimensions: Partial<DrawingDimensions> = {};
 
     // Letter gives 51x66, A4 gives 49.6077x70.1575
@@ -314,27 +315,26 @@ export class PdfWriter {
     dimensions.iconSize = PdfWriter.ICON_BASE_SIZE * dimensions.fontSizeScale;
     dimensions.iconTotalSize = PdfWriter.ICON_BASE_TOTAL_SIZE * dimensions.fontSizeScale;
 
-    this._doc.setFontSize(dimensions.contentFontSize);
+    // This is technically missing fields set in initFontDimensions, but _init guarantees
+    // they'll be set before they're used.
+    return dimensions as DrawingDimensions;
+  }
+
+  private _initFontDimensions() {
+    this._doc.setFontSize(this._dims.contentFontSize);
     this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.BOLD_FONT_STYLE);
+
     // We know that "WARNING:" will be the widest prefix.
     const warningWidth = this._textWidth(
       [PdfWriter.WARNING_PREFIX],
-      dimensions.contentFontSize,
-      dimensions.scaleFactor,
+      this._dims.contentFontSize,
+      this._dims.scaleFactor,
     );
-    dimensions.prefixCellWidth =
+    this._dims.prefixCellWidth =
       warningWidth +
-      dimensions.iconTotalSize +
-      dimensions.defaultCellPadding.right +
-      dimensions.defaultCellPadding.left;
-    dimensions.prefixCellLineHeight = this._doc.getLineHeight() / dimensions.scaleFactor;
-
-    this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
-    dimensions.prefixContentLineHeight = this._doc.getLineHeight() / dimensions.scaleFactor;
-
-    console.debug(`PDF: page dimensions=${JSON.stringify(dimensions)}`);
-
-    return dimensions as DrawingDimensions;
+      this._dims.iconTotalSize +
+      this._dims.defaultCellPadding.left +
+      this._dims.defaultCellPadding.right;
   }
 
   private _tableMarginFromOptions(pageWidth: number): MarginPadding {
@@ -370,22 +370,20 @@ export class PdfWriter {
 
   private _getColumnMarginLeft(): number {
     return (
-      this._dims!.tableMargin.left + this._currentColumn * (this._dims!.availableColumnWidth + this._dims!.gutterWidth)
+      this._dims.tableMargin.left + this._currentColumn * (this._dims.availableColumnWidth + this._dims.gutterWidth)
     );
   }
 
   private _getColumnMarginRight(): number {
     return (
-      this._dims!.tableMargin.right +
-      (this._dims!.columns - 1 - this._currentColumn) * (this._dims!.availableColumnWidth + this._dims!.gutterWidth)
+      this._dims.tableMargin.right +
+      (this._dims.columns - 1 - this._currentColumn) * (this._dims.availableColumnWidth + this._dims.gutterWidth)
     );
   }
 
   private _addCover(metadata: ChecklistFileMetadata) {
-    if (!this._doc) return;
-
     // Center the title at the top half.
-    this._setCurrentY(this._dims!.tableMargin.top + this._dims!.innerPageHeight / 4);
+    this._setCurrentY(this._dims.tableMargin.top + this._dims.innerPageHeight / 4);
     this._addCenteredText('Checklists', {
       advanceY: 0,
       fontSize: PdfWriter.MAIN_TITLE_FONT_SIZE,
@@ -398,7 +396,7 @@ export class PdfWriter {
     if (metadata.makeAndModel) metadataHeight += PdfWriter.METADATA_HEADER_HEIGHT + PdfWriter.METADATA_VALUE_HEIGHT;
     if (metadata.manufacturerInfo) metadataHeight += PdfWriter.METADATA_HEADER_HEIGHT + PdfWriter.METADATA_VALUE_HEIGHT;
     if (metadata.copyrightInfo) metadataHeight += PdfWriter.METADATA_HEADER_HEIGHT + PdfWriter.METADATA_VALUE_HEIGHT;
-    const metadataStartY = this._dims!.tableMargin.top + (this._dims!.innerPageHeight * 3) / 4 - metadataHeight / 2;
+    const metadataStartY = this._dims.tableMargin.top + (this._dims.innerPageHeight * 3) / 4 - metadataHeight / 2;
     this._setCurrentY(metadataStartY);
 
     if (metadata.aircraftInfo) {
@@ -446,7 +444,7 @@ export class PdfWriter {
       });
     }
 
-    this._setCurrentY(this._dims!.footNoteY);
+    this._setCurrentY(this._dims.footNoteY);
     this._addCenteredText('Generated by https://github.com/rdamazio/efis-editor/', {
       advanceY: PdfWriter.FOOTNOTE_HEIGHT,
       fontSize: PdfWriter.FOOTNOTE_FONT_SIZE,
@@ -455,8 +453,6 @@ export class PdfWriter {
   }
 
   private _addGroups(groups: ChecklistGroup[]) {
-    if (!this._doc) return;
-
     for (const group of groups) {
       this._addGroup(group);
 
@@ -468,8 +464,6 @@ export class PdfWriter {
   }
 
   private _addGroupTitle(group: ChecklistGroup, height: number): { usedDarkBackground: boolean } {
-    if (!this._doc) return { usedDarkBackground: false };
-
     console.debug(`PDF: Group ${group.title}`);
 
     this._doc.saveGraphicsState();
@@ -485,7 +479,7 @@ export class PdfWriter {
     }
     this._doc.setFillColor(rectColor);
     this._doc.setTextColor(textColor);
-    this._doc.rect(0, 0, this._dims!.groupBackgroundWidth, height, PdfWriter.RECT_FILL_STYLE);
+    this._doc.rect(0, 0, this._dims.groupBackgroundWidth, height, PdfWriter.RECT_FILL_STYLE);
 
     // ---------------------------
     // Margin                    | marginOffset  \
@@ -493,18 +487,18 @@ export class PdfWriter {
     // Title                     | usableHeight  | height
     // | ‾ textBaseY             /               /
     // ---------
-    const marginOffset = this._options.marginOffsetsGroupTitle ? this._dims!.tableMargin.top : 0;
+    const marginOffset = this._options.marginOffsetsGroupTitle ? this._dims.tableMargin.top : 0;
     const usableHeight = height - marginOffset;
     const usableCenterY = marginOffset + usableHeight / 2;
     console.debug(`PDF: Title height=${height}; usable=${usableHeight}; usableCenter=${usableCenterY}`);
 
-    this._doc.setFontSize(this._dims!.groupTitleFontSize);
-    const lines = this._doc.splitTextToSize(group.title, this._dims!.groupTitleWidth) as string[];
+    this._doc.setFontSize(this._dims.groupTitleFontSize);
+    const lines = this._doc.splitTextToSize(group.title, this._dims.groupTitleWidth) as string[];
 
     this._setCurrentY(usableCenterY);
     this._addCenteredText(lines, {
       advanceY: usableCenterY,
-      fontSize: this._dims!.groupTitleFontSize,
+      fontSize: this._dims.groupTitleFontSize,
       fontStyle: PdfWriter.BOLD_FONT_STYLE,
       baseline: 'middle',
       useColumnWidth: !this._options.outputGroupCoverPages,
@@ -515,28 +509,26 @@ export class PdfWriter {
   }
 
   private _addGroup(group: ChecklistGroup) {
-    if (!this._doc) return;
-
     let titleOffset = 0;
     if (this._options.outputGroupCoverPages) {
-      const { usedDarkBackground } = this._addGroupTitle(group, this._dims!.pageHeight);
+      const { usedDarkBackground } = this._addGroupTitle(group, this._dims.pageHeight);
       if (usedDarkBackground) {
         this._darkBackgroundPages.push(this._doc.getCurrentPageInfo().pageNumber);
       }
       this._newPage(true);
     } else {
-      this._doc.setFontSize(this._dims!.groupTitleFontSize);
-      const maxWidth = this._dims!.availableColumnWidth - this._dims!.defaultPadding * 4;
+      this._doc.setFontSize(this._dims.groupTitleFontSize);
+      const maxWidth = this._dims.availableColumnWidth - this._dims.defaultPadding * 4;
       const lines = this._doc.splitTextToSize(group.title, maxWidth) as string[];
-      const addedHeight = ((lines.length - 1) * (this._dims!.groupTitleFontSize * 1.5)) / this._dims!.scaleFactor;
+      const addedHeight = ((lines.length - 1) * (this._dims.groupTitleFontSize * 1.5)) / this._dims.scaleFactor;
 
       titleOffset = PdfWriter.GROUP_TITLE_HEIGHT * 2 + addedHeight;
       if (this._options.marginOffsetsGroupTitle) {
-        titleOffset += this._dims!.tableMargin.top;
-      } else if (titleOffset < this._dims!.tableMargin.top) {
+        titleOffset += this._dims.tableMargin.top;
+      } else if (titleOffset < this._dims.tableMargin.top) {
         // Ensure that the margin is respected for the table, even if they
         // want the group title to go there.
-        titleOffset = this._dims!.tableMargin.top;
+        titleOffset = this._dims.tableMargin.top;
       }
       this._addGroupTitle(group, titleOffset - 1);
     }
@@ -546,10 +538,10 @@ export class PdfWriter {
       console.debug(`PDF: Checklist ${checklist.title}`);
 
       // Calculate where to start the next table.
-      let startY = this._dims!.tableMargin.top;
+      let startY = this._dims.tableMargin.top;
       if (first) {
         // First checklist in the group - offset by the group title height if needed.
-        startY = titleOffset || this._dims!.tableMargin.top;
+        startY = titleOffset || this._dims.tableMargin.top;
         first = false;
       } else if (this._options.checklistStart === 'page') {
         // User requested a new physical page for each checklist.
@@ -557,7 +549,7 @@ export class PdfWriter {
       } else if (this._options.checklistStart === 'column') {
         // User requested a new column for each checklist.
         this._newPage(false);
-      } else if (this._doc.lastAutoTable.finalY - this._dims!.tableMargin.top > this._dims!.innerPageHeight / 2) {
+      } else if (this._doc.lastAutoTable.finalY - this._dims.tableMargin.top > this._dims.innerPageHeight / 2) {
         // More than half the page is already used, start on the next column.
         this._newPage(false);
       } else {
@@ -572,7 +564,7 @@ export class PdfWriter {
             {
               content: checklist.title,
               colSpan: 3,
-              styles: { halign: 'center', fontSize: this._dims!.headerFontSize },
+              styles: { halign: 'center', fontSize: this._dims.headerFontSize },
             },
           ],
         ],
@@ -581,22 +573,22 @@ export class PdfWriter {
         margin: {
           left: this._getColumnMarginLeft(),
           right: this._getColumnMarginRight(),
-          top: this._dims!.tableMargin.top,
-          bottom: this._dims!.tableMargin.bottom,
+          top: this._dims.tableMargin.top,
+          bottom: this._dims.tableMargin.bottom,
         },
         startY: startY,
         rowPageBreak: 'avoid',
         styles: PdfWriter.DEBUG_LAYOUT // eslint-disable-line @typescript-eslint/no-unnecessary-condition
           ? { lineWidth: 0.1 }
           : undefined,
-        bodyStyles: { fontSize: this._dims!.contentFontSize, valign: 'top' },
+        bodyStyles: { fontSize: this._dims.contentFontSize, valign: 'top' },
         didDrawPage: (data: HookData) => {
-          const nextColumn = (this._currentColumn + 1) % this._dims!.columns;
+          const nextColumn = (this._currentColumn + 1) % this._dims.columns;
           data.settings.margin.left =
-            this._dims!.tableMargin.left + nextColumn * (this._dims!.availableColumnWidth + this._dims!.gutterWidth);
+            this._dims.tableMargin.left + nextColumn * (this._dims.availableColumnWidth + this._dims.gutterWidth);
           data.settings.margin.right =
-            this._dims!.tableMargin.right +
-            (this._dims!.columns - 1 - nextColumn) * (this._dims!.availableColumnWidth + this._dims!.gutterWidth);
+            this._dims.tableMargin.right +
+            (this._dims.columns - 1 - nextColumn) * (this._dims.availableColumnWidth + this._dims.gutterWidth);
         },
         didDrawCell: (data: CellHookData) => {
           this._drawPrefixedCell(data);
@@ -620,8 +612,6 @@ export class PdfWriter {
   }
 
   private _itemToCells(item: ChecklistItem): CellDef[] {
-    if (!this._doc) return [];
-
     const cells: CellDef[] = [];
     const prompt: CellDef = { content: item.prompt, styles: { halign: 'left', minCellWidth: 10 } };
 
@@ -635,7 +625,7 @@ export class PdfWriter {
         break;
       case ChecklistItem_Type.ITEM_SPACE:
         prompt.styles!.fillColor = 255;
-        prompt.styles!.minCellHeight = this._doc.getLineHeight() / this._dims!.scaleFactor;
+        prompt.styles!.minCellHeight = this._doc.getLineHeight() / this._dims.scaleFactor;
         break;
       case ChecklistItem_Type.ITEM_WARNING:
         prefix = PdfWriter.WARNING_PREFIX;
@@ -656,7 +646,7 @@ export class PdfWriter {
     } else if (item.indent) {
       prompt.styles!.cellPadding = {
         // Specifying any cellPadding removes the other default paddings, so must specify all of them.
-        ...this._dims!.defaultCellPadding,
+        ...this._dims.defaultCellPadding,
         left: this._indentPadding(item.indent),
       };
     }
@@ -759,7 +749,7 @@ export class PdfWriter {
     let leftPadding = data.cell.padding('left');
     let tableWidth = data.cell.width;
     const margin = {
-      ...this._dims!.tableMargin,
+      ...this._dims.tableMargin,
       left: this._getColumnMarginLeft(),
       right: this._getColumnMarginRight(),
     };
@@ -769,8 +759,8 @@ export class PdfWriter {
       data.cell.styles.halign = 'left';
       leftPadding = 0;
       const textWidth = this._textWidth(data.cell.text);
-      tableWidth = this._dims!.prefixCellWidth + textWidth + 2 * this._dims!.defaultPadding;
-      const innerTableWidth = this._dims!.availableColumnWidth;
+      tableWidth = this._dims.prefixCellWidth + textWidth + 2 * this._dims.defaultPadding;
+      const innerTableWidth = this._dims.availableColumnWidth;
       const innerMargins = (innerTableWidth - tableWidth) / 2;
       margin.left += innerMargins;
 
@@ -791,14 +781,14 @@ export class PdfWriter {
           {
             content: prefix.trim(),
             styles: {
-              cellWidth: this._dims!.prefixCellWidth,
-              cellPadding: { ...this._dims!.defaultCellPadding, left: this._dims!.iconTotalSize },
+              cellWidth: this._dims.prefixCellWidth,
+              cellPadding: { ...this._dims.defaultCellPadding, left: this._dims.iconTotalSize },
               halign: 'right',
               fontStyle: prefixFontStyle,
               textColor: prefixColor,
             },
           },
-          { content: contents.trim(), styles: { cellPadding: this._dims!.defaultCellPadding } },
+          { content: contents.trim(), styles: { cellPadding: this._dims.defaultCellPadding } },
         ],
       ],
       startY: data.cell.y,
@@ -821,16 +811,14 @@ export class PdfWriter {
       // Icon drawing is asynchronous, and we're in a synchronous autotable callback, so just collect what needs to be
       // drawn, for now.
 
+      const lineHeight = this._doc.getLineHeight() / this._dims.scaleFactor;
       this._icons.push({
         name: icon,
-        page: this._doc!.getCurrentPageInfo().pageNumber,
+        page: this._doc.getCurrentPageInfo().pageNumber,
         // Position to the left of the text.
         x: margin.left + leftPadding,
         // Position centered with the first line of text.
-        y:
-          data.cell.y +
-          this._dims!.defaultCellPadding.top +
-          (this._dims!.prefixCellLineHeight - this._dims!.iconSize) / 2,
+        y: data.cell.y + this._dims.defaultCellPadding.top + (lineHeight - this._dims.iconSize) / 2,
       });
     }
 
@@ -838,8 +826,6 @@ export class PdfWriter {
   }
 
   private async _addIcons() {
-    if (!this._doc) return;
-
     console.debug('PDF: Icons=', this._icons);
     const allIcons = await this._allIcons;
     for (const icon of this._icons) {
@@ -852,7 +838,7 @@ export class PdfWriter {
       // svg2pdf relies on jspdf's state machine, so we have to await for each one instead of
       // letting them work in parallel.
       // eslint-disable-next-line no-await-in-loop
-      await this._doc.svg(iconEl, { x: icon.x, y: icon.y, width: this._dims!.iconSize, height: this._dims!.iconSize });
+      await this._doc.svg(iconEl, { x: icon.x, y: icon.y, width: this._dims.iconSize, height: this._dims.iconSize });
     }
   }
 
@@ -899,25 +885,24 @@ export class PdfWriter {
   }
 
   private _indentPadding(indent: number) {
-    return indent + this._dims!.defaultPadding;
+    return indent + this._dims.defaultPadding;
   }
 
   private _calculatePrefixedCell(text: string, indent: number): { lines: string[]; height: number } {
-    if (!this._doc) throw new FormatError('No document created');
-
     const maxContentWidth = this._calculatePrefixedContentWidth(indent);
 
     // splitTextToSize needs the correct font setting for calculation.
     // We could pass it through its options param, but options.font would have to come from jspdf's getFont anyway.
-    this._doc.setFontSize(this._dims!.contentFontSize);
+    this._doc.setFontSize(this._dims.contentFontSize);
     this._doc.setFont(PdfWriter.DEFAULT_FONT_NAME, PdfWriter.NORMAL_FONT_STYLE);
 
     // Actually calculate the text wrapping so we know how many lines the cell will take.
     const splitText = this._doc.splitTextToSize(text, maxContentWidth) as string[];
     const numLines = splitText.length;
 
-    const textHeight = numLines * this._dims!.prefixContentLineHeight;
-    const cellHeight = textHeight + 2 * this._dims!.defaultPadding;
+    const lineHeight = this._doc.getLineHeight() / this._dims.scaleFactor;
+    const textHeight = numLines * lineHeight;
+    const cellHeight = textHeight + 2 * this._dims.defaultPadding;
 
     console.debug(`PDF: Text "${text}": numLines=${numLines}; cellHeight=${cellHeight}; maxWidth=${maxContentWidth}`);
 
@@ -928,20 +913,20 @@ export class PdfWriter {
     const indentWidth = this._indentPadding(indent);
     // autotable adds +1 to the allowed wrapping width to account for rounding:
     // https://github.com/simonbengtsson/jsPDF-AutoTable/blob/cd107726591d01a315d158bb827191928e1964b5/src/widthCalculator.ts#L302
-    const roundWidth = 1.0 / this._dims!.scaleFactor;
+    const roundWidth = 1.0 / this._dims.scaleFactor;
 
     console.debug(`PDF: Prefixed width: indent=${indentWidth}`);
 
     // Calculate the cell width that's available for the text contents
     return (
       // The available column width (accounting for margins and gutters):
-      this._dims!.availableColumnWidth -
+      this._dims.availableColumnWidth -
       // The prefix + content (with padding):
       indentWidth -
       // The content (with padding):
-      this._dims!.prefixCellWidth -
+      this._dims.prefixCellWidth -
       // The content (no padding):
-      2 * this._dims!.defaultPadding +
+      2 * this._dims.defaultPadding +
       // The content (with rounding):
       roundWidth
     );
@@ -950,22 +935,20 @@ export class PdfWriter {
   private _textWidth(lines: string[], fontSize?: number, scaleFactor?: number): number {
     // Calculate total width as the width of the longest line.
     const unitWidth = lines.reduce((max: number, line: string) => {
-      const width = this._doc!.getStringUnitWidth(line);
+      const width = this._doc.getStringUnitWidth(line);
       console.debug(`PDF: Width=${width} for line "${line}"`);
       return Math.max(max, width);
     }, 0);
-    return (unitWidth * (fontSize ?? this._dims!.contentFontSize)) / (scaleFactor ?? this._dims!.scaleFactor);
+    return (unitWidth * (fontSize ?? this._dims.contentFontSize)) / (scaleFactor ?? this._dims.scaleFactor);
   }
 
   private _addPageFooters() {
-    if (!this._doc) return;
-
     const pageCount = this._doc.internal.pages.length - 1;
 
     const firstNumberedPage = this._options.outputCoverPage ? 2 : 1;
     for (let i = firstNumberedPage; i <= pageCount; i++) {
       this._doc.setPage(i);
-      this._setCurrentY(this._dims!.footNoteY);
+      this._setCurrentY(this._dims.footNoteY);
       this._doc.saveGraphicsState();
       if (this._darkBackgroundPages.includes(i)) {
         this._doc.setTextColor('white');
@@ -983,10 +966,8 @@ export class PdfWriter {
   }
 
   private _newPage(forceNewPhysicalPage = false) {
-    if (!this._doc) return;
-
     this._currentColumn++;
-    if (!forceNewPhysicalPage && this._currentColumn < this._dims!.columns) {
+    if (!forceNewPhysicalPage && this._currentColumn < this._dims.columns) {
       console.debug(`PDF: New column ${this._currentColumn}`);
       this._setCurrentY(0);
       return;
@@ -997,11 +978,11 @@ export class PdfWriter {
     if (PdfWriter.DEBUG_LAYOUT) {
       this._doc.setLineWidth(0.01);
       for (
-        let x = this._dims!.tableMargin.left - this._dims!.gutterWidth / 2;
-        x < this._dims!.pageWidth - this._dims!.tableMargin.right;
-        x += this._dims!.columnWidth
+        let x = this._dims.tableMargin.left - this._dims.gutterWidth / 2;
+        x < this._dims.pageWidth - this._dims.tableMargin.right;
+        x += this._dims.columnWidth
       ) {
-        this._doc.rect(x, 0, this._dims!.columnWidth, this._dims!.pageHeight, 'S');
+        this._doc.rect(x, 0, this._dims.columnWidth, this._dims.pageHeight, 'S');
       }
     }
 
@@ -1012,8 +993,6 @@ export class PdfWriter {
   }
 
   private _addCenteredText(txt: string | string[], options: CenteredTextOptions) {
-    if (!this._doc) return;
-
     const { advanceY, fontSize, fontStyle, baseline, useColumnWidth } = options;
 
     this._doc.saveGraphicsState();
@@ -1024,10 +1003,10 @@ export class PdfWriter {
 
     let center: number;
     if (useColumnWidth) {
-      center = this._getColumnMarginLeft() + this._dims!.availableColumnWidth / 2;
+      center = this._getColumnMarginLeft() + this._dims.availableColumnWidth / 2;
     } else {
-      const tableWidth = this._dims!.pageWidth - this._dims!.tableMargin.left - this._dims!.tableMargin.right;
-      center = this._dims!.tableMargin.left + tableWidth / 2;
+      const tableWidth = this._dims.pageWidth - this._dims.tableMargin.left - this._dims.tableMargin.right;
+      center = this._dims.tableMargin.left + tableWidth / 2;
     }
 
     this._doc.text(txt, center, this._currentY, { align: 'center', baseline: baseline ?? 'alphabetic' });
