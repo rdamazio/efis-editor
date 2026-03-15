@@ -84,8 +84,26 @@ export class ChecklistItemsComponent {
     this._pushUndoState('Item deleted');
 
     const checklist = this.checklist();
+
+    // Calculate which item should remain selected, if any.
+    let newIdx: number | undefined;
+    if (checklist?.items.length === 1) {
+      // Last remaining item is being deleted
+      this._selectedIdx = null;
+      newIdx = undefined;
+    } else if (idx === this._selectedIdx) {
+      // Current selected item is being deleted
+      this._keepSelectedIdx = true;
+      newIdx = Math.min(idx, checklist!.items.length - 2);
+    } else if (this._selectedIdx !== null && idx < this._selectedIdx) {
+      // Another item before the selected one is being deleted
+      this._keepSelectedIdx = true;
+      newIdx = this._selectedIdx - 1;
+    }
+
     checklist!.items.splice(idx, 1);
-    this.checklistChange.emit(checklist);
+
+    this.onItemsUpdated(newIdx);
   }
 
   onNewItem(type: ChecklistItem_Type) {
@@ -144,12 +162,6 @@ export class ChecklistItemsComponent {
 
   deleteCurrentItem() {
     this._selectedItemComponent()?.onDelete();
-
-    if (this._selectedIdx === this.checklist()!.items.length) {
-      this.selectPreviousItem();
-    } else {
-      this.onItemsUpdated();
-    }
   }
 
   indentCurrentItem(delta: number) {
