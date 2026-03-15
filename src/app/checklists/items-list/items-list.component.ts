@@ -130,28 +130,28 @@ export class ChecklistItemsComponent {
 
   selectNextItem() {
     const checklist = this.checklist();
-    if (!checklist) {
+    if (!checklist || checklist.items.length === 0) {
       this._selectedIdx = null;
       return;
     }
-    if (this._selectedIdx !== null && this._selectedIdx < checklist.items.length - 1) {
-      this._selectedIdx++;
-    } else {
+    if (this._selectedIdx === null) {
       this._selectedIdx = 0;
+    } else if (this._selectedIdx < checklist.items.length - 1) {
+      this._selectedIdx++;
     }
     this.onItemsUpdated();
   }
 
   selectPreviousItem() {
-    const current = this.checklist();
-    if (!current) {
+    const checklist = this.checklist();
+    if (!checklist || checklist.items.length === 0) {
       this._selectedIdx = null;
       return;
     }
-    if (this._selectedIdx !== null && this._selectedIdx > 0) {
+    if (this._selectedIdx === null) {
+      this._selectedIdx = checklist.items.length - 1;
+    } else if (this._selectedIdx > 0) {
       this._selectedIdx--;
-    } else {
-      this._selectedIdx = current.items.length - 1;
     }
     this.onItemsUpdated();
   }
