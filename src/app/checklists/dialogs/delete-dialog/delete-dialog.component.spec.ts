@@ -43,30 +43,34 @@ describe('DeleteDialogComponent', () => {
     const confirmPromise = DeleteDialogComponent.confirmDeletion(DATA, dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
     await user.click(cancelButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(await confirmPromise).toBe(false);
+    expect(dialogs).toHaveLength(0);
+
+    await expect(confirmPromise).resolves.toBe(false);
   });
 
   it('should open and confirm the dialog', async () => {
     const confirmPromise = DeleteDialogComponent.confirmDeletion(DATA, dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     const deleteButton = await screen.findByRole('button', { name: 'Delete!' });
 
     await user.click(deleteButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(await confirmPromise).toBe(true);
+    expect(dialogs).toHaveLength(0);
+
+    await expect(confirmPromise).resolves.toBe(true);
   });
 });

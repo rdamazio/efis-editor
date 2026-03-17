@@ -38,52 +38,62 @@ describe('GoogleDriveDisconnectDialogComponent', () => {
     const confirmPromise = GoogleDriveDisconnectDialogComponent.confirmDisconnection(dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
     await user.click(cancelButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(await confirmPromise).toBeUndefined();
+    expect(dialogs).toHaveLength(0);
+
+    await expect(confirmPromise).resolves.toBeUndefined();
   });
 
   it('should open and confirm the dialog', async () => {
     const confirmPromise = GoogleDriveDisconnectDialogComponent.confirmDisconnection(dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     const deleteAll = await screen.findByRole('checkbox', { name: 'Delete all EFIS Editor data from Google Drive' });
+
     expect(deleteAll).not.toBeChecked();
 
     const stopButton = await screen.findByRole('button', { name: 'Stop synchronization' });
     await user.click(stopButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(await confirmPromise).toEqual({ deleteAllData: false });
+    expect(dialogs).toHaveLength(0);
+
+    await expect(confirmPromise).resolves.toEqual({ deleteAllData: false });
   });
 
   it('should open and confirm the dialog with data deletion', async () => {
     const confirmPromise = GoogleDriveDisconnectDialogComponent.confirmDisconnection(dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     const deleteAll = await screen.findByRole('checkbox', { name: 'Delete all EFIS Editor data from Google Drive' });
+
     expect(deleteAll).not.toBeChecked();
+
     await user.click(deleteAll);
+
     expect(deleteAll).toBeChecked();
 
     const stopButton = await screen.findByRole('button', { name: 'Stop synchronization' });
     await user.click(stopButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(await confirmPromise).toEqual({ deleteAllData: true });
+    expect(dialogs).toHaveLength(0);
+
+    await expect(confirmPromise).resolves.toEqual({ deleteAllData: true });
   });
 });

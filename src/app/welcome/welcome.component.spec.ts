@@ -44,18 +44,21 @@ describe('WelcomeComponent', () => {
     it('should show warning when Google Drive is disconnected', async () => {
       state$.next(DriveSyncState.DISCONNECTED);
       await fixture.whenStable();
+
       expect(component.showStorageWarning()).toBe(true);
     });
 
     it('should not show warning when Google Drive is in sync', async () => {
       state$.next(DriveSyncState.IN_SYNC);
       await fixture.whenStable();
+
       expect(component.showStorageWarning()).toBe(false);
     });
 
     it('should not show warning when Google Drive is syncing', async () => {
       state$.next(DriveSyncState.SYNCING);
       await fixture.whenStable();
+
       expect(component.showStorageWarning()).toBe(false);
     });
   });
@@ -69,6 +72,7 @@ describe('WelcomeComponent', () => {
       vi.spyOn(globalThis.navigator, 'platform', 'get').mockReturnValue('iPad');
 
       const url = component.installUrl();
+
       expect(url).toContain('support.apple.com');
       expect(url).toContain('ipados');
       expect(url).not.toContain('ios');
@@ -80,6 +84,7 @@ describe('WelcomeComponent', () => {
       );
 
       const url = component.installUrl();
+
       expect(url).toContain('support.apple.com');
       expect(url).toContain('ios');
       expect(url).not.toContain('ipados');
@@ -91,6 +96,7 @@ describe('WelcomeComponent', () => {
       );
 
       const url = component.installUrl();
+
       expect(url).toContain('support.apple.com');
       expect(url).not.toContain('ios');
       expect(url).not.toContain('ipados');
@@ -100,6 +106,7 @@ describe('WelcomeComponent', () => {
       deviceService.setDeviceInfo(
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36',
       );
+
       expect(component.installUrl()).toContain('support.google.com');
     });
 
@@ -107,11 +114,13 @@ describe('WelcomeComponent', () => {
       deviceService.setDeviceInfo(
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Edge/92.0.4515.159 Safari/537.36',
       );
+
       expect(component.installUrl()).toContain('learn.microsoft.com');
     });
 
     it('should return MDN link for Firefox on Linux', () => {
       deviceService.setDeviceInfo('Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0');
+
       expect(component.installUrl()).toContain('developer.mozilla.org');
     });
   });

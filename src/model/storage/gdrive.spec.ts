@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { filter, firstValueFrom, Subscription } from 'rxjs';
-import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { type Mock } from 'vitest';
 import { ChecklistFile, ChecklistGroup } from '../../../gen/ts/checklist';
 import { EXPECTED_CONTENTS } from '../formats/test-data';
 import { LazyBrowserStorage } from './browser-storage';
@@ -100,6 +100,7 @@ describe('GoogleDriveApi', () => {
 
   async function expectState(state: DriveSyncState) {
     const currentState = await firstValueFrom(gdrive.getState(), { defaultValue: DriveSyncState.FAILED });
+
     expect(currentState).toEqual(state);
   }
 
@@ -113,6 +114,7 @@ describe('GoogleDriveApi', () => {
 
   function expectUpload(checklist: ChecklistFile, mtime: Date, existingFile?: boolean) {
     const name = checklist.metadata!.name;
+
     expect(gdriveApi.uploadFile).toHaveBeenCalledWith(
       name + GoogleDriveStorage.CHECKLIST_EXTENSION,
       existingFile ? fileIdForName(name) : undefined,
@@ -156,7 +158,8 @@ describe('GoogleDriveApi', () => {
     gdriveApi.listFiles.mockResolvedValue([]);
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
-    expect(gdriveApi.authenticate).toHaveBeenCalledTimes(1);
+
+    expect(gdriveApi.authenticate).toHaveBeenCalledOnce();
     expect(gdriveApi.authenticate).toHaveBeenCalledWith();
 
     // Create it again, it should just load up the original token and run a sync with it.
@@ -167,7 +170,7 @@ describe('GoogleDriveApi', () => {
     await expectState(DriveSyncState.IN_SYNC);
 
     expect(gdriveApi.load).toHaveBeenCalledTimes(2);
-    expect(gdriveApi.authenticate).toHaveBeenCalledTimes(1);
+    expect(gdriveApi.authenticate).toHaveBeenCalledOnce();
     expect(gdriveApi.authenticate).toHaveBeenCalledWith();
     expect(gdriveApi.accessToken).toEqual('some_token');
 
@@ -187,8 +190,8 @@ describe('GoogleDriveApi', () => {
     await expectState(DriveSyncState.DISCONNECTED);
     await gdrive.init();
     await expectState(DriveSyncState.DISCONNECTED);
-    expect(gdriveApi.authenticate).toHaveBeenCalledTimes(1);
-    expect(gdriveApi.authenticate).toHaveBeenCalledWith();
+
+    expect(gdriveApi.authenticate).toHaveBeenCalledExactlyOnceWith();
     expect(gdriveApi.accessToken).toBeUndefined();
     expect(gdriveApi.revokeAccessToken).not.toHaveBeenCalled();
   });
@@ -203,8 +206,8 @@ describe('GoogleDriveApi', () => {
 
     await gdrive.disableSync(true);
     await expectState(DriveSyncState.DISCONNECTED);
-    expect(gdriveApi.revokeAccessToken).toHaveBeenCalledTimes(1);
-    expect(gdriveApi.revokeAccessToken).toHaveBeenCalledWith();
+
+    expect(gdriveApi.revokeAccessToken).toHaveBeenCalledExactlyOnceWith();
     expect(gdriveApi.accessToken).toBeUndefined();
   });
 
@@ -237,12 +240,13 @@ describe('GoogleDriveApi', () => {
     await gdrive.synchronize();
 
     await expectState(DriveSyncState.IN_SYNC);
+
     expect(gdriveApi.downloadFile).not.toHaveBeenCalled();
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
   });
 
   it('should download a remote-only file', async () => {
-    expect(await store.getChecklistFile(FILE_NAME)).toBeNull();
+    await expect(store.getChecklistFile(FILE_NAME)).resolves.toBeNull();
 
     // Verify that the download happened.
     gdriveApi.listFiles.mockResolvedValue([newFile(FILE_NAME, NEWER_MTIME)]);
@@ -258,17 +262,19 @@ describe('GoogleDriveApi', () => {
     await expectState(DriveSyncState.IN_SYNC);
 
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
-    expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
-    expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledExactlyOnceWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
     expect(allDownloads).toHaveLength(1);
     expect(allDownloads).toEqual(expect.arrayContaining([FILE_NAME]));
 
     // Verify that the download was saved locally.
     const savedChecklist = await store.getChecklistFile(FILE_NAME);
+
     expect(savedChecklist).toBeTruthy();
+
     const expectedWithMtime = ChecklistFile.clone(EXPECTED_CONTENTS);
     expectedWithMtime.metadata!.modifiedTime = NEWER_MTIME_UNIX;
+
     expect(savedChecklist).toEqual(expectedWithMtime);
   });
 
@@ -293,17 +299,19 @@ describe('GoogleDriveApi', () => {
     await expectState(DriveSyncState.IN_SYNC);
 
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
-    expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
-    expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledExactlyOnceWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
     expect(allDownloads).toHaveLength(1);
     expect(allDownloads).toEqual(expect.arrayContaining([FILE_NAME]));
 
     // Verify that the download was saved locally.
     const savedChecklist = await store.getChecklistFile(FILE_NAME);
+
     expect(savedChecklist).toBeTruthy();
+
     const expectedWithMtime = ChecklistFile.clone(EXPECTED_CONTENTS);
     expectedWithMtime.metadata!.modifiedTime = NEWER_MTIME_UNIX;
+
     expect(savedChecklist).toEqual(expectedWithMtime);
   });
 
@@ -357,8 +365,7 @@ describe('GoogleDriveApi', () => {
 
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
     expect(gdriveApi.downloadFile).not.toHaveBeenCalled();
-    expect(gdriveApi.trashFile).toHaveBeenCalledTimes(1);
-    expect(gdriveApi.trashFile).toHaveBeenCalledWith(FILE_ID);
+    expect(gdriveApi.trashFile).toHaveBeenCalledExactlyOnceWith(FILE_ID);
   });
 
   it('should not delete a remote file when locally deleted while disconnected', async () => {
@@ -386,9 +393,8 @@ describe('GoogleDriveApi', () => {
     await gdrive.synchronize();
     await expectState(DriveSyncState.IN_SYNC);
 
-    expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledExactlyOnceWith(FILE_ID);
 
-    expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
   });
 
@@ -423,17 +429,19 @@ describe('GoogleDriveApi', () => {
     await expectState(DriveSyncState.IN_SYNC);
 
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
-    expect(gdriveApi.downloadFile).toHaveBeenCalledTimes(1);
-    expect(gdriveApi.downloadFile).toHaveBeenCalledWith(FILE_ID);
+    expect(gdriveApi.downloadFile).toHaveBeenCalledExactlyOnceWith(FILE_ID);
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
     expect(allDownloads).toHaveLength(1);
     expect(allDownloads).toEqual(expect.arrayContaining([FILE_NAME]));
 
     // Verify that the download was saved locally.
     const savedChecklist = await store.getChecklistFile(FILE_NAME);
+
     expect(savedChecklist).toBeTruthy();
+
     const expectedWithMtime = ChecklistFile.clone(EXPECTED_CONTENTS);
     expectedWithMtime.metadata!.modifiedTime = NOW_PLUS_10M_UNIX;
+
     expect(savedChecklist).toEqual(expectedWithMtime);
   });
 
@@ -441,7 +449,8 @@ describe('GoogleDriveApi', () => {
     const file = newFile(FILE_NAME, NEWER_MTIME);
     file.trashed = true;
     await store.saveChecklistFile(EXPECTED_CONTENTS, OLDER_MTIME);
-    expect(await store.getChecklistFile(FILE_NAME)).not.toBeNull();
+
+    await expect(store.getChecklistFile(FILE_NAME)).resolves.not.toBeNull();
 
     gdriveApi.listFiles.mockResolvedValue([file]);
     await gdrive.synchronize();
@@ -454,6 +463,7 @@ describe('GoogleDriveApi', () => {
 
     // Verify that the download was deleted locally.
     const savedChecklist = await store.getChecklistFile(FILE_NAME);
+
     expect(savedChecklist).toBeNull();
   });
 
@@ -491,6 +501,7 @@ describe('GoogleDriveApi', () => {
     await expectState(DriveSyncState.IN_SYNC);
 
     expectUpload(EXPECTED_CONTENTS, NOW_PLUS_10M, true);
+
     expect(gdriveApi.downloadFile).not.toHaveBeenCalled();
     expect(gdriveApi.trashFile).not.toHaveBeenCalled();
   });
@@ -515,6 +526,7 @@ describe('GoogleDriveApi', () => {
       return Promise.reject(new Error('Unknown file ID'));
     });
     await gdrive.deleteAllData();
+
     expect(gdriveApi.deleteFile).toHaveBeenCalledTimes(2);
 
     expect(gdriveApi.uploadFile).not.toHaveBeenCalled();
@@ -523,12 +535,17 @@ describe('GoogleDriveApi', () => {
 
     // Local storage should be untouched.
     const localChecklists = await firstValueFrom(store.listChecklistFiles(), { defaultValue: [] });
+
     expect(localChecklists).toHaveLength(1);
     expect(localChecklists).toEqual(expect.arrayContaining([FILE_NAME]));
+
     const checklist = await store.getChecklistFile(FILE_NAME);
+
     expect(checklist).toBeTruthy();
+
     const expectedWithMtime = ChecklistFile.clone(EXPECTED_CONTENTS);
     expectedWithMtime.metadata!.modifiedTime = OLDER_MTIME_UNIX;
+
     expect(checklist).toEqual(expectedWithMtime);
   });
 

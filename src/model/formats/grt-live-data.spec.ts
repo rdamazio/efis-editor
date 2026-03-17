@@ -5,7 +5,7 @@ describe('GrtLiveData', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.1);
   });
 
-  it('GRT string replacements', () => {
+  it('replaces GRT string variables', () => {
     expect(GrtLiveData.replaceLiveDataFields('Some text without variables')).toEqual('Some text without variables');
     expect(GrtLiveData.replaceLiveDataFields('RPM is %86%, EGT is %103%')).toEqual('RPM is 2455, EGT is 1210');
     expect(GrtLiveData.replaceLiveDataFields('Wind %75% at %74%')).toEqual('Wind 246 at 6');

@@ -74,7 +74,8 @@ describe('PrintDialogComponent', () => {
 
     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     okButton = await screen.findByRole('button', { name: 'Ok' });
     cancelButton = await screen.findByRole('button', { name: 'Cancel' });
@@ -91,11 +92,10 @@ describe('PrintDialogComponent', () => {
     await user.click(cancelButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(dataOut).toHaveBeenCalledTimes(1);
+    expect(dialogs).toHaveLength(0);
 
-    expect(dataOut).toHaveBeenCalledWith(undefined);
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(undefined);
   });
 
   it('should open, modify and cancel the dialog, without changing stored settings', async () => {
@@ -112,13 +112,13 @@ describe('PrintDialogComponent', () => {
     await user.click(cancelButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(dataOut).toHaveBeenCalledTimes(1);
+    expect(dialogs).toHaveLength(0);
 
-    expect(dataOut).toHaveBeenCalledWith(undefined);
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(undefined);
 
     const newOpts = await prefs.getPrintOptions();
+
     expect(newOpts).not.toBeNull();
     expect(newOpts.pageSize).toEqual('a6');
   });
@@ -129,13 +129,11 @@ describe('PrintDialogComponent', () => {
     await user.click(okButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
+
+    expect(dialogs).toHaveLength(0);
 
     // Original object must be unmodified, but new one must have been returned.
-    expect(dataOut).toHaveBeenCalledTimes(1);
-
-    // Original object must be unmodified, but new one must have been returned.
-    expect(dataOut).toHaveBeenCalledWith(DEFAULT_OPTIONS);
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(DEFAULT_OPTIONS);
   });
 
   it('should emit and store changed options', async () => {
@@ -166,9 +164,11 @@ describe('PrintDialogComponent', () => {
       checklistStart: 'page',
       fontSizePercent: 90,
     };
-    expect(dataOut).toHaveBeenCalledTimes(1);
-    expect(dataOut).toHaveBeenCalledWith(expectedOpts);
+
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(expectedOpts);
+
     const newOpts = await prefs.getPrintOptions();
+
     expect(newOpts).toEqual(expectedOpts);
   });
 
@@ -187,13 +187,16 @@ describe('PrintDialogComponent', () => {
     await user.click(okButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
+
+    expect(dialogs).toHaveLength(0);
 
     expect(dataOut).toHaveBeenCalledWith({
       ...expectedOpts,
       checklistStart: 'page', // Clamped due to columns=1 overriding 'below' which was copied from DEFAULT_OPTIONS
     });
+
     const newOpts = await prefs.getPrintOptions();
+
     expect(newOpts).toEqual({
       ...expectedOpts,
       checklistStart: 'page',
@@ -211,10 +214,12 @@ describe('PrintDialogComponent', () => {
 
     // Verify initial state is reflected in the UI
     const columnsInput = await screen.findByRole('spinbutton', { name: 'Columns' });
+
     expect(columnsInput).toHaveValue(2);
 
     // The "New column" radio should be checked initially
     const checklistStartColumn = await screen.findByRole('radio', { name: 'New column' });
+
     expect(checklistStartColumn).toBeChecked();
 
     // Change columns to 1
@@ -223,14 +228,17 @@ describe('PrintDialogComponent', () => {
 
     // The "New page" radio should now be automatically selected
     const checklistStartPage = await screen.findByRole('radio', { name: 'New page' });
+
     expect(checklistStartPage).toBeChecked();
     expect(checklistStartColumn).toBeDisabled();
 
     // The logic should also correctly emit the clamped value
     await user.click(okButton);
-    expect(dataOut).toHaveBeenCalledTimes(1);
+
+    expect(dataOut).toHaveBeenCalledOnce();
 
     const emittedOpts = dataOut.mock.calls[0][0]!;
+
     expect(emittedOpts.columns).toBe(1);
     expect(emittedOpts.checklistStart).toBe('page');
   });

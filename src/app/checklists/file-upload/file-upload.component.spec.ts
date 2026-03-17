@@ -44,8 +44,7 @@ describe('ChecklistFileUploadComponent', () => {
 
     await forUpload();
 
-    expect(fileUploaded).toHaveBeenCalledTimes(1);
-    expect(fileUploaded).toHaveBeenCalledWith(expectedContents);
+    expect(fileUploaded).toHaveBeenCalledExactlyOnceWith(expectedContents);
   }
 
   it('should upload JSON file', async () => {

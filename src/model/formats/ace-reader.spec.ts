@@ -6,6 +6,7 @@ describe('AceReader', () => {
   it('read test file', async () => {
     const f = await loadFile('/src/model/formats/test.ace', 'test.ace');
     const readFile = await parseChecklistFile(f);
+
     expect(readFile).toEqual(EXPECTED_CONTENTS);
   });
 });

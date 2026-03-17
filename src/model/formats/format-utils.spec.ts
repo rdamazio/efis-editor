@@ -5,6 +5,7 @@ describe('FormatUtils', () => {
   it('should determine checklist item type by prefix correctly', () => {
     for (const [expectedType, prefix] of FormatUtils.CHECKLIST_ITEM_PREFIXES) {
       const { type: actualType, prompt: text } = FormatUtils.promptToPartialChecklistItem(`${prefix}: text`);
+
       expect(actualType).toBe(expectedType);
       expect(text).toBe(': text');
     }

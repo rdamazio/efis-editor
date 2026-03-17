@@ -43,7 +43,8 @@ describe('TitleDialogComponent', () => {
     const titlePromise = TitleDialogComponent.promptForTitle(DATA, dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     const titleBox = await screen.findByRole('textbox', { name: 'Title' });
     await user.type(titleBox, ' is home');
@@ -52,16 +53,18 @@ describe('TitleDialogComponent', () => {
     await user.click(cancelButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(await titlePromise).toBeUndefined();
+    expect(dialogs).toHaveLength(0);
+
+    await expect(titlePromise).resolves.toBeUndefined();
   });
 
   it('should open and confirm the dialog', async () => {
     const titlePromise = TitleDialogComponent.promptForTitle(DATA, dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     const titleBox = await screen.findByRole('textbox', { name: 'Title' });
     await user.type(titleBox, ' is home');
@@ -70,8 +73,9 @@ describe('TitleDialogComponent', () => {
     await user.click(okButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(await titlePromise).toEqual('Earth is home');
+    expect(dialogs).toHaveLength(0);
+
+    await expect(titlePromise).resolves.toEqual('Earth is home');
   });
 });

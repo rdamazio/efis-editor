@@ -47,20 +47,23 @@ describe('ChecklistItemComponent', () => {
 
     expect(editButton).toBeVisible();
     expect(editButton).toBeEnabled();
+
     await user.click(editButton!);
 
     const editBox = await screen.findByRole('textbox', { name: 'Prompt text' });
+
     expect(editBox).toBeVisible();
     expect(editBox).toHaveValue('My prompt');
     expect(screen.queryByRole('textbox', { name: 'Expectation text' })).not.toBeInTheDocument();
 
     await user.type(editBox, ' was modified');
+
     expect(editBox).toHaveValue('My prompt was modified');
+
     await user.type(editBox, '[Enter]');
 
-    expect(itemChange).toHaveBeenCalledTimes(1);
+    expect(itemChange).toHaveBeenCalledExactlyOnceWith(item);
 
-    expect(itemChange).toHaveBeenCalledWith(item);
     expect(item.prompt).toEqual('My prompt was modified');
   });
 
@@ -70,15 +73,17 @@ describe('ChecklistItemComponent', () => {
     await user.click(editButton!);
 
     const editBox = await screen.findByRole('textbox', { name: 'Prompt text' });
+
     expect(editBox).toHaveValue('My prompt');
 
     await user.type(editBox, ' had ~ as an invalid character');
+
     expect(editBox).toHaveValue('My prompt had  as an invalid character');
+
     await user.type(editBox, '[Enter]');
 
-    expect(itemChange).toHaveBeenCalledTimes(1);
+    expect(itemChange).toHaveBeenCalledExactlyOnceWith(item);
 
-    expect(itemChange).toHaveBeenCalledWith(item);
     expect(item.prompt).toEqual('My prompt had  as an invalid character');
   });
 
@@ -89,19 +94,25 @@ describe('ChecklistItemComponent', () => {
 
     expect(editButton).toBeVisible();
     expect(editButton).toBeEnabled();
+
     await user.click(editButton!);
 
     const promptBox = await screen.findByRole('textbox', { name: 'Prompt text' });
+
     expect(promptBox).toBeVisible();
     expect(promptBox).toHaveValue('My prompt');
+
     const expectationBox = await screen.findByRole('textbox', { name: 'Expectation text' });
+
     expect(expectationBox).toBeVisible();
     expect(expectationBox).toHaveValue('My expectation');
 
     await user.type(promptBox, ' was modified');
     await user.type(expectationBox, ' was modified too');
+
     expect(promptBox).toHaveValue('My prompt was modified');
     expect(expectationBox).toHaveValue('My expectation was modified too');
+
     await user.type(expectationBox, '[Enter]');
 
     expect(itemChange).toHaveBeenCalledWith(item);
@@ -116,19 +127,25 @@ describe('ChecklistItemComponent', () => {
 
     expect(editButton).toBeVisible();
     expect(editButton).toBeEnabled();
+
     await user.click(editButton!);
 
     const promptBox = await screen.findByRole('textbox', { name: 'Prompt text' });
+
     expect(promptBox).toBeVisible();
     expect(promptBox).toHaveValue('My prompt');
+
     const expectationBox = await screen.findByRole('textbox', { name: 'Expectation text' });
+
     expect(expectationBox).toBeVisible();
     expect(expectationBox).toHaveValue('My expectation');
 
     await user.type(promptBox, ' was modified');
     await user.type(expectationBox, ' was modified too');
+
     expect(promptBox).toHaveValue('My prompt was modified');
     expect(expectationBox).toHaveValue('My expectation was modified too');
+
     await user.type(expectationBox, '[Escape]');
 
     expect(itemChange).not.toHaveBeenCalled();
@@ -153,11 +170,10 @@ describe('ChecklistItemComponent', () => {
 
     expect(deleteButton).toBeVisible();
     expect(deleteButton).toBeEnabled();
+
     await user.click(deleteButton!);
 
-    expect(itemDeleted).toHaveBeenCalledTimes(1);
-
-    expect(itemDeleted).toHaveBeenCalledWith(true);
+    expect(itemDeleted).toHaveBeenCalledExactlyOnceWith(true);
   });
 
   it('should toggle centered', async () => {
@@ -176,9 +192,8 @@ describe('ChecklistItemComponent', () => {
     expect(indentLeftButton).toBeDisabled();
     expect(indentRightButton).toBeDisabled();
 
-    expect(itemChange).toHaveBeenCalledTimes(1);
+    expect(itemChange).toHaveBeenCalledExactlyOnceWith(item);
 
-    expect(itemChange).toHaveBeenCalledWith(item);
     expect(item.centered).toBe(true);
     expect(item.indent).toEqual(0);
 

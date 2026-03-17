@@ -30,6 +30,7 @@ describe('ForeFlightFormat', () => {
       const checklistData = 'oh my god secret secret is so amazing!';
       const encrypted = await ForeFlightUtils.encrypt(checklistData);
       const decrypted = await ForeFlightUtils.decrypt(await encrypted.arrayBuffer());
+
       expect(encrypted).not.toBe(new Blob([checklistData]));
       expect(encrypted.type).toBe('application/octet-stream');
       expect(decrypted).toBe(checklistData);
@@ -39,6 +40,7 @@ describe('ForeFlightFormat', () => {
   describe('ForeFlightReader', () => {
     it('should determine correct checklist metadata', () => {
       const mockFile = new File([], 'bar.fmd');
+
       expect(ForeFlightReader.getChecklistMetadata(mockFile, ForeFlightChecklistMetadata.create())).toEqual(
         ChecklistFileMetadata.create({ name: 'bar' }),
       );
@@ -49,6 +51,7 @@ describe('ForeFlightFormat', () => {
         detail: 'Wright Model B',
       });
       const actualMetadata = ForeFlightReader.getChecklistMetadata(mockFile, mockMetadata);
+
       expect(actualMetadata).toEqual(
         ChecklistFileMetadata.create({ name: 'foo', aircraftInfo: 'TAIL NUMBER', makeAndModel: 'Wright Model B' }),
       );
@@ -58,6 +61,7 @@ describe('ForeFlightFormat', () => {
   it('should read test file', async () => {
     const file = await loadFile('/src/model/formats/test-foreflight.fmd', 'test-foreflight.fmd');
     const checklistFile = await parseChecklistFile(file);
+
     expect(checklistFile).toEqual(EXPECTED_FOREFLIGHT_CONTENTS);
   });
 
@@ -67,9 +71,11 @@ describe('ForeFlightFormat', () => {
   it('should pass a round-trip test', async () => {
     const writtenFile = await serializeChecklistFile(EXPECTED_FOREFLIGHT_CONTENTS, FormatId.FOREFLIGHT);
     const writtenData = new Uint8Array(await writtenFile.arrayBuffer());
+
     expect(writtenData.byteLength).toBeGreaterThan(1000);
 
     const readFile = await ForeFlightReader.read(new File([writtenFile], 'test-foreflight.fmd'));
+
     expect(readFile).toEqual(EXPECTED_FOREFLIGHT_CONTENTS);
   });
 });

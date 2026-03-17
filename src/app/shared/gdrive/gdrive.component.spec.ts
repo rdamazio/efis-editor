@@ -59,41 +59,46 @@ describe('GoogleDriveComponent', () => {
   }
 
   it('should start in disconnected state', async () => {
-    expect(gdrive.init).toHaveBeenCalledTimes(1);
-    expect(gdrive.init).toHaveBeenCalledWith();
+    expect(gdrive.init).toHaveBeenCalledExactlyOnceWith();
     expect(gdrive.synchronize).not.toHaveBeenCalled();
     expect(syncButton).toBeVisible();
     expect(syncButton).toBeEnabled();
     expect(screen.getByText('cloud_off')).toBeVisible();
 
     await user.click(syncButton);
-    expect(await findConnectMenuItem()).toBeEnabled();
-    expect(await findDisconnectMenuItem()).toBeDisabled();
+
+    await expect(findConnectMenuItem()).resolves.toBeEnabled();
+    await expect(findDisconnectMenuItem()).resolves.toBeDisabled();
   });
 
   it('should not start synchronizing if dialog is cancelled', async () => {
     await user.click(syncButton);
     const connect = await findConnectMenuItem();
+
     expect(connect).toBeEnabled();
+
     await user.click(connect);
     await user.click(await screen.findByRole('button', { name: 'Cancel' }));
+
     expect(gdrive.synchronize).not.toHaveBeenCalled();
   });
 
   it('should connect when sync requested', async () => {
     await user.click(syncButton);
     const connect = await findConnectMenuItem();
+
     expect(connect).toBeEnabled();
+
     await user.click(connect);
+
     expect(gdrive.synchronize).not.toHaveBeenCalled();
 
     // Connection dialog should pop up - confirm it.
-    expect(await screen.findByText('Google Drive synchronization')).toBeVisible();
+    await expect(screen.findByText('Google Drive synchronization')).resolves.toBeVisible();
+
     await user.click(await screen.findByRole('button', { name: 'Synchronize' }));
 
-    expect(gdrive.synchronize).toHaveBeenCalledTimes(1);
-
-    expect(gdrive.synchronize).toHaveBeenCalledWith();
+    expect(gdrive.synchronize).toHaveBeenCalledExactlyOnceWith();
   });
 
   it('should force sync even when connected', async () => {
@@ -101,25 +106,28 @@ describe('GoogleDriveComponent', () => {
 
     await user.click(syncButton);
     const connect = await findConnectMenuItem();
+
     expect(connect).toBeEnabled();
+
     await user.click(connect);
 
-    expect(gdrive.synchronize).toHaveBeenCalledTimes(1);
-
-    expect(gdrive.synchronize).toHaveBeenCalledWith();
+    expect(gdrive.synchronize).toHaveBeenCalledExactlyOnceWith();
   });
 
   it('should not disconnect if cancelled', async () => {
     state$.next(DriveSyncState.IN_SYNC);
-    expect(await screen.findByText('cloud_done')).toBeVisible();
+
+    await expect(screen.findByText('cloud_done')).resolves.toBeVisible();
 
     await user.click(syncButton);
     const disconnect = await findDisconnectMenuItem();
+
     expect(disconnect).toBeEnabled();
 
     await user.click(disconnect);
 
-    expect(await screen.findByText('Google Drive synchronization')).toBeVisible();
+    await expect(screen.findByText('Google Drive synchronization')).resolves.toBeVisible();
+
     await user.click(await screen.findByRole('button', { name: 'Cancel' }));
 
     expect(gdrive.deleteAllData).not.toHaveBeenCalled();
@@ -128,88 +136,108 @@ describe('GoogleDriveComponent', () => {
 
   it('should disconnect without deleting data', async () => {
     state$.next(DriveSyncState.IN_SYNC);
-    expect(await screen.findByText('cloud_done')).toBeVisible();
+
+    await expect(screen.findByText('cloud_done')).resolves.toBeVisible();
 
     await user.click(syncButton);
     const disconnect = await findDisconnectMenuItem();
+
     expect(disconnect).toBeEnabled();
 
     await user.click(disconnect);
 
-    expect(await screen.findByText('Google Drive synchronization')).toBeVisible();
+    await expect(screen.findByText('Google Drive synchronization')).resolves.toBeVisible();
 
     const deleteAllDataCheckbox = await screen.findByRole('checkbox', {
       name: 'Delete all EFIS Editor data from Google Drive',
     });
+
     expect(deleteAllDataCheckbox).not.toBeChecked();
+
     await user.click(await screen.findByRole('button', { name: 'Stop synchronization' }));
 
     expect(gdrive.deleteAllData).not.toHaveBeenCalled();
-    expect(gdrive.disableSync).toHaveBeenCalledTimes(1);
-    expect(gdrive.disableSync).toHaveBeenCalledWith(true);
+    expect(gdrive.disableSync).toHaveBeenCalledExactlyOnceWith(true);
   });
 
   it('should disconnect and delete data', async () => {
     state$.next(DriveSyncState.IN_SYNC);
-    expect(await screen.findByText('cloud_done')).toBeVisible();
+
+    await expect(screen.findByText('cloud_done')).resolves.toBeVisible();
 
     await user.click(syncButton);
     const disconnect = await findDisconnectMenuItem();
+
     expect(disconnect).toBeEnabled();
 
     await user.click(disconnect);
 
-    expect(await screen.findByText('Google Drive synchronization')).toBeVisible();
+    await expect(screen.findByText('Google Drive synchronization')).resolves.toBeVisible();
 
     const deleteAllDataCheckbox = await screen.findByRole('checkbox', {
       name: 'Delete all EFIS Editor data from Google Drive',
     });
     await user.click(deleteAllDataCheckbox);
+
     expect(deleteAllDataCheckbox).toBeChecked();
 
     await user.click(await screen.findByRole('button', { name: 'Stop synchronization' }));
 
-    expect(gdrive.deleteAllData).toHaveBeenCalledTimes(1);
+    expect(gdrive.deleteAllData).toHaveBeenCalledExactlyOnceWith();
 
-    expect(gdrive.deleteAllData).toHaveBeenCalledWith();
-    expect(gdrive.disableSync).toHaveBeenCalledTimes(1);
-    expect(gdrive.disableSync).toHaveBeenCalledWith(true);
+    expect(gdrive.disableSync).toHaveBeenCalledExactlyOnceWith(true);
   });
 
   it('should render all states properly', async () => {
     expect(screen.getByText('cloud_off')).toBeVisible();
     expect(syncButton).toBeEnabled();
+
     await user.click(syncButton);
-    expect(await findConnectMenuItem()).toBeEnabled();
-    expect(await findDisconnectMenuItem()).toBeDisabled();
+
+    await expect(findConnectMenuItem()).resolves.toBeEnabled();
+    await expect(findDisconnectMenuItem()).resolves.toBeDisabled();
+
     await user.click(syncButton);
 
     state$.next(DriveSyncState.SYNCING);
-    expect(await screen.findByText('cloud_sync')).toBeVisible();
+
+    await expect(screen.findByText('cloud_sync')).resolves.toBeVisible();
     expect(syncButton).toBeDisabled();
 
     state$.next(DriveSyncState.NEEDS_SYNC);
-    expect(await screen.findByText('cloud_upload')).toBeVisible();
+
+    await expect(screen.findByText('cloud_upload')).resolves.toBeVisible();
     expect(syncButton).toBeEnabled();
+
     await user.click(syncButton);
-    expect(await findConnectMenuItem()).toBeEnabled();
-    expect(await findDisconnectMenuItem()).toBeEnabled();
+
+    await expect(findConnectMenuItem()).resolves.toBeEnabled();
+    await expect(findDisconnectMenuItem()).resolves.toBeEnabled();
+
     await user.click(syncButton);
 
     state$.next(DriveSyncState.IN_SYNC);
-    expect(await screen.findByText('cloud_done')).toBeVisible();
+
+    await expect(screen.findByText('cloud_done')).resolves.toBeVisible();
     expect(syncButton).toBeEnabled();
+
     await user.click(syncButton);
-    expect(await findConnectMenuItem()).toBeEnabled();
-    expect(await findDisconnectMenuItem()).toBeEnabled();
+
+    await expect(findConnectMenuItem()).resolves.toBeEnabled();
+    await expect(findDisconnectMenuItem()).resolves.toBeEnabled();
+
     await user.click(syncButton);
 
     state$.next(DriveSyncState.FAILED);
-    expect(await screen.findByText('cloud_alert')).toBeVisible();
+
+    await expect(screen.findByText('cloud_alert')).resolves.toBeVisible();
     expect(syncButton).toBeEnabled();
+
     await user.click(syncButton);
-    expect(await findConnectMenuItem()).toBeEnabled();
-    expect(await findDisconnectMenuItem()).toBeEnabled();
+
+    await expect(findConnectMenuItem()).resolves.toBeEnabled();
+    await expect(findDisconnectMenuItem()).resolves.toBeEnabled();
+
     await user.click(syncButton);
   });
 
@@ -217,16 +245,20 @@ describe('GoogleDriveComponent', () => {
     const loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
 
     errors$.next('Oopsie');
-    expect(await screen.findByText('Oopsie')).toBeVisible();
+
+    await expect(screen.findByText('Oopsie')).resolves.toBeVisible();
 
     const snackBars = await loader.getAllHarnesses(MatSnackBarHarness);
+
     expect(snackBars).toHaveLength(1);
+
     const snackBar = snackBars[0];
-    expect(await snackBar.getMessage()).toEqual('Oopsie');
+
+    await expect(snackBar.getMessage()).resolves.toEqual('Oopsie');
     expect(gdrive.synchronize).not.toHaveBeenCalled();
 
     await snackBar.dismissWithAction();
-    expect(gdrive.synchronize).toHaveBeenCalledTimes(1);
-    expect(gdrive.synchronize).toHaveBeenCalledWith();
+
+    expect(gdrive.synchronize).toHaveBeenCalledExactlyOnceWith();
   });
 });

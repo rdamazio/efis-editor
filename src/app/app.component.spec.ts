@@ -15,12 +15,14 @@ describe('AppComponent', () => {
 
   it('should create the app', () => {
     const app = fixture.componentInstance;
+
     expect(app).toBeTruthy();
     expect(app.title).toEqual('EFIS Editor');
   });
 
   it('should render the title', () => {
     const toolbar = screen.getByRole('toolbar');
+
     expect(toolbar).toBeVisible();
     expect(within(toolbar).getByRole('heading', { name: 'EFIS Editor' })).toBeVisible();
   });

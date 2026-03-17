@@ -38,29 +38,33 @@ describe('GoogleDriveConnectDialogComponent', () => {
     const confirmPromise = GoogleDriveConnectDialogComponent.confirmConnection(dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
     await user.click(cancelButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(await confirmPromise).toBe(false);
+    expect(dialogs).toHaveLength(0);
+
+    await expect(confirmPromise).resolves.toBe(false);
   });
 
   it('should open and confirm the dialog', async () => {
     const confirmPromise = GoogleDriveConnectDialogComponent.confirmConnection(dialog);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     const syncButton = await screen.findByRole('button', { name: 'Synchronize' });
     await user.click(syncButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(await confirmPromise).toBe(true);
+    expect(dialogs).toHaveLength(0);
+
+    await expect(confirmPromise).resolves.toBe(true);
   });
 });

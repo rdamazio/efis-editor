@@ -37,6 +37,7 @@ describe('ChecklistTreeBarComponent', () => {
     tree.isAllExpanded.mockReturnValue(true);
     tree.isAllCollapsed.mockReturnValue(false);
     rendered.detectChanges();
+
     expect(expandButton).toBeDisabled();
     expect(collapseButton).toBeEnabled();
   });
@@ -45,6 +46,7 @@ describe('ChecklistTreeBarComponent', () => {
     tree.isAllExpanded.mockReturnValue(false);
     tree.isAllCollapsed.mockReturnValue(true);
     rendered.detectChanges();
+
     expect(expandButton).toBeEnabled();
     expect(collapseButton).toBeDisabled();
   });
@@ -55,9 +57,7 @@ describe('ChecklistTreeBarComponent', () => {
 
     await user.click(expandButton);
 
-    expect(tree.expandAll).toHaveBeenCalledTimes(1);
-
-    expect(tree.expandAll).toHaveBeenCalledWith();
+    expect(tree.expandAll).toHaveBeenCalledExactlyOnceWith();
   });
 
   it('should collapse all when that button is clicked', async () => {
@@ -66,8 +66,6 @@ describe('ChecklistTreeBarComponent', () => {
 
     await user.click(collapseButton);
 
-    expect(tree.collapseAll).toHaveBeenCalledTimes(1);
-
-    expect(tree.collapseAll).toHaveBeenCalledWith();
+    expect(tree.collapseAll).toHaveBeenCalledExactlyOnceWith();
   });
 });

@@ -17,44 +17,49 @@ describe('AceWriter', () => {
     const writtenFile = await serializeChecklistFile(readFile, FormatId.ACE);
     const writtenData = new Uint8Array(await writtenFile.arrayBuffer());
     const readData = new Uint8Array(await f.arrayBuffer());
+
     expect(writtenData.byteLength).toBeGreaterThan(1000);
     expect(writtenData).toEqual(readData);
   });
 
   describe('try writing files without a name', () => {
-    [
-      ChecklistFile.create({ metadata: undefined }),
-      ChecklistFile.create({ metadata: ChecklistFileMetadata.create({ name: undefined }) }),
-      ChecklistFile.create({ metadata: ChecklistFileMetadata.create({ name: '' }) }),
-    ].forEach((file: ChecklistFile) => {
-      it('write nameless file', async () => {
-        await expect(serializeChecklistFile(file, FormatId.ACE)).rejects.toThrow(FormatError);
-      });
+    it.each([
+      { name: 'undefined metadata', file: ChecklistFile.create({ metadata: undefined }) },
+      {
+        name: 'undefined name',
+        file: ChecklistFile.create({ metadata: ChecklistFileMetadata.create({ name: undefined }) }),
+      },
+      {
+        name: 'empty name',
+        file: ChecklistFile.create({ metadata: ChecklistFileMetadata.create({ name: '' }) }),
+      },
+    ])('write nameless file: $name', async ({ file }) => {
+      await expect(serializeChecklistFile(file, FormatId.ACE)).rejects.toThrow(FormatError);
     });
   });
 
   describe('try writing files without metadata fields', () => {
-    ['makeAndModel', 'aircraftInfo', 'manufacturerInfo', 'copyrightInfo'].forEach((field) => {
-      it(`without ${field}`, async () => {
-        const contents = ChecklistFile.clone(EXPECTED_CONTENTS);
-        (contents.metadata as unknown as Record<string, string>)[field] = '';
-        const writtenFile = await serializeChecklistFile(contents, FormatId.ACE);
-
-        // Try reading back normally first.
-        const readFile1 = await parseChecklistFile(writtenFile);
-        expect(readFile1).toEqual(contents);
-
-        // Read back without trimming to verify that the file contains a space in the metadata field.
-        AceReader.trimMetadataFields = false;
-        const readFile2 = await parseChecklistFile(writtenFile);
-        const expectedContents2 = ChecklistFile.clone(EXPECTED_CONTENTS);
-        (expectedContents2.metadata as unknown as Record<string, string>)[field] = ' ';
-        expect(readFile2).toEqual(expectedContents2);
-      });
-    });
-
     afterEach(() => {
       AceReader.trimMetadataFields = true;
+    });
+
+    it.each(['makeAndModel', 'aircraftInfo', 'manufacturerInfo', 'copyrightInfo'])('without %s', async (field) => {
+      const contents = ChecklistFile.clone(EXPECTED_CONTENTS);
+      (contents.metadata as unknown as Record<string, string>)[field] = '';
+      const writtenFile = await serializeChecklistFile(contents, FormatId.ACE);
+
+      // Try reading back normally first.
+      const readFile1 = await parseChecklistFile(writtenFile);
+
+      expect(readFile1).toEqual(contents);
+
+      // Read back without trimming to verify that the file contains a space in the metadata field.
+      AceReader.trimMetadataFields = false;
+      const readFile2 = await parseChecklistFile(writtenFile);
+      const expectedContents2 = ChecklistFile.clone(EXPECTED_CONTENTS);
+      (expectedContents2.metadata as unknown as Record<string, string>)[field] = ' ';
+
+      expect(readFile2).toEqual(expectedContents2);
     });
   });
 
@@ -69,6 +74,7 @@ describe('AceWriter', () => {
       );
       const writtenFile = await serializeChecklistFile(contents, FormatId.ACE);
       const readFile = await parseChecklistFile(writtenFile);
+
       expect(readFile).toEqual(EXPECTED_CONTENTS);
     });
 
@@ -82,6 +88,7 @@ describe('AceWriter', () => {
       );
       const writtenFile = await serializeChecklistFile(contents, FormatId.ACE);
       const readFile = await parseChecklistFile(writtenFile);
+
       expect(readFile).toEqual(EXPECTED_CONTENTS);
     });
 
@@ -104,6 +111,7 @@ describe('AceWriter', () => {
       );
       const writtenFile = await serializeChecklistFile(contents, FormatId.ACE);
       const readFile = await parseChecklistFile(writtenFile);
+
       expect(readFile).toEqual(EXPECTED_CONTENTS);
     });
   });

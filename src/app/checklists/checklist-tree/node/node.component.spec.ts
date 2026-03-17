@@ -39,14 +39,17 @@ describe('NodeComponent', () => {
     await renderComponent();
 
     const renameButton = screen.queryByTestId('rename-button');
+
     expect(renameButton).not.toBeVisible();
 
     const title = screen.queryByText(node.title);
+
     expect(title).toBeInTheDocument();
+
     await user.hover(title!);
 
-    expect(await screen.findByTestId('rename-button')).toBeVisible();
-    expect(await screen.findByTestId('delete-button')).toBeVisible();
+    await expect(screen.findByTestId('rename-button')).resolves.toBeVisible();
+    await expect(screen.findByTestId('delete-button')).resolves.toBeVisible();
   });
 
   it('should not render buttons on hover if disabled', async () => {
@@ -54,11 +57,13 @@ describe('NodeComponent', () => {
     await renderComponent();
 
     const title = screen.queryByText(node.title);
+
     expect(title).toBeInTheDocument();
+
     await user.hover(title!);
 
-    expect(await screen.findByTestId('rename-button')).not.toBeVisible();
-    expect(await screen.findByTestId('delete-button')).not.toBeVisible();
+    await expect(screen.findByTestId('rename-button')).resolves.not.toBeVisible();
+    await expect(screen.findByTestId('delete-button')).resolves.not.toBeVisible();
   });
 
   it('should render Add new node', async () => {
@@ -75,39 +80,46 @@ describe('NodeComponent', () => {
     await renderComponent();
 
     const renameButton = await screen.findByTestId('rename-button');
+
     expect(renameButton).toBeInTheDocument();
+
     await user.click(renameButton);
 
-    expect(nodeRename).toHaveBeenCalledTimes(1);
-
-    expect(nodeRename).toHaveBeenCalledWith(node);
+    expect(nodeRename).toHaveBeenCalledExactlyOnceWith(node);
   });
 
   it('should output when delete is clicked and user confirms', async () => {
     await renderComponent();
 
     const deleteButton = await screen.findByTestId('delete-button');
+
     expect(deleteButton).toBeInTheDocument();
+
     await user.click(deleteButton);
 
     const confirmButton = await screen.findByRole('button', { name: 'Delete!' });
+
     expect(confirmButton).toBeInTheDocument();
+
     await user.click(confirmButton);
 
     expect(screen.queryByRole('button', { name: 'Delete!' })).not.toBeInTheDocument();
-    expect(nodeDelete).toHaveBeenCalledTimes(1);
-    expect(nodeDelete).toHaveBeenCalledWith(node);
+    expect(nodeDelete).toHaveBeenCalledExactlyOnceWith(node);
   });
 
   it('should not output when delete is clicked and user cancels', async () => {
     await renderComponent();
 
     const deleteButton = await screen.findByTestId('delete-button');
+
     expect(deleteButton).toBeInTheDocument();
+
     await user.click(deleteButton);
 
     const cancelButton = await screen.findByRole('button', { name: 'Cancel' });
+
     expect(cancelButton).toBeInTheDocument();
+
     await user.click(cancelButton);
 
     expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
@@ -120,12 +132,15 @@ describe('NodeComponent', () => {
 
     // Current category should show.
     const categoryIcon = await screen.findByText(/🄰.*/);
+
     expect(categoryIcon).toBeVisible();
 
     // Change to normal category.
     await user.click(categoryIcon);
     const normalOption = await screen.findByText('🄽ormal');
+
     expect(normalOption).toBeVisible();
+
     await user.click(normalOption);
 
     expect(screen.queryByText(/🄰.*/)).not.toBeInTheDocument();

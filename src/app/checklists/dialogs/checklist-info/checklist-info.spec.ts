@@ -78,7 +78,8 @@ describe('ChecklistInfoComponent', () => {
 
     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     okButton = await screen.findByRole('button', { name: 'Ok' });
     cancelButton = await screen.findByRole('button', { name: 'Cancel' });
@@ -95,11 +96,11 @@ describe('ChecklistInfoComponent', () => {
     await user.click(cancelButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(dataOut).toHaveBeenCalledTimes(1);
+    expect(dialogs).toHaveLength(0);
 
-    expect(dataOut).toHaveBeenCalledWith(undefined);
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(undefined);
+
     expect(dataIn).toEqual(DEFAULT_DATA_IN);
   });
 
@@ -111,21 +112,22 @@ describe('ChecklistInfoComponent', () => {
     await user.click(okButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
+
+    expect(dialogs).toHaveLength(0);
 
     const modifiedData = Checklist.clone(DEFAULT_DATA_IN);
     modifiedData.title = 'New title';
 
-    expect(dataOut).toHaveBeenCalledTimes(1);
-
-    expect(dataOut).toHaveBeenCalledWith(modifiedData);
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(modifiedData);
   });
 
   it('should require title to be non-empty', async () => {
     await openDialog();
 
     await user.clear(titleBox);
+
     expect(okButton).toBeDisabled();
+
     await user.click(cancelButton);
   });
 
@@ -140,13 +142,12 @@ describe('ChecklistInfoComponent', () => {
     await user.click(okButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
+
+    expect(dialogs).toHaveLength(0);
 
     const modifiedData = Checklist.clone(DEFAULT_DATA_IN);
     modifiedData.completionAction = Checklist_CompletionAction.ACTION_OPEN_FLIGHT_PLAN;
 
-    expect(dataOut).toHaveBeenCalledTimes(1);
-
-    expect(dataOut).toHaveBeenCalledWith(modifiedData);
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(modifiedData);
   });
 });

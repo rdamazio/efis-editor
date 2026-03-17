@@ -101,29 +101,29 @@ describe('ChecklistCommandBarComponent', () => {
   it('should emit when Open is clicked', async () => {
     await renderComponent(true, false);
     await user.click(openButton);
-    expect(openFile).toHaveBeenCalledTimes(1);
-    expect(openFile).toHaveBeenCalledWith(true);
+
+    expect(openFile).toHaveBeenCalledExactlyOnceWith(true);
   });
 
   it('should emit when Upload is clicked', async () => {
     await renderComponent(true, false);
     await user.click(uploadButton);
-    expect(uploadFile).toHaveBeenCalledTimes(1);
-    expect(uploadFile).toHaveBeenCalledWith(true);
+
+    expect(uploadFile).toHaveBeenCalledExactlyOnceWith(true);
   });
 
   it('should emit when Print is clicked', async () => {
     await renderComponent(true, true);
     await user.click(printButton);
-    expect(downloadFile).toHaveBeenCalledTimes(1);
-    expect(downloadFile).toHaveBeenCalledWith(FormatId.PDF);
+
+    expect(downloadFile).toHaveBeenCalledExactlyOnceWith(FormatId.PDF);
   });
 
   it('should emit when Info is clicked', async () => {
     await renderComponent(true, true);
     await user.click(infoButton);
-    expect(fileInfo).toHaveBeenCalledTimes(1);
-    expect(fileInfo).toHaveBeenCalledWith(true);
+
+    expect(fileInfo).toHaveBeenCalledExactlyOnceWith(true);
   });
 
   it('should emit when New is clicked', async () => {
@@ -131,15 +131,16 @@ describe('ChecklistCommandBarComponent', () => {
     await user.click(newButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
+
     expect(dialogs).toHaveLength(1);
 
     const titleBox = await screen.findByRole('textbox', { name: 'Title' });
+
     expect(titleBox).toBeVisible();
+
     await user.type(titleBox, 'New title[Enter]');
 
-    expect(newFile).toHaveBeenCalledTimes(1);
-
-    expect(newFile).toHaveBeenCalledWith('New title');
+    expect(newFile).toHaveBeenCalledExactlyOnceWith('New title');
   });
 
   it('should emit when Download is clicked', async () => {
@@ -147,15 +148,16 @@ describe('ChecklistCommandBarComponent', () => {
     await user.click(downloadButton);
 
     const menu = await loader.getHarness(MatMenuHarness.with({ triggerText: 'download' }));
-    expect(await menu.isOpen()).toBe(true);
+
+    await expect(menu.isOpen()).resolves.toBe(true);
 
     const formatButton = await screen.findByRole('menuitem', { name: 'Download as Jeppesen ForeFlight' });
+
     expect(formatButton).toBeVisible();
+
     await user.click(formatButton);
 
-    expect(downloadFile).toHaveBeenCalledTimes(1);
-
-    expect(downloadFile).toHaveBeenCalledWith(FormatId.FOREFLIGHT);
+    expect(downloadFile).toHaveBeenCalledExactlyOnceWith(FormatId.FOREFLIGHT);
   });
 
   it('should emit when Delete is clicked', async () => {
@@ -163,14 +165,15 @@ describe('ChecklistCommandBarComponent', () => {
     await user.click(deleteButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
+
     expect(dialogs).toHaveLength(1);
 
     const confirmButton = await screen.findByRole('button', { name: 'Delete!' });
+
     expect(confirmButton).toBeVisible();
+
     await user.click(confirmButton);
 
-    expect(deleteFile).toHaveBeenCalledTimes(1);
-
-    expect(deleteFile).toHaveBeenCalledWith(true);
+    expect(deleteFile).toHaveBeenCalledExactlyOnceWith(true);
   });
 });

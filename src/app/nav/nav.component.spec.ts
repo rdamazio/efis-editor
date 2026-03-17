@@ -48,6 +48,7 @@ describe('NavComponent', () => {
 
   it('should render', () => {
     const heading = screen.getByRole('heading');
+
     expect(heading).toBeVisible();
     expect(heading).toHaveTextContent(/EFIS Editor/);
   });
@@ -58,6 +59,7 @@ describe('NavComponent', () => {
     await fixture.whenStable();
 
     const heading = screen.getByRole('heading');
+
     expect(heading).toHaveTextContent(/EFIS Editor.*My route title/);
   });
 
@@ -68,6 +70,7 @@ describe('NavComponent', () => {
     await fixture.whenStable();
 
     const heading = screen.getByRole('heading');
+
     expect(heading).toHaveTextContent(/EFIS Editor.*My route title.*My filename/);
   });
 
@@ -113,32 +116,41 @@ describe('NavComponent', () => {
     fixture.detectChanges();
 
     const button = screen.getByRole('button', { name: 'Show keyboard shortcuts' });
+
     expect(button).toBeVisible();
 
     await user.click(button);
-    expect(toggleHelp).toHaveBeenCalledTimes(1);
-    expect(toggleHelp).toHaveBeenCalledWith(expect.any(MatDialog));
+
+    expect(toggleHelp).toHaveBeenCalledExactlyOnceWith(expect.any(MatDialog));
   });
 
   it('should show About dialog', async () => {
     const sidenavToggle = screen.getByRole('button', { name: 'Toggle sidenav' });
+
     expect(sidenavToggle).toBeVisible();
+
     await user.click(sidenavToggle);
 
     const aboutLink = await screen.findByText('About');
+
     expect(aboutLink).toBeVisible();
+
     await user.click(aboutLink);
 
     let dialogs = await loader.getAllHarnesses(MatDialogHarness);
+
     expect(dialogs).toHaveLength(1);
 
     expect(screen.getByRole('img', { name: 'GitHub logo' })).toBeVisible();
 
     const okButton = screen.getByRole('button', { name: 'Ok' });
+
     expect(okButton).toBeVisible();
+
     await user.click(okButton);
 
     dialogs = await loader.getAllHarnesses(MatDialogHarness);
+
     expect(dialogs).toHaveLength(0);
   });
 });

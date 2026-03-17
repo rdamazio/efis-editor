@@ -158,6 +158,7 @@ describe('ChecklistsComponent', () => {
 
   function expectFragment(fragment: string) {
     const extras = vi.mocked(navigate).mock.lastCall?.[1] as NavigationExtras;
+
     expect(extras.fragment).toEqual(fragment);
   }
 
@@ -176,12 +177,15 @@ describe('ChecklistsComponent', () => {
 
   async function expectFile(name: string, expectedFile: ChecklistFile, completed?: Promise<boolean>) {
     if (completed) {
-      expect(await completed).toBe(true);
+      await expect(completed).resolves.toBe(true);
     }
 
     const storedFile = await storage.getChecklistFile(name);
+
     expect(storedFile).not.toBeNull();
+
     storedFile!.metadata!.modifiedTime = 0;
+
     expect(storedFile).toEqual(expectedFile);
   }
 
@@ -226,7 +230,9 @@ describe('ChecklistsComponent', () => {
               // Spaces don't have a unique name to look for - find the last one instead.
               const allBlanks = await screen.findAllByRole('listitem', { name: 'Blank item' });
               numBlanks++;
+
               expect(allBlanks).toHaveLength(numBlanks);
+
               itemEl = allBlanks[numBlanks - 1];
             } else {
               itemEl = await screen.findByRole('listitem', { name: `Item: ${item.prompt}` });
@@ -274,27 +280,35 @@ describe('ChecklistsComponent', () => {
 
   it('should create and delete a file', async () => {
     await newFile('My file');
-    expect(await storage.getChecklistFile('My file')).not.toBeNull();
+
+    await expect(storage.getChecklistFile('My file')).resolves.not.toBeNull();
+
     expectFragment('My file');
     expectNavData('My file');
+
     expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
 
     const completed = storageCompleted();
     await user.click(screen.getByRole('button', { name: 'Delete file' }));
     const confirmButton = await screen.findByRole('button', { name: 'Delete!' });
+
     expect(confirmButton).toBeVisible();
+
     await user.click(confirmButton);
 
-    expect(await completed).toBe(true);
+    await expect(completed).resolves.toBe(true);
     expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
-    expect(await storage.getChecklistFile('My file')).toBeNull();
+    await expect(storage.getChecklistFile('My file')).resolves.toBeNull();
+
     expectFragment('');
     expectNavData(undefined);
   });
 
   it('should create and rename a file', async () => {
     await newFile('My file');
-    expect(await storage.getChecklistFile('My file')).not.toBeNull();
+
+    await expect(storage.getChecklistFile('My file')).resolves.not.toBeNull();
+
     expectFragment('My file');
     expectNavData('My file');
 
@@ -306,9 +320,9 @@ describe('ChecklistsComponent', () => {
     const okButton = await screen.findByRole('button', { name: 'Ok' });
     await user.click(okButton);
 
-    expect(await completed).toBe(true);
-    expect(await storage.getChecklistFile('My file')).toBeNull();
-    expect(await storage.getChecklistFile('Renamed file')).not.toBeNull();
+    await expect(completed).resolves.toBe(true);
+    await expect(storage.getChecklistFile('My file')).resolves.toBeNull();
+    await expect(storage.getChecklistFile('Renamed file')).resolves.not.toBeNull();
 
     expectFragment('Renamed file');
     expectNavData('Renamed file');
@@ -316,7 +330,9 @@ describe('ChecklistsComponent', () => {
 
   it('should rename a file through navigation', async () => {
     await newFile('My file');
-    expect(await storage.getChecklistFile('My file')).not.toBeNull();
+
+    await expect(storage.getChecklistFile('My file')).resolves.not.toBeNull();
+
     expectFragment('My file');
     expectNavData('My file');
 
@@ -327,17 +343,20 @@ describe('ChecklistsComponent', () => {
     rendered.detectChanges();
     TestBed.tick();
     await rendered.fixture.whenStable();
-    expect(await completed).toBe(true);
+
+    await expect(completed).resolves.toBe(true);
 
     expectFragment('Renamed file');
-    expect(await storage.getChecklistFile('My file')).toBeNull();
-    expect(await storage.getChecklistFile('Renamed file')).not.toBeNull();
+
+    await expect(storage.getChecklistFile('My file')).resolves.toBeNull();
+    await expect(storage.getChecklistFile('Renamed file')).resolves.not.toBeNull();
   });
 
   it('should not overwrite an existing file', async () => {
     await newFile('My file');
     await user.click(await screen.findByRole('treeitem', { name: 'Checklist: First checklist' }));
     await addItem('caution', 'Second item');
+
     expect(screen.getByRole('listitem', { name: 'Item: Second item' })).toBeInTheDocument();
 
     // Try to create the same file again - this should fail, keeping the original file.
@@ -423,6 +442,7 @@ describe('ChecklistsComponent', () => {
     const completed = storageCompleted();
     const item = screen.getByRole('listitem', { name: 'Item: Checklist created' });
     await user.click(within(item).getByRole('button', { name: /Delete.*/ }));
+
     expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
 
     // Verify the stored contents.
@@ -437,22 +457,28 @@ describe('ChecklistsComponent', () => {
 
     await addItem('caution', 'Delete me');
     const item = screen.getByRole('listitem', { name: 'Item: Delete me' });
+
     expect(item).toBeInTheDocument();
 
     // Delete the item.
     const completed = storageCompleted();
     await user.click(within(item).getByRole('button', { name: 'Delete Delete me' }));
+
     expect(screen.queryByRole('listitem', { name: 'Item: Delete me' })).not.toBeInTheDocument();
+
     await expectFile('My file', NEW_FILE, completed);
 
     // Undo the deletion.
     const completed2 = storageCompleted();
     const undoButton = await screen.findByRole('button', { name: 'Undo', hidden: true });
+
     expect(undoButton).toBeVisible();
+
     await user.click(undoButton);
 
     // Verify that it's back to the screen and in storage.
-    expect(await screen.findByRole('listitem', { name: 'Item: Delete me' })).toBeInTheDocument();
+    await expect(screen.findByRole('listitem', { name: 'Item: Delete me' })).resolves.toBeInTheDocument();
+
     const expectedFile = ChecklistFile.clone(NEW_FILE);
     expectedFile.groups[0].checklists[0].items.push(
       ChecklistItem.create({
@@ -485,14 +511,19 @@ describe('ChecklistsComponent', () => {
     await newFile('My file');
     expectFragment('My file');
     expectNavData('My file');
+
     expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
 
     await setFragment('');
+
     expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
+
     expectNavData(undefined);
 
     await setFragment('My file');
-    expect(await screen.findByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
+
+    await expect(screen.findByRole('treeitem', { name: 'Checklist: First checklist' })).resolves.toBeInTheDocument();
+
     expectNavData('My file');
   });
 
@@ -510,18 +541,22 @@ describe('ChecklistsComponent', () => {
     expectNavData('My file');
 
     await setFragment('My file/1/0');
+
     expect(lastSnackMessage()).toMatch(/.*does not have group 1.*/);
 
     await addGroup('Second checklist group');
     await addChecklist('Second checklist group', 'Second checklist');
     expectFragment('My file/1/0');
+
     expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
 
     await setFragment('My file/2/0');
+
     expect(lastSnackMessage()).toMatch(/.*does not have group 2.*/);
 
     // Switching back to a correct URL still works.
     await setFragment('My file/0/0');
+
     expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
   });
 
@@ -531,10 +566,12 @@ describe('ChecklistsComponent', () => {
     expectNavData('My file');
 
     await setFragment('My file/0/2');
+
     expect(lastSnackMessage()).toMatch(/.*has no checklist 2.*/);
 
     // Switching back to a correct URL still works.
     await setFragment('My file/0/0');
+
     expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
   });
 
@@ -544,20 +581,25 @@ describe('ChecklistsComponent', () => {
     expectNavData('My file');
 
     await setFragment('My file/0/0');
+
     expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
 
     await setFragment('My file/0');
+
     expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
 
     await setFragment('My file/abc');
+
     expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
 
     await setFragment('My file/0x0/0x0');
+
     expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
 
     // Switching back to a correct URL still works.
     await setFragment('My file/0/0');
-    expect(await screen.findByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
+
+    await expect(screen.findByRole('listitem', { name: 'Item: Checklist created' })).resolves.toBeInTheDocument();
   });
 
   describe('keyboard shortcuts', () => {
@@ -574,6 +616,7 @@ describe('ChecklistsComponent', () => {
       // Delete the initially-added item.
       const item = screen.getByRole('listitem', { name: 'Item: Checklist created' });
       await user.click(within(item).getByRole('button', { name: /Delete.*/ }));
+
       expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
 
       // Exercise all the keyboard shortcuts.
@@ -596,7 +639,7 @@ describe('ChecklistsComponent', () => {
       );
 
       // Check that all the items were rendered.
-      expect(await screen.findByRole('listitem', { name: 'Blank item' })).toBeVisible();
+      await expect(screen.findByRole('listitem', { name: 'Blank item' })).resolves.toBeVisible();
       expect(screen.getAllByRole('listitem', { name: 'Item: New item' })).toHaveLength(
         ChecklistsComponent.NEW_ITEM_SHORTCUTS.length - 1,
       );
@@ -656,7 +699,9 @@ describe('ChecklistsComponent', () => {
 
       // Once again, but this time select the item by clicking on it.
       const secondItem = await screen.findByText('Other prompt');
+
       expect(secondItem).toBeVisible();
+
       await user.click(secondItem);
       await user.keyboard('[Enter]');
 
@@ -736,7 +781,7 @@ describe('ChecklistsComponent', () => {
       rendered.detectChanges(); // HACK: Wait for the item to be added.
       await user.keyboard('[Enter]');
 
-      expect(await screen.findByRole('listitem', { name: 'Item: New item' })).toBeInTheDocument();
+      await expect(screen.findByRole('listitem', { name: 'Item: New item' })).resolves.toBeInTheDocument();
 
       // Delete it.
       const completed = storageCompleted();
@@ -744,17 +789,21 @@ describe('ChecklistsComponent', () => {
 
       // Verify that it's gone from storage and the UI.
       await expectFile('My file', NEW_FILE, completed);
+
       expect(screen.queryByRole('listitem', { name: 'Item: New item' })).not.toBeInTheDocument();
 
       // Also delete the other that was already there (it should have been selected after the other was deleted).
       const completed2 = storageCompleted();
+
       expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
+
       await user.keyboard('[Delete]');
 
       // Verify that it's also gone from storage and the UI.
       const expectedFile = ChecklistFile.clone(NEW_FILE);
       expectedFile.groups[0].checklists[0].items = [];
       await expectFile('My file', expectedFile, completed2);
+
       expect(screen.queryByRole('listitem', { name: 'Item: Checklist created' })).not.toBeInTheDocument();
     });
 
@@ -764,8 +813,9 @@ describe('ChecklistsComponent', () => {
 
       // Add a second item.
       await addItem('caution', 'Later item');
-      expect(await screen.findByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
-      expect(await screen.findByRole('listitem', { name: 'Item: Later item' })).toBeInTheDocument();
+
+      await expect(screen.findByRole('listitem', { name: 'Item: Checklist created' })).resolves.toBeInTheDocument();
+      await expect(screen.findByRole('listitem', { name: 'Item: Later item' })).resolves.toBeInTheDocument();
 
       // Select the first item again.
       await user.keyboard('[ArrowUp]');
@@ -774,7 +824,7 @@ describe('ChecklistsComponent', () => {
       const completed = storageCompleted();
       await user.keyboard(`[${metaKey}>]D[/${metaKey}]`);
 
-      expect(await screen.findAllByRole('listitem', { name: 'Item: Checklist created' })).toHaveLength(2);
+      await expect(screen.findAllByRole('listitem', { name: 'Item: Checklist created' })).resolves.toHaveLength(2);
 
       // Check storage.
       const expectedFile = ChecklistFile.clone(NEW_FILE);
@@ -800,9 +850,9 @@ describe('ChecklistsComponent', () => {
       await retype(promptBox1, 'Modified item');
       await retype(expectationBox, 'Modified expectation[Enter]');
 
-      expect(await screen.findByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
-      expect(await screen.findByRole('listitem', { name: 'Item: Modified item' })).toBeInTheDocument();
-      expect(await screen.findByRole('listitem', { name: 'Item: Later item' })).toBeInTheDocument();
+      await expect(screen.findByRole('listitem', { name: 'Item: Checklist created' })).resolves.toBeInTheDocument();
+      await expect(screen.findByRole('listitem', { name: 'Item: Modified item' })).resolves.toBeInTheDocument();
+      await expect(screen.findByRole('listitem', { name: 'Item: Later item' })).resolves.toBeInTheDocument();
 
       // Check storage.
       items[1].prompt = 'Modified item';

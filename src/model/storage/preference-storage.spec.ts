@@ -48,6 +48,7 @@ describe('PreferenceStorage', () => {
 
   it('should retrieve default print options when none are stored', async () => {
     const opts = await store.getPrintOptions();
+
     expect(opts).toEqual(DEFAULT_OPTIONS);
   });
 
@@ -55,6 +56,7 @@ describe('PreferenceStorage', () => {
     await store.setPrintOptions(NON_DEFAULT_OPTS);
 
     const storedOpts = await store.getPrintOptions();
+
     expect(storedOpts).toEqual(NON_DEFAULT_OPTS);
   });
 
@@ -70,6 +72,7 @@ describe('PreferenceStorage', () => {
     await store.setPrintOptions(opts);
 
     const storedOpts = await store.getPrintOptions();
+
     expect(storedOpts).toEqual({
       ...DEFAULT_OPTIONS,
       ...opts,
@@ -86,6 +89,7 @@ describe('PreferenceStorage', () => {
     browserStore.setItem('prefs:print', JSON.stringify(oldOpts));
 
     const storedOpts = await store.getPrintOptions();
+
     expect(storedOpts.checklistStart).toEqual('page');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     expect((storedOpts as any).checklistNewPage).toBeUndefined();
@@ -95,6 +99,7 @@ describe('PreferenceStorage', () => {
     browserStore.setItem('prefs:print', JSON.stringify(oldOpts));
 
     const storedOpts2 = await store.getPrintOptions();
+
     expect(storedOpts2.checklistStart).toEqual('below');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     expect((storedOpts2 as any).checklistNewPage).toBeUndefined();

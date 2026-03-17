@@ -69,7 +69,7 @@ describe('ChecklistStorage', () => {
   });
 
   it('should be empty at the start', async () => {
-    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: [123] })).toHaveLength(0);
+    await expect(firstValueFrom(store.listChecklistFiles(), { defaultValue: [123] })).resolves.toHaveLength(0);
   });
 
   async function getChecklistFile(name: string): Promise<ChecklistFile | null> {
@@ -81,25 +81,31 @@ describe('ChecklistStorage', () => {
   }
 
   describe('should save and read each checklist', () => {
-    [A_CHECKLIST_FILE, ANOTHER_CHECKLIST_FILE, YET_ANOTHER_CHECKLIST_FILE].forEach((file: ChecklistFile) => {
-      beforeEach(async () => {
-        await store.clear();
-      });
+    it.each([
+      { label: 'A_CHECKLIST_FILE', file: A_CHECKLIST_FILE },
+      { label: 'ANOTHER_CHECKLIST_FILE', file: ANOTHER_CHECKLIST_FILE },
+      { label: 'YET_ANOTHER_CHECKLIST_FILE', file: YET_ANOTHER_CHECKLIST_FILE },
+    ])('should save and read back $label', async ({ file }) => {
+      await store.clear();
 
-      it('should save and read back a checklist', async () => {
-        await store.saveChecklistFile(file);
-        const files$ = store.listChecklistFiles();
-        expect(await firstValueFrom(files$, { defaultValue: 'FAIL' })).toEqual([file.metadata!.name]);
-        const checklist = await store.getChecklistFile(file.metadata!.name);
-        expect(checklist).toBeTruthy();
-        expect(checklist!.metadata?.modifiedTime).toBeGreaterThan(0);
-        checklist!.metadata!.modifiedTime = 0;
-        expect(checklist).toEqual(file);
+      await store.saveChecklistFile(file);
+      const files$ = store.listChecklistFiles();
 
-        await store.deleteChecklistFile(file.metadata!.name);
-        expect(await firstValueFrom(files$, { defaultValue: ['FAIL'] })).toEqual([]);
-        expect(await getChecklistFile(file.metadata!.name)).toBeNull();
-      });
+      await expect(firstValueFrom(files$, { defaultValue: 'FAIL' })).resolves.toEqual([file.metadata!.name]);
+
+      const checklist = await store.getChecklistFile(file.metadata!.name);
+
+      expect(checklist).toBeTruthy();
+      expect(checklist!.metadata?.modifiedTime).toBeGreaterThan(0);
+
+      checklist!.metadata!.modifiedTime = 0;
+
+      expect(checklist).toEqual(file);
+
+      await store.deleteChecklistFile(file.metadata!.name);
+
+      await expect(firstValueFrom(files$, { defaultValue: ['FAIL'] })).resolves.toEqual([]);
+      await expect(getChecklistFile(file.metadata!.name)).resolves.toBeNull();
     });
   });
 
@@ -107,23 +113,27 @@ describe('ChecklistStorage', () => {
     await store.saveChecklistFile(A_CHECKLIST_FILE);
     await store.saveChecklistFile(ANOTHER_CHECKLIST_FILE);
     await store.saveChecklistFile(YET_ANOTHER_CHECKLIST_FILE);
-    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toHaveLength(3);
-    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toEqual(
+
+    await expect(firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).resolves.toHaveLength(3);
+    await expect(firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).resolves.toEqual(
       expect.arrayContaining([
         A_CHECKLIST_FILE.metadata!.name,
         ANOTHER_CHECKLIST_FILE.metadata!.name,
         YET_ANOTHER_CHECKLIST_FILE.metadata!.name,
       ]),
     );
-    expect(await getChecklistFile(A_CHECKLIST_FILE.metadata!.name)).toEqual(A_CHECKLIST_FILE);
-    expect(await getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(ANOTHER_CHECKLIST_FILE);
-    expect(await getChecklistFile(YET_ANOTHER_CHECKLIST_FILE.metadata!.name)).toEqual(YET_ANOTHER_CHECKLIST_FILE);
+    await expect(getChecklistFile(A_CHECKLIST_FILE.metadata!.name)).resolves.toEqual(A_CHECKLIST_FILE);
+    await expect(getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).resolves.toEqual(ANOTHER_CHECKLIST_FILE);
+    await expect(getChecklistFile(YET_ANOTHER_CHECKLIST_FILE.metadata!.name)).resolves.toEqual(
+      YET_ANOTHER_CHECKLIST_FILE,
+    );
 
     await store.deleteChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name);
-    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toHaveLength(2);
-    expect(await firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).toEqual(
+
+    await expect(firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).resolves.toHaveLength(2);
+    await expect(firstValueFrom(store.listChecklistFiles(), { defaultValue: ['FAIL'] })).resolves.toEqual(
       expect.arrayContaining([A_CHECKLIST_FILE.metadata!.name, YET_ANOTHER_CHECKLIST_FILE.metadata!.name]),
     );
-    expect(await getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).toBeNull();
+    await expect(getChecklistFile(ANOTHER_CHECKLIST_FILE.metadata!.name)).resolves.toBeNull();
   });
 });

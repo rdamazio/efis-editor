@@ -69,7 +69,8 @@ describe('ChecklistFileInfoComponent', () => {
 
     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(1);
+
+    expect(dialogs).toHaveLength(1);
 
     okButton = await screen.findByRole('button', { name: 'Ok' });
     cancelButton = await screen.findByRole('button', { name: 'Cancel' });
@@ -90,11 +91,11 @@ describe('ChecklistFileInfoComponent', () => {
     await user.click(cancelButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
 
-    expect(dataOut).toHaveBeenCalledTimes(1);
+    expect(dialogs).toHaveLength(0);
 
-    expect(dataOut).toHaveBeenCalledWith(undefined);
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(undefined);
+
     expect(metadata.name).toEqual('Name');
   });
 
@@ -115,12 +116,12 @@ describe('ChecklistFileInfoComponent', () => {
     await user.click(okButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(dialogs.length).toBe(0);
+
+    expect(dialogs).toHaveLength(0);
 
     // Original object must be unmodified, but new one must have been returned.
     expect(metadata.name).toEqual('Name');
-    expect(dataOut).toHaveBeenCalledTimes(1);
-    expect(dataOut).toHaveBeenCalledWith(newMetadata);
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(newMetadata);
   });
 
   it('should require name to be non-empty', async () => {
@@ -130,7 +131,9 @@ describe('ChecklistFileInfoComponent', () => {
     await openDialog();
 
     await user.clear(nameBox);
+
     expect(okButton).toBeDisabled();
+
     await user.click(cancelButton);
   });
 
@@ -154,7 +157,7 @@ describe('ChecklistFileInfoComponent', () => {
     const expectedMetadata = ChecklistFileMetadata.clone(metadata);
     expectedMetadata.defaultChecklistIndex = 0;
     expectedMetadata.defaultGroupIndex = 0;
-    expect(dataOut).toHaveBeenCalledTimes(1);
-    expect(dataOut).toHaveBeenCalledWith(expectedMetadata);
+
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(expectedMetadata);
   });
 });

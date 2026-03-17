@@ -30,6 +30,7 @@ describe('DynonFormat', () => {
   async function expectWriteRead(fileName: string, formatId: FormatId): Promise<void> {
     const f = await loadFile('/src/model/formats/' + fileName, 'test.txt');
     const readFile = await parseChecklistFile(f);
+
     expect(readFile).toEqual(DYNON_EXPECTED_CONTENTS);
 
     // Now write the file back.
@@ -39,6 +40,7 @@ describe('DynonFormat', () => {
     const writtenLines = writtenData.split('\r\n');
     const readData = decoder.decode(await f.arrayBuffer());
     const readLines = readData.split('\r\n');
+
     expect(writtenLines).toEqual(readLines);
   }
 });
