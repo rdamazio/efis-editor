@@ -235,11 +235,11 @@ describe('PrintDialogComponent', () => {
     // The logic should also correctly emit the clamped value
     await user.click(okButton);
 
-    expect(dataOut).toHaveBeenCalledOnce();
-
-    const emittedOpts = dataOut.mock.calls[0][0]!;
-
-    expect(emittedOpts.columns).toBe(1);
-    expect(emittedOpts.checklistStart).toBe('page');
+    expect(dataOut).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({
+        columns: 1,
+        checklistStart: 'page',
+      }),
+    );
   });
 });

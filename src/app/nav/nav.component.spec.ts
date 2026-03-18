@@ -1,5 +1,4 @@
 import { ComponentFixture, DeferBlockState } from '@angular/core/testing';
-import type { Mock } from 'vitest';
 
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
@@ -8,6 +7,8 @@ import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { HotkeysService } from '@ngneat/hotkeys';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
+import { Mock } from 'vitest';
+import { mock, MockProxy } from 'vitest-mock-extended';
 import { HelpComponent } from '../shared/hotkeys/help/help.component';
 import { NavData } from './nav-data';
 import { NavComponent } from './nav.component';
@@ -18,15 +19,12 @@ describe('NavComponent', () => {
   let fixture: ComponentFixture<NavComponent>;
   let loader: HarnessLoader;
   let navData: NavData;
-  let hotkeys: { getHotkeys: Mock; getShortcuts: Mock };
+  let hotkeys: MockProxy<HotkeysService>;
   let toggleHelp: Mock<typeof HelpComponent.toggleHelp>;
 
   beforeEach(async () => {
     user = userEvent.setup();
-    hotkeys = {
-      getHotkeys: vi.fn().mockName('HotkeysService.getHotkeys'),
-      getShortcuts: vi.fn().mockName('HotkeysService.getShortcuts'),
-    };
+    hotkeys = mock<HotkeysService>();
     hotkeys.getHotkeys.mockReturnValue([]);
     hotkeys.getShortcuts.mockReturnValue([]);
     toggleHelp = vi.spyOn(HelpComponent, 'toggleHelp');

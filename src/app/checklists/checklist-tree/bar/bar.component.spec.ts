@@ -1,11 +1,11 @@
 import { render, RenderResult, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
-import type { Mock } from 'vitest';
+import { mock, MockProxy } from 'vitest-mock-extended';
 import { ChecklistTreeComponent } from '../checklist-tree.component';
 import { ChecklistTreeBarComponent } from './bar.component';
 
 describe('ChecklistTreeBarComponent', () => {
-  let tree: { isAllExpanded: Mock; expandAll: Mock; isAllCollapsed: Mock; collapseAll: Mock };
+  let tree: MockProxy<ChecklistTreeComponent>;
   let rendered: RenderResult<ChecklistTreeBarComponent>;
   let expandButton: HTMLElement;
   let collapseButton: HTMLElement;
@@ -14,16 +14,10 @@ describe('ChecklistTreeBarComponent', () => {
   beforeEach(async () => {
     user = userEvent.setup();
 
-    tree = {
-      // eslint-disable-next-line no-secrets/no-secrets
-      isAllExpanded: vi.fn().mockName('ChecklistTreeComponent.isAllExpanded'),
-      expandAll: vi.fn().mockName('ChecklistTreeComponent.expandAll'),
-      isAllCollapsed: vi.fn().mockName('ChecklistTreeComponent.isAllCollapsed'),
-      collapseAll: vi.fn().mockName('ChecklistTreeComponent.collapseAll'),
-    };
+    tree = mock<ChecklistTreeComponent>();
 
     rendered = await render(ChecklistTreeBarComponent, {
-      inputs: { tree: tree as unknown as ChecklistTreeComponent },
+      inputs: { tree: tree },
     });
     expandButton = screen.queryByRole('button', { name: 'Expand all checklist groups' })!;
     collapseButton = screen.queryByRole('button', { name: 'Collapse all checklist groups' })!;

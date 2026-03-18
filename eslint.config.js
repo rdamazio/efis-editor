@@ -7,6 +7,7 @@ const css = require('@eslint/css');
 const eslint = require('@eslint/js');
 const angular = require('angular-eslint');
 const vitest = require('@vitest/eslint-plugin');
+const jest = require('eslint-plugin-jest');
 const nosecrets = require('eslint-plugin-no-secrets');
 const prettierRecommended = require('eslint-plugin-prettier/recommended');
 // TODO: Re-enable once https://github.com/eslint-community/eslint-plugin-promise/issues/616 is fixed.
@@ -53,6 +54,7 @@ module.exports = defineConfig(
       rxjsX.configs.strict,
     ],
     plugins: {
+      jest: jest,
       'no-secrets': nosecrets,
     },
     processor: angular.processInlineTemplates,
@@ -239,6 +241,8 @@ module.exports = defineConfig(
     files: ['**/*.spec.ts'],
     extends: [testing.configs['flat/angular']],
     rules: {
+      '@typescript-eslint/unbound-method': 'off',
+      'jest/unbound-method': ['error', { ignoreStatic: true }],
       'no-await-in-loop': 'off',
       'no-restricted-imports': ['error', '@testing-library/dom'],
       'testing-library/no-render-in-lifecycle': 'off',

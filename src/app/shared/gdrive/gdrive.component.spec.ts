@@ -4,7 +4,7 @@ import { MatSnackBarHarness } from '@angular/material/snack-bar/testing';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import { BehaviorSubject, Subject } from 'rxjs';
-import type { Mock } from 'vitest';
+import { mock, MockProxy } from 'vitest-mock-extended';
 import { DriveSyncState, GoogleDriveStorage } from '../../../model/storage/gdrive';
 import { GoogleDriveComponent } from './gdrive.component';
 
@@ -12,7 +12,7 @@ describe('GoogleDriveComponent', () => {
   let user: UserEvent;
   let fixture: ComponentFixture<GoogleDriveComponent>;
   let syncButton: HTMLElement;
-  let gdrive: Record<keyof GoogleDriveStorage, Mock>;
+  let gdrive: MockProxy<GoogleDriveStorage>;
   let state$: BehaviorSubject<DriveSyncState>;
   let downloads$: Subject<string>;
   let errors$: Subject<string>;
@@ -20,16 +20,7 @@ describe('GoogleDriveComponent', () => {
   beforeEach(async () => {
     user = userEvent.setup();
 
-    gdrive = {
-      init: vi.fn().mockName('GoogleDriveStorage.init'),
-      destroy: vi.fn().mockName('GoogleDriveStorage.destroy'),
-      deleteAllData: vi.fn().mockName('GoogleDriveStorage.deleteAllData'),
-      getState: vi.fn().mockName('GoogleDriveStorage.getState'),
-      synchronize: vi.fn().mockName('GoogleDriveStorage.synchronize'),
-      disableSync: vi.fn().mockName('GoogleDriveStorage.disableSync'),
-      onDownloads: vi.fn().mockName('GoogleDriveStorage.onDownloads'),
-      onErrors: vi.fn().mockName('GoogleDriveStorage.onErrors'),
-    };
+    gdrive = mock<GoogleDriveStorage>();
     state$ = new BehaviorSubject<DriveSyncState>(DriveSyncState.DISCONNECTED);
     downloads$ = new Subject<string>();
     errors$ = new Subject<string>();

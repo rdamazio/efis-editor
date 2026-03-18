@@ -157,14 +157,16 @@ describe('ChecklistsComponent', () => {
   }
 
   function expectFragment(fragment: string) {
-    const extras = vi.mocked(navigate).mock.lastCall?.[1] as NavigationExtras;
-
-    expect(extras.fragment).toEqual(fragment);
+    expect(navigate).toHaveBeenLastCalledWith([], expect.objectContaining({ fragment }));
   }
 
   function expectNavData(fileName?: string) {
     expect(navData.routeTitle()).toEqual('Checklists');
     expect(navData.fileName()).toEqual(fileName);
+  }
+
+  function expectLastSnackMatching(pattern: string | RegExp) {
+    expect(showSnack).toHaveBeenLastCalledWith(expect.stringMatching(pattern), expect.any(String));
   }
 
   async function storageCompleted(): Promise<boolean> {
@@ -187,10 +189,6 @@ describe('ChecklistsComponent', () => {
     storedFile!.metadata!.modifiedTime = 0;
 
     expect(storedFile).toEqual(expectedFile);
-  }
-
-  function lastSnackMessage(): string {
-    return vi.mocked(showSnack).mock.lastCall?.[0] as string;
   }
 
   it('should create a new checklist and populate it', async () => {
@@ -532,7 +530,8 @@ describe('ChecklistsComponent', () => {
     expectNavData(undefined);
 
     expect(screen.queryByRole('treeitem', { name: /Checklist:/ })).not.toBeInTheDocument();
-    expect(lastSnackMessage()).toMatch(/Failed to load.*/);
+
+    expectLastSnackMatching(/Failed to load.*/);
   });
 
   it('should handle a URL fragment with a bad group number', async () => {
@@ -542,7 +541,7 @@ describe('ChecklistsComponent', () => {
 
     await setFragment('My file/1/0');
 
-    expect(lastSnackMessage()).toMatch(/.*does not have group 1.*/);
+    expectLastSnackMatching(/.*does not have group 1.*/);
 
     await addGroup('Second checklist group');
     await addChecklist('Second checklist group', 'Second checklist');
@@ -552,7 +551,7 @@ describe('ChecklistsComponent', () => {
 
     await setFragment('My file/2/0');
 
-    expect(lastSnackMessage()).toMatch(/.*does not have group 2.*/);
+    expectLastSnackMatching(/.*does not have group 2.*/);
 
     // Switching back to a correct URL still works.
     await setFragment('My file/0/0');
@@ -567,7 +566,7 @@ describe('ChecklistsComponent', () => {
 
     await setFragment('My file/0/2');
 
-    expect(lastSnackMessage()).toMatch(/.*has no checklist 2.*/);
+    expectLastSnackMatching(/.*has no checklist 2.*/);
 
     // Switching back to a correct URL still works.
     await setFragment('My file/0/0');
