@@ -242,6 +242,10 @@ module.exports = defineConfig(
     extends: [testing.configs['flat/angular']],
     rules: {
       '@typescript-eslint/unbound-method': 'off',
+      'jest/no-error-equal': 'error',
+      'jest/no-export': 'error',
+      'jest/no-jasmine-globals': 'error',
+      'jest/no-unnecessary-assertion': 'error',
       'jest/unbound-method': ['error', { ignoreStatic: true }],
       'no-await-in-loop': 'off',
       'no-restricted-imports': ['error', '@testing-library/dom'],

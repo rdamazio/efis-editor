@@ -20,7 +20,7 @@ type OutputType = PdfWriterOptions | undefined;
   standalone: true,
   template: '<button (click)="openDialog()">Open dialog</button>',
 })
-export class DialogTestComponent {
+class DialogTestComponent {
   public readonly dataOut = output<OutputType>();
 
   constructor(
@@ -119,7 +119,6 @@ describe('PrintDialogComponent', () => {
 
     const newOpts = await prefs.getPrintOptions();
 
-    expect(newOpts).not.toBeNull();
     expect(newOpts.pageSize).toEqual('a6');
   });
 

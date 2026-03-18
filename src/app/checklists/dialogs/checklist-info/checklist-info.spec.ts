@@ -23,7 +23,7 @@ type OutputType = Checklist | undefined;
   standalone: true,
   template: '<button (click)="openDialog()">Open dialog</button>',
 })
-export class DialogTestComponent {
+class DialogTestComponent {
   public readonly dataIn = input.required<Checklist>();
   public readonly dataOut = output<OutputType>();
 

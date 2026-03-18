@@ -19,7 +19,7 @@ type OutputType = ChecklistFileMetadata | undefined;
   standalone: true,
   template: '<button (click)="openDialog()">Open dialog</button>',
 })
-export class DialogTestComponent {
+class DialogTestComponent {
   public readonly metadataIn = input.required<ChecklistFileMetadata>();
   public readonly groupsIn = input.required<ChecklistGroup[]>();
   public readonly dataOut = output<OutputType>();
