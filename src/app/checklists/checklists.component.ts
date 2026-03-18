@@ -67,7 +67,7 @@ interface ParsedFragment {
 })
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, HotkeyRegistree {
   static readonly NEW_ITEM_SHORTCUTS = [
-    { secondKey: 'r', typeDescription: 'challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
+    { secondKey: 'r', typeDescription: 'challenge..response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
     { secondKey: 'c', typeDescription: 'challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
     { secondKey: 'x', typeDescription: 'text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
     { secondKey: 't', typeDescription: 'title', type: ChecklistItem_Type.ITEM_TITLE },

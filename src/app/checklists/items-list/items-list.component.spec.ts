@@ -97,7 +97,7 @@ describe('ChecklistItemsComponent', () => {
 
   it('should add a challenge/response item', async () => {
     const origSize = checklist!.items.length;
-    const addButton = screen.getByRole('button', { name: 'Add a new checklist challenge/response' });
+    const addButton = screen.getByRole('button', { name: 'Add a new checklist challenge..response' });
     await user.click(addButton);
     await user.keyboard('[Enter]');
 

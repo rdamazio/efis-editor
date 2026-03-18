@@ -43,7 +43,7 @@ export class ChecklistItemsComponent {
   static readonly UNDO_LEVELS = 1;
 
   readonly itemTypes: { label: string; type: ChecklistItem_Type }[] = [
-    { label: 'Challenge/response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
+    { label: 'Challenge..response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
     { label: 'Challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
     { label: 'Text', type: ChecklistItem_Type.ITEM_PLAINTEXT },
     { label: 'Title', type: ChecklistItem_Type.ITEM_TITLE },
