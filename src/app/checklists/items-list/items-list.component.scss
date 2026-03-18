@@ -8,6 +8,8 @@
   padding: 10px;
   height: calc(100% - 60px);
   overflow-y: auto;
+  scroll-padding-bottom: 120px;
+  scroll-padding-top: 20px;
 
   color: mat.get-theme-color(theme.$efis-editor-theme, on-surface-variant);
   background: mat.get-theme-color(theme.$efis-editor-theme, primary, 0);
