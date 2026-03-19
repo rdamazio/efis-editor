@@ -207,6 +207,24 @@ describe('ChecklistItemsComponent', () => {
     expect(checklistChange).toHaveBeenCalledExactlyOnceWith(checklist);
   });
 
+  it('should add an item after the selected item when add button is clicked', async () => {
+    const item = screen.getByText('Challenge item');
+    await user.click(item);
+
+    const origSize = checklist!.items.length;
+    const addButton = screen.getByRole('button', { name: 'Add a new checklist note' });
+    await user.click(addButton);
+    await user.keyboard('[Escape]');
+
+    expect(checklist!.items).toHaveLength(origSize + 1);
+
+    // The new item should be at index 1 (after "Challenge item")
+    const newItem = checklist!.items[1];
+
+    expect(newItem.type).toEqual(ChecklistItem_Type.ITEM_NOTE);
+    expect(newItem.prompt).toEqual('New item');
+  });
+
   it('should delete an item', async () => {
     const item = screen.getByRole('listitem', { name: 'Item: Warning item' });
 

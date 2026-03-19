@@ -40,6 +40,7 @@
             extended
             class="action-button"
             aria-label="Add a new checklist {{ item_type.label | lowercase }}"
+            (mousedown)="$event.preventDefault()"
             (click)="onNewItem(item_type.type)"
           >
             <mat-icon class="action-icon">add</mat-icon>
