@@ -4,6 +4,7 @@
   #scrollContainer
   class="container"
   data-testid="items-list"
+  [style.scroll-padding-bottom.px]="dynamicPadding()"
   (scroll)="updateScrollShadow()"
   (onResize)="updateScrollShadow()"
 >
@@ -31,7 +32,7 @@
         </div>
       }
     </div>
-    <div class="list-item add-bar" [class.at-bottom]="isAtBottom()">
+    <div #addBar class="list-item add-bar" [class.at-bottom]="isAtBottom()" (onResize)="updateAddBarHeight()">
       @for (item_type of itemTypes; track item_type.type) {
         <div class="action-button">
           <button

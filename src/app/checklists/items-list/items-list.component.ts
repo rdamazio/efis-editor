@@ -3,6 +3,7 @@ import { LowerCasePipe } from '@angular/common';
 import {
   afterNextRender,
   Component,
+  computed,
   effect,
   ElementRef,
   Injector,
@@ -42,6 +43,10 @@ export class ChecklistItemsComponent {
   // TODO: Customize snackbar to allow multiple undos.
   static readonly UNDO_LEVELS = 1;
 
+  // The additional buffer space at the bottom of the list, to reduce overlap between the item
+  // selection border and the add bar gradient.
+  static readonly ADD_BAR_HEIGHT_OFFSET = 12;
+
   readonly itemTypes: { label: string; type: ChecklistItem_Type }[] = [
     { label: 'Challenge..response', type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE },
     { label: 'Challenge', type: ChecklistItem_Type.ITEM_CHALLENGE },
@@ -69,6 +74,9 @@ export class ChecklistItemsComponent {
 
   readonly isAtBottom = signal(false);
   readonly scrollContainer = viewChild.required<ElementRef<HTMLElement>>('scrollContainer');
+  readonly addBar = viewChild<ElementRef<HTMLElement>>('addBar');
+  readonly addBarHeight = signal(0);
+  readonly dynamicPadding = computed(() => ChecklistItemsComponent.ADD_BAR_HEIGHT_OFFSET + this.addBarHeight());
 
   constructor(
     private readonly _injector: Injector,
@@ -91,6 +99,13 @@ export class ChecklistItemsComponent {
     const el = this.scrollContainer().nativeElement;
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 5;
     this.isAtBottom.set(atBottom);
+  }
+
+  updateAddBarHeight() {
+    const el = this.addBar()?.nativeElement;
+    if (el) {
+      this.addBarHeight.set(el.offsetHeight);
+    }
   }
 
   onDrop(event: CdkDragDrop<ChecklistItem[]>): void {
