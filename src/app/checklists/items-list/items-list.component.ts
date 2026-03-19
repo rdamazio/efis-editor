@@ -156,6 +156,12 @@ export class ChecklistItemsComponent {
     this.onItemsUpdated();
   }
 
+  deselectCurrentItem() {
+    this._selectedItemComponent()?.blur();
+    this._selectedIdx = null;
+    this.onItemsUpdated();
+  }
+
   editCurrentItem() {
     this._selectedItemComponent()?.onEdit(undefined);
   }

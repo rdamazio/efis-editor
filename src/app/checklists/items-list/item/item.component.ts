@@ -120,4 +120,8 @@ export class ChecklistItemComponent {
   focus() {
     this.containerRef().nativeElement.focus();
   }
+
+  blur() {
+    this.containerRef().nativeElement.blur();
+  }
 }

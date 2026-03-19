@@ -175,6 +175,16 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       });
     hotkeys
       .addShortcut({
+        keys: 'escape',
+        description: 'De-select the current item',
+        preventDefault: true,
+        group: 'Navigation',
+      })
+      .subscribe(() => {
+        this.items().deselectCurrentItem();
+      });
+    hotkeys
+      .addShortcut({
         keys: 'meta.down',
         description: 'Select next checklist',
         preventDefault: true,
