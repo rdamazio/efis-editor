@@ -4,6 +4,7 @@
   #container
   class="item-container"
   [class.highlighted]="highlighted()"
+  [class.soft-highlighted]="softHighlighted()"
   tabindex="0"
   (focus)="itemFocused.emit(true)"
   (blur)="itemBlurred.emit(true)"

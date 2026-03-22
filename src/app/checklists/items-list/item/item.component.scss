@@ -11,8 +11,13 @@
   box-shadow: 0 0 3px 5px mat.get-theme-color(theme.$efis-editor-theme, primary);
 }
 
+.item-container.soft-highlighted {
+  background-color: rgba(255, 235, 59, 0.15); // Slightly softer yellow
+  border-radius: 5px;
+}
+
 .item-container.highlighted {
-  background-color: rgba(255, 235, 59, 0.2); // Yellow highlight with opacity for dark mode compatibility
+  background-color: rgba(255, 235, 59, 0.3); // Keep it distinct and stronger
   border-radius: 5px;
 }
 

@@ -64,6 +64,7 @@ export class ChecklistItemsComponent {
   readonly checklistChange = output<Checklist | undefined>();
 
   readonly groupDropListIds = input<string[]>([]);
+  readonly softHighlightedIndices = input<Set<number>>(new Set());
   readonly items = viewChildren(ChecklistItemComponent);
   private _selectedIdx: number | null = null;
   protected readonly _highlightedIdx = signal<number | undefined>(undefined);

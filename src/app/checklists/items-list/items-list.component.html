@@ -24,6 +24,7 @@
             #item
             [item]="item"
             [highlighted]="$index === _highlightedIdx()"
+            [softHighlighted]="softHighlightedIndices().has($index)"
             (itemChange)="onItemsUpdated()"
             (itemDeleted)="onItemDeleted($index)"
             (itemFocused)="onItemFocused($index)"

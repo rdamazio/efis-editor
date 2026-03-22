@@ -23,6 +23,7 @@ import { EditableLabelComponent } from '../../../shared/editable-label/editable-
 export class ChecklistItemComponent {
   readonly item = input.required<ChecklistItem>();
   readonly highlighted = input<boolean>(false);
+  readonly softHighlighted = input<boolean>(false);
   readonly itemChange = output<ChecklistItem>();
   readonly itemDeleted = output<boolean>();
   readonly itemFocused = output<boolean>();
