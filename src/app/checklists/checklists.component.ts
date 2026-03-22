@@ -3,6 +3,7 @@ import {
   afterNextRender,
   AfterViewInit,
   Component,
+  computed,
   effect,
   Inject,
   Injector,
@@ -31,6 +32,7 @@ import { serializeChecklistFile } from '../../model/formats/format-registry';
 import { ChecklistStorage } from '../../model/storage/checklist-storage';
 import { GoogleDriveStorage } from '../../model/storage/gdrive';
 import { PreferenceStorage } from '../../model/storage/preference-storage';
+import { SearchService } from '../../model/storage/search-service';
 import { NavData } from '../nav/nav-data';
 import { HotkeyRegistrar, HotkeyRegistree, HotkeyRegistry } from '../shared/hotkeys/hotkey-registration';
 import { ChecklistTreeBarComponent } from './checklist-tree/bar/bar.component';
@@ -91,11 +93,25 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   // eslint-disable-next-line rxjs-x/no-exposed-subjects
   storageCompleted$?: Subject<boolean>;
 
+  private _searchResults = computed(() => {
+    // TODO: This needs updating even if only the selected file changed.
+    const query = this._navData().searchQuery();
+    if (!this.selectedFile || !query) return [];
+    return this._search.searchInFile(this.selectedFile, query);
+  });
+  private _currentSearchResult = computed(() => {
+    const results = this._searchResults();
+    const current = this._navData().searchMatchCurrent();
+    if (current === undefined || current < 0 || current >= results.length) return undefined;
+    return results[current];
+  });
+
   // eslint-disable-next-line @typescript-eslint/max-params
   constructor(
     public store: ChecklistStorage,
     private readonly _gdrive: GoogleDriveStorage,
     private readonly _prefs: PreferenceStorage,
+    private readonly _search: SearchService,
     private readonly _dialog: MatDialog,
     private readonly _snackBar: MatSnackBar,
     private readonly _spinner: NgxSpinnerService,
@@ -114,6 +130,13 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         const fileName = this._navData().fileName();
         if (!fileName) return;
         void this.onFileRename(fileName);
+      },
+      { injector: this._injector },
+    );
+
+    effect(
+      () => {
+        this._navData().searchMatchTotal.set(this._searchResults()?.length ?? 0);
       },
       { injector: this._injector },
     );
