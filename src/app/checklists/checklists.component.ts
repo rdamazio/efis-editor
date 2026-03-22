@@ -84,6 +84,42 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   readonly tree = viewChild.required<ChecklistTreeComponent>('tree');
   readonly items = viewChild.required<ChecklistItemsComponent>('items');
 
+  private readonly _selectedChecklistPos = computed(() => {
+    // Both tree and its file/selectedChecklist are signals, so this is reactive.
+    const file = this.tree()?.file();
+    const checklist = this.tree()?.selectedChecklist();
+    if (!file || !checklist) return undefined;
+
+    for (const [groupIdx, group] of file.groups.entries()) {
+      for (const [checklistIdx, cl] of group.checklists.entries()) {
+        if (cl === checklist) {
+          return { groupIdx, checklistIdx };
+        }
+      }
+    }
+    return undefined;
+  });
+
+  private readonly _searchResults = computed(() => {
+    const file = this.tree()?.file();
+    const query = this._navData().searchQuery();
+    if (!file || !query) return [];
+    return this._search.searchInFile(file, query);
+  });
+
+  protected readonly _currentChecklistMatchIndices = computed(() => {
+    const pos = this._selectedChecklistPos();
+    if (!pos) return new Set<number>();
+
+    const indices = new Set<number>();
+    for (const r of this._searchResults()) {
+      if (r.groupIdx === pos.groupIdx && r.checklistIdx === pos.checklistIdx && r.itemIdx !== undefined) {
+        indices.add(r.itemIdx);
+      }
+    }
+    return indices;
+  });
+
   showFilePicker = false;
   showFileUpload = false;
 
