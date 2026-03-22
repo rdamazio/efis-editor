@@ -20,6 +20,9 @@ jobs:
     needs: buildprep
     permissions:
       contents: read
+    env:
+      # TODO: Remove after actions migrate
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Fetch prepared artifacts
@@ -34,9 +37,6 @@ jobs:
         run: npm run build:prod
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
-        # TODO: Remove after this action migrates
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           path: dist/efis-editor/browser
 
@@ -53,14 +53,14 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      # TODO: Remove after actions migrate
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        # TODO: Remove after this action migrates
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       - name: Create tag
         uses: actions/github-script@v8
         with:
