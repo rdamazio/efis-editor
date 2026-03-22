@@ -62,9 +62,8 @@ jobs:
       - uses: codespell-project/actions-codespell@8f01853be192eb0f849a5c7d721450e7a467c579 # v2
         with:
           path: src
-      # TODO: Re-enable once https://github.com/marocchino/validate-dependabot/issues/819 is resolved.
-      #- uses: marocchino/validate-dependabot@d8ae5c0d03dd75fbd0ad5f8ab4ba8101ebbd4b37 # v3
-      #  id: validate
+      - uses: marocchino/validate-dependabot@d8ae5c0d03dd75fbd0ad5f8ab4ba8101ebbd4b37 # v3
+        id: validate
 
   dependabot:
     runs-on: ubuntu-latest
