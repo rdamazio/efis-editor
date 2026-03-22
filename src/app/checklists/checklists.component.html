@@ -36,6 +36,7 @@
     class="checklist-items"
     role="main"
     [groupDropListIds]="tree.groupDropListIds()"
+    [softHighlightedIndices]="_currentChecklistMatchIndices()"
     [(checklist)]="tree.selectedChecklist"
     (checklistChange)="onChecklistChanged()"
   />
