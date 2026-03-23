@@ -58,6 +58,7 @@ jobs:
       - name: Extract prepared artifacts
         run: tar xf prepared-source.tar
       - run: npm run lint
+      - run: npm run lint:actions
       - run: npm run format
       - uses: codespell-project/actions-codespell@8f01853be192eb0f849a5c7d721450e7a467c579 # v2
         with:
