@@ -35,7 +35,7 @@ export interface DynonFormatOptions extends FormatOptions {
   forbidCommas?: boolean;
 }
 
-export class DynonFormat extends AbstractChecklistFormat<DynonFormatOptions> {
+export class DynonFormat extends AbstractChecklistFormat {
   private readonly _textFormatOptions: TextFormatOptions;
   private readonly _fileName: string;
 

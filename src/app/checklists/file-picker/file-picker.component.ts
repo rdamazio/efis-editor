@@ -10,6 +10,6 @@ import { MatSelectModule } from '@angular/material/select';
 })
 export class ChecklistFilePickerComponent {
   readonly fileNames = input.required<string[]>();
-  readonly selectedFile = model<string>('');
+  readonly selectedFile = model('');
   readonly fileSelected = output<string>();
 }
