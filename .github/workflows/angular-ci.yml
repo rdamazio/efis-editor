@@ -28,8 +28,20 @@ jobs:
       - name: Extract prepared artifacts
         run: tar xf prepared-source.tar
       - name: Build
-        run: npm run build --if-present
-      - name: Install Playwright browser
+        run: npm run build
+
+  test:
+    runs-on: ubuntu-latest
+    needs: buildprep
+
+    steps:
+      - name: Fetch prepared artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: prepared-source
+      - name: Extract prepared artifacts
+        run: tar xf prepared-source.tar
+      - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox
       - name: Run tests
         # Attempt to re-run in case there's flakiness.
@@ -39,8 +51,6 @@ jobs:
           # as launchOptions.executablePath for ALL Playwright browsers (including Firefox)
           # which causes Firefox to attempt executing the google-chrome binary.
           CHROME_BIN: ''
-      - name: Run test coverage
-        run: npm run test:coverage
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
@@ -48,9 +58,34 @@ jobs:
         with:
           name: test-results
           path: |
-            coverage/
             test-results/
             **/__screenshots__/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  coverage:
+    runs-on: ubuntu-latest
+    needs: buildprep
+
+    steps:
+      - name: Fetch prepared artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: prepared-source
+      - name: Extract prepared artifacts
+        run: tar xf prepared-source.tar
+      - name: Install Playwright browser
+        # Coverage only works on Chromium.
+        run: npx playwright install --with-deps chromium
+      - name: Run test coverage
+        run: npm run test:coverage
+      - name: Upload coverage results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: coverage-results
+          path: |
+            coverage/
           if-no-files-found: ignore
           retention-days: 30
 
@@ -75,7 +110,7 @@ jobs:
 
   dependabot:
     runs-on: ubuntu-latest
-    needs: [build, lint]
+    needs: [build, test, coverage, lint]
     if: github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'rdamazio/efis-editor'
     permissions:
       contents: write
