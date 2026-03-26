@@ -14,9 +14,11 @@ permissions:
 
 jobs:
   buildprep:
+    name: Prepare code
     uses: rdamazio/efis-editor/.github/workflows/build-prep.yml@main
 
   build:
+    name: Code builds
     runs-on: ubuntu-latest
     needs: buildprep
 
@@ -31,6 +33,7 @@ jobs:
         run: npm run build
 
   test:
+    name: Tests pass
     runs-on: ubuntu-latest
     needs: buildprep
 
@@ -64,6 +67,7 @@ jobs:
           retention-days: 30
 
   coverage:
+    name: Code coverage
     runs-on: ubuntu-latest
     needs: buildprep
 
@@ -90,6 +94,7 @@ jobs:
           retention-days: 30
 
   lint:
+    name: Linters
     runs-on: ubuntu-latest
     needs: buildprep
     steps:
@@ -109,6 +114,7 @@ jobs:
         id: validate
 
   dependabot:
+    name: Dependabot auto-merge
     runs-on: ubuntu-latest
     needs: [build, test, coverage, lint]
     if: github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'rdamazio/efis-editor'
