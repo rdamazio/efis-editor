@@ -17,6 +17,7 @@ describe('WelcomeComponent', () => {
     gdrive = {
       getState: vi.fn().mockName('GoogleDriveStorage.getState'),
     };
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
     state$ = new BehaviorSubject<DriveSyncState>(DriveSyncState.DISCONNECTED);
     gdrive.getState.mockReturnValue(state$);
 
