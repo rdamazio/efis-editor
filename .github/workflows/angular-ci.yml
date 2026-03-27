@@ -34,6 +34,11 @@ jobs:
       - name: Run tests
         # Attempt to re-run in case there's flakiness.
         run: npm run test:headless || npm run test:headless
+        env:
+          # Clear CHROME_BIN because otherwise @angular/build:unit-test will apply it
+          # as launchOptions.executablePath for ALL Playwright browsers (including Firefox)
+          # which causes Firefox to attempt executing the google-chrome binary.
+          CHROME_BIN: ''
       - name: Run test coverage
         run: npm run test:coverage
 
