@@ -89,13 +89,17 @@ describe('ChecklistsComponent', () => {
     vi.setConfig({ testTimeout: originalTimeout });
   });
 
-  async function newFile(fileName: string) {
+  async function newFile(fileName: string, waitForStorage = true) {
+    const completed = storageCompleted();
     await user.click(screen.getByRole('button', { name: 'New file' }));
     const checklistTitleBox = await screen.findByRole('textbox', { name: 'Title' });
     await user.type(checklistTitleBox, `${fileName}[Enter]`);
 
     rendered.detectChanges();
     await rendered.fixture.whenStable();
+    if (waitForStorage) {
+      await expect(completed).resolves.toBe(true);
+    }
   }
 
   async function newEmptyFile(fileName: string) {
@@ -107,7 +111,10 @@ describe('ChecklistsComponent', () => {
     const group1 = screen.getByRole('treeitem', { name: 'Group: First checklist group' });
     await user.click(within(group1).getByRole('button', { name: 'Delete First checklist group' }));
     const groupConfirmButton = await screen.findByRole('button', { name: 'Delete!' });
+    const completed = storageCompleted();
     await user.click(groupConfirmButton);
+
+    await expect(completed).resolves.toBe(true);
   }
 
   async function addGroup(groupTitle: string) {
@@ -127,11 +134,20 @@ describe('ChecklistsComponent', () => {
     await user.type(checklistTitleBox, `${checklistTitle}[Enter]`);
   }
 
-  async function addItem(type: string, prompt?: string, expectation?: string) {
+  async function addItem(type: string, prompt?: string, expectation?: string, waitForStorage = true) {
+    let completed: Promise<boolean> | undefined;
     const newButton = screen.getByRole('button', { name: `Add a new checklist ${type}` });
+
+    if (waitForStorage) {
+      completed = storageCompleted();
+    }
     await user.click(newButton);
 
     if (prompt) {
+      if (waitForStorage) {
+        await expect(completed).resolves.toBe(true);
+      }
+
       const item = screen.getByRole('listitem', { name: 'Item: New item' });
       const itemPromptBox = await within(item).findByRole('textbox', { name: 'Prompt text' });
       await retype(itemPromptBox, prompt);
@@ -140,7 +156,14 @@ describe('ChecklistsComponent', () => {
         const itemExpectationBox = await within(item).findByRole('textbox', { name: 'Expectation text' });
         await retype(itemExpectationBox, expectation);
       }
+      if (waitForStorage) {
+        completed = storageCompleted();
+      }
       await user.click(within(item).getByRole('button', { name: 'Save changes to Prompt text' }));
+    }
+
+    if (waitForStorage) {
+      await expect(completed).resolves.toBe(true);
     }
   }
 
@@ -219,7 +242,7 @@ describe('ChecklistsComponent', () => {
 
         for (const item of checklist.items) {
           const type = typeMap.get(item.type);
-          await addItem(type!, item.prompt, item.expectation);
+          await addItem(type!, item.prompt, item.expectation, false);
 
           // Perform formatting if needed.
           if (item.centered || item.indent) {
@@ -358,7 +381,8 @@ describe('ChecklistsComponent', () => {
     expect(screen.getByRole('listitem', { name: 'Item: Second item' })).toBeInTheDocument();
 
     // Try to create the same file again - this should fail, keeping the original file.
-    await newFile('My file');
+    // (there's no way to wait for a storage event NOT happening, so we don't wait)
+    await newFile('My file', false);
 
     expect(screen.getByRole('listitem', { name: 'Item: Second item' })).toBeInTheDocument();
 
@@ -462,16 +486,20 @@ describe('ChecklistsComponent', () => {
     const completed = storageCompleted();
     await user.click(within(item).getByRole('button', { name: 'Delete Delete me' }));
 
-    expect(screen.queryByRole('listitem', { name: 'Item: Delete me' })).not.toBeInTheDocument();
+    rendered.detectChanges();
+    await rendered.fixture.whenStable();
+    await vi.waitFor(() => {
+      expect(screen.queryByRole('listitem', { name: 'Item: Delete me' })).not.toBeInTheDocument();
+    });
 
     await expectFile('My file', NEW_FILE, completed);
 
     // Undo the deletion.
-    const completed2 = storageCompleted();
     const undoButton = await screen.findByRole('button', { name: 'Undo', hidden: true });
 
     expect(undoButton).toBeVisible();
 
+    const completed2 = storageCompleted();
     await user.click(undoButton);
 
     // Verify that it's back to the screen and in storage.
@@ -778,7 +806,10 @@ describe('ChecklistsComponent', () => {
       await user.keyboard('nw');
       await debounce();
       rendered.detectChanges(); // HACK: Wait for the item to be added.
+      const addCompleted = storageCompleted();
       await user.keyboard('[Enter]');
+
+      await expect(addCompleted).resolves.toBe(true);
 
       await expect(screen.findByRole('listitem', { name: 'Item: New item' })).resolves.toBeInTheDocument();
 
@@ -993,6 +1024,7 @@ describe('ChecklistsComponent', () => {
       await user.click(screen.getByRole('treeitem', { name: 'Checklist: Third checklist' }));
       await addItem('text', 'Checklist III');
       expectFragment('My file/1/0');
+      await rendered.fixture.whenStable();
 
       const expectedFile = (await storage.getChecklistFile('My file'))!;
       expectedFile.metadata!.modifiedTime = 0;
@@ -1060,8 +1092,10 @@ describe('ChecklistsComponent', () => {
       await addGroup('Second checklist group');
       await addChecklist('Second checklist group', 'Third checklist');
       await addGroup('Third checklist group');
+      const completed = storageCompleted();
       await addChecklist('Third checklist group', 'Fourth checklist');
-      await rendered.fixture.whenStable();
+
+      await expect(completed).resolves.toBe(true);
 
       const expectedFile = (await storage.getChecklistFile('My file'))!;
       expectedFile.metadata!.modifiedTime = 0;
@@ -1073,17 +1107,17 @@ describe('ChecklistsComponent', () => {
       expectFragment('My file/0/1');
 
       // Move the first group down.
-      const completed = storageCompleted();
+      const completed2 = storageCompleted();
       await user.keyboard('[ShiftLeft>][AltLeft>][ArrowDown][/AltLeft][/ShiftLeft]');
       expectFragment('My file/1/1');
       expectedFile.groups = [group2, group1, group3];
-      await expectFile('My file', expectedFile, completed);
+      await expectFile('My file', expectedFile, completed2);
 
-      const completed2 = storageCompleted();
+      const completed3 = storageCompleted();
       await user.keyboard('[ShiftLeft>][AltLeft>][ArrowDown][/AltLeft][/ShiftLeft]');
       expectFragment('My file/2/1');
       expectedFile.groups = [group2, group3, group1];
-      await expectFile('My file', expectedFile, completed2);
+      await expectFile('My file', expectedFile, completed3);
 
       // Move it past the bottom and assert no change.
       await user.keyboard('[ShiftLeft>][AltLeft>][ArrowDown][/AltLeft][/ShiftLeft]');
