@@ -478,9 +478,11 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     this.showFilePicker = false;
     this.showFileUpload = false;
 
+    const completed$ = this._startStorage();
     const existingFile = await this.store.getChecklistFile(fileName);
     if (existingFile !== null) {
       this._snackBar.open(`A file named "${fileName}" already exists.`, '');
+      this._completeStorage(completed$);
       return;
     }
 
@@ -510,7 +512,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       metadata: ChecklistFileMetadata.create({ name: fileName }),
     };
     await Promise.all([this.store.saveChecklistFile(file), this._displayFile(file)]);
-    this._notifyComplete();
+    this._completeStorage(completed$);
   }
 
   onOpenFile() {
@@ -526,8 +528,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   async onFileUploaded(file: ChecklistFile) {
     this.showFileUpload = false;
 
+    const completed$ = this._startStorage();
     await Promise.all([this.store.saveChecklistFile(file), this._displayFile(file)]);
-    this._notifyComplete();
+    this._completeStorage(completed$);
   }
 
   async onDownloadFile(formatId: FormatId) {
@@ -571,11 +574,12 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
 
     if (!this.selectedFile) return;
 
+    const completed$ = this._startStorage();
     const name = this.selectedFile.metadata!.name;
 
     await Promise.all([this.store.deleteChecklistFile(name), this._displayFile(undefined)]);
     this._snackBar.open(`Deleted file "${name}".`, '');
-    this._notifyComplete();
+    this._completeStorage(completed$);
   }
 
   async onFileInfo() {
@@ -604,6 +608,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   async onMetadataUpdate(updatedMetadata?: ChecklistFileMetadata): Promise<void> {
     if (!updatedMetadata || !this.selectedFile) return;
 
+    const completed$ = this._startStorage();
     const oldName = this.selectedFile.metadata!.name;
     const newName = updatedMetadata.name;
     this.selectedFile.metadata = updatedMetadata;
@@ -614,7 +619,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       promises.push(this._updateNavigation());
     }
     await Promise.all(promises);
-    this._notifyComplete();
+    this._completeStorage(completed$);
   }
 
   async onFileSelected(id?: string) {
@@ -646,6 +651,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   }
 
   async onChecklistChanged() {
+    const completed$ = this._startStorage();
     // If the change involved moving the selected checklist/group, we may need to update the fragment
     await this._updateNavigation();
 
@@ -654,13 +660,19 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       await this.store.saveChecklistFile(file);
     }
 
-    this._notifyComplete();
+    this._completeStorage(completed$);
   }
 
-  private _notifyComplete() {
+  private _startStorage(): Subject<boolean> | undefined {
+    const completed$ = this.storageCompleted$;
+    this.storageCompleted$ = undefined;
+    return completed$;
+  }
+
+  private _completeStorage(completed$?: Subject<boolean>) {
     // Signal completion, for testing.
-    if (this.storageCompleted$) {
-      this.storageCompleted$.next(true);
+    if (completed$) {
+      completed$.next(true);
     }
   }
 }

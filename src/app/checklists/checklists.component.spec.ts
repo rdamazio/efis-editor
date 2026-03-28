@@ -90,16 +90,14 @@ describe('ChecklistsComponent', () => {
   });
 
   async function newFile(fileName: string, waitForStorage = true) {
-    const completed = storageCompleted();
+    const completed = waitForStorage ? storageCompletion() : undefined;
     await user.click(screen.getByRole('button', { name: 'New file' }));
     const checklistTitleBox = await screen.findByRole('textbox', { name: 'Title' });
     await user.type(checklistTitleBox, `${fileName}[Enter]`);
 
     rendered.detectChanges();
     await rendered.fixture.whenStable();
-    if (waitForStorage) {
-      await expect(completed).resolves.toBe(true);
-    }
+    await storageCompleted(completed);
   }
 
   async function newEmptyFile(fileName: string) {
@@ -111,42 +109,42 @@ describe('ChecklistsComponent', () => {
     const group1 = screen.getByRole('treeitem', { name: 'Group: First checklist group' });
     await user.click(within(group1).getByRole('button', { name: 'Delete First checklist group' }));
     const groupConfirmButton = await screen.findByRole('button', { name: 'Delete!' });
-    const completed = storageCompleted();
+    const completed = storageCompletion();
     await user.click(groupConfirmButton);
-
-    await expect(completed).resolves.toBe(true);
+    await storageCompleted(completed);
   }
 
-  async function addGroup(groupTitle: string) {
+  async function addGroup(groupTitle: string, waitForStorage = true) {
+    const completed = waitForStorage ? storageCompletion() : undefined;
     const addGroupButton = screen.getByRole('button', { name: 'Add new checklist group' });
     await user.click(addGroupButton);
 
     const checklistTitleBox = await screen.findByRole('textbox', { name: 'Title' });
     await user.type(checklistTitleBox, `${groupTitle}[Enter]`);
+
+    await storageCompleted(completed);
   }
 
-  async function addChecklist(groupTitle: string, checklistTitle: string) {
+  async function addChecklist(groupTitle: string, checklistTitle: string, waitForStorage = true) {
+    const completed = waitForStorage ? storageCompletion() : undefined;
     const group = screen.getByRole('treeitem', { name: `Group: ${groupTitle}` });
     const addChecklistButton = within(group).getByRole('button', { name: 'Add new checklist' });
     await user.click(addChecklistButton);
 
     const checklistTitleBox = await screen.findByRole('textbox', { name: 'Title' });
-    await user.type(checklistTitleBox, `${checklistTitle}[Enter]`);
+    await retype(checklistTitleBox, `${checklistTitle}[Enter]`);
+
+    await storageCompleted(completed);
   }
 
   async function addItem(type: string, prompt?: string, expectation?: string, waitForStorage = true) {
-    let completed: Promise<boolean> | undefined;
     const newButton = screen.getByRole('button', { name: `Add a new checklist ${type}` });
 
-    if (waitForStorage) {
-      completed = storageCompleted();
-    }
+    let completed = waitForStorage ? storageCompletion() : undefined;
     await user.click(newButton);
 
     if (prompt) {
-      if (waitForStorage) {
-        await expect(completed).resolves.toBe(true);
-      }
+      await storageCompleted(completed);
 
       const item = screen.getByRole('listitem', { name: 'Item: New item' });
       const itemPromptBox = await within(item).findByRole('textbox', { name: 'Prompt text' });
@@ -156,15 +154,10 @@ describe('ChecklistsComponent', () => {
         const itemExpectationBox = await within(item).findByRole('textbox', { name: 'Expectation text' });
         await retype(itemExpectationBox, expectation);
       }
-      if (waitForStorage) {
-        completed = storageCompleted();
-      }
+      completed = waitForStorage ? storageCompletion() : undefined;
       await user.click(within(item).getByRole('button', { name: 'Save changes to Prompt text' }));
     }
-
-    if (waitForStorage) {
-      await expect(completed).resolves.toBe(true);
-    }
+    await storageCompleted(completed);
   }
 
   async function retype(element: HTMLElement, text: string) {
@@ -192,7 +185,7 @@ describe('ChecklistsComponent', () => {
     expect(showSnack).toHaveBeenLastCalledWith(expect.stringMatching(pattern), expect.any(String));
   }
 
-  async function storageCompleted(): Promise<boolean> {
+  async function storageCompletion(): Promise<boolean> {
     // There's no good way to wait for some of the storage asynchronous operations, so inject one.
     const component = rendered.fixture.componentInstance;
     component.storageCompleted$ = new Subject<boolean>();
@@ -200,10 +193,15 @@ describe('ChecklistsComponent', () => {
     return firstValueFrom(component.storageCompleted$.pipe(take(1)), { defaultValue: false });
   }
 
-  async function expectFile(name: string, expectedFile: ChecklistFile, completed?: Promise<boolean>) {
+  async function storageCompleted(completed?: Promise<boolean>) {
     if (completed) {
       await expect(completed).resolves.toBe(true);
     }
+  }
+
+  async function expectFile(name: string, expectedFile: ChecklistFile, completed?: Promise<boolean>) {
+    await rendered.fixture.whenStable();
+    await storageCompleted(completed);
 
     const storedFile = await storage.getChecklistFile(name);
 
@@ -292,7 +290,7 @@ describe('ChecklistsComponent', () => {
     const option = await screen.findByRole('option', { name: defaultChecklistTitle });
     await user.click(option);
 
-    const completed = storageCompleted();
+    const completed = storageCompletion();
     const okButton = await screen.findByRole('button', { name: 'Ok' });
     await user.click(okButton);
 
@@ -309,7 +307,7 @@ describe('ChecklistsComponent', () => {
 
     expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
 
-    const completed = storageCompleted();
+    const completed = storageCompletion();
     await user.click(screen.getByRole('button', { name: 'Delete file' }));
     const confirmButton = await screen.findByRole('button', { name: 'Delete!' });
 
@@ -317,7 +315,8 @@ describe('ChecklistsComponent', () => {
 
     await user.click(confirmButton);
 
-    await expect(completed).resolves.toBe(true);
+    await storageCompleted(completed);
+
     expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
     await expect(storage.getChecklistFile('My file')).resolves.toBeNull();
 
@@ -333,7 +332,7 @@ describe('ChecklistsComponent', () => {
     expectFragment('My file');
     expectNavData('My file');
 
-    const completed = storageCompleted();
+    const completed = storageCompletion();
     await user.click(screen.getByRole('button', { name: 'Open file information dialog' }));
     const nameBox = await screen.findByRole('textbox', { name: 'File name' });
     await retype(nameBox, 'Renamed file');
@@ -341,7 +340,8 @@ describe('ChecklistsComponent', () => {
     const okButton = await screen.findByRole('button', { name: 'Ok' });
     await user.click(okButton);
 
-    await expect(completed).resolves.toBe(true);
+    await storageCompleted(completed);
+
     await expect(storage.getChecklistFile('My file')).resolves.toBeNull();
     await expect(storage.getChecklistFile('Renamed file')).resolves.not.toBeNull();
 
@@ -357,7 +357,7 @@ describe('ChecklistsComponent', () => {
     expectFragment('My file');
     expectNavData('My file');
 
-    const completed = storageCompleted();
+    const completed = storageCompletion();
 
     navData.fileName.set('Renamed file');
 
@@ -365,7 +365,7 @@ describe('ChecklistsComponent', () => {
     TestBed.tick();
     await rendered.fixture.whenStable();
 
-    await expect(completed).resolves.toBe(true);
+    await storageCompleted(completed);
 
     expectFragment('Renamed file');
 
@@ -406,24 +406,29 @@ describe('ChecklistsComponent', () => {
 
     const promptBox = await screen.findByRole('textbox', { name: 'Prompt text' });
     const expectationBox = await screen.findByRole('textbox', { name: 'Expectation text' });
+    const itemCompleted = storageCompletion();
     await retype(promptBox, 'New prompt');
     await retype(expectationBox, 'New expectation[Enter]');
+    await storageCompleted(itemCompleted);
 
     // Rename the checklist.
     await user.hover(screen.getByText('First checklist'));
     await user.click(await within(checklist).findByRole('button', { name: 'Rename First checklist' }));
 
     const checklistTitleBox = await screen.findByRole('textbox', { name: 'Title' });
+    const checklistCompleted = storageCompletion();
     await retype(checklistTitleBox, 'Renamed checklist[Enter]');
+    await storageCompleted(checklistCompleted);
 
     // Rename the group.
     const group = screen.getByRole('treeitem', { name: 'Group: First checklist group' });
     await user.hover(screen.getByText('First checklist group'));
     await user.click(await within(group).findByRole('button', { name: 'Rename First checklist group' }));
 
-    const completed = storageCompleted();
     const groupTitleBox = await screen.findByRole('textbox', { name: 'Title' });
+    const groupCompleted = storageCompletion();
     await retype(groupTitleBox, 'Renamed group[Enter]');
+    await storageCompleted(groupCompleted);
 
     // Verify the stored contents.
     await expectFile(
@@ -449,7 +454,6 @@ describe('ChecklistsComponent', () => {
           },
         ],
       }),
-      completed,
     );
   });
 
@@ -461,7 +465,7 @@ describe('ChecklistsComponent', () => {
     await user.click(checklist);
 
     // Delete the item.
-    const completed = storageCompleted();
+    const completed = storageCompletion();
     const item = screen.getByRole('listitem', { name: 'Item: Checklist created' });
     await user.click(within(item).getByRole('button', { name: /Delete.*/ }));
 
@@ -483,7 +487,7 @@ describe('ChecklistsComponent', () => {
     expect(item).toBeInTheDocument();
 
     // Delete the item.
-    const completed = storageCompleted();
+    const completed = storageCompletion();
     await user.click(within(item).getByRole('button', { name: 'Delete Delete me' }));
 
     rendered.detectChanges();
@@ -499,7 +503,7 @@ describe('ChecklistsComponent', () => {
 
     expect(undoButton).toBeVisible();
 
-    const completed2 = storageCompleted();
+    const completed2 = storageCompletion();
     await user.click(undoButton);
 
     // Verify that it's back to the screen and in storage.
@@ -523,7 +527,7 @@ describe('ChecklistsComponent', () => {
     const checklist = screen.getByRole('treeitem', { name: 'Checklist: First checklist' });
     await user.click(await within(checklist).findByRole('button', { name: 'Delete First checklist' }));
 
-    const completed = storageCompleted();
+    const completed = storageCompletion();
     const confirmButton = await screen.findByRole('button', { name: 'Delete!' });
     await user.click(confirmButton);
 
@@ -648,11 +652,14 @@ describe('ChecklistsComponent', () => {
 
       // Exercise all the keyboard shortcuts.
       for (const shortcut of ChecklistsComponent.NEW_ITEM_SHORTCUTS) {
+        const completedKey = storageCompletion();
         await debounce();
         await user.keyboard('n');
         await user.keyboard(shortcut.secondKey);
         await debounce();
         await user.keyboard('[Enter]');
+
+        await storageCompleted(completedKey);
       }
       await debounce();
 
@@ -688,7 +695,10 @@ describe('ChecklistsComponent', () => {
       const promptBox1 = await screen.findByRole('textbox', { name: 'Prompt text' });
       const expectationBox = await screen.findByRole('textbox', { name: 'Expectation text' });
       await retype(promptBox1, 'New prompt');
+
+      const completed = storageCompletion();
       await retype(expectationBox, 'New expectation[Enter]');
+      await storageCompleted(completed);
 
       // Items present: ['New prompt']
 
@@ -696,7 +706,7 @@ describe('ChecklistsComponent', () => {
       await user.keyboard('nw');
       await debounce();
 
-      const completed = storageCompleted();
+      const completed2 = storageCompletion();
       const promptBox2 = await screen.findByRole('textbox', { name: 'Prompt text' });
       await retype(promptBox2, 'Other prompt[Enter]');
 
@@ -707,7 +717,7 @@ describe('ChecklistsComponent', () => {
       items[0].expectation = 'New expectation';
       items.push(ChecklistItem.create({ type: ChecklistItem_Type.ITEM_WARNING, prompt: 'Other prompt' }));
 
-      await expectFile('My file', expectedFile, completed);
+      await expectFile('My file', expectedFile, completed2);
 
       // Items present: ['New prompt', 'Other prompt']
 
@@ -715,12 +725,12 @@ describe('ChecklistsComponent', () => {
       await user.keyboard('[ArrowUp]');
       await user.keyboard('[Enter]');
 
-      const completed2 = storageCompleted();
+      const completed3 = storageCompletion();
       const promptBox3 = await screen.findByRole('textbox', { name: 'Prompt text' });
       await retype(promptBox3, 'Third prompt[Enter]');
 
       expectedFile.groups[0].checklists[0].items[0].prompt = 'Third prompt';
-      await expectFile('My file', expectedFile, completed2);
+      await expectFile('My file', expectedFile, completed3);
 
       // Items present: ['Third prompt', 'Other prompt']
 
@@ -732,12 +742,12 @@ describe('ChecklistsComponent', () => {
       await user.click(secondItem);
       await user.keyboard('[Enter]');
 
-      const completed3 = storageCompleted();
+      const completed4 = storageCompletion();
       const promptBox4 = await screen.findByRole('textbox', { name: 'Prompt text' });
       await retype(promptBox4, 'Yet another prompt[Enter]');
 
       expectedFile.groups[0].checklists[0].items[1].prompt = 'Yet another prompt';
-      await expectFile('My file', expectedFile, completed3);
+      await expectFile('My file', expectedFile, completed4);
 
       // Items present: ['Third prompt', 'Yet another prompt']
     });
@@ -747,7 +757,7 @@ describe('ChecklistsComponent', () => {
       await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
 
       // Select and shift the item.
-      const completed = storageCompleted();
+      const completed = storageCompletion();
       await user.keyboard('[ArrowDown]');
       await user.keyboard('[ShiftLeft>][ArrowRight][/ShiftLeft]');
 
@@ -757,7 +767,7 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile, completed);
 
       // Shift it back.
-      const completed2 = storageCompleted();
+      const completed2 = storageCompletion();
       await user.keyboard('[ShiftLeft>][ArrowLeft][/ShiftLeft]');
 
       // Verify that it was indented in storage.
@@ -775,7 +785,7 @@ describe('ChecklistsComponent', () => {
       expect(screen.getByText('Center me')).toBeVisible();
 
       // Select and shift the item.
-      const completed = storageCompleted();
+      const completed = storageCompletion();
       // The added item will have kept focus - center it.
       await user.keyboard('[ShiftLeft>]c[/ShiftLeft]');
       await debounce();
@@ -788,7 +798,7 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile, completed);
 
       // Uncenter it.
-      const completed2 = storageCompleted();
+      const completed2 = storageCompletion();
       await user.keyboard('[ShiftLeft>]c[/ShiftLeft]');
       await debounce();
 
@@ -806,7 +816,7 @@ describe('ChecklistsComponent', () => {
       await user.keyboard('nw');
       await debounce();
       rendered.detectChanges(); // HACK: Wait for the item to be added.
-      const addCompleted = storageCompleted();
+      const addCompleted = storageCompletion();
       await user.keyboard('[Enter]');
 
       await expect(addCompleted).resolves.toBe(true);
@@ -814,7 +824,7 @@ describe('ChecklistsComponent', () => {
       await expect(screen.findByRole('listitem', { name: 'Item: New item' })).resolves.toBeInTheDocument();
 
       // Delete it.
-      const completed = storageCompleted();
+      const completed = storageCompletion();
       await user.keyboard('[Delete]');
 
       // Verify that it's gone from storage and the UI.
@@ -823,7 +833,7 @@ describe('ChecklistsComponent', () => {
       expect(screen.queryByRole('listitem', { name: 'Item: New item' })).not.toBeInTheDocument();
 
       // Also delete the other that was already there (it should have been selected after the other was deleted).
-      const completed2 = storageCompleted();
+      const completed2 = storageCompletion();
 
       expect(screen.getByRole('listitem', { name: 'Item: Checklist created' })).toBeInTheDocument();
 
@@ -851,7 +861,7 @@ describe('ChecklistsComponent', () => {
       await user.keyboard('[ArrowUp]');
 
       // Duplicate it.
-      const completed = storageCompleted();
+      const completed = storageCompletion();
       await user.keyboard(`[${metaKey}>]D[/${metaKey}]`);
 
       await expect(screen.findAllByRole('listitem', { name: 'Item: Checklist created' })).resolves.toHaveLength(2);
@@ -873,10 +883,10 @@ describe('ChecklistsComponent', () => {
       await debounce();
 
       // Edit the duplicate, which should already be selected.
-      const completed2 = storageCompleted();
       await user.keyboard('[Enter]');
       const promptBox1 = await screen.findByRole('textbox', { name: 'Prompt text' });
       const expectationBox = await screen.findByRole('textbox', { name: 'Expectation text' });
+      const completed2 = storageCompletion();
       await retype(promptBox1, 'Modified item');
       await retype(expectationBox, 'Modified expectation[Enter]');
 
@@ -962,7 +972,7 @@ describe('ChecklistsComponent', () => {
       const item3 = ChecklistItem.create({ type: ChecklistItem_Type.ITEM_TITLE, prompt: 'Third item' });
 
       // Shift first item down.
-      const completed = storageCompleted();
+      const completed = storageCompletion();
       await user.keyboard('[ArrowDown]');
       await debounce();
       await user.keyboard('[ShiftLeft>][ArrowDown][/ShiftLeft]');
@@ -974,7 +984,7 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile, completed);
 
       // Shift it again
-      const completed2 = storageCompleted();
+      const completed2 = storageCompletion();
       await user.keyboard('[ShiftLeft>][ArrowDown][/ShiftLeft]');
       await debounce();
 
@@ -987,7 +997,7 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile);
 
       // Shift it up
-      const completed4 = storageCompleted();
+      const completed4 = storageCompletion();
       await user.keyboard('[ShiftLeft>][ArrowUp][/ShiftLeft]');
       await debounce();
 
@@ -995,7 +1005,7 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile, completed4);
 
       // Shift it up again
-      const completed5 = storageCompleted();
+      const completed5 = storageCompletion();
       await user.keyboard('[ShiftLeft>][ArrowUp][/ShiftLeft]');
       await debounce();
 
@@ -1033,20 +1043,20 @@ describe('ChecklistsComponent', () => {
       const checklist3 = expectedFile.groups[1].checklists[0];
 
       // Move the last checklist up.
-      const completed = storageCompleted();
+      const completed = storageCompletion();
       await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowUp][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/2');
       expectedFile.groups[0].checklists = [checklist1, checklist2, checklist3];
       expectedFile.groups[1].checklists = [];
       await expectFile('My file', expectedFile, completed);
 
-      const completed2 = storageCompleted();
+      const completed2 = storageCompletion();
       await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowUp][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/1');
       expectedFile.groups[0].checklists = [checklist1, checklist3, checklist2];
       await expectFile('My file', expectedFile, completed2);
 
-      const completed3 = storageCompleted();
+      const completed3 = storageCompletion();
       await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowUp][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/0');
       expectedFile.groups[0].checklists = [checklist3, checklist1, checklist2];
@@ -1058,19 +1068,19 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile);
 
       // Move it back down.
-      const completed5 = storageCompleted();
+      const completed5 = storageCompletion();
       await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowDown][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/1');
       expectedFile.groups[0].checklists = [checklist1, checklist3, checklist2];
       await expectFile('My file', expectedFile, completed5);
 
-      const completed6 = storageCompleted();
+      const completed6 = storageCompletion();
       await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowDown][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/0/2');
       expectedFile.groups[0].checklists = [checklist1, checklist2, checklist3];
       await expectFile('My file', expectedFile, completed6);
 
-      const completed7 = storageCompleted();
+      const completed7 = storageCompletion();
       await user.keyboard(`[ShiftLeft>][${metaKey}>][ArrowDown][/${metaKey}][/ShiftLeft]`);
       expectFragment('My file/1/0');
       expectedFile.groups[0].checklists = [checklist1, checklist2];
@@ -1092,10 +1102,7 @@ describe('ChecklistsComponent', () => {
       await addGroup('Second checklist group');
       await addChecklist('Second checklist group', 'Third checklist');
       await addGroup('Third checklist group');
-      const completed = storageCompleted();
       await addChecklist('Third checklist group', 'Fourth checklist');
-
-      await expect(completed).resolves.toBe(true);
 
       const expectedFile = (await storage.getChecklistFile('My file'))!;
       expectedFile.metadata!.modifiedTime = 0;
@@ -1107,13 +1114,13 @@ describe('ChecklistsComponent', () => {
       expectFragment('My file/0/1');
 
       // Move the first group down.
-      const completed2 = storageCompleted();
+      const completed2 = storageCompletion();
       await user.keyboard('[ShiftLeft>][AltLeft>][ArrowDown][/AltLeft][/ShiftLeft]');
       expectFragment('My file/1/1');
       expectedFile.groups = [group2, group1, group3];
       await expectFile('My file', expectedFile, completed2);
 
-      const completed3 = storageCompleted();
+      const completed3 = storageCompletion();
       await user.keyboard('[ShiftLeft>][AltLeft>][ArrowDown][/AltLeft][/ShiftLeft]');
       expectFragment('My file/2/1');
       expectedFile.groups = [group2, group3, group1];
@@ -1125,13 +1132,13 @@ describe('ChecklistsComponent', () => {
       await expectFile('My file', expectedFile);
 
       // Move it back up.
-      const completed4 = storageCompleted();
+      const completed4 = storageCompletion();
       await user.keyboard('[ShiftLeft>][AltLeft>][ArrowUp][/AltLeft][/ShiftLeft]');
       expectFragment('My file/1/1');
       expectedFile.groups = [group2, group1, group3];
       await expectFile('My file', expectedFile, completed4);
 
-      const completed5 = storageCompleted();
+      const completed5 = storageCompletion();
       await user.keyboard('[ShiftLeft>][AltLeft>][ArrowUp][/AltLeft][/ShiftLeft]');
       expectFragment('My file/0/1');
       expectedFile.groups = [group1, group2, group3];
