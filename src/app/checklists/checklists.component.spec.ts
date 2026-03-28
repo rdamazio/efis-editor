@@ -61,7 +61,7 @@ describe('ChecklistsComponent', () => {
       providers: [
         { provide: ROUTER_OUTLET_DATA, useValue: signal(navData) },
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 0 } },
-        { provide: HOTKEY_DEBOUNCE_TIME, useValue: 50 },
+        { provide: HOTKEY_DEBOUNCE_TIME, useValue: 20 },
       ],
       deferBlockStates: DeferBlockState.Complete,
     });
@@ -635,8 +635,9 @@ describe('ChecklistsComponent', () => {
 
   describe('keyboard shortcuts', () => {
     async function debounce() {
+      // Wait for the hotkey debounce
       return new Promise((resolve) => {
-        setTimeout(resolve, 100);
+        setTimeout(resolve, 30);
       });
     }
 
@@ -654,14 +655,12 @@ describe('ChecklistsComponent', () => {
       for (const shortcut of ChecklistsComponent.NEW_ITEM_SHORTCUTS) {
         const completedKey = storageCompletion();
         await debounce();
-        await user.keyboard('n');
-        await user.keyboard(shortcut.secondKey);
+        await user.keyboard(`n${shortcut.secondKey}`);
         await debounce();
         await user.keyboard('[Enter]');
 
         await storageCompleted(completedKey);
       }
-      await debounce();
 
       // Create the expected resulting checklist data structure.
       const expectedItems = ChecklistsComponent.NEW_ITEM_SHORTCUTS.map((s) =>
