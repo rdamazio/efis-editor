@@ -29,8 +29,6 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: prepared-source
-      - name: Extract prepared artifacts
-        run: tar xf prepared-source.tar
       - name: Run tests
         run: npm run test:headless
       - name: Build

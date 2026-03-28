@@ -24,11 +24,9 @@ jobs:
 
     steps:
       - name: Fetch prepared artifacts
-        uses: actions/download-artifact@v8
+        uses: atos-actions/download-artifact@248feaadb6062a09de762913065013f42f61470a
         with:
           name: prepared-source
-      - name: Extract prepared artifacts
-        run: tar xf prepared-source.tar
       - name: Build
         run: npm run build
 
@@ -39,11 +37,9 @@ jobs:
 
     steps:
       - name: Fetch prepared artifacts
-        uses: actions/download-artifact@v8
+        uses: atos-actions/download-artifact@248feaadb6062a09de762913065013f42f61470a
         with:
           name: prepared-source
-      - name: Extract prepared artifacts
-        run: tar xf prepared-source.tar
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox
       - name: Run tests
@@ -73,11 +69,9 @@ jobs:
 
     steps:
       - name: Fetch prepared artifacts
-        uses: actions/download-artifact@v8
+        uses: atos-actions/download-artifact@248feaadb6062a09de762913065013f42f61470a
         with:
           name: prepared-source
-      - name: Extract prepared artifacts
-        run: tar xf prepared-source.tar
       - name: Install Playwright browser
         # Coverage only works on Chromium.
         run: npx playwright install --with-deps chromium
@@ -99,11 +93,9 @@ jobs:
     needs: buildprep
     steps:
       - name: Fetch prepared artifacts
-        uses: actions/download-artifact@v8
+        uses: atos-actions/download-artifact@248feaadb6062a09de762913065013f42f61470a
         with:
           name: prepared-source
-      - name: Extract prepared artifacts
-        run: tar xf prepared-source.tar
       - run: npm run lint
       - run: npm run lint:actions
       - run: npm run format

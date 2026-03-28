@@ -30,12 +30,14 @@ jobs:
         run: npm run genproto
       - name: Generate dev keys
         run: npm run genkeys
-      - name: Archive prepared artifacts
-        run: tar --exclude=.jj --exclude=.git -cvf prepared-source.tar * .*
       - name: Upload prepared artifacts
-        uses: actions/upload-artifact@v7
+        uses: atos-actions/upload-artifact@38bbb7b835d66503ae5df1473965079dc6ce8f65
         with:
           name: prepared-source
-          path: prepared-source.tar
+          path: |
+            .
+            !.git
+            !.jj
           if-no-files-found: error
           retention-days: 1
+          compression-level: 1
