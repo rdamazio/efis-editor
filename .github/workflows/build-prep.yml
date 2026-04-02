@@ -31,7 +31,7 @@ jobs:
       - name: Generate dev keys
         run: npm run genkeys
       - name: Upload prepared artifacts
-        uses: atos-actions/upload-artifact@38bbb7b835d66503ae5df1473965079dc6ce8f65
+        uses: atos-actions/upload-artifact@83539d851aae0ec2e0c3ad7912ccfb66e13f0843
         with:
           name: prepared-source
           path: |
