@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Fetch prepared artifacts
-        uses: atos-actions/download-artifact@248feaadb6062a09de762913065013f42f61470a
+        uses: atos-actions/download-artifact@d1e3e6643ea5c245d882277db031c31739e83d3e
         with:
           name: prepared-source
       - name: Build
@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Fetch prepared artifacts
-        uses: atos-actions/download-artifact@248feaadb6062a09de762913065013f42f61470a
+        uses: atos-actions/download-artifact@d1e3e6643ea5c245d882277db031c31739e83d3e
         with:
           name: prepared-source
       - name: Install Playwright browsers
@@ -69,7 +69,7 @@ jobs:
 
     steps:
       - name: Fetch prepared artifacts
-        uses: atos-actions/download-artifact@248feaadb6062a09de762913065013f42f61470a
+        uses: atos-actions/download-artifact@d1e3e6643ea5c245d882277db031c31739e83d3e
         with:
           name: prepared-source
       - name: Install Playwright browser
@@ -93,7 +93,7 @@ jobs:
     needs: buildprep
     steps:
       - name: Fetch prepared artifacts
-        uses: atos-actions/download-artifact@248feaadb6062a09de762913065013f42f61470a
+        uses: atos-actions/download-artifact@d1e3e6643ea5c245d882277db031c31739e83d3e
         with:
           name: prepared-source
       - run: npm run lint
