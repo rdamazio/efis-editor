@@ -102,10 +102,16 @@
             "providersFile": "src/test-providers.ts",
             "tsConfig": "tsconfig.spec.json",
             "watch": false,
-            "browsers": ["chromium", "firefox"],
             "browserViewport": "1280x1024"
           },
+          "defaultConfiguration": "browsers",
           "configurations": {
+            "quick": {
+              "browsers": ["chromium"]
+            },
+            "browsers": {
+              "browsers": ["chromium", "firefox"]
+            },
             "coverage": {
               "browsers": ["chromium"],
               "coverageThresholds": {

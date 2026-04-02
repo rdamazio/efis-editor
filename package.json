@@ -15,6 +15,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch",
     "test:headless": "ng test --headless",
+    "test:quick": "ng test --configuration quick --headless",
     "test:coverage": "ng test --configuration coverage --headless --coverage",
     "lint": "ng lint",
     "format": "prettier --check \"{./*,src/**/*}.{js,json,ts,html,css,scss}\" \"./public/site.webmanifest\"",
