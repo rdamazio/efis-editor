@@ -82,6 +82,11 @@ describe('ChecklistFileInfoComponent', () => {
     defaultChecklistBox = await screen.findByRole('combobox', { name: /Default checklist.*/ });
   }
 
+  async function pasteInto(element: HTMLInputElement, text: string) {
+    await user.dblClick(element);
+    await user.paste(text);
+  }
+
   it('should open and cancel the dialog', async () => {
     await openDialog();
 
@@ -107,12 +112,12 @@ describe('ChecklistFileInfoComponent', () => {
     await openDialog();
 
     const newMetadata = EXPECTED_CONTENTS.metadata!;
-    await user.clear(nameBox);
-    await user.type(nameBox, newMetadata.name);
-    await user.type(aircraftMakeModelBox, newMetadata.makeAndModel);
-    await user.type(aircraftInfoBox, newMetadata.aircraftInfo);
-    await user.type(manufacturerBox, newMetadata.manufacturerInfo);
-    await user.type(copyrightBox, newMetadata.copyrightInfo);
+    // Pasting is significantly faster than user.type which simulates each key press individually.
+    await pasteInto(nameBox, newMetadata.name);
+    await pasteInto(aircraftMakeModelBox, newMetadata.makeAndModel);
+    await pasteInto(aircraftInfoBox, newMetadata.aircraftInfo);
+    await pasteInto(manufacturerBox, newMetadata.manufacturerInfo);
+    await pasteInto(copyrightBox, newMetadata.copyrightInfo);
     await user.click(okButton);
 
     const dialogs = await loader.getAllHarnesses(MatDialogHarness);

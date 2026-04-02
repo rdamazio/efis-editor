@@ -54,9 +54,12 @@ describe('ChecklistsComponent', () => {
     const isPC = !navigator.userAgent.includes('Macintosh');
     metaKey = isPC ? 'ControlLeft' : 'MetaLeft';
 
-    user = userEvent.setup();
+    user = userEvent.setup({ delay: null });
 
     navData = { routeTitle: signal(undefined), fileName: signal(undefined) };
+
+    window.location.hash = '';
+
     rendered = await render(ChecklistsComponent, {
       providers: [
         { provide: ROUTER_OUTLET_DATA, useValue: signal(navData) },
@@ -85,6 +88,7 @@ describe('ChecklistsComponent', () => {
   ));
 
   afterEach(async () => {
+    await rendered.fixture.whenStable();
     await storage.clear();
     vi.setConfig({ testTimeout: originalTimeout });
   });
@@ -93,7 +97,7 @@ describe('ChecklistsComponent', () => {
     const completed = waitForStorage ? storageCompletion() : undefined;
     await user.click(screen.getByRole('button', { name: 'New file' }));
     const checklistTitleBox = await screen.findByRole('textbox', { name: 'Title' });
-    await user.type(checklistTitleBox, `${fileName}[Enter]`);
+    await retype(checklistTitleBox, `${fileName}[Enter]`);
 
     rendered.detectChanges();
     await rendered.fixture.whenStable();
@@ -120,7 +124,7 @@ describe('ChecklistsComponent', () => {
     await user.click(addGroupButton);
 
     const checklistTitleBox = await screen.findByRole('textbox', { name: 'Title' });
-    await user.type(checklistTitleBox, `${groupTitle}[Enter]`);
+    await retype(checklistTitleBox, `${groupTitle}[Enter]`);
 
     await storageCompleted(completed);
   }
@@ -162,7 +166,16 @@ describe('ChecklistsComponent', () => {
 
   async function retype(element: HTMLElement, text: string) {
     await user.clear(element);
-    await user.type(element, text);
+
+    if (text.endsWith('[Enter]')) {
+      const pasteText = text.slice(0, -7);
+      if (pasteText) {
+        await user.paste(pasteText);
+      }
+      await user.keyboard('[Enter]');
+    } else {
+      await user.paste(text);
+    }
   }
 
   async function setFragment(fragment: string) {
@@ -721,6 +734,7 @@ describe('ChecklistsComponent', () => {
       // Items present: ['New prompt', 'Other prompt']
 
       // Move back up and modify the first item again.
+      await debounce();
       await user.keyboard('[ArrowUp]');
       await user.keyboard('[Enter]');
 
@@ -758,7 +772,9 @@ describe('ChecklistsComponent', () => {
       // Select and shift the item.
       const completed = storageCompletion();
       await user.keyboard('[ArrowDown]');
+      await debounce();
       await user.keyboard('[ShiftLeft>][ArrowRight][/ShiftLeft]');
+      await debounce();
 
       // Verify that it was indented in storage.
       const expectedFile = ChecklistFile.clone(NEW_FILE);

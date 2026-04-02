@@ -74,15 +74,17 @@ export class ChecklistStorage {
   }
 
   async clear() {
-    // Clear only checklist items.
-    const ids = this._filesSubject$.value;
-    const allDeletes: Promise<void>[] = [];
-    for (const id of ids) {
-      allDeletes.push(this.deleteChecklistFile(id));
-    }
-    await Promise.all(allDeletes);
-
     const store = await this._browserStorage.storage;
+    const keysToDelete: string[] = [];
+    for (let i = 0; i < store.length; i++) {
+      const k = store.key(i);
+      if (k?.startsWith(CHECKLIST_PREFIX)) {
+        keysToDelete.push(k);
+      }
+    }
+    for (const k of keysToDelete) {
+      store.removeItem(k);
+    }
     this._publishList(store);
   }
 }

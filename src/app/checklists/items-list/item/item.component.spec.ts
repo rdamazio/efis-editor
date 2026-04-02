@@ -16,7 +16,7 @@ describe('ChecklistItemComponent', () => {
   let item: ChecklistItem;
 
   beforeEach(() => {
-    user = userEvent.setup();
+    user = userEvent.setup({ delay: null });
     itemChange = vi.fn().mockName('ChecklistItemComponent.itemChange');
     itemDeleted = vi.fn().mockName('ChecklistItemComponent.itemDeleted');
 

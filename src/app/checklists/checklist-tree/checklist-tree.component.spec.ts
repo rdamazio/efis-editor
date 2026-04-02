@@ -14,7 +14,7 @@ describe('ChecklistTreeComponent', () => {
   let selectedChecklistGroup: Mock<(value: ChecklistGroup | undefined) => void>;
 
   beforeEach(() => {
-    user = userEvent.setup();
+    user = userEvent.setup({ delay: null });
     file = ChecklistFile.clone(EXPECTED_CONTENTS);
     selectedChecklistInput = undefined;
 

@@ -16,7 +16,7 @@ describe('ChecklistItemsComponent', () => {
   let fixture: ComponentFixture<ChecklistItemsComponent>;
 
   beforeEach(async () => {
-    user = userEvent.setup();
+    user = userEvent.setup({ delay: null });
     checklist = Checklist.clone(EXPECTED_CONTENTS.groups[0].checklists[0]);
     checklistChange = vi.fn(onChecklistChanged).mockName('ChecklistItemsComponent.checklistChange');
 

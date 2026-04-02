@@ -52,7 +52,7 @@ describe('PrintDialogComponent', () => {
   let completionActions: HTMLElement;
 
   beforeEach(async () => {
-    user = userEvent.setup();
+    user = userEvent.setup({ delay: null });
     dataOut = vi.fn();
     dataOut.mockName('PrintDialogComponent.dataOut');
 
