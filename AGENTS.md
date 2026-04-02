@@ -72,6 +72,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use the `jj` version control system.
 - jj automatically adds files to the next commit, so you don't need to use `jj add`.
 - Create a commit (`jj commit -m "COMMIT MESSAGE"`) after each logical change.
+- Remember to remove any temporary files you created, such as scripts, before creating the commit.
 - Use descriptive, semantic commit messages
 - Commit messages should be in the format "TYPE(SCOPE): DESCRIPTION"
 - Commit message types are "feat", "fix", "refactor", "docs", "lint", "build", "formats", "revert", "test"
