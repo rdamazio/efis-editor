@@ -13,33 +13,25 @@ permissions:
   contents: read
 
 jobs:
-  buildprep:
-    name: Prepare code
-    uses: rdamazio/efis-editor/.github/workflows/build-prep.yml@main
-
   build:
     name: Code builds
     runs-on: ubuntu-latest
-    needs: buildprep
 
     steps:
-      - name: Fetch prepared artifacts
-        uses: atos-actions/download-artifact@d1e3e6643ea5c245d882277db031c31739e83d3e
-        with:
-          name: prepared-source
+      - uses: actions/checkout@v6
+      - name: Prepare build
+        uses: ./.github/actions/build-prep
       - name: Build
         run: npm run build
 
   test:
     name: Tests pass
     runs-on: ubuntu-latest
-    needs: buildprep
 
     steps:
-      - name: Fetch prepared artifacts
-        uses: atos-actions/download-artifact@d1e3e6643ea5c245d882277db031c31739e83d3e
-        with:
-          name: prepared-source
+      - uses: actions/checkout@v6
+      - name: Prepare build
+        uses: ./.github/actions/build-prep
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox
       - name: Run tests
@@ -65,13 +57,11 @@ jobs:
   coverage:
     name: Code coverage
     runs-on: ubuntu-latest
-    needs: buildprep
 
     steps:
-      - name: Fetch prepared artifacts
-        uses: atos-actions/download-artifact@d1e3e6643ea5c245d882277db031c31739e83d3e
-        with:
-          name: prepared-source
+      - uses: actions/checkout@v6
+      - name: Prepare build
+        uses: ./.github/actions/build-prep
       - name: Install Playwright browser
         # Coverage only works on Chromium.
         run: npx playwright install --with-deps chromium
@@ -90,12 +80,10 @@ jobs:
   lint:
     name: Linters
     runs-on: ubuntu-latest
-    needs: buildprep
     steps:
-      - name: Fetch prepared artifacts
-        uses: atos-actions/download-artifact@d1e3e6643ea5c245d882277db031c31739e83d3e
-        with:
-          name: prepared-source
+      - uses: actions/checkout@v6
+      - name: Prepare build
+        uses: ./.github/actions/build-prep
       - run: npm run lint
       - run: npm run lint:actions
       - run: npm run format
