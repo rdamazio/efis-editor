@@ -1,6 +1,10 @@
 name: 'Build preparation'
 description: 'Prepares the environment for building'
 
+inputs:
+  browsers:
+    description: 'Space-separated list of browsers to install with Playwright'
+
 runs:
   using: 'composite'
   steps:
@@ -19,4 +23,8 @@ runs:
       shell: bash
     - name: Generate dev keys
       run: npm run genkeys
+      shell: bash
+    - name: Install Playwright browsers
+      if: ${{ inputs.browsers != '' }}
+      run: npx playwright install --with-deps ${{ inputs.browsers }}
       shell: bash

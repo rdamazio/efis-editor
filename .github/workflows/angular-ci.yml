@@ -32,8 +32,8 @@ jobs:
       - uses: actions/checkout@v6
       - name: Prepare build
         uses: ./.github/actions/build-prep
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium firefox
+        with:
+          browsers: chromium firefox
       - name: Run tests
         # Attempt to re-run in case there's flakiness.
         run: npm run test:headless || npm run test:headless
@@ -62,9 +62,9 @@ jobs:
       - uses: actions/checkout@v6
       - name: Prepare build
         uses: ./.github/actions/build-prep
-      - name: Install Playwright browser
-        # Coverage only works on Chromium.
-        run: npx playwright install --with-deps chromium
+        with:
+          # Coverage only works on Chromium.
+          browsers: chromium
       - name: Run test coverage
         run: npm run test:coverage
       - name: Upload coverage results
