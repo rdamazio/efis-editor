@@ -1,18 +1,17 @@
 import {
-  Checklist,
-  Checklist_CompletionAction,
-  ChecklistFile,
-  ChecklistFileMetadata,
-  ChecklistGroup,
-  ChecklistGroup_Category,
-  ChecklistItem,
-  ChecklistItem_Type,
+    Checklist,
+    Checklist_CompletionAction,
+    ChecklistFile,
+    ChecklistFileMetadata,
+    ChecklistGroup,
+    ChecklistGroup_Category,
+    ChecklistItem,
+    ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
 import { FormatUtils } from './format-utils';
-import { TextFormatOptions } from './text-format-options';
 
-export class TextReader {
-  constructor(private readonly _file: File, private readonly _options?: TextFormatOptions) {}
+export class PlaintextReader {
+  constructor(private readonly _file: File) {}
 
   public async read(): Promise<ChecklistFile> {
     const text = await this._file.text();

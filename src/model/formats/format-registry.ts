@@ -18,6 +18,7 @@ import { GrtFormat } from './grt-format';
 import { JsonFormat } from './json-format';
 import { PdfFormat } from './pdf-format';
 import { TXT_EXTENSION } from './text-format-options';
+import { TxtFormat } from './txt-format';
 
 class FormatRegistry {
   private readonly _outputFormats = new Map<FormatId, AbstractChecklistFormat>();
@@ -98,6 +99,10 @@ FORMAT_REGISTRY.register(GrtFormat, FormatId.GRT, 'Grand Rapids Technologies', {
 });
 FORMAT_REGISTRY.register(JsonFormat, FormatId.JSON, 'Raw data');
 FORMAT_REGISTRY.register(PdfFormat, FormatId.PDF, 'Printable PDF', { supportsImport: false });
+FORMAT_REGISTRY.register(TxtFormat, FormatId.TXT, 'Plain Text', {
+  supportsImport: true,
+  extension: TXT_EXTENSION,
+});
 
 export async function serializeChecklistFile(
   checklistFile: ChecklistFile,
@@ -115,5 +120,15 @@ export async function parseChecklistFile(file: File): Promise<ChecklistFile> {
     return Promise.reject(new FormatError(`Unknown file extension "${extension}".`));
   }
 
-  return Promise.any(formats.map(async (format) => format.toProto(file)));
+  const errors: Error[] = [];
+  for (const format of formats) {
+    try {
+      return await format.toProto(file);
+    } catch (e) {
+      // Keep track of failures but proceed to check the next matching format
+      errors.push(e as Error);
+    }
+  }
+
+  throw new AggregateError(errors, `File could not be parsed by any supported format for extension ${extension}.`);
 }
