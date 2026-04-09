@@ -92,10 +92,11 @@ export class TextReader {
   }
 
   private _parseItem(line: string): ChecklistItem {
-    const splitIndex = line.indexOf(' - ');
+    const separator = this._options?.expectationSeparator ?? ' - ';
+    const splitIndex = line.indexOf(separator);
     if (splitIndex !== -1) {
       const prompt = line.substring(0, splitIndex).trim();
-      const expectation = line.substring(splitIndex + 3).trim();
+      const expectation = line.substring(splitIndex + separator.length).trim();
       return ChecklistItem.create({
         type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
         prompt,
