@@ -14,7 +14,7 @@ export const IFLY_EFB_FORMAT_OPTIONS: TextFormatOptions = {
   readChecklistPrefix: '>> ',
 
   groupTitleInOwnLine: true,
-  expectationSeparator: ' - ',
+  expectationSeparator: ': ',
   notePrefix: 'NOTE: ',
   titlePrefixSuffix: '** ',
   warningPrefix: 'WARNING: ',
