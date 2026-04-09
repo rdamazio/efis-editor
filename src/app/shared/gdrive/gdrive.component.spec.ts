@@ -21,7 +21,6 @@ describe('GoogleDriveComponent', () => {
     user = userEvent.setup();
 
     gdrive = mock<GoogleDriveStorage>();
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
     state$ = new BehaviorSubject<DriveSyncState>(DriveSyncState.DISCONNECTED);
     downloads$ = new Subject<string>();
     errors$ = new Subject<string>();
