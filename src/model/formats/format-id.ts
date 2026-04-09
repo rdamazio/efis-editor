@@ -7,6 +7,7 @@ export const enum FormatId {
   FOREFLIGHT = 'fmd',
   GARMIN_PILOT = 'gplt',
   GRT = 'grt',
+  IFLY_EFB = 'ifly',
   JSON = 'json',
   PDF = 'pdf',
   TXT = 'txt',

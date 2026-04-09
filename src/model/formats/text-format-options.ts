@@ -28,11 +28,22 @@ export interface TextFormatOptions {
   groupNameSeparator?: string;
   // If true, the first group name will not be output.
   skipFirstGroup?: boolean;
+  // If true, group titles will be on their own line.
+  groupTitleInOwnLine?: boolean;
+  // Prefix for a line that starts a new group, for writing.
+  groupPrefix?: string;
 
   checklistTopBlankLine?: boolean;
 
   // Whether to output a fake checklist with checklist metadata.
   outputMetadata?: boolean;
+  // Whether to output the header comment. Defaults to true.
+  outputHeaderComment?: boolean;
+
+  // Prefix for a line that starts a new group, for reading.
+  readGroupPrefix?: string;
+  // Prefix for a line that starts a new checklist, for reading.
+  readChecklistPrefix?: string;
 
   // For these, {{checklistNum}} and {{itemNum}} will be replaced by sequential counters.
   checklistPrefix: string;

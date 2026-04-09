@@ -33,11 +33,14 @@ export class TextReader {
     let currentGroup: ChecklistGroup | undefined = undefined;
     let currentChecklist: Checklist | undefined = undefined;
 
+    const groupPrefix = this._options?.readGroupPrefix ?? '> ';
+    const checklistPrefix = this._options?.readChecklistPrefix ?? '>> ';
+
     for (const rawLine of lines) {
       const line = rawLine.trim();
 
-      if (line.startsWith('>> ')) {
-        const title = line.substring(3).trim();
+      if (line.startsWith(checklistPrefix)) {
+        const title = line.substring(checklistPrefix.length).trim();
         currentChecklist = Checklist.create({
           title,
           completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
@@ -52,8 +55,8 @@ export class TextReader {
           outFile.groups.push(currentGroup);
         }
         currentGroup.checklists.push(currentChecklist);
-      } else if (line.startsWith('> ')) {
-        const title = line.substring(2).trim();
+      } else if (line.startsWith(groupPrefix)) {
+        const title = line.substring(groupPrefix.length).trim();
         
         let category = ChecklistGroup_Category.normal;
         const upperTitle = title.toUpperCase();
