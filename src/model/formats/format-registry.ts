@@ -15,6 +15,7 @@ import { ForeFlightFormat } from './foreflight-format';
 import { FormatId } from './format-id';
 import { GarminPilotFormat } from './garmin-pilot-format';
 import { GrtFormat } from './grt-format';
+import { IflyEfbFormat } from './ifly-efb-format';
 import { JsonFormat } from './json-format';
 import { PdfFormat } from './pdf-format';
 import { TXT_EXTENSION } from './text-format-options';
@@ -97,6 +98,7 @@ FORMAT_REGISTRY.register(GrtFormat, FormatId.GRT, 'Grand Rapids Technologies', {
   supportsImport: true,
   extension: TXT_EXTENSION,
 });
+FORMAT_REGISTRY.register(IflyEfbFormat, FormatId.IFLY_EFB, 'iFly EFB');
 FORMAT_REGISTRY.register(JsonFormat, FormatId.JSON, 'Raw data');
 FORMAT_REGISTRY.register(PdfFormat, FormatId.PDF, 'Printable PDF', { supportsImport: false });
 FORMAT_REGISTRY.register(TxtFormat, FormatId.TXT, 'Plain Text', {
