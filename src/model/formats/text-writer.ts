@@ -25,18 +25,28 @@ export class TextWriter {
   }
 
   public write(file: ChecklistFile): Blob {
-    this._addLine(HEADER_COMMENT);
+    if (this._options.outputHeaderComment !== false) {
+      this._addLine(HEADER_COMMENT);
+    }
 
     let firstGroup = true;
     let checklistIdx = 0;
     for (const group of file.groups) {
+      if (this._options.groupTitleInOwnLine) {
+        this._addLine();
+        if (this._options.groupPrefix) {
+          this._addPart(this._options.groupPrefix);
+        }
+        this._addLine(this._normalizeText(group.title));
+      }
+
       for (const checklist of group.checklists) {
         this._addLine();
         this._addPart(this._replaceNumbers(this._options.checklistPrefix, checklistIdx, 0));
         this._addPart(' ');
-        if (!firstGroup || !this._options.skipFirstGroup) {
+        if (!this._options.groupTitleInOwnLine && (!firstGroup || !this._options.skipFirstGroup)) {
           this._addPart(this._normalizeText(group.title));
-          this._addPart(': ');
+          this._addPart(this._options.groupNameSeparator ?? ': ');
         }
         this._addLine(this._normalizeText(checklist.title));
 
