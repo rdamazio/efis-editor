@@ -7,11 +7,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconButtonSizesModule } from 'mat-icon-button-sizes';
 import { DynamicDataPipe } from './dynamic-data.pipe';
+import { HighlightTermsDirective } from './highlight-terms-directive';
 
 @Component({
   selector: 'editable-label',
   imports: [
     DynamicDataPipe,
+    HighlightTermsDirective,
     MatButtonModule,
     MatFormFieldModule,
     MatIconButtonSizesModule,
@@ -35,6 +37,8 @@ export class EditableLabelComponent {
   readonly editing = model<boolean>();
   readonly value = model('');
   readonly label = input('');
+  readonly highlightedTerms = input<string[]>([]);
+  readonly highlightClass = input<string>('');
   readonly disableSave = input(false);
   readonly disallowEmpty = input(false);
   readonly dynamicData = input(false);
