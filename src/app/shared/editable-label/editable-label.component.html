@@ -1,8 +1,12 @@
 @if (!editing()) {
   @if (dynamicData()) {
-    {{ value() | dynamicData: isExpectation() }}
+    <span
+      [highlightTerms]="highlightedTerms()"
+      [highlightClass]="highlightClass()"
+      [text]="value() | dynamicData: isExpectation()"
+    ></span>
   } @else {
-    {{ value() }}
+    <span [highlightTerms]="highlightedTerms()" [highlightClass]="highlightClass()" [text]="value()"></span>
   }
 } @else {
   <mat-form-field appearance="outline" class="editable-input-field">
