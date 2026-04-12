@@ -161,3 +161,7 @@
   width: auto;
   flex-grow: 1;
 }
+
+:host ::ng-deep .highlight {
+  background-color: mat.get-theme-color(theme.$efis-editor-theme, tertiary, 90) !important;
+}
