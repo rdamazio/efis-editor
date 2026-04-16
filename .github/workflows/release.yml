@@ -55,7 +55,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v5
       - name: Create tag
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             github.rest.git.updateRef({
