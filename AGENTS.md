@@ -61,6 +61,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 ## Testing
 
 - Use the `vitest` framework for unit testing
+- Use angular testing-library for testing components or directives. Prefer it to the built-in Angular testing utilities, but don't hesitate to use the Angular testing utilities when they are more convenient.
 - Execute tests with `npm run test:headless`
 - To run only a specific test, use `npm run test:headless -- --include <test-file-name>`
 - Do not use `npm run test`
