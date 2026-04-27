@@ -27,6 +27,8 @@ export abstract class ExportOptions {}
 
 export abstract class AbstractChecklistFormat<T extends FormatOptions = FormatOptions> {
   public readonly supportsImport: boolean;
+  public abstract readonly mimeType: string;
+
   protected readonly _extension?: FileExtension;
 
   constructor(

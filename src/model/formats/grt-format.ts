@@ -24,6 +24,8 @@ export const GRT_FORMAT_OPTIONS: TextFormatOptions = {
 };
 
 export class GrtFormat extends AbstractChecklistFormat {
+  public readonly mimeType = 'text/plain';
+
   public async toProto(file: File): Promise<ChecklistFile> {
     return new TextReader(file, GRT_FORMAT_OPTIONS).read();
   }

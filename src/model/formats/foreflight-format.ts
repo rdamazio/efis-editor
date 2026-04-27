@@ -37,6 +37,8 @@ export class ForeFlightFormatError extends FormatError {
  *   Multiline ForeFlight notes are expanded as multiple indented text elements.
  */
 export class ForeFlightFormat extends AbstractChecklistFormat {
+  public readonly mimeType = 'application/octet-stream';
+
   public async toProto(file: File): Promise<ChecklistFile> {
     return ForeFlightReader.read(file);
   }

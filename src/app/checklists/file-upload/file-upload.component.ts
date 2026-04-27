@@ -13,7 +13,10 @@ import { FORMAT_REGISTRY, parseChecklistFile } from '../../../model/formats/form
 })
 export class ChecklistFileUploadComponent {
   readonly fileUploaded = output<ChecklistFile>();
-  protected readonly _acceptExtensions = FORMAT_REGISTRY.getSupportedInputExtensions();
+  protected readonly _accept = [
+    FORMAT_REGISTRY.getSupportedInputExtensions(),
+    FORMAT_REGISTRY.getSupportedMimeTypes(),
+  ].join(', ');
 
   constructor(private readonly _snackBar: MatSnackBar) {}
 

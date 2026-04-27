@@ -2,6 +2,8 @@ import { ChecklistFile, ChecklistGroup, ChecklistGroup_Category } from '../../..
 import { AbstractChecklistFormat } from './abstract-format';
 
 export class JsonFormat extends AbstractChecklistFormat {
+  public readonly mimeType = 'application/json';
+
   public async toProto(file: File): Promise<ChecklistFile> {
     const contents = await file.text();
     const checklist = ChecklistFile.fromJsonString(contents);

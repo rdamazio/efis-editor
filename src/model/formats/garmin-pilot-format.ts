@@ -4,6 +4,8 @@ import { GarminPilotReader } from './garmin-pilot-reader';
 import { GarminPilotWriter } from './garmin-pilot-writer';
 
 export class GarminPilotFormat extends AbstractChecklistFormat {
+  public readonly mimeType = 'application/gzip';
+
   public async toProto(file: File): Promise<ChecklistFile> {
     return await GarminPilotReader.read(file);
   }

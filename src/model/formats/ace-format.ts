@@ -4,6 +4,8 @@ import { AceReader } from './ace-reader';
 import { AceWriter } from './ace-writer';
 
 export class AceFormat extends AbstractChecklistFormat {
+  public readonly mimeType = 'application/octet-stream';
+
   public async toProto(file: File): Promise<ChecklistFile> {
     return new AceReader(file).read();
   }
