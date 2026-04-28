@@ -36,6 +36,8 @@ export interface DynonFormatOptions extends FormatOptions {
 }
 
 export class DynonFormat extends AbstractChecklistFormat {
+  public readonly mimeType = 'text/plain';
+
   private readonly _textFormatOptions: TextFormatOptions;
   private readonly _fileName: string;
 

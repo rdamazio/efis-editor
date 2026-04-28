@@ -62,6 +62,10 @@ class FormatRegistry {
     return [...this._inputFormats.keys()].sort().join(', ');
   }
 
+  public getSupportedMimeTypes(): string {
+    return [...new Set(this._inputFormats.values().map(([format]) => format.mimeType))].sort().join(', ');
+  }
+
   public getSupportedOutputFormats(): OutputFormat[] {
     return [...this._outputFormats.entries()].map(
       ([formatId, format]): OutputFormat => ({
