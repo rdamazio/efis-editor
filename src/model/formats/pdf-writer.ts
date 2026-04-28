@@ -198,7 +198,7 @@ export class PdfWriter {
     this._addPhysicalPage = this._doc.addPage.bind(this._doc);
     this._doc.addPage = () => {
       this._newPage();
-      return this._doc as jsPDF;
+      return this._doc;
     };
 
     this._dims = this._initStaticDimensions();
