@@ -1,6 +1,7 @@
-import { Component, output } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { BROWSERS, DeviceDetectorService } from 'ngx-device-detector';
 import { NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop';
 import { ChecklistFile } from '../../../../gen/ts/checklist';
 import { FORMAT_REGISTRY, parseChecklistFile } from '../../../model/formats/format-registry';
@@ -12,12 +13,13 @@ import { FORMAT_REGISTRY, parseChecklistFile } from '../../../model/formats/form
   styleUrl: './file-upload.component.scss',
 })
 export class ChecklistFileUploadComponent {
+  private readonly _deviceService = inject(DeviceDetectorService);
   readonly fileUploaded = output<ChecklistFile>();
-  protected readonly _accept = [
-    FORMAT_REGISTRY.getSupportedInputExtensions(),
-    FORMAT_REGISTRY.getSupportedMimeTypes(),
-  ].join(', ');
-
+  protected readonly _accept =
+    FORMAT_REGISTRY.getSupportedInputExtensions() +
+    (this._deviceService.deviceInfo().browser === BROWSERS.SAFARI
+      ? ', ' + FORMAT_REGISTRY.getSupportedMimeTypes()
+      : '');
   constructor(private readonly _snackBar: MatSnackBar) {}
 
   async onDropped(files: NgxFileDropEntry[]) {
