@@ -11,7 +11,7 @@
     "build": "ng build",
     "build:prod": "ng build --configuration production --base-href /efis-editor/",
     "genproto": "npx protoc --proto_path=src/model/proto --plugin=protoc-gen-ts=node_modules/@protobuf-ts/plugin/bin/protoc-gen-ts --ts_out=gen/ts src/model/proto/*.proto",
-    "genkeys": "[ -f src/environments/dev-keys.ts ] || echo 'export const GDRIVE_CLIENT_ID = '\\''YOUR_ID'\\'';' > src/environments/dev-keys.ts",
+    "genkeys": "node -e \"require('fs').existsSync('src/environments/dev-keys.ts') || require('fs').writeFileSync('src/environments/dev-keys.ts', 'export const GDRIVE_CLIENT_ID = \\'YOUR_ID\\';\\n')\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch",
     "test:headless": "ng test --headless",
