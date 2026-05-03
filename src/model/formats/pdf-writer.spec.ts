@@ -192,8 +192,7 @@ describe('PdfWriter', () => {
   async function parsePdf(data: ArrayBuffer): Promise<pdfjs.PDFDocumentProxy> {
     pdfjs.GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.js';
 
-    return pdfjs.getDocument({ data: data, useWorkerFetch: false, isEvalSupported: false, useSystemFonts: true })
-      .promise;
+    return pdfjs.getDocument({ data: data, useWorkerFetch: false, useSystemFonts: true }).promise;
   }
 
   async function pdfToText(pdf: pdfjs.PDFDocumentProxy): Promise<string> {
