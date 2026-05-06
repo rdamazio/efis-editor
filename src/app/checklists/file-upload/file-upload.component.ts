@@ -1,6 +1,7 @@
-import { Component, output } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DeviceDetectorService, OS } from 'ngx-device-detector';
 import { NgxFileDropEntry, NgxFileDropModule } from 'ngx-file-drop';
 import { ChecklistFile } from '../../../../gen/ts/checklist';
 import { FORMAT_REGISTRY, parseChecklistFile } from '../../../model/formats/format-registry';
@@ -13,7 +14,13 @@ import { FORMAT_REGISTRY, parseChecklistFile } from '../../../model/formats/form
 })
 export class ChecklistFileUploadComponent {
   readonly fileUploaded = output<ChecklistFile>();
-  protected readonly _acceptExtensions = FORMAT_REGISTRY.getSupportedInputExtensions();
+  protected readonly _deviceService = inject(DeviceDetectorService);
+  protected readonly _acceptExtensions =
+    FORMAT_REGISTRY.getSupportedInputExtensions() +
+    // Browsers on iOS ignore extensions, and if `accept` is not restricted, display a dialog asking to make a shot,
+    // select one from the camera roll or upload a file. Specifying at least one (apparently arbitrary) MIME type
+    // causes Safari to directly show an unrestricted file picker instead.
+    (this._deviceService.deviceInfo().os === OS.IOS ? ', application/octet-stream' : '');
 
   constructor(private readonly _snackBar: MatSnackBar) {}
 
