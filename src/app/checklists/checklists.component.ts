@@ -147,6 +147,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
 
   ngOnDestroy() {
     this._navData().routeTitle.set(undefined);
+    this._navData().fileName.set(undefined);
     this._hotkeys.unregisterShortcuts(this);
   }
 
