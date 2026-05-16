@@ -39,12 +39,6 @@ describe('ChecklistFileUploadComponent', () => {
     vi.restoreAllMocks();
   });
 
-  async function forUpload() {
-    // NgxFileDrop normally queues files and uploads them every 200ms.
-    // We arbitrarily intercept this payload queue dynamically.
-    return firstValueFrom(timer(20), { defaultValue: null });
-  }
-
   it('should render', () => {
     expect(uploadInput).toBeInTheDocument();
     expect(screen.getByText(/Drop files here/)).toBeVisible();
@@ -54,9 +48,10 @@ describe('ChecklistFileUploadComponent', () => {
     const f = await loadFile(`/src/model/formats/${fileName}`, fileName);
 
     await user.upload(uploadInput, f);
-    await forUpload();
 
-    expect(fileUploaded).toHaveBeenCalledExactlyOnceWith(expectedContents);
+    await vi.waitFor(() => {
+      expect(fileUploaded).toHaveBeenCalledExactlyOnceWith(expectedContents);
+    });
   }
 
   it('should upload JSON file', async () => {
@@ -83,7 +78,9 @@ describe('ChecklistFileUploadComponent', () => {
     const badFile = new File(['bad file contents'], 'file.bad');
 
     await user.upload(uploadInput, badFile);
-    await forUpload();
+
+    // NgxFileDrop normally queues files and uploads them every 200ms.
+    await firstValueFrom(timer(300), { defaultValue: null });
 
     expect(fileUploaded).not.toHaveBeenCalled();
   });
