@@ -4,6 +4,8 @@ description: 'Prepares the environment for building'
 inputs:
   browsers:
     description: 'Space-separated list of browsers to install with Playwright'
+  github-token:
+    description: 'GitHub token for fetching versions'
 
 runs:
   using: 'composite'
@@ -18,6 +20,8 @@ runs:
       shell: bash
     - name: Install ProtoC
       uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
+      with:
+        repo-token: ${{ inputs.github-token }}
     - name: Generate protos
       run: npm run genproto
       shell: bash

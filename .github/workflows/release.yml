@@ -24,6 +24,7 @@ jobs:
         uses: ./.github/actions/build-prep
         with:
           browsers: chromium firefox
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
       - name: Run tests
         run: npm run test:headless
       - name: Build

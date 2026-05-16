@@ -21,6 +21,8 @@ jobs:
       - uses: actions/checkout@v6
       - name: Prepare build
         uses: ./.github/actions/build-prep
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
       - name: Build
         run: npm run build
 
@@ -34,6 +36,7 @@ jobs:
         uses: ./.github/actions/build-prep
         with:
           browsers: chromium firefox
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
       - name: Run tests
         # Attempt to re-run in case there's flakiness.
         run: npm run test:headless || npm run test:headless
@@ -65,6 +68,7 @@ jobs:
         with:
           # Coverage only works on Chromium.
           browsers: chromium
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
       - name: Run test coverage
         run: npm run test:coverage
       - name: Upload coverage results
@@ -84,6 +88,8 @@ jobs:
       - uses: actions/checkout@v6
       - name: Prepare build
         uses: ./.github/actions/build-prep
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
       - run: npm run lint
       - run: npm run lint:actions
       - run: npm run format
