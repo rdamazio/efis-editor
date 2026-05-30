@@ -19,6 +19,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use signals for state management
 - Implement lazy loading for feature routes
 - Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
+- Don't directly inspect or manipulate the DOM if you can avoid it - use Angular primitives instead.
 - Use `NgOptimizedImage` for all static images.
   - `NgOptimizedImage` does not work for inline base64 images.
 - Use the linter (`npm run lint`) to check for style issues, but only as a last step after everything is done.
