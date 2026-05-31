@@ -18,8 +18,9 @@ runs:
     - name: Install npm dependencies
       run: npm ci
       shell: bash
-    - name: Install ProtoC
-      uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
+    # TODO: swicth back to `arduino/setup-protoc@v3` after it supports Node 24
+    - name: Install Protoc
+      uses: StackOverflowExcept1on/setup-protoc@f5f2b9afbd3d14a13caf3e0b4f6c109ed8f3e89c # node24
       with:
         repo-token: ${{ inputs.github-token }}
     - name: Generate protos
