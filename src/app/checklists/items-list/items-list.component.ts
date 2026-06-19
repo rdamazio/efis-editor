@@ -9,7 +9,7 @@ import {
   ElementRef,
   Injector,
   input,
-  linkedSignal,
+  model,
   output,
   signal,
   viewChild,
@@ -60,11 +60,8 @@ export class ChecklistItemsComponent {
     { label: 'Blank row', type: ChecklistItem_Type.ITEM_SPACE },
   ];
 
-  readonly checklistInput = input<Checklist | undefined>(undefined, { alias: 'checklist' });
-  readonly checklist = linkedSignal(this.checklistInput);
-  // Angular's model uses reference equality to decide whether to emit, so we must use
-  // an explicit output to notify about deeper changes in the object.
-  readonly checklistChange = output<Checklist | undefined>();
+  readonly checklist = model<Checklist | undefined>(undefined);
+  readonly checklistModified = output<Checklist | undefined>();
 
   readonly groupDropListIds = input<string[]>([]);
   readonly items = viewChildren(ChecklistItemComponent);
@@ -117,7 +114,7 @@ export class ChecklistItemsComponent {
   }
 
   onItemsUpdated(selectedIdx?: number, editSelectedItem = false) {
-    this.checklistChange.emit(this.checklist());
+    this.checklistModified.emit(this.checklist());
     afterNextRender(
       () => {
         this.updateScrollShadow();

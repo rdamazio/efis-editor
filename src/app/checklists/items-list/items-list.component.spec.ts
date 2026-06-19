@@ -22,7 +22,7 @@ describe('ChecklistItemsComponent', () => {
 
     rendered = await render(ChecklistItemsComponent, {
       inputs: { checklist },
-      on: { checklistChange },
+      on: { checklistModified: checklistChange },
     });
     fixture = rendered.fixture;
   });
