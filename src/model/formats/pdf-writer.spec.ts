@@ -1,5 +1,5 @@
 import * as pdfjs from 'pdfjs-dist';
-import 'pdfjs-dist/build/pdf.worker';
+import 'pdfjs-dist/build/pdf.worker.mjs';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { FormatId } from './format-id';
 import { serializeChecklistFile } from './format-registry';
@@ -190,7 +190,7 @@ describe('PdfWriter', () => {
   }
 
   async function parsePdf(data: ArrayBuffer): Promise<pdfjs.PDFDocumentProxy> {
-    pdfjs.GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.js';
+    pdfjs.GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.mjs';
 
     return pdfjs.getDocument({ data: data, useWorkerFetch: false, useSystemFonts: true }).promise;
   }
