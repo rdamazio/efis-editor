@@ -301,8 +301,7 @@ describe('ChecklistItemsComponent', () => {
 
     await fixture.whenStable();
 
-    // eslint-disable-next-line testing-library/no-node-access
-    expect(document.activeElement).toBe(editBox);
+    expect(editBox).toHaveFocus();
 
     await user.keyboard('[Escape]');
 

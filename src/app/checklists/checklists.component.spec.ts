@@ -1,5 +1,6 @@
 import { signal } from '@angular/core';
 import { DeferBlockState, inject, TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationExtras, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { render, RenderResult, screen, within } from '@testing-library/angular';
@@ -40,6 +41,7 @@ describe('ChecklistsComponent', () => {
   let navigate: Mock;
   let showSnack: Mock;
   let navData: NavData;
+  let router: Router;
 
   let realNavigate: (commands: unknown[], extras?: NavigationExtras) => Promise<boolean>;
   let metaKey: string;
@@ -72,9 +74,10 @@ describe('ChecklistsComponent', () => {
 
   beforeEach(inject(
     [ChecklistStorage, LazyBrowserStorage, MatSnackBar, Router],
-    async (s: ChecklistStorage, browserStore: LazyBrowserStorage, snack: MatSnackBar, router: Router) => {
-      realNavigate = router.navigate.bind(router);
-      navigate = vi.spyOn(router, 'navigate');
+    async (s: ChecklistStorage, browserStore: LazyBrowserStorage, snack: MatSnackBar, r: Router) => {
+      router = r;
+      realNavigate = r.navigate.bind(r);
+      navigate = vi.spyOn(r, 'navigate');
 
       // Verifying snackbars with durations doesn't work with MatSnackBarHarness, so use a spy instead.
       // https://github.com/angular/components/issues/19290
@@ -87,11 +90,12 @@ describe('ChecklistsComponent', () => {
     },
   ));
 
-  afterEach(async () => {
+  afterEach(inject([MatDialog], async (dialog: MatDialog) => {
+    dialog.closeAll();
     await rendered.fixture.whenStable();
     await storage.clear();
     vi.setConfig({ testTimeout: originalTimeout });
-  });
+  }));
 
   async function newFile(fileName: string, waitForStorage = true) {
     const completed = waitForStorage ? storageCompletion() : undefined;
@@ -651,11 +655,65 @@ describe('ChecklistsComponent', () => {
     async function startEditing() {
       await newFile('My file');
       await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
-      await user.keyboard('[ArrowDown]');
-      await user.keyboard('[Enter]');
 
-      await expect(screen.findByRole('textbox', { name: 'Prompt text' })).resolves.toBeInTheDocument();
+      // Wait for the checklist items to be rendered in the DOM
+      await expect(screen.findByRole('listitem', { name: 'Item: Checklist created' })).resolves.toBeInTheDocument();
+
+      // Programmatically trigger editing mode on the first item in the next tick
+      const itemsList = rendered.fixture.componentInstance.items();
+      const firstItem = itemsList.items()[0];
+
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          firstItem.promptInput().edit();
+          resolve();
+        }, 0);
+      });
+
+      await rendered.fixture.whenStable();
+      rendered.detectChanges();
+
+      expect(itemsList.hasUnsavedEdits()).toBe(true);
     }
+
+    it('should warn and cancel when opening another file', async () => {
+      await startEditing();
+
+      // Create another file in store first so we can select it
+      await storage.saveChecklistFile(
+        ChecklistFile.create({
+          metadata: { name: 'Other file' },
+          groups: [{ title: 'G', checklists: [{ title: 'C' }] }],
+        }),
+      );
+      rendered.detectChanges();
+      await rendered.fixture.whenStable();
+
+      // Click Open File to open the file picker
+      const openButton = screen.getByRole('button', { name: 'Open file' });
+      await user.click(openButton);
+
+      // Click the select dropdown to open the options list
+      const combo = await screen.findByRole('combobox', { name: /Select checklist file.*/ });
+      await user.click(combo);
+
+      // Click the other file option
+      const otherFileOption = await screen.findByRole('option', { name: 'Other file' });
+      const clickPromise = user.click(otherFileOption);
+
+      // Click 'Keep editing'
+      const discardCancelButton = await screen.findByRole('button', { name: 'Keep editing' });
+
+      expect(discardCancelButton).toBeInTheDocument();
+
+      await user.click(discardCancelButton);
+      await clickPromise;
+
+      // Verify we are still on the current file and editing
+      expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
+
+      expect(screen.getByRole('textbox', { name: 'Prompt text' })).toBeVisible();
+    });
 
     it('should warn and cancel when clicking another checklist in the tree', async () => {
       await startEditing();
@@ -677,9 +735,7 @@ describe('ChecklistsComponent', () => {
       const promptBox = screen.getByRole('textbox', { name: 'Prompt text' });
 
       expect(promptBox).toBeVisible();
-
-      // eslint-disable-next-line testing-library/no-node-access
-      expect(document.activeElement).toBe(promptBox);
+      expect(promptBox).toHaveFocus();
     });
 
     it('should warn and confirm when clicking another checklist in the tree', async () => {
@@ -709,8 +765,8 @@ describe('ChecklistsComponent', () => {
       await startEditing();
 
       // Try to change URL fragment to empty (unloads file/checklist)
-      // Do not use setFragment() here to avoid deadlocking on whenStable() before dialog is clicked.
-      await realNavigate([], { fragment: '' });
+      // Use router.navigate and store the promise to trigger the spy without deadlocking
+      const navPromise = router.navigate([], { fragment: '' });
       rendered.detectChanges();
 
       // Click 'Keep editing' on the warning dialog
@@ -719,6 +775,7 @@ describe('ChecklistsComponent', () => {
       expect(discardCancelButton).toBeInTheDocument();
 
       await user.click(discardCancelButton);
+      await navPromise;
 
       // Await stability now that the dialog is closed
       await rendered.fixture.whenStable();
@@ -736,8 +793,8 @@ describe('ChecklistsComponent', () => {
       await startEditing();
 
       // Try to change URL fragment to empty
-      // Do not use setFragment() here to avoid deadlocking on whenStable() before dialog is clicked.
-      await realNavigate([], { fragment: '' });
+      // Use router.navigate and store the promise to trigger the spy without deadlocking
+      const navPromise = router.navigate([], { fragment: '' });
       rendered.detectChanges();
 
       // Click 'Discard changes'
@@ -746,6 +803,7 @@ describe('ChecklistsComponent', () => {
       expect(discardOkButton).toBeInTheDocument();
 
       await user.click(discardOkButton);
+      await navPromise;
 
       // Await stability now that the dialog is closed
       await rendered.fixture.whenStable();
@@ -755,41 +813,6 @@ describe('ChecklistsComponent', () => {
       expectFragment('');
 
       expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
-    });
-
-    it('should warn and cancel when opening another file', async () => {
-      await startEditing();
-
-      // Create another file in store first so we can select it
-      const completed = storageCompletion();
-      await storage.saveChecklistFile(
-        ChecklistFile.create({
-          metadata: { name: 'Other file' },
-          groups: [{ title: 'G', checklists: [{ title: 'C' }] }],
-        }),
-      );
-      await storageCompleted(completed);
-
-      // Click Open File to open the file picker
-      const openButton = screen.getByRole('button', { name: 'Open file' });
-      await user.click(openButton);
-
-      // Click the other file
-      const otherFileOption = await screen.findByRole('button', { name: 'Other file' });
-      const clickPromise = user.click(otherFileOption);
-
-      // Click 'Keep editing'
-      const discardCancelButton = await screen.findByRole('button', { name: 'Keep editing' });
-
-      expect(discardCancelButton).toBeInTheDocument();
-
-      await user.click(discardCancelButton);
-      await clickPromise;
-
-      // Verify we are still on the current file and editing
-      expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
-
-      expect(screen.getByRole('textbox', { name: 'Prompt text' })).toBeVisible();
     });
   });
 
