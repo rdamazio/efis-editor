@@ -73,6 +73,8 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - jj automatically adds files to the next commit, so you don't need to use `jj add`.
 - Create a commit (`jj commit -m "COMMIT MESSAGE"`) after each logical change.
 - End the first line of the commit message with `#genai`.
+- Later in the commit description, include a summary of the changes made and the rationale for those changes.
+- At the end of the commit description, include metadata about the agent that performed the changes, such as agent name and version.
 - Remember to remove any temporary files you created, such as scripts, before creating the commit.
 - Use descriptive, semantic commit messages
 - Commit messages should be in the format "TYPE(SCOPE): DESCRIPTION"
