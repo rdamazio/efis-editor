@@ -2,7 +2,7 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import type { Mock } from 'vitest';
 
 import { HarnessLoader } from '@angular/cdk/testing';
-import { Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { render, screen } from '@testing-library/angular';
@@ -17,6 +17,7 @@ type OutputType = ChecklistFileMetadata | undefined;
   selector: 'test-info-dialog',
   imports: [MatDialogModule],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: '<button (click)="openDialog()">Open dialog</button>',
 })
 class DialogTestComponent {

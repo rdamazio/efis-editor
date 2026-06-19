@@ -2,6 +2,7 @@ import { AsyncPipe } from '@angular/common';
 import {
   afterNextRender,
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   effect,
   Inject,
@@ -63,6 +64,7 @@ interface ParsedFragment {
     NgxSpinnerModule,
   ],
   templateUrl: './checklists.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './checklists.component.scss',
 })
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, HotkeyRegistree {

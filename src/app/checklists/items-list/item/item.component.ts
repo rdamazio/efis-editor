@@ -1,5 +1,5 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, input, output, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, input, output, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -18,6 +18,7 @@ import { EditableLabelComponent } from '../../../shared/editable-label/editable-
     MatTooltipModule,
   ],
   templateUrl: './item.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './item.component.scss',
 })
 export class ChecklistItemComponent {

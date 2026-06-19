@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -33,6 +33,7 @@ export interface TitleDialogData {
     ReactiveFormsModule,
   ],
   templateUrl: './title-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './title-dialog.component.scss',
 })
 export class TitleDialogComponent {

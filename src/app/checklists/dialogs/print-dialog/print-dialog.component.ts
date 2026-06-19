@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -39,6 +39,7 @@ import { PreferenceStorage } from '../../../../model/storage/preference-storage'
     ReactiveFormsModule,
   ],
   templateUrl: './print-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './print-dialog.component.scss',
 })
 export class PrintDialogComponent implements OnInit {

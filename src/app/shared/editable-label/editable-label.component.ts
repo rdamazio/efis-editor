@@ -1,4 +1,14 @@
-import { afterNextRender, Component, ElementRef, Injector, input, model, output, viewChild } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Injector,
+  input,
+  model,
+  output,
+  viewChild,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
@@ -22,6 +32,7 @@ import { DynamicDataPipe } from './dynamic-data.pipe';
     ReactiveFormsModule,
   ],
   templateUrl: './editable-label.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './editable-label.component.scss',
 })
 export class EditableLabelComponent {

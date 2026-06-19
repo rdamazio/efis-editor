@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -35,6 +35,7 @@ export interface GoogleDriveDisconnectDialogReturnData {
     ReactiveFormsModule,
   ],
   templateUrl: './gdrive-disconnect-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './gdrive-disconnect-dialog.component.scss',
 })
 export class GoogleDriveDisconnectDialogComponent {

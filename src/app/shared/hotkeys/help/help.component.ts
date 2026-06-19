@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
@@ -10,6 +10,7 @@ import { ShortcutPipe } from './shortcut.pipe';
   selector: 'app-help',
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatTableModule, ShortcutPipe],
   templateUrl: './help.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './help.component.scss',
 })
 export class HelpComponent {

@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 
@@ -7,6 +7,7 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } fr
   selector: 'app-about',
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, NgOptimizedImage],
   templateUrl: './about.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './about.component.scss',
 })
 export class AboutComponent {}

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +16,7 @@ import { GoogleDriveDisconnectDialogComponent } from './disconnect-dialog/gdrive
   imports: [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatSnackBarModule, MatTooltipModule],
   templateUrl: './gdrive.component.html',
   styleUrl: './gdrive.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     '(window:beforeunload)': 'onPageUnload()',

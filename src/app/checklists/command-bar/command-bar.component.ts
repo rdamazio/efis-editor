@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +14,7 @@ import { FORMAT_REGISTRY } from '../../../model/formats/format-registry';
   selector: 'checklist-command-bar',
   imports: [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatTooltipModule],
   templateUrl: './command-bar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './command-bar.component.scss',
 })
 export class ChecklistCommandBarComponent {

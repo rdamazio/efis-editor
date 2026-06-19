@@ -10,6 +10,7 @@ import {
 import {
   afterNextRender,
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   Injector,
@@ -58,6 +59,7 @@ type MovementDirection = 'up' | 'down';
     MatTreeModule,
   ],
   templateUrl: './checklist-tree.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './checklist-tree.component.scss',
 })
 export class ChecklistTreeComponent implements OnInit, AfterViewInit {

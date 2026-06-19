@@ -2,13 +2,14 @@ import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray 
 import { LowerCasePipe } from '@angular/common';
 import {
   afterNextRender,
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
   ElementRef,
   Injector,
   input,
-  model,
+  linkedSignal,
   output,
   signal,
   viewChild,
@@ -37,6 +38,7 @@ import { ChecklistItemComponent } from './item/item.component';
     NgxResizeObserverModule,
   ],
   templateUrl: './items-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './items-list.component.scss',
 })
 export class ChecklistItemsComponent {
@@ -58,7 +60,8 @@ export class ChecklistItemsComponent {
     { label: 'Blank row', type: ChecklistItem_Type.ITEM_SPACE },
   ];
 
-  readonly checklist = model<Checklist | undefined>();
+  readonly checklistInput = input<Checklist | undefined>(undefined, { alias: 'checklist' });
+  readonly checklist = linkedSignal(this.checklistInput);
   // Angular's model uses reference equality to decide whether to emit, so we must use
   // an explicit output to notify about deeper changes in the object.
   readonly checklistChange = output<Checklist | undefined>();

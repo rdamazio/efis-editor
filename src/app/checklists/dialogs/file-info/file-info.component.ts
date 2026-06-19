@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -35,6 +35,7 @@ export interface FileInfoDialogData {
     ReactiveFormsModule,
   ],
   templateUrl: './file-info.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './file-info.component.scss',
 })
 export class ChecklistFileInfoComponent {

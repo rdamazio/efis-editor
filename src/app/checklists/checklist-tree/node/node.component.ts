@@ -1,5 +1,5 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
-import { Component, input, output, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,6 +23,7 @@ import { ChecklistTreeNode } from './node';
     MatOption,
   ],
   templateUrl: './node.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './node.component.scss',
 })
 export class ChecklistTreeNodeComponent {

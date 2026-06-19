@@ -1,4 +1,4 @@
-import { Component, inject, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DeviceDetectorService, OS } from 'ngx-device-detector';
@@ -10,6 +10,7 @@ import { FORMAT_REGISTRY, parseChecklistFile } from '../../../model/formats/form
   selector: 'checklist-file-upload',
   imports: [MatIconModule, NgxFileDropModule],
   templateUrl: './file-upload.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './file-upload.component.scss',
 })
 export class ChecklistFileUploadComponent {

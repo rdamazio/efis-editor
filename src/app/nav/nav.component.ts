@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,6 +32,7 @@ import { NavData } from './nav-data';
     RouterOutlet,
   ],
   templateUrl: './nav.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nav.component.scss',
 })
 export class NavComponent {

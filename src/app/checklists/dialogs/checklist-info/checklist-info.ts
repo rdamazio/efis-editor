@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -30,6 +30,7 @@ import { Checklist, Checklist_CompletionAction } from '../../../../../gen/ts/che
     ReactiveFormsModule,
   ],
   templateUrl: './checklist-info.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './checklist-info.scss',
 })
 export class ChecklistInfoComponent {

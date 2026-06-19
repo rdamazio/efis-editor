@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MatDialog,
@@ -14,6 +14,7 @@ import { filter, lastValueFrom, Observable } from 'rxjs';
   selector: 'gdrive-connect-dialog',
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, NgOptimizedImage],
   templateUrl: './gdrive-connect-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './gdrive-connect-dialog.component.scss',
 })
 export class GoogleDriveConnectDialogComponent {

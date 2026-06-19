@@ -1,6 +1,6 @@
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { Component, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { ComponentFixture, inject } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDialogHarness } from '@angular/material/dialog/testing';
@@ -18,6 +18,7 @@ type OutputType = PdfWriterOptions | undefined;
   selector: 'test-print-dialog',
   imports: [MatDialogModule],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: '<button (click)="openDialog()">Open dialog</button>',
 })
 class DialogTestComponent {

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -11,6 +11,7 @@ import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
   selector: 'app-welcome',
   imports: [MatButtonModule, MatCardModule, RouterLink],
   templateUrl: './welcome.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './welcome.component.scss',
 })
 export class WelcomeComponent {
