@@ -183,6 +183,7 @@ describe('ChecklistsComponent', () => {
 
     rendered.detectChanges();
     await rendered.fixture.whenStable();
+    rendered.detectChanges();
   }
 
   function expectFragment(fragment: string) {
@@ -644,6 +645,152 @@ describe('ChecklistsComponent', () => {
     await setFragment('My file/0/0');
 
     await expect(screen.findByRole('listitem', { name: 'Item: Checklist created' })).resolves.toBeInTheDocument();
+  });
+
+  describe('unsaved changes warning', () => {
+    async function startEditing() {
+      await newFile('My file');
+      await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+      await user.keyboard('[ArrowDown]');
+      await user.keyboard('[Enter]');
+
+      await expect(screen.findByRole('textbox', { name: 'Prompt text' })).resolves.toBeInTheDocument();
+    }
+
+    it('should warn and cancel when clicking another checklist in the tree', async () => {
+      await startEditing();
+
+      // Try to click to add a new checklist (which triggers a selection change)
+      const addChecklistButton = screen.getByRole('button', { name: 'Add new checklist' });
+      const clickPromise = user.click(addChecklistButton);
+
+      // Verify the unsaved changes warning dialog is opened
+      const discardCancelButton = await screen.findByRole('button', { name: 'Keep editing' });
+
+      expect(discardCancelButton).toBeInTheDocument();
+
+      // Click 'Keep editing'
+      await user.click(discardCancelButton);
+      await clickPromise;
+
+      // Verify we are still editing and the prompt box is still visible and focused
+      const promptBox = screen.getByRole('textbox', { name: 'Prompt text' });
+
+      expect(promptBox).toBeVisible();
+
+      // eslint-disable-next-line testing-library/no-node-access
+      expect(document.activeElement).toBe(promptBox);
+    });
+
+    it('should warn and confirm when clicking another checklist in the tree', async () => {
+      await startEditing();
+
+      // Try to click to add a new checklist group (which deselects the current checklist)
+      const addGroupButton = screen.getByRole('button', { name: 'Add new checklist group' });
+      const clickPromise = user.click(addGroupButton);
+
+      // Verify warning dialog is opened, and click 'Discard changes'
+      const discardOkButton = await screen.findByRole('button', { name: 'Discard changes' });
+
+      expect(discardOkButton).toBeInTheDocument();
+
+      await user.click(discardOkButton);
+      await clickPromise;
+
+      // The new group dialog should now open (which prompts for title)
+      const titleInput = await screen.findByRole('textbox', { name: 'Title' });
+
+      expect(titleInput).toBeVisible();
+
+      await user.keyboard('[Escape]'); // cancel new group dialog
+    });
+
+    it('should warn and cancel when changing the URL fragment', async () => {
+      await startEditing();
+
+      // Try to change URL fragment to empty (unloads file/checklist)
+      // Do not use setFragment() here to avoid deadlocking on whenStable() before dialog is clicked.
+      await realNavigate([], { fragment: '' });
+      rendered.detectChanges();
+
+      // Click 'Keep editing' on the warning dialog
+      const discardCancelButton = await screen.findByRole('button', { name: 'Keep editing' });
+
+      expect(discardCancelButton).toBeInTheDocument();
+
+      await user.click(discardCancelButton);
+
+      // Await stability now that the dialog is closed
+      await rendered.fixture.whenStable();
+      rendered.detectChanges();
+
+      // Verify fragment is reverted to 'My file/0/0' and we are still editing
+      expectFragment('My file/0/0');
+
+      const promptBox = screen.getByRole('textbox', { name: 'Prompt text' });
+
+      expect(promptBox).toBeVisible();
+    });
+
+    it('should warn and confirm when changing the URL fragment', async () => {
+      await startEditing();
+
+      // Try to change URL fragment to empty
+      // Do not use setFragment() here to avoid deadlocking on whenStable() before dialog is clicked.
+      await realNavigate([], { fragment: '' });
+      rendered.detectChanges();
+
+      // Click 'Discard changes'
+      const discardOkButton = await screen.findByRole('button', { name: 'Discard changes' });
+
+      expect(discardOkButton).toBeInTheDocument();
+
+      await user.click(discardOkButton);
+
+      // Await stability now that the dialog is closed
+      await rendered.fixture.whenStable();
+      rendered.detectChanges();
+
+      // Verify fragment remains empty and checklist is unloaded
+      expectFragment('');
+
+      expect(screen.queryByRole('treeitem', { name: 'Checklist: First checklist' })).not.toBeInTheDocument();
+    });
+
+    it('should warn and cancel when opening another file', async () => {
+      await startEditing();
+
+      // Create another file in store first so we can select it
+      const completed = storageCompletion();
+      await storage.saveChecklistFile(
+        ChecklistFile.create({
+          metadata: { name: 'Other file' },
+          groups: [{ title: 'G', checklists: [{ title: 'C' }] }],
+        }),
+      );
+      await storageCompleted(completed);
+
+      // Click Open File to open the file picker
+      const openButton = screen.getByRole('button', { name: 'Open file' });
+      await user.click(openButton);
+
+      // Click the other file
+      const otherFileOption = await screen.findByRole('button', { name: 'Other file' });
+      const clickPromise = user.click(otherFileOption);
+
+      // Click 'Keep editing'
+      const discardCancelButton = await screen.findByRole('button', { name: 'Keep editing' });
+
+      expect(discardCancelButton).toBeInTheDocument();
+
+      await user.click(discardCancelButton);
+      await clickPromise;
+
+      // Verify we are still on the current file and editing
+      expect(screen.getByRole('treeitem', { name: 'Checklist: First checklist' })).toBeInTheDocument();
+
+      expect(screen.getByRole('textbox', { name: 'Prompt text' })).toBeVisible();
+    });
   });
 
   describe('keyboard shortcuts', () => {

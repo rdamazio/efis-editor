@@ -286,4 +286,26 @@ describe('ChecklistItemsComponent', () => {
     // Verify undo snackbar is dismissed
     await expect(loader.getAllHarnesses(MatSnackBarHarness)).resolves.toHaveLength(0);
   });
+
+  it('should track unsaved edits and focus first editing item', async () => {
+    expect(fixture.componentInstance.hasUnsavedEdits()).toBe(false);
+
+    const item = screen.getByRole('listitem', { name: 'Item: Caution item' });
+    const editButton = within(item).getByRole('button', { name: 'Edit Caution item' });
+    await user.click(editButton);
+
+    expect(fixture.componentInstance.hasUnsavedEdits()).toBe(true);
+
+    const editBox = await within(item).findByRole('textbox', { name: 'Prompt text' });
+    fixture.componentInstance.focusFirstEditingItem();
+
+    await fixture.whenStable();
+
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(document.activeElement).toBe(editBox);
+
+    await user.keyboard('[Escape]');
+
+    expect(fixture.componentInstance.hasUnsavedEdits()).toBe(false);
+  });
 });

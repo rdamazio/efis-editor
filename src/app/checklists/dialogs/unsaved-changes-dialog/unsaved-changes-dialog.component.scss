@@ -1,0 +1,21 @@
+@use '@angular/material' as mat;
+@use '../../../../theme' as theme;
+
+.content {
+  display: flex;
+  align-items: center;
+}
+
+.warning-icon {
+  color: mat.get-theme-color(theme.$efis-editor-theme, error, 60);
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  margin: 0 15px 10px 10px;
+}
+
+.discard-ok {
+  background-color: mat.get-theme-color(theme.$efis-editor-theme, error, 60);
+  color: mat.get-theme-color(theme.$efis-editor-theme, on-error);
+}

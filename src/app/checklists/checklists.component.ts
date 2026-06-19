@@ -39,6 +39,7 @@ import { ChecklistTreeComponent } from './checklist-tree/checklist-tree.componen
 import { ChecklistCommandBarComponent } from './command-bar/command-bar.component';
 import { ChecklistFileInfoComponent } from './dialogs/file-info/file-info.component';
 import { PrintDialogComponent } from './dialogs/print-dialog/print-dialog.component';
+import { UnsavedChangesDialogComponent } from './dialogs/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { ChecklistFilePickerComponent } from './file-picker/file-picker.component';
 import { ChecklistFileUploadComponent } from './file-upload/file-upload.component';
 import { ChecklistItemsComponent } from './items-list/items-list.component';
@@ -66,6 +67,10 @@ interface ParsedFragment {
   templateUrl: './checklists.component.html',
   styleUrl: './checklists.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,
+  host: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    '(window:beforeunload)': 'onBeforeUnload($event)',
+  },
 })
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, HotkeyRegistree {
   static readonly NEW_ITEM_SHORTCUTS = [
@@ -86,6 +91,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
 
   showFilePicker = false;
   showFileUpload = false;
+  viewInitialized = false;
 
   private _loadingFragment = false;
 
@@ -131,6 +137,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   }
 
   ngAfterViewInit() {
+    this.viewInitialized = true;
     this._hotkeys.registerShortcuts(this);
 
     this._gdrive
@@ -193,12 +200,12 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Navigation',
       })
       .subscribe(() => {
-        this.tree().selectNextChecklist();
+        void this.tree().selectNextChecklist();
       });
     hotkeys
       .addShortcut({ keys: 'meta.up', description: 'Select next checklist', preventDefault: true, group: 'Navigation' })
       .subscribe(() => {
-        this.tree().selectPreviousChecklist();
+        void this.tree().selectPreviousChecklist();
       });
 
     hotkeys
@@ -209,7 +216,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Navigation',
       })
       .subscribe(() => {
-        this.tree().selectNextGroup();
+        void this.tree().selectNextGroup();
       });
     hotkeys
       .addShortcut({
@@ -219,7 +226,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Navigation',
       })
       .subscribe(() => {
-        this.tree().selectPreviousGroup();
+        void this.tree().selectPreviousGroup();
       });
 
     hotkeys
@@ -379,8 +386,26 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     const parsed = this._parseFragment(fragment);
     const fileName = parsed.fileName;
 
+    if (this.viewInitialized) {
+      const isSameFile = fileName === this.selectedFile?.metadata?.name;
+      const currentPos = this.tree().selectedChecklistPosition();
+      const isSameChecklist =
+        isSameFile && parsed.groupIdx === currentPos?.groupIdx && parsed.checklistIdx === currentPos?.checklistIdx;
+
+      if (isSameChecklist) {
+        this._loadingFragment = false;
+        return;
+      }
+
+      if (!(await this.confirmUnsavedChanges())) {
+        this._loadingFragment = false;
+        await this._updateNavigation();
+        return;
+      }
+    }
+
     if (fileName !== this.selectedFile?.metadata?.name) {
-      await this.onFileSelected(fileName);
+      await this.onFileSelected(fileName, true);
     }
 
     if (fileName) {
@@ -477,6 +502,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   }
 
   async onNewFile(fileName: string) {
+    if (!(await this.confirmUnsavedChanges())) {
+      return;
+    }
     this.showFilePicker = false;
     this.showFileUpload = false;
 
@@ -528,6 +556,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   }
 
   async onFileUploaded(file: ChecklistFile) {
+    if (!(await this.confirmUnsavedChanges())) {
+      return;
+    }
     this.showFileUpload = false;
 
     const completed$ = this._startStorage();
@@ -624,7 +655,10 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     this._completeStorage(completed$);
   }
 
-  async onFileSelected(id?: string) {
+  async onFileSelected(id?: string, bypassUnsavedCheck = false) {
+    if (!bypassUnsavedCheck && !(await this.confirmUnsavedChanges())) {
+      return;
+    }
     this.showFilePicker = false;
 
     let file: ChecklistFile | undefined;
@@ -676,5 +710,30 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     if (completed$) {
       completed$.next(true);
     }
+  }
+
+  async confirmUnsavedChanges(): Promise<boolean> {
+    if (this.viewInitialized && this.items().hasUnsavedEdits()) {
+      const confirmed = await UnsavedChangesDialogComponent.confirmDiscard(this._dialog);
+      if (!confirmed) {
+        this.items().focusFirstEditingItem();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  onBeforeUnload(event: BeforeUnloadEvent) {
+    if (this.items().hasUnsavedEdits()) {
+      event.preventDefault();
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      event.returnValue = '';
+      return '';
+    }
+    return undefined;
+  }
+
+  async canDeactivate(): Promise<boolean> {
+    return await this.confirmUnsavedChanges();
   }
 }

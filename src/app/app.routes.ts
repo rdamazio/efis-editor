@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import type { ChecklistsComponent } from './checklists/checklists.component';
 import { WelcomeComponent } from './welcome/welcome.component';
 
 export const ROUTES: Routes = [
@@ -6,5 +7,6 @@ export const ROUTES: Routes = [
   {
     path: 'checklists',
     loadComponent: async () => import('./checklists/checklists.component').then((m) => m.ChecklistsComponent),
+    canDeactivate: [async (component: ChecklistsComponent) => component.canDeactivate()],
   },
 ];

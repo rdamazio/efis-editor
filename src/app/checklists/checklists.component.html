@@ -27,6 +27,7 @@
       #tree
       class="checklist-tree"
       role="navigation"
+      [beforeSelectionChange]="confirmUnsavedChanges.bind(this)"
       (fileModified)="onChecklistChanged()"
       (selectedChecklistChange)="onChecklistSelected()"
     />

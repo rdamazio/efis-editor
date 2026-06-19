@@ -14,6 +14,7 @@ import {
   Component,
   ElementRef,
   Injector,
+  input,
   model,
   OnInit,
   output,
@@ -68,8 +69,17 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
   readonly selectedChecklist = model<Checklist>();
   readonly selectedChecklistGroup = model<ChecklistGroup>();
   readonly groupDropListIds = model<string[]>([]);
+  readonly beforeSelectionChange = input<() => Promise<boolean>>();
   readonly tree = viewChild.required(MatTree);
   readonly allDropLists = viewChildren(CdkDropList<ChecklistTreeNode>);
+
+  private async _confirmSelectionChange(): Promise<boolean> {
+    const guard = this.beforeSelectionChange();
+    if (guard) {
+      return await guard();
+    }
+    return true;
+  }
   dataSource = new MatTreeNestedDataSource<ChecklistTreeNode>();
 
   dragging = false;
@@ -140,6 +150,12 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
   childrenAccessor = (node: ChecklistTreeNode) => node.children ?? [];
 
   async onNodeSelect(node: ChecklistTreeNode) {
+    if (node.checklist === this.selectedChecklist() && !node.isAddNew) {
+      return;
+    }
+    if (!(await this._confirmSelectionChange())) {
+      return;
+    }
     let checklist: Checklist | undefined;
     let checklistGroup: ChecklistGroup | undefined;
     if (!node.isAddNew) {
@@ -387,20 +403,20 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
     return { groupIdx, checklistIdx };
   }
 
-  selectNextChecklist() {
-    this._selectNextChecklist('down');
+  async selectNextChecklist() {
+    await this._selectNextChecklist('down');
   }
 
-  selectPreviousChecklist() {
-    this._selectNextChecklist('up');
+  async selectPreviousChecklist() {
+    await this._selectNextChecklist('up');
   }
 
-  selectNextGroup() {
-    this._selectNextGroup('down');
+  async selectNextGroup() {
+    await this._selectNextGroup('down');
   }
 
-  selectPreviousGroup() {
-    this._selectNextGroup('up');
+  async selectPreviousGroup() {
+    await this._selectNextGroup('up');
   }
 
   moveCurrentChecklistUp() {
@@ -419,11 +435,15 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
     this._moveCurrentGroup('down');
   }
 
-  private _selectNextChecklist(direction: MovementDirection) {
+  private async _selectNextChecklist(direction: MovementDirection) {
     const file = this.file();
     if (!file) return;
     const next = this._findNextChecklist(direction);
     if (!next) return;
+
+    if (!(await this._confirmSelectionChange())) {
+      return;
+    }
 
     const { groupIdx, checklistIdx } = next;
     const group = file.groups[groupIdx];
@@ -508,7 +528,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private _selectNextGroup(direction: MovementDirection) {
+  private async _selectNextGroup(direction: MovementDirection) {
     const file = this.file();
     if (!file) return;
     let groupIdx = this._findNextGroup(direction);
@@ -524,6 +544,10 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
         // Only found empty groups after the current one.
         return;
       }
+    }
+
+    if (!(await this._confirmSelectionChange())) {
+      return;
     }
 
     const group = file.groups[groupIdx];

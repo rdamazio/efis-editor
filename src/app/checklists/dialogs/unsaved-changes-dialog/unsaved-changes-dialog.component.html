@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Unsaved changes?</h2>
+<mat-dialog-content>
+  <div class="content">
+    <mat-icon class="warning-icon">warning</mat-icon>
+
+    <span>You have unsaved edits in your checklist. If you leave, these changes will be lost.</span>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button class="discard-ok" mat-button [mat-dialog-close]="true">Discard changes</button>
+  <button class="discard-cancel" mat-button [mat-dialog-close]="false">Keep editing</button>
+</mat-dialog-actions>

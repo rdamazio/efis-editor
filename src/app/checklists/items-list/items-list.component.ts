@@ -360,6 +360,31 @@ export class ChecklistItemsComponent {
     this.onItemsUpdated();
   }
 
+  hasUnsavedEdits(): boolean {
+    return this.items().some((it) => {
+      const promptEditing = it.promptInput().editing() ?? false;
+      const expectationEditing = it.expectationInput().editing() ?? false;
+      return promptEditing || expectationEditing;
+    });
+  }
+
+  focusFirstEditingItem() {
+    const item = this.items().find((it) => {
+      const promptEditing = it.promptInput().editing() ?? false;
+      const expectationEditing = it.expectationInput().editing() ?? false;
+      return promptEditing || expectationEditing;
+    });
+    if (item) {
+      item.promptInput().focus();
+      scrollIntoView(item.containerRef().nativeElement, {
+        scrollMode: 'if-needed',
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
+      });
+    }
+  }
+
   itemLabel(item: ChecklistItem): string {
     if (item.type === ChecklistItem_Type.ITEM_SPACE) {
       return 'Blank item';
