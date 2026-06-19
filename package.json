@@ -68,7 +68,7 @@
   "devDependencies": {
     "@action-validator/cli": "^0.6.0",
     "@angular-eslint/schematics": "^21.4.0",
-    "@angular/build": "^21.2.13",
+    "@angular/build": "^22.0.3",
     "@angular/cli": "^21.2.13",
     "@angular/compiler-cli": "^21.2.15",
     "@eslint/css": "^1.3.0",
