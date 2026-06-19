@@ -23,8 +23,8 @@ import { ChecklistTreeNode } from './node';
     MatOption,
   ],
   templateUrl: './node.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './node.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistTreeNodeComponent {
   readonly node = input.required<ChecklistTreeNode>();

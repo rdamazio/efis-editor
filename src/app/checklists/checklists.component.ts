@@ -64,8 +64,8 @@ interface ParsedFragment {
     NgxSpinnerModule,
   ],
   templateUrl: './checklists.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './checklists.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, HotkeyRegistree {
   static readonly NEW_ITEM_SHORTCUTS = [

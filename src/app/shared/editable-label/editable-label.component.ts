@@ -32,8 +32,8 @@ import { DynamicDataPipe } from './dynamic-data.pipe';
     ReactiveFormsModule,
   ],
   templateUrl: './editable-label.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './editable-label.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class EditableLabelComponent {
   control = new FormControl('');

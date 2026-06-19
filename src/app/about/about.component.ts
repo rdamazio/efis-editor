@@ -7,7 +7,7 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } fr
   selector: 'app-about',
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, NgOptimizedImage],
   templateUrl: './about.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './about.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class AboutComponent {}

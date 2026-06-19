@@ -21,8 +21,8 @@ type OutputType = Checklist | undefined;
   selector: 'test-info-dialog',
   imports: [MatDialogModule],
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
   template: '<button (click)="openDialog()">Open dialog</button>',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 class DialogTestComponent {
   public readonly dataIn = input.required<Checklist>();

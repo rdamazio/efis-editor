@@ -39,8 +39,8 @@ import { PreferenceStorage } from '../../../../model/storage/preference-storage'
     ReactiveFormsModule,
   ],
   templateUrl: './print-dialog.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './print-dialog.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class PrintDialogComponent implements OnInit {
   public options = inject(MAT_DIALOG_DATA) as PdfWriterOptions;

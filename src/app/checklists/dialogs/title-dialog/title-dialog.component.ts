@@ -33,8 +33,8 @@ export interface TitleDialogData {
     ReactiveFormsModule,
   ],
   templateUrl: './title-dialog.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './title-dialog.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class TitleDialogComponent {
   public title = '';

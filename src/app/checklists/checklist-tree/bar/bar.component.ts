@@ -9,8 +9,8 @@ import { ChecklistTreeComponent } from '../checklist-tree.component';
   selector: 'checklist-tree-bar',
   imports: [MatButtonModule, MatIconButtonSizesModule, MatIconModule, MatTooltipModule],
   templateUrl: './bar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './bar.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistTreeBarComponent {
   readonly tree = input.required<ChecklistTreeComponent>();

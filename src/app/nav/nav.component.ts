@@ -32,8 +32,8 @@ import { NavData } from './nav-data';
     RouterOutlet,
   ],
   templateUrl: './nav.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nav.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class NavComponent {
   readonly navData: NavData = { routeTitle: signal(undefined), fileName: signal(undefined) };

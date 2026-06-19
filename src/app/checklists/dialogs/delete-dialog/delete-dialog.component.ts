@@ -20,8 +20,8 @@ export interface DeleteDialogData {
   selector: 'checklist-delete-dialog',
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatIconModule],
   templateUrl: './delete-dialog.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './delete-dialog.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class DeleteDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: DeleteDialogData) {}

@@ -30,8 +30,8 @@ import { Checklist, Checklist_CompletionAction } from '../../../../../gen/ts/che
     ReactiveFormsModule,
   ],
   templateUrl: './checklist-info.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './checklist-info.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistInfoComponent {
   protected readonly _completionActions = Checklist_CompletionAction;

@@ -10,8 +10,8 @@ import { FORMAT_REGISTRY, parseChecklistFile } from '../../../model/formats/form
   selector: 'checklist-file-upload',
   imports: [MatIconModule, NgxFileDropModule],
   templateUrl: './file-upload.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './file-upload.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistFileUploadComponent {
   readonly fileUploaded = output<ChecklistFile>();

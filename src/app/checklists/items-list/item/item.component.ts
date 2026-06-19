@@ -18,8 +18,8 @@ import { EditableLabelComponent } from '../../../shared/editable-label/editable-
     MatTooltipModule,
   ],
   templateUrl: './item.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './item.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistItemComponent {
   readonly item = input.required<ChecklistItem>();

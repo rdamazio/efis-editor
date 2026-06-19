@@ -35,8 +35,8 @@ export interface GoogleDriveDisconnectDialogReturnData {
     ReactiveFormsModule,
   ],
   templateUrl: './gdrive-disconnect-dialog.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './gdrive-disconnect-dialog.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class GoogleDriveDisconnectDialogComponent {
   private readonly _formBuilder = inject(FormBuilder);

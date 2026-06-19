@@ -35,8 +35,8 @@ export interface FileInfoDialogData {
     ReactiveFormsModule,
   ],
   templateUrl: './file-info.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './file-info.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistFileInfoComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: FileInfoDialogData) {}

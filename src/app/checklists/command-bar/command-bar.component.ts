@@ -14,8 +14,8 @@ import { FORMAT_REGISTRY } from '../../../model/formats/format-registry';
   selector: 'checklist-command-bar',
   imports: [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatTooltipModule],
   templateUrl: './command-bar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './command-bar.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistCommandBarComponent {
   protected readonly _formatIdPdf = FormatId.PDF;

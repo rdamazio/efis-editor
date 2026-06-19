@@ -5,8 +5,8 @@ import { NavComponent } from './nav/nav.component';
 @Component({
   selector: 'app-root',
   imports: [MatIconModule, NavComponent],
-  changeDetection: ChangeDetectionStrategy.Eager,
   template: '<app-nav />',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class AppComponent implements OnInit {
   title = 'EFIS Editor';

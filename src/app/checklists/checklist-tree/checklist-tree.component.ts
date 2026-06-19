@@ -59,8 +59,8 @@ type MovementDirection = 'up' | 'down';
     MatTreeModule,
   ],
   templateUrl: './checklist-tree.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './checklist-tree.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistTreeComponent implements OnInit, AfterViewInit {
   readonly file = model<ChecklistFile>();

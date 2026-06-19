@@ -38,8 +38,8 @@ import { ChecklistItemComponent } from './item/item.component';
     NgxResizeObserverModule,
   ],
   templateUrl: './items-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './items-list.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistItemsComponent {
   // TODO: Customize snackbar to allow multiple undos.

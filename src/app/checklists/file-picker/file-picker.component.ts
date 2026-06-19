@@ -6,8 +6,8 @@ import { MatSelectModule } from '@angular/material/select';
   selector: 'checklist-file-picker',
   imports: [MatIconModule, MatSelectModule],
   templateUrl: './file-picker.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './file-picker.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistFilePickerComponent {
   readonly fileNames = input.required<string[]>();

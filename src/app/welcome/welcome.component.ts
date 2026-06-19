@@ -11,8 +11,8 @@ import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
   selector: 'app-welcome',
   imports: [MatButtonModule, MatCardModule, RouterLink],
   templateUrl: './welcome.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './welcome.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class WelcomeComponent {
   private readonly _gdrive = inject(GoogleDriveStorage);

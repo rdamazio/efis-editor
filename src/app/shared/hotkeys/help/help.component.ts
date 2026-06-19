@@ -10,8 +10,8 @@ import { ShortcutPipe } from './shortcut.pipe';
   selector: 'app-help',
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatTableModule, ShortcutPipe],
   templateUrl: './help.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './help.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class HelpComponent {
   readonly columns = ['action', 'key'];

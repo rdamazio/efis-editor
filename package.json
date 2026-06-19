@@ -18,6 +18,7 @@
     "test:quick": "ng test --configuration quick --headless",
     "test:coverage": "ng test --configuration coverage --headless --coverage",
     "lint": "ng lint",
+    "lint:fix": "ng lint --fix",
     "format": "prettier --check \"{./*,src/**/*}.{js,json,ts,html,css,scss}\" \"./public/site.webmanifest\"",
     "format:fix": "npm run format -- --write",
     "spell": "codespell src/",

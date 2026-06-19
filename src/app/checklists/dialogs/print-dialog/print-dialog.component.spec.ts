@@ -18,8 +18,8 @@ type OutputType = PdfWriterOptions | undefined;
   selector: 'test-print-dialog',
   imports: [MatDialogModule],
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
   template: '<button (click)="openDialog()">Open dialog</button>',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 class DialogTestComponent {
   public readonly dataOut = output<OutputType>();

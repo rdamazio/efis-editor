@@ -14,8 +14,8 @@ import { filter, lastValueFrom, Observable } from 'rxjs';
   selector: 'gdrive-connect-dialog',
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, NgOptimizedImage],
   templateUrl: './gdrive-connect-dialog.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './gdrive-connect-dialog.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class GoogleDriveConnectDialogComponent {
   public static async confirmConnection(dialog: MatDialog): Promise<boolean> {
