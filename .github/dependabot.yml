@@ -4,10 +4,21 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
+
+# TODO: Remove once https://github.com/dependabot/dependabot-core/issues/15435 is fixed.
+registries:
+  # setup the public registry
+  public:
+    type: npm-registry
+    url: https://registry.npmjs.org/
+    token: ${{ secrets.DEPENDABOT_NULL_TOKEN }}
+    replaces-base: true
+
 updates:
   # Maintain dependencies for npm
   - package-ecosystem: 'npm' # See documentation for possible values
     directory: '/' # Location of package manifests
+    registries: '*'
     schedule:
       interval: 'weekly'
       day: 'friday'
