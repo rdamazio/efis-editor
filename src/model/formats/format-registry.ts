@@ -63,14 +63,12 @@ class FormatRegistry {
   }
 
   public getSupportedOutputFormats(): OutputFormat[] {
-    return [...this._outputFormats.entries()].map(
-      ([formatId, format]): OutputFormat => ({
-        id: formatId,
-        name: format.name,
-        extension: format.extension,
-        supportsImport: format.supportsImport,
-      }),
-    );
+    return [...this._outputFormats.entries()].map(([formatId, format]): OutputFormat => ({
+      id: formatId,
+      name: format.name,
+      extension: format.extension,
+      supportsImport: format.supportsImport,
+    }));
   }
 }
 

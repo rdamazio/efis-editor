@@ -548,9 +548,10 @@ export class GoogleDriveStorage {
 
     // While JSON.stringify below properly serializes dates, JSON.parse does not parse them back.
     const parsedDeletions = JSON.parse(deletionsJson) as LocalDeletionJson[];
-    return parsedDeletions.map(
-      (d: LocalDeletionJson): LocalDeletion => ({ fileName: d.fileName, deletionTime: new Date(d.deletionTime) }),
-    );
+    return parsedDeletions.map((d: LocalDeletionJson): LocalDeletion => ({
+      fileName: d.fileName,
+      deletionTime: new Date(d.deletionTime),
+    }));
   }
 
   private async _setLocalDeletions(deletions: LocalDeletion[]) {

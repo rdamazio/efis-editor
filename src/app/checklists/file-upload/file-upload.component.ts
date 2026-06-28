@@ -34,18 +34,17 @@ export class ChecklistFileUploadComponent {
           fsEntry.file(resolve, reject);
         });
       })
-      .map(
-        async (filePromise: Promise<File>): Promise<void> =>
-          filePromise
-            .then(async (file: File): Promise<ChecklistFile> => parseChecklistFile(file))
-            .then((checklistFile: ChecklistFile) => {
-              this.fileUploaded.emit(checklistFile);
-              return void 0;
-            })
-            .catch((reason: unknown) => {
-              console.error('Failed to parse file: ', reason);
-              this._snackBar.open(`Failed to parse uploaded file.`, '');
-            }),
+      .map(async (filePromise: Promise<File>): Promise<void> =>
+        filePromise
+          .then(async (file: File): Promise<ChecklistFile> => parseChecklistFile(file))
+          .then((checklistFile: ChecklistFile) => {
+            this.fileUploaded.emit(checklistFile);
+            return void 0;
+          })
+          .catch((reason: unknown) => {
+            console.error('Failed to parse file: ', reason);
+            this._snackBar.open(`Failed to parse uploaded file.`, '');
+          }),
       );
     return Promise.all(parsedFiles);
   }
