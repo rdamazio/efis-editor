@@ -16,9 +16,10 @@
           "/*.js",
           "/**/*.svg",
           "/**/*.png",
+          "/**/*.avif",
           "/**/*.ico",
           "/**/*.ttf",
-          "!/**/screenshot*.png"
+          "!/**/screenshot*.avif"
         ]
       }
     },
@@ -40,7 +41,7 @@
       "installMode": "lazy",
       "updateMode": "lazy",
       "resources": {
-        "files": ["/**/screenshot*.png"]
+        "files": ["/**/screenshot*.avif"]
       }
     }
   ],

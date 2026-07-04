@@ -29,16 +29,16 @@
   ],
   "screenshots": [
     {
-      "src": "screenshot-wide.png",
+      "src": "screenshot-wide.avif",
       "sizes": "960x680",
-      "type": "image/png",
+      "type": "image/avif",
       "form_factor": "wide",
       "label": "Checklist editor screen"
     },
     {
-      "src": "screenshot-narrow.png",
+      "src": "screenshot-narrow.avif",
       "sizes": "833x960",
-      "type": "image/png",
+      "type": "image/avif",
       "form_factor": "narrow",
       "label": "Checklist editor screen"
     }
