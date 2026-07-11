@@ -1,18 +1,17 @@
 import {
-  Checklist,
-  Checklist_CompletionAction,
-  ChecklistFile,
-  ChecklistFileMetadata,
-  ChecklistGroup,
-  ChecklistGroup_Category,
-  ChecklistItem,
-  ChecklistItem_Type,
+    Checklist,
+    Checklist_CompletionAction,
+    ChecklistFile,
+    ChecklistFileMetadata,
+    ChecklistGroup,
+    ChecklistGroup_Category,
+    ChecklistItem,
+    ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
 import { FormatUtils } from './format-utils';
-import { TextFormatOptions } from './text-format-options';
 
-export class TextReader {
-  constructor(private readonly _file: File, private readonly _options?: TextFormatOptions) {}
+export class PlaintextReader {
+  constructor(private readonly _file: File) {}
 
   public async read(): Promise<ChecklistFile> {
     const text = await this._file.text();
@@ -33,14 +32,11 @@ export class TextReader {
     let currentGroup: ChecklistGroup | undefined = undefined;
     let currentChecklist: Checklist | undefined = undefined;
 
-    const groupPrefix = this._options?.readGroupPrefix ?? '> ';
-    const checklistPrefix = this._options?.readChecklistPrefix ?? '>> ';
-
     for (const rawLine of lines) {
       const line = rawLine.trim();
 
-      if (line.startsWith(checklistPrefix)) {
-        const title = line.substring(checklistPrefix.length).trim();
+      if (line.startsWith('>> ')) {
+        const title = line.substring(3).trim();
         currentChecklist = Checklist.create({
           title,
           completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
@@ -55,8 +51,8 @@ export class TextReader {
           outFile.groups.push(currentGroup);
         }
         currentGroup.checklists.push(currentChecklist);
-      } else if (line.startsWith(groupPrefix)) {
-        const title = line.substring(groupPrefix.length).trim();
+      } else if (line.startsWith('> ')) {
+        const title = line.substring(2).trim();
         
         let category = ChecklistGroup_Category.normal;
         const upperTitle = title.toUpperCase();
@@ -92,11 +88,10 @@ export class TextReader {
   }
 
   private _parseItem(line: string): ChecklistItem {
-    const separator = this._options?.expectationSeparator ?? ' - ';
-    const splitIndex = line.indexOf(separator);
+    const splitIndex = line.indexOf(' - ');
     if (splitIndex !== -1) {
       const prompt = line.substring(0, splitIndex).trim();
-      const expectation = line.substring(splitIndex + separator.length).trim();
+      const expectation = line.substring(splitIndex + 3).trim();
       return ChecklistItem.create({
         type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
         prompt,

@@ -47,17 +47,17 @@ You can try it out directly in the link above, but here's what it currently look
 
 Different checklist file formats support different subsets of all the features in the editor:
 
-| **Feature**                | AFS/Dynon          | ForeFlight         | Garmin (G3X/GTN)   | Garmin Pilot       | GRT                | PDF                |
-| -------------------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| Checklist groups           | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Checklist group categories | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: |
-| Item types                 | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Indentation                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
-| Centering                  | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
-| Default checklist/group    | :x:                | :x:                | :white_check_mark: | :x:                | :x:                | :x:                |
-| Checklist metadata         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
-| Live data                  | :x:                | :x:                | :x:                | :white_check_mark: | :white_check_mark: | :x:                |
-| Completion actions         | :x:                | :x:                | :x:                | :white_check_mark: | :x:                | :white_check_mark: |
+| **Feature**                | AFS/Dynon          | ForeFlight         | Garmin (G3X/GTN)   | Garmin Pilot       | GRT                | iFly EFB           | PDF                |
+| -------------------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Checklist groups           | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Checklist group categories | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :x:                | :white_check_mark: |
+| Item types                 | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Indentation                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Centering                  | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Default checklist/group    | :x:                | :x:                | :white_check_mark: | :x:                | :x:                | :x:                | :x:                |
+| Checklist metadata         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Live data                  | :x:                | :x:                | :x:                | :white_check_mark: | :white_check_mark: | :x:                | :x:                |
+| Completion actions         | :x:                | :x:                | :x:                | :white_check_mark: | :x:                | :x:                | :white_check_mark: |
 
 > [!NOTE]
 > See sections below on format-specific details to understand how data from the editor gets translated to those formats.
@@ -143,6 +143,18 @@ GRT uses a text format for checklists, very similar to AFS/Dynon (see above).
 It also supports dynamic data, where certain EFIS parameters are baked into the text by entering
 tokens like `%24%` (oil temperature) anywhere in the text of any item type. Supported tokens are
 listed in the GRT manual (there's 130 of them).
+
+### iFly EFB
+
+iFly EFB uses a simple text format for checklists, so different item types, identation,
+centering, etc. are represented with plain text formatting (e.g. titles show up as
+`** YOUR TITLE **`) or prefixes (e.g. a warning will read `WARNING: Your warning text`). As much as
+possible, the editor supports parsing this formatting back when importing, but if you add your own
+formatting to an item's text, it may get it wrong.
+
+This format supports multiple checklists, but not checklist groups - instead, groups after the first
+one have the group names prepended to the checklist name (e.g. an "Engine-out landing" checklist
+under the "Emergency" group will show up as a checklist named "Emergency - Engine-out landing").
 
 ### ForeFlight
 
