@@ -14,8 +14,8 @@ import { FORMAT_REGISTRY, parseChecklistFile } from '../../../model/formats/form
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistFileUploadComponent {
-  readonly fileUploaded = output<ChecklistFile>();
   protected readonly _deviceService = inject(DeviceDetectorService);
+  readonly fileUploaded = output<ChecklistFile>();
   protected readonly _acceptExtensions =
     FORMAT_REGISTRY.getSupportedInputExtensions() +
     // Browsers on iOS ignore extensions, and if `accept` is not restricted, display a dialog asking to make a shot,

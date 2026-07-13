@@ -1,6 +1,6 @@
 /// <reference types="@types/gapi.client.drive-v3" />
 import { HttpStatusCode } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, inject, Service } from '@angular/core';
 import { BehaviorSubject, filter, firstValueFrom, Observable, Subject, takeUntil } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
 import { LazyBrowserStorage } from './browser-storage';
@@ -84,7 +84,7 @@ interface LocalDeletionJson {
  * such as the fact that trashed file names disappear after 30 days, are documented
  * throughout the code.
  */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class GoogleDriveStorage {
   public static readonly CHECKLIST_MIME_TYPE = 'application/vnd.damazio.efis-editor.checklist';
   public static readonly CHECKLIST_EXTENSION = '.checklist';
@@ -95,7 +95,10 @@ export class GoogleDriveStorage {
   private static readonly LOCAL_DELETIONS_STORAGE_KEY = 'local_deletions';
   private static readonly MAX_RETRIES = 3;
 
-  private readonly _browserStorage: Promise<Storage>;
+  private readonly _api = inject(GoogleDriveApi);
+  private readonly _checklistStorage = inject(ChecklistStorage);
+  private readonly _browserStorage = inject(LazyBrowserStorage).storage;
+
   private readonly _state$ = new BehaviorSubject(DriveSyncState.DISCONNECTED);
   private readonly _downloads$ = new Subject<string>();
   private readonly _errors$ = new Subject<string>();
@@ -108,13 +111,7 @@ export class GoogleDriveStorage {
   private _syncInterval?: number;
   private _lastSync = new Date(0);
 
-  constructor(
-    private readonly _api: GoogleDriveApi,
-    private readonly _checklistStorage: ChecklistStorage,
-    lazyStorage: LazyBrowserStorage,
-  ) {
-    this._browserStorage = lazyStorage.storage;
-
+  constructor() {
     this._state$
       .asObservable()
       .pipe(takeUntil(this._destroyed))

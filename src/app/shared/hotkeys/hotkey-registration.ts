@@ -1,5 +1,5 @@
 import { isPlatformServer } from '@angular/common';
-import { Inject, Injectable, InjectionToken, Optional, PLATFORM_ID } from '@angular/core';
+import { InjectionToken, PLATFORM_ID, Service, inject } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Hotkey, HotkeysService } from '@ngneat/hotkeys';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -54,18 +54,18 @@ export class HotkeyRegistrar {
   }
 }
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class HotkeyRegistry {
+  private readonly _dialog = inject(MatDialog);
+  private readonly _hotkeys = inject(HotkeysService);
+  private readonly _platformId = inject(PLATFORM_ID);
+  readonly debounceTime = inject(HOTKEY_DEBOUNCE_TIME, { optional: true }) ?? undefined;
+
   private readonly _hotkeyRegistrars = new Map<HotkeyRegistree, HotkeyRegistrar>();
   private _helpRegistered = false;
 
-  constructor(
-    private readonly _dialog: MatDialog,
-    private readonly _hotkeys: HotkeysService,
-    @Inject(PLATFORM_ID) private readonly _platformId: object,
-    @Inject(HOTKEY_DEBOUNCE_TIME) @Optional() readonly debounceTime?: number,
-  ) {
-    this._hotkeys.setSequenceDebounce(debounceTime ?? 500);
+  constructor() {
+    this._hotkeys.setSequenceDebounce(this.debounceTime ?? 500);
   }
 
   registerShortcuts(registree: HotkeyRegistree) {

@@ -1,17 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Service, inject } from '@angular/core';
 import { DEFAULT_OPTIONS, PdfWriterOptions } from '../formats/pdf-writer';
 import { LazyBrowserStorage } from './browser-storage';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class PreferenceStorage {
   private static readonly PREFERENCES_PREFIX = 'prefs:';
   private static readonly PRINT_OPTIONS_KEY = PreferenceStorage.PREFERENCES_PREFIX + 'print';
 
-  private readonly _browserStorage: Promise<Storage>;
-
-  constructor(lazyStorage: LazyBrowserStorage) {
-    this._browserStorage = lazyStorage.storage;
-  }
+  private readonly _browserStorage = inject(LazyBrowserStorage).storage;
 
   public async getPrintOptions(): Promise<PdfWriterOptions> {
     const store = await this._browserStorage;

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Service, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ChecklistFile } from '../../../gen/ts/checklist';
 import { FormatId } from '../formats/format-id';
@@ -7,12 +7,13 @@ import { LazyBrowserStorage } from './browser-storage';
 
 const CHECKLIST_PREFIX = 'checklists:';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ChecklistStorage {
+  private readonly _browserStorage = inject(LazyBrowserStorage);
   private readonly _jsonFormat = FORMAT_REGISTRY.getFormat(FormatId.JSON);
 
-  constructor(private readonly _browserStorage: LazyBrowserStorage) {
-    _browserStorage.storage
+  constructor() {
+    this._browserStorage.storage
       .then((store: Storage) => {
         this._publishList(store);
         return void {};

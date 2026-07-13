@@ -1,21 +1,20 @@
 /// <reference types="@types/gapi.client.drive-v3" />
 /// <reference types="@types/google.accounts"/>
-import { afterNextRender, Injectable, Injector } from '@angular/core';
+import { afterNextRender, inject, Injector, Service } from '@angular/core';
 import { ENVIRONMENT } from '../../environments/environment';
 import { MultipartEncoder } from './multipart';
 
 /**
  * High-level wrapper for the Google Drive API, with a consistent Promise interface.
  */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class GoogleDriveApi {
   private static readonly UPLOAD_API_PATH = '/upload/drive/v3/files';
   private static readonly API_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 
+  private readonly _injector = inject(Injector);
   private _loaded = false;
   private readonly _loadedScripts: string[] = [];
-
-  constructor(private readonly _injector: Injector) {}
 
   public async load() {
     if (this._loaded) {

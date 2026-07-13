@@ -154,7 +154,7 @@ describe('GoogleDriveApi', () => {
 
     // Create it again, it should just load up the original token and run a sync with it.
     const oldGdrive = gdrive;
-    gdrive = new GoogleDriveStorage(gdriveApi, store, lazyBrowserStore);
+    gdrive = TestBed.runInInjectionContext(() => new GoogleDriveStorage());
     await expectState(DriveSyncState.DISCONNECTED);
     await gdrive.init();
     await expectState(DriveSyncState.IN_SYNC);
@@ -176,7 +176,7 @@ describe('GoogleDriveApi', () => {
     gdrive.destroy();
 
     // Create it again, it should NOT load up the original token or try to sync.
-    gdrive = new GoogleDriveStorage(gdriveApi, store, lazyBrowserStore);
+    gdrive = TestBed.runInInjectionContext(() => new GoogleDriveStorage());
     await expectState(DriveSyncState.DISCONNECTED);
     await gdrive.init();
     await expectState(DriveSyncState.DISCONNECTED);

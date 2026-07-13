@@ -1,6 +1,6 @@
-import { Injectable, afterNextRender } from '@angular/core';
+import { Service, afterNextRender } from '@angular/core';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class LazyBrowserStorage {
   public readonly storage: Promise<Storage>;
   private _storageResolveFunc?: () => void;
