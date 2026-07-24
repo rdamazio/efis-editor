@@ -100,7 +100,7 @@
     "playwright": "^1.61.1",
     "prettier": "^3.9.5",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "typescript": "~6.0.3",
+    "typescript": "~7.0.2",
     "typescript-eslint": "8.64.0",
     "vitest": "^4.0.18",
     "vitest-mock-extended": "^5.1.0"
