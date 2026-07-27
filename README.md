@@ -35,6 +35,7 @@ You can try it out directly in the link above, but here's what it currently look
 
 - Checklists:
   - Advanced Flight Systems (AFS)
+  - CSV spreadsheet (.csv file format)
   - Dynon SkyView
   - Jeppesen ForeFlight (.fmd file format)<sup>†</sup>
   - Garmin Pilot (.gplt file format) <sup>†</sup>
@@ -47,17 +48,17 @@ You can try it out directly in the link above, but here's what it currently look
 
 Different checklist file formats support different subsets of all the features in the editor:
 
-| **Feature**                | AFS/Dynon          | ForeFlight         | Garmin (G3X/GTN)   | Garmin Pilot       | GRT                | PDF                |
-| -------------------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| Checklist groups           | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Checklist group categories | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: |
-| Item types                 | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Indentation                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
-| Centering                  | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
-| Default checklist/group    | :x:                | :x:                | :white_check_mark: | :x:                | :x:                | :x:                |
-| Checklist metadata         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
-| Live data                  | :x:                | :x:                | :x:                | :white_check_mark: | :white_check_mark: | :x:                |
-| Completion actions         | :x:                | :x:                | :x:                | :white_check_mark: | :x:                | :white_check_mark: |
+| **Feature**                | AFS/Dynon          | CSV                | ForeFlight         | Garmin (G3X/GTN)   | Garmin Pilot       | GRT                | PDF                |
+| -------------------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Checklist groups           | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Checklist group categories | :x:                | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: |
+| Item types                 | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Indentation                | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
+| Centering                  | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
+| Default checklist/group    | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :x:                | :x:                |
+| Checklist metadata         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
+| Live data                  | :x:                | :x:                | :x:                | :x:                | :white_check_mark: | :white_check_mark: | :x:                |
+| Completion actions         | :x:                | :x:                | :x:                | :x:                | :white_check_mark: | :x:                | :white_check_mark: |
 
 > [!NOTE]
 > See sections below on format-specific details to understand how data from the editor gets translated to those formats.
@@ -135,6 +136,32 @@ process will then wrap lines longer than that length.
 
 This format also does not support checklist metadata, so an additional checklist with all your
 metadata is added to the end of the file.
+
+### CSV Spreadsheet
+
+CSV spreadsheet files (.csv) allow importing and exporting checklist data to edit easily using spreadsheet applications like Google Sheets or Microsoft Excel.
+
+The CSV file can contain 3 parts, in this order: metadata (optional), table header, and then checklist items.
+
+To be imported successfully, the CSV file must contain a **table header row** identifying the data columns:
+
+- **Metadata** (Optional): Metadata key-value pairs can be placed in rows prior to the table header row (e.g. `Name:,My Airplane Checklists` or `Make & Model:,Cessna 172`). Supported metadata keys:
+  - `Name:` (File title)
+  - `Make & Model:` (Aircraft make & model)
+  - `Aircraft:` (Aircraft info / tail number)
+  - `Manufacturer Info:` (Manufacturer info)
+  - `Copyright Info:` (Copyright info)
+  - `Default Group:` (Title of the default group)
+  - `Default Checklist:` (Title of the default checklist)
+- **Table Header Row**: Must contain at minimum the columns `Group`, `Checklist`, `Type`, `Text` (case-insensitive). The columns `Response`, `Indent`, and `Center` are optional.
+- **Item Rows**:
+  - `Group`: Name of the checklist group. If omitted on subsequent rows, items belong to the previous group.
+  - `Checklist`: Name of the checklist within the group. If omitted on subsequent rows, items belong to the previous checklist.
+  - `Type`: Item type (`Title Bar`, `Challenge`, `Information`, `Warning`, `Caution`, `Note`, `Space`).
+  - `Text`: Item text / prompt.
+  - `Response`: Expected response for challenge items. If provided, the item is created as a Challenge/Response item.
+  - `Indent`: Indentation level (numeric integer `0`, `1`, etc., optional).
+  - `Center`: Centering flag (`true` / `1` / `yes`, optional).
 
 ### GRT
 
