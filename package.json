@@ -46,6 +46,8 @@
     "@ngneat/until-destroy": "^10.0.0",
     "buffer": "^6.0.3",
     "buffer-crc32": "^1.0.0",
+    "csv-parse": "^7.0.1",
+    "csv-stringify": "^6.8.1",
     "escape-string-regexp": "^5.0.0",
     "express": "^5.2.1",
     "fast-deep-equal": "^3.1.3",
