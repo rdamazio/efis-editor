@@ -1337,7 +1337,36 @@ describe('ChecklistsComponent', () => {
     });
   });
 
-  it('should toggle checklist mode and check items off', async () => {
+  it('should check items with keyboard (Enter and Space) in checklist mode', async () => {
+    await newFile('My file');
+    await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+    await addItem('challenge..response', 'Second item', 'CHECK');
+    await addItem('challenge..response', 'Third item', 'CHECK');
+
+    const modeBtn = screen.getByRole('button', { name: 'Switch to checklist mode' });
+
+    await user.click(modeBtn);
+
+    const itemsComp = rendered.fixture.componentInstance.items();
+
+    expect(itemsComp.checkedItemIndices().size).toBe(0);
+
+    // Press Enter once: checks item 0 (Checklist created) and advances selection to item 1 (Second item)
+    await user.keyboard('[Enter]');
+    rendered.detectChanges();
+
+    expect(itemsComp.checkedItemIndices().has(0)).toBe(true);
+    expect(itemsComp.checkedItemIndices().has(1)).toBe(false);
+
+    // Press Space once: checks item 1 (Second item) and advances selection to item 2 (Third item)
+    await user.keyboard(' ');
+    rendered.detectChanges();
+
+    expect(itemsComp.checkedItemIndices().has(1)).toBe(true);
+    expect(itemsComp.checkedItemIndices().has(2)).toBe(false);
+  });
+
+  it('should check items with mouse click in checklist mode', async () => {
     await newFile('My file');
     await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
 
@@ -1345,15 +1374,66 @@ describe('ChecklistsComponent', () => {
 
     await user.click(modeBtn);
 
-    expect(screen.getByRole('button', { name: 'Switch to edit mode' })).toBeVisible();
-    expect(screen.queryByRole('button', { name: 'Add a new checklist challenge..response' })).not.toBeInTheDocument();
+    const checkbox0 = screen.getByRole('checkbox', { name: 'Check Checklist created' });
 
-    const checkbox = screen.getByRole('checkbox', { name: 'Check Checklist created' });
+    await user.click(checkbox0);
 
-    expect(checkbox).toBeInTheDocument();
+    const itemsComp = rendered.fixture.componentInstance.items();
 
-    await user.click(checkbox);
+    expect(itemsComp.checkedItemIndices().has(0)).toBe(true);
+  });
 
-    expect(rendered.fixture.componentInstance.items().checkedItemIndices().has(0)).toBe(true);
+  it('should check items with Check item button in checklist mode', async () => {
+    await newFile('My file');
+    await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+
+    const modeBtn = screen.getByRole('button', { name: 'Switch to checklist mode' });
+
+    await user.click(modeBtn);
+
+    const checkBtn = screen.getByRole('button', { name: 'Check current item' });
+
+    await user.click(checkBtn);
+
+    const itemsComp = rendered.fixture.componentInstance.items();
+
+    expect(itemsComp.checkedItemIndices().has(0)).toBe(true);
+  });
+
+  it('should check items with a mix of keyboard, Check item button, and mouse click', async () => {
+    await newFile('My file');
+    await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+    await addItem('challenge..response', 'Second item', 'CHECK');
+    await addItem('challenge..response', 'Third item', 'CHECK');
+
+    const modeBtn = screen.getByRole('button', { name: 'Switch to checklist mode' });
+
+    await user.click(modeBtn);
+
+    const itemsComp = rendered.fixture.componentInstance.items();
+
+    // 1. Keyboard Enter: checks item 0 (Checklist created), selection advances to item 1 (Second item)
+    await user.keyboard('[Enter]');
+    rendered.detectChanges();
+
+    expect(itemsComp.checkedItemIndices().has(0)).toBe(true);
+    expect(itemsComp.checkedItemIndices().has(1)).toBe(false);
+
+    // 2. Check item button: checks item 1 (Second item), selection advances to item 2 (Third item)
+    const checkBtn = screen.getByRole('button', { name: 'Check current item' });
+
+    await user.click(checkBtn);
+    rendered.detectChanges();
+
+    expect(itemsComp.checkedItemIndices().has(1)).toBe(true);
+    expect(itemsComp.checkedItemIndices().has(2)).toBe(false);
+
+    // 3. Mouse click on checkbox 0 to toggle off item 0
+    const checkbox0 = screen.getByRole('checkbox', { name: 'Check Checklist created' });
+
+    await user.click(checkbox0);
+    rendered.detectChanges();
+
+    expect(itemsComp.checkedItemIndices().has(0)).toBe(false);
   });
 });

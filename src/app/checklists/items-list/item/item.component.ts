@@ -20,10 +20,6 @@ import { EditableLabelComponent } from '../../../shared/editable-label/editable-
   templateUrl: './item.component.html',
   styleUrl: './item.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,
-  host: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    '(keydown)': 'onKeyDown($event)',
-  },
 })
 export class ChecklistItemComponent {
   readonly item = input.required<ChecklistItem>();
@@ -44,16 +40,6 @@ export class ChecklistItemComponent {
   isCheckable(): boolean {
     const t = this.item().type;
     return t === ChecklistItem_Type.ITEM_CHALLENGE || t === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE;
-  }
-
-  onKeyDown(event: KeyboardEvent) {
-    if (this.checkMode() && (event.key === ' ' || event.key === 'Enter')) {
-      if (this.isCheckable()) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.itemCheckedToggle.emit();
-      }
-    }
   }
 
   onEdit(e?: Event) {
