@@ -95,7 +95,7 @@ export class ChecklistItemsComponent {
       this._undoState = [];
 
       if (isCheckMode && chk && chk.items.length > 0) {
-        this._selectedIdx = 0;
+        this._selectedIdx = this._findFirstCheckableIdx();
         afterNextRender(
           () => {
             this._focusSelectedItem();
@@ -226,6 +226,32 @@ export class ChecklistItemsComponent {
     return item.type === ChecklistItem_Type.ITEM_CHALLENGE || item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE;
   }
 
+  private _findNextCheckableIdx(fromIdx: number): number | null {
+    const chk = this.checklist();
+    if (!chk) {
+      return null;
+    }
+    for (let i = fromIdx + 1; i < chk.items.length; i++) {
+      if (this._isCheckable(chk.items[i])) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  private _findFirstCheckableIdx(): number {
+    const chk = this.checklist();
+    if (!chk || chk.items.length === 0) {
+      return 0;
+    }
+    for (let i = 0; i < chk.items.length; i++) {
+      if (this._isCheckable(chk.items[i])) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
   onItemCheckedToggle(idx: number) {
     const chk = this.checklist();
     if (!chk || idx < 0 || idx >= chk.items.length) {
@@ -256,7 +282,7 @@ export class ChecklistItemsComponent {
       return;
     }
 
-    this._selectedIdx ??= 0;
+    this._selectedIdx ??= this._findFirstCheckableIdx();
 
     const currentIdx = this._selectedIdx;
     const item = chk.items[currentIdx];
@@ -270,10 +296,11 @@ export class ChecklistItemsComponent {
       }
     }
 
-    if (currentIdx < chk.items.length - 1) {
-      this.selectNextItem();
+    const nextCheckable = this._findNextCheckableIdx(currentIdx);
+    if (nextCheckable !== null) {
+      this.onItemsUpdated(nextCheckable);
     } else {
-      this.onItemsUpdated();
+      this.onItemsUpdated(chk.items.length - 1);
     }
   }
 
@@ -281,7 +308,7 @@ export class ChecklistItemsComponent {
     this.checkedItemIndices.set(new Set());
     const chk = this.checklist();
     if (chk && chk.items.length > 0) {
-      this.onItemsUpdated(0);
+      this.onItemsUpdated(this._findFirstCheckableIdx());
     } else {
       this.onItemsUpdated();
     }
