@@ -93,6 +93,27 @@
   color: #66bb6a;
 }
 
+.check-mode {
+  .item-challenge .indentable-container:before,
+  .item-challenge-response .indentable-container:before {
+    font-size: 1.25em;
+    line-height: 1;
+    top: 2px;
+    width: 24px;
+  }
+
+  .checkbox-click-target {
+    top: 2px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .item-challenge .indentable-container,
+  .item-challenge-response .indentable-container {
+    padding-left: 26px;
+  }
+}
+
 .item-challenge .indentable-container,
 .item-challenge-response .indentable-container {
   padding-left: 20px;
