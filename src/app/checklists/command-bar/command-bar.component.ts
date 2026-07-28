@@ -23,6 +23,8 @@ export class ChecklistCommandBarComponent {
 
   readonly hasFiles = input.required<boolean>();
   readonly fileIsOpen = input.required<boolean>();
+  readonly checkMode = input<boolean>(false);
+  readonly toggleCheckMode = output<boolean>();
   readonly newFile = output<string>(); // Emits filename
   readonly openFile = output<boolean>();
   readonly uploadFile = output<boolean>();

@@ -20,13 +20,20 @@ import { EditableLabelComponent } from '../../../shared/editable-label/editable-
   templateUrl: './item.component.html',
   styleUrl: './item.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,
+  host: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    '(keydown)': 'onKeyDown($event)',
+  },
 })
 export class ChecklistItemComponent {
   readonly item = input.required<ChecklistItem>();
+  readonly checkMode = input(false);
+  readonly checked = input(false);
   readonly itemChange = output<ChecklistItem>();
   readonly itemDeleted = output<boolean>();
   readonly itemFocused = output<boolean>();
   readonly itemBlurred = output<boolean>();
+  readonly itemCheckedToggle = output();
   readonly containerRef = viewChild.required<ElementRef<HTMLElement>>('container');
   readonly promptInput = viewChild.required<EditableLabelComponent>('promptInput');
   readonly expectationInput = viewChild.required<EditableLabelComponent>('expectationInput');
@@ -34,9 +41,24 @@ export class ChecklistItemComponent {
 
   readonly itemType = ChecklistItem_Type;
 
+  isCheckable(): boolean {
+    const t = this.item().type;
+    return t === ChecklistItem_Type.ITEM_CHALLENGE || t === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE;
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    if (this.checkMode() && (event.key === ' ' || event.key === 'Enter')) {
+      if (this.isCheckable()) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.itemCheckedToggle.emit();
+      }
+    }
+  }
+
   onEdit(e?: Event) {
     e?.stopPropagation();
-    if (this.item().type === ChecklistItem_Type.ITEM_SPACE) {
+    if (this.checkMode() || this.item().type === ChecklistItem_Type.ITEM_SPACE) {
       return;
     }
 
@@ -111,10 +133,23 @@ export class ChecklistItemComponent {
     this.itemDeleted.emit(true);
   }
 
+  onCheckboxClick(event: MouseEvent) {
+    event.stopPropagation();
+    if (this.checkMode() && this.isCheckable()) {
+      this.itemCheckedToggle.emit();
+    }
+  }
+
   onItemClick(event: MouseEvent) {
     event.stopPropagation();
-    if (!this.promptInput().editing()) {
-      this.focus();
+    if (this.checkMode()) {
+      if (this.isCheckable()) {
+        this.itemCheckedToggle.emit();
+      }
+    } else {
+      if (!this.promptInput().editing()) {
+        this.focus();
+      }
     }
   }
 

@@ -1044,6 +1044,7 @@ describe('ChecklistsComponent', () => {
 
       // Select the first item again.
       await user.keyboard('[ArrowUp]');
+      await debounce();
 
       // Duplicate it.
       const completed = storageCompletion();
@@ -1334,5 +1335,25 @@ describe('ChecklistsComponent', () => {
       expectFragment('My file/0/1');
       await expectFile('My file', expectedFile);
     });
+  });
+
+  it('should toggle checklist mode and check items off', async () => {
+    await newFile('My file');
+    await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
+
+    const modeBtn = screen.getByRole('button', { name: 'Switch to checklist mode' });
+
+    await user.click(modeBtn);
+
+    expect(screen.getByRole('button', { name: 'Switch to edit mode' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Add a new checklist challenge..response' })).not.toBeInTheDocument();
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Check Checklist created' });
+
+    expect(checkbox).toBeInTheDocument();
+
+    await user.click(checkbox);
+
+    expect(rendered.fixture.componentInstance.items().checkedItemIndices().has(0)).toBe(true);
   });
 });

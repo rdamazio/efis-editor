@@ -6,6 +6,8 @@
         <checklist-command-bar
           [hasFiles]="(store.listChecklistFiles() | async)?.length !== 0"
           [fileIsOpen]="selectedFile !== undefined"
+          [checkMode]="checkMode()"
+          (toggleCheckMode)="toggleCheckMode()"
           (newFile)="onNewFile($event)"
           (openFile)="onOpenFile()"
           (uploadFile)="onUploadFile()"
@@ -27,6 +29,7 @@
       #tree
       class="checklist-tree"
       role="navigation"
+      [checkMode]="checkMode()"
       [beforeSelectionChange]="confirmUnsavedChanges.bind(this)"
       (fileModified)="onChecklistChanged()"
       (selectedChecklistChange)="onChecklistSelected()"
@@ -36,6 +39,7 @@
     #items
     class="checklist-items"
     role="main"
+    [checkMode]="checkMode()"
     [groupDropListIds]="tree.groupDropListIds()"
     [(checklist)]="tree.selectedChecklist"
     (checklistModified)="onChecklistChanged()"

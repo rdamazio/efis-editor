@@ -10,6 +10,7 @@ import {
   OnDestroy,
   OnInit,
   Signal,
+  signal,
   viewChild,
 } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -89,9 +90,15 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
   readonly tree = viewChild.required<ChecklistTreeComponent>('tree');
   readonly items = viewChild.required<ChecklistItemsComponent>('items');
 
+  readonly checkMode = signal(false);
+
   showFilePicker = false;
   showFileUpload = false;
   viewInitialized = false;
+
+  toggleCheckMode() {
+    this.checkMode.update((val) => !val);
+  }
 
   private _loadingFragment = false;
 
@@ -232,13 +239,17 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
     hotkeys
       .addShortcut({
         keys: 'enter',
-        description: 'Edit checklist item',
+        description: 'Edit or check checklist item',
         preventDefault: true,
         trigger: 'keyup',
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items().editCurrentItem();
+        if (this.checkMode()) {
+          this.items().toggleCurrentItemChecked();
+        } else {
+          this.items().editCurrentItem();
+        }
       });
     hotkeys
       .addShortcut({
@@ -249,7 +260,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items().deleteCurrentItem();
+        if (!this.checkMode()) {
+          this.items().deleteCurrentItem();
+        }
       });
     hotkeys
       .addShortcut({
@@ -259,7 +272,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items().duplicateCurrentItem();
+        if (!this.checkMode()) {
+          this.items().duplicateCurrentItem();
+        }
       });
     hotkeys
       .addShortcut({
@@ -269,7 +284,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items().indentCurrentItem(1);
+        if (!this.checkMode()) {
+          this.items().indentCurrentItem(1);
+        }
       });
     hotkeys
       .addShortcut({
@@ -279,7 +296,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items().indentCurrentItem(-1);
+        if (!this.checkMode()) {
+          this.items().indentCurrentItem(-1);
+        }
       });
     hotkeys
       .addShortcut({
@@ -289,7 +308,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Editing',
       })
       .subscribe(() => {
-        this.items().toggleCurrentItemCenter();
+        if (!this.checkMode()) {
+          this.items().toggleCurrentItemCenter();
+        }
       });
     hotkeys
       .addShortcut({
@@ -299,7 +320,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.items().moveCurrentItemUp();
+        if (!this.checkMode()) {
+          this.items().moveCurrentItemUp();
+        }
       });
     hotkeys
       .addShortcut({
@@ -309,7 +332,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.items().moveCurrentItemDown();
+        if (!this.checkMode()) {
+          this.items().moveCurrentItemDown();
+        }
       });
     hotkeys
       .addShortcut({
@@ -319,7 +344,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.tree().moveCurrentChecklistUp();
+        if (!this.checkMode()) {
+          this.tree().moveCurrentChecklistUp();
+        }
       });
     hotkeys
       .addShortcut({
@@ -329,7 +356,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.tree().moveCurrentChecklistDown();
+        if (!this.checkMode()) {
+          this.tree().moveCurrentChecklistDown();
+        }
       });
     hotkeys
       .addShortcut({
@@ -339,7 +368,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.tree().moveCurrentGroupUp();
+        if (!this.checkMode()) {
+          this.tree().moveCurrentGroupUp();
+        }
       });
     hotkeys
       .addShortcut({
@@ -349,16 +380,20 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
         group: 'Reordering',
       })
       .subscribe(() => {
-        this.tree().moveCurrentGroupDown();
+        if (!this.checkMode()) {
+          this.tree().moveCurrentGroupDown();
+        }
       });
 
     hotkeys
       .addShortcut({ keys: 'meta.i', description: 'Edit file information', preventDefault: true, group: 'Editing' })
       .subscribe(() => {
-        const fn = async () => {
-          await this.onFileInfo();
-        };
-        fn().catch(console.error.bind(console));
+        if (!this.checkMode()) {
+          const fn = async () => {
+            await this.onFileInfo();
+          };
+          fn().catch(console.error.bind(console));
+        }
       });
 
     for (const shortcut of ChecklistsComponent.NEW_ITEM_SHORTCUTS) {
@@ -370,7 +405,9 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
           group: 'Adding',
         })
         .subscribe(() => {
-          this.items().onNewItem(shortcut.type);
+          if (!this.checkMode()) {
+            this.items().onNewItem(shortcut.type);
+          }
         });
     }
     /* eslint-enable rxjs-x/no-ignored-subscription */

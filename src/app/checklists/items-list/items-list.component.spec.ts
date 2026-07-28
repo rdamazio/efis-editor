@@ -307,4 +307,26 @@ describe('ChecklistItemsComponent', () => {
 
     expect(fixture.componentInstance.hasUnsavedEdits()).toBe(false);
   });
+
+  it('should hide addBar and disable editing in checkMode', () => {
+    fixture.componentRef.setInput('checkMode', true);
+    fixture.detectChanges();
+
+    expect(screen.queryByRole('button', { name: /Add a new checklist/ })).not.toBeInTheDocument();
+  });
+
+  it('should toggle item checked state when clicked in checkMode', async () => {
+    fixture.componentRef.setInput('checkMode', true);
+    fixture.detectChanges();
+
+    const item = screen.getByRole('listitem', { name: 'Item: Challenge item' });
+    const checkbox = within(item).getByRole('checkbox', { name: 'Check Challenge item' });
+
+    expect(checkbox).not.toHaveClass('checkbox-checked');
+
+    await user.click(checkbox);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.checkedItemIndices().has(0)).toBe(true);
+  });
 });

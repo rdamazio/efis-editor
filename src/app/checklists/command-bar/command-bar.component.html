@@ -1,7 +1,17 @@
 <div class="command-bar">
-  <button mat-icon-button matTooltip="New file" aria-label="New file" (click)="onNewFile()">
-    <mat-icon>note_add</mat-icon>
+  <button
+    mat-icon-button
+    [matTooltip]="checkMode() ? 'Switch to edit mode' : 'Switch to checklist mode'"
+    [attr.aria-label]="checkMode() ? 'Switch to edit mode' : 'Switch to checklist mode'"
+    (click)="toggleCheckMode.emit(!checkMode())"
+  >
+    <mat-icon>{{ checkMode() ? 'edit' : 'fact_check' }}</mat-icon>
   </button>
+  @if (!checkMode()) {
+    <button mat-icon-button matTooltip="New file" aria-label="New file" (click)="onNewFile()">
+      <mat-icon>note_add</mat-icon>
+    </button>
+  }
   <button
     mat-icon-button
     matTooltip="Open file"
@@ -11,9 +21,11 @@
   >
     <mat-icon>folder_open</mat-icon>
   </button>
-  <button mat-icon-button matTooltip="Upload file" aria-label="Upload file" (click)="uploadFile.emit(true)">
-    <mat-icon>upload</mat-icon>
-  </button>
+  @if (!checkMode()) {
+    <button mat-icon-button matTooltip="Upload file" aria-label="Upload file" (click)="uploadFile.emit(true)">
+      <mat-icon>upload</mat-icon>
+    </button>
+  }
   <button
     mat-icon-button
     matTooltip="Download file"
@@ -39,15 +51,17 @@
   >
     <mat-icon>print</mat-icon>
   </button>
-  <button
-    mat-icon-button
-    matTooltip="Delete file"
-    aria-label="Delete file"
-    [disabled]="!fileIsOpen()"
-    (click)="onDeleteFile()"
-  >
-    <mat-icon>delete</mat-icon>
-  </button>
+  @if (!checkMode()) {
+    <button
+      mat-icon-button
+      matTooltip="Delete file"
+      aria-label="Delete file"
+      [disabled]="!fileIsOpen()"
+      (click)="onDeleteFile()"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
+  }
   <button
     mat-icon-button
     matTooltip="File information"
