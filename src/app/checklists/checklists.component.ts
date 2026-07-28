@@ -246,7 +246,7 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       })
       .subscribe(() => {
         if (this.checkMode()) {
-          this.items().toggleCurrentItemChecked();
+          this.items().checkCurrentItemAndNext();
         } else {
           this.items().editCurrentItem();
         }

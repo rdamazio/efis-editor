@@ -4,7 +4,7 @@
   #scrollContainer
   class="container"
   data-testid="items-list"
-  [style.scroll-padding-bottom.px]="checkMode() ? 0 : dynamicPadding()"
+  [style.scroll-padding-bottom.px]="dynamicPadding()"
   (scroll)="updateScrollShadow()"
   (onResize)="updateScrollShadow()"
 >
@@ -43,8 +43,8 @@
         </div>
       }
     </div>
-    @if (!checkMode()) {
-      <div #addBar class="list-item add-bar" [class.at-bottom]="isAtBottom()" (onResize)="updateAddBarHeight()">
+    <div #addBar class="list-item add-bar" [class.at-bottom]="isAtBottom()" (onResize)="updateAddBarHeight()">
+      @if (!checkMode()) {
         @for (item_type of itemTypes; track item_type.type) {
           <div class="action-button">
             <button
@@ -60,8 +60,35 @@
             </button>
           </div>
         }
-      </div>
-    }
+      } @else {
+        <div class="action-button">
+          <button
+            mat-fab
+            extended
+            class="action-button"
+            aria-label="Check current item"
+            (mousedown)="$event.preventDefault()"
+            (click)="checkCurrentItemAndNext()"
+          >
+            <mat-icon class="action-icon">check_box</mat-icon>
+            <span class="action-label">Check item</span>
+          </button>
+        </div>
+        <div class="action-button">
+          <button
+            mat-fab
+            extended
+            class="action-button"
+            aria-label="Reset all checked items"
+            (mousedown)="$event.preventDefault()"
+            (click)="resetCheckedItems()"
+          >
+            <mat-icon class="action-icon">restart_alt</mat-icon>
+            <span class="action-label">Reset</span>
+          </button>
+        </div>
+      }
+    </div>
   } @else {
     <div>Select or create a checklist from the left-side bar.</div>
   }

@@ -308,25 +308,50 @@ describe('ChecklistItemsComponent', () => {
     expect(fixture.componentInstance.hasUnsavedEdits()).toBe(false);
   });
 
-  it('should hide addBar and disable editing in checkMode', () => {
+  it('should render Check item and Reset buttons in checkMode and disable add item buttons', () => {
     fixture.componentRef.setInput('checkMode', true);
     fixture.detectChanges();
 
     expect(screen.queryByRole('button', { name: /Add a new checklist/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Check current item' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Reset all checked items' })).toBeVisible();
   });
 
-  it('should toggle item checked state when clicked in checkMode', async () => {
+  it('should check current item and advance selection when Check item button is clicked', async () => {
     fixture.componentRef.setInput('checkMode', true);
     fixture.detectChanges();
 
-    const item = screen.getByRole('listitem', { name: 'Item: Challenge item' });
-    const checkbox = within(item).getByRole('checkbox', { name: 'Check Challenge item' });
+    const checkBtn = screen.getByRole('button', { name: 'Check current item' });
 
-    expect(checkbox).not.toHaveClass('checkbox-checked');
+    expect(fixture.componentInstance.checkedItemIndices().has(0)).toBe(false);
 
-    await user.click(checkbox);
+    await user.click(checkBtn);
     fixture.detectChanges();
 
     expect(fixture.componentInstance.checkedItemIndices().has(0)).toBe(true);
+
+    // Clicking again checks next item (index 1)
+    await user.click(checkBtn);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.checkedItemIndices().has(1)).toBe(true);
+  });
+
+  it('should reset checked items and select first item when Reset button is clicked', async () => {
+    fixture.componentRef.setInput('checkMode', true);
+    fixture.detectChanges();
+
+    const checkBtn = screen.getByRole('button', { name: 'Check current item' });
+    const resetBtn = screen.getByRole('button', { name: 'Reset all checked items' });
+
+    await user.click(checkBtn);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.checkedItemIndices().has(0)).toBe(true);
+
+    await user.click(resetBtn);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.checkedItemIndices().size).toBe(0);
   });
 });

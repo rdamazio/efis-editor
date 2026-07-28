@@ -86,14 +86,25 @@ export class ChecklistItemsComponent {
   ) {
     effect(() => {
       // HACK: Access the signals to track them.
-      this.checklist();
-      this.checkMode();
+      const chk = this.checklist();
+      const isCheckMode = this.checkMode();
 
       // When we open an entirely separate checklist or switch mode, reset selection, checked state and undo history.
-      this._selectedIdx = null;
       this.checkedItemIndices.set(new Set());
       this._dismissUndoSnackbar();
       this._undoState = [];
+
+      if (isCheckMode && chk && chk.items.length > 0) {
+        this._selectedIdx = 0;
+        afterNextRender(
+          () => {
+            this._focusSelectedItem();
+          },
+          { injector: this._injector },
+        );
+      } else if (!isCheckMode) {
+        this._selectedIdx = null;
+      }
 
       this.updateScrollShadow();
     });
@@ -226,9 +237,37 @@ export class ChecklistItemsComponent {
     }
   }
 
-  toggleCurrentItemChecked() {
-    if (this._selectedIdx !== null) {
-      this.onItemCheckedToggle(this._selectedIdx);
+  checkCurrentItemAndNext() {
+    const chk = this.checklist();
+    if (!chk || chk.items.length === 0) {
+      return;
+    }
+
+    this._selectedIdx ??= 0;
+
+    const currentIdx = this._selectedIdx;
+    const currentSet = new Set(this.checkedItemIndices());
+
+    if (!currentSet.has(currentIdx)) {
+      currentSet.add(currentIdx);
+      this.checkedItemIndices.set(currentSet);
+      this._scrollDownIfNeeded(currentIdx);
+    }
+
+    if (currentIdx < chk.items.length - 1) {
+      this.selectNextItem();
+    } else {
+      this.onItemsUpdated();
+    }
+  }
+
+  resetCheckedItems() {
+    this.checkedItemIndices.set(new Set());
+    const chk = this.checklist();
+    if (chk && chk.items.length > 0) {
+      this.onItemsUpdated(0);
+    } else {
+      this.onItemsUpdated();
     }
   }
 
