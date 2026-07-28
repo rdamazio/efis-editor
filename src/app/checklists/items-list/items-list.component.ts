@@ -271,8 +271,15 @@ export class ChecklistItemsComponent {
     }
     this.checkedItemIndices.set(current);
 
-    if (isNowChecked && this.checkMode()) {
-      this._scrollDownIfNeeded(idx);
+    if (this.checkMode()) {
+      if (isNowChecked) {
+        this._scrollDownIfNeeded(idx);
+        const nextCheckable = this._findNextCheckableIdx(idx);
+        const targetIdx = nextCheckable ?? chk.items.length - 1;
+        this.onItemsUpdated(targetIdx);
+      } else {
+        this.onItemsUpdated(idx);
+      }
     }
   }
 

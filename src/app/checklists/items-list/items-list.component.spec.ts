@@ -373,4 +373,19 @@ describe('ChecklistItemsComponent', () => {
     expect(fixture.componentInstance.checkedItemIndices().has(1)).toBe(true);
     expect(fixture.componentInstance.checkedItemIndices().has(2)).toBe(false);
   });
+
+  it('should advance selection to next checkable item when checking an item by clicking its checkbox', async () => {
+    fixture.componentRef.setInput('checkMode', true);
+    fixture.detectChanges();
+
+    const item0 = screen.getByRole('listitem', { name: 'Item: Challenge item' });
+    const checkbox0 = within(item0).getByRole('checkbox', { name: 'Check Challenge item' });
+
+    await user.click(checkbox0);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.checkedItemIndices().has(0)).toBe(true);
+    // Selection should have advanced to item 1 (next checkable item)
+    expect(fixture.componentInstance.checkedItemIndices().has(1)).toBe(false);
+  });
 });
