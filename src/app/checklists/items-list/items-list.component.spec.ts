@@ -308,13 +308,29 @@ describe('ChecklistItemsComponent', () => {
     expect(fixture.componentInstance.hasUnsavedEdits()).toBe(false);
   });
 
-  it('should render Check item and Reset buttons in checkMode and disable add item buttons', () => {
+  it('should render Check item, Skip item and Reset buttons in checkMode and disable add item buttons', () => {
     fixture.componentRef.setInput('checkMode', true);
     fixture.detectChanges();
 
     expect(screen.queryByRole('button', { name: /Add a new checklist/ })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Check current item' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Skip current item' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Reset all checked items' })).toBeVisible();
+  });
+
+  it('should advance selection without checking current item when Skip item button is clicked', async () => {
+    fixture.componentRef.setInput('checkMode', true);
+    fixture.detectChanges();
+
+    const skipBtn = screen.getByRole('button', { name: 'Skip current item' });
+
+    expect(fixture.componentInstance.checkedItemIndices().has(0)).toBe(false);
+
+    await user.click(skipBtn);
+    fixture.detectChanges();
+
+    // Item 0 is NOT checked, selection has moved to item 1 (next checkable item)
+    expect(fixture.componentInstance.checkedItemIndices().has(0)).toBe(false);
   });
 
   it('should check current item and advance selection when Check item button is clicked', async () => {
