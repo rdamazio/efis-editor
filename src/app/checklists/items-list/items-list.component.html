@@ -79,6 +79,19 @@
             mat-fab
             extended
             class="action-button"
+            aria-label="Skip current item"
+            (mousedown)="$event.preventDefault()"
+            (click)="skipCurrentItem()"
+          >
+            <mat-icon class="action-icon">skip_next</mat-icon>
+            <span class="action-label">Skip item</span>
+          </button>
+        </div>
+        <div class="action-button">
+          <button
+            mat-fab
+            extended
+            class="action-button"
             aria-label="Reset all checked items"
             (mousedown)="$event.preventDefault()"
             (click)="resetCheckedItems()"

@@ -311,6 +311,24 @@ export class ChecklistItemsComponent {
     }
   }
 
+  skipCurrentItem() {
+    const chk = this.checklist();
+    if (!chk || chk.items.length === 0) {
+      return;
+    }
+
+    this._selectedIdx ??= this._findFirstCheckableIdx();
+
+    const currentIdx = this._selectedIdx;
+    const nextCheckable = this._findNextCheckableIdx(currentIdx);
+
+    if (nextCheckable !== null) {
+      this.onItemsUpdated(nextCheckable);
+    } else {
+      this.onItemsUpdated(chk.items.length - 1);
+    }
+  }
+
   resetCheckedItems() {
     this.checkedItemIndices.set(new Set());
     const chk = this.checklist();
