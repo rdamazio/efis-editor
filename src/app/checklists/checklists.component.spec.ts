@@ -1337,7 +1337,7 @@ describe('ChecklistsComponent', () => {
     });
   });
 
-  it('should check items with keyboard (Enter and Space) in checklist mode', async () => {
+  it('should check items with keyboard (Enter) in checklist mode', async () => {
     await newFile('My file');
     await user.click(screen.getByRole('treeitem', { name: 'Checklist: First checklist' }));
     await addItem('challenge..response', 'Second item', 'CHECK');
@@ -1358,8 +1358,8 @@ describe('ChecklistsComponent', () => {
     expect(itemsComp.checkedItemIndices().has(0)).toBe(true);
     expect(itemsComp.checkedItemIndices().has(1)).toBe(false);
 
-    // Press Space once: checks item 1 (Second item) and advances selection to item 2 (Third item)
-    await user.keyboard(' ');
+    // Press Enter again: checks item 1 (Second item) and advances selection to item 2 (Third item)
+    await user.keyboard('[Enter]');
     rendered.detectChanges();
 
     expect(itemsComp.checkedItemIndices().has(1)).toBe(true);

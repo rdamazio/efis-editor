@@ -253,19 +253,6 @@ export class ChecklistsComponent implements OnInit, AfterViewInit, OnDestroy, Ho
       });
     hotkeys
       .addShortcut({
-        keys: 'space',
-        description: 'Check checklist item',
-        preventDefault: true,
-        trigger: 'keyup',
-        group: 'Editing',
-      })
-      .subscribe(() => {
-        if (this.checkMode()) {
-          this.items().checkCurrentItemAndNext();
-        }
-      });
-    hotkeys
-      .addShortcut({
         keys: 'delete',
         description: 'Delete checklist item',
         preventDefault: true,
