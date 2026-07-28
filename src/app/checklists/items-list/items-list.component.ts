@@ -64,6 +64,8 @@ export class ChecklistItemsComponent {
   readonly checklistModified = output<Checklist | undefined>();
 
   readonly groupDropListIds = input<string[]>([]);
+  readonly checkMode = input<boolean>(false);
+  readonly checkedItemIndices = signal<Set<number>>(new Set());
   readonly items = viewChildren(ChecklistItemComponent);
   private _selectedIdx: number | null = null;
   // Whether to keep the intended selected item even if it loses focus.
@@ -83,11 +85,13 @@ export class ChecklistItemsComponent {
     private readonly _snackBar: MatSnackBar,
   ) {
     effect(() => {
-      // HACK: Access the signal to track it. For some reason, checklist.subscribe() doesn't work.
+      // HACK: Access the signals to track them.
       this.checklist();
+      this.checkMode();
 
-      // When we open an entirely separate checklist, get rid of selection and undo history.
+      // When we open an entirely separate checklist or switch mode, reset selection, checked state and undo history.
       this._selectedIdx = null;
+      this.checkedItemIndices.set(new Set());
       this._dismissUndoSnackbar();
       this._undoState = [];
 
@@ -207,6 +211,54 @@ export class ChecklistItemsComponent {
     this.onItemsUpdated();
   }
 
+  onItemCheckedToggle(idx: number) {
+    const current = new Set(this.checkedItemIndices());
+    const isNowChecked = !current.has(idx);
+    if (isNowChecked) {
+      current.add(idx);
+    } else {
+      current.delete(idx);
+    }
+    this.checkedItemIndices.set(current);
+
+    if (isNowChecked && this.checkMode()) {
+      this._scrollDownIfNeeded(idx);
+    }
+  }
+
+  toggleCurrentItemChecked() {
+    if (this._selectedIdx !== null) {
+      this.onItemCheckedToggle(this._selectedIdx);
+    }
+  }
+
+  private _scrollDownIfNeeded(checkedIdx: number) {
+    afterNextRender(
+      () => {
+        const containerEl = this.scrollContainer().nativeElement;
+        const itemComp = this.items().at(checkedIdx);
+        if (!itemComp) return;
+
+        const itemEl = itemComp.containerRef().nativeElement;
+        const containerRect = containerEl.getBoundingClientRect();
+        const itemRect = itemEl.getBoundingClientRect();
+
+        if (itemRect.bottom >= containerRect.bottom - 60) {
+          const targetIdx = Math.min(this.items().length - 1, checkedIdx + 3);
+          const targetComp = this.items().at(targetIdx);
+          if (targetComp) {
+            scrollIntoView(targetComp.containerRef().nativeElement, {
+              behavior: 'smooth',
+              block: 'nearest',
+              scrollMode: 'if-needed',
+            });
+          }
+        }
+      },
+      { injector: this._injector },
+    );
+  }
+
   deselectCurrentItem() {
     this._selectedItemComponent()?.blur();
     this._selectedIdx = null;
@@ -214,7 +266,9 @@ export class ChecklistItemsComponent {
   }
 
   editCurrentItem() {
-    this._selectedItemComponent()?.onEdit(undefined);
+    if (!this.checkMode()) {
+      this._selectedItemComponent()?.onEdit(undefined);
+    }
   }
 
   deleteCurrentItem() {

@@ -4,6 +4,7 @@
   [childrenAccessor]="childrenAccessor"
   class="checklist-tree"
   cdkDropList
+  [cdkDropListDisabled]="checkMode()"
   [cdkDropListEnterPredicate]="groupEnterPredicate.bind(this)"
   [cdkDropListSortPredicate]="groupDropSortPredicate.bind(this)"
   (cdkDropListDropped)="onGroupDrop($event)"
@@ -19,17 +20,19 @@
     level="1"
     class="checklist-node"
     [class.checklist-selected]="node.checklist && selectedChecklist() === node.checklist"
+    [hidden]="node.isAddNew && checkMode()"
     (click)="onNodeSelect(node)"
     checklistDrag
     [allDropLists]="allDropLists()"
     [checklistDragNode]="item"
     cdkDragLockAxis="y"
     [cdkDragData]="node"
-    [cdkDragDisabled]="!node.checklist"
+    [cdkDragDisabled]="!node.checklist || checkMode()"
   >
     <checklist-tree-node
       #item
       [node]="node"
+      [checkMode]="checkMode()"
       (nodeRename)="onChecklistRename(node)"
       (nodeDelete)="onChecklistDelete(node)"
       [disableButtonHover]="dragging"
@@ -48,8 +51,9 @@
     [checklistDragNode]="group"
     cdkDragLockAxis="y"
     [cdkDragData]="node"
-    [cdkDragDisabled]="!node.group"
+    [cdkDragDisabled]="!node.group || checkMode()"
     cdkDropList
+    [cdkDropListDisabled]="checkMode()"
     [cdkDropListData]="node"
     [cdkDropListConnectedTo]="groupDropListIds()"
     [cdkDropListEnterPredicate]="leafEnterPredicate.bind(this)"
@@ -67,6 +71,7 @@
       <checklist-tree-node
         #group
         [node]="node"
+        [checkMode]="checkMode()"
         (nodeRename)="onGroupRename(node)"
         (nodeDelete)="onGroupDelete(node)"
         [disableButtonHover]="dragging"

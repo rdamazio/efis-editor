@@ -29,6 +29,7 @@ import { ChecklistTreeNode } from './node';
 export class ChecklistTreeNodeComponent {
   readonly node = input.required<ChecklistTreeNode>();
   readonly disableButtonHover = input(false);
+  readonly checkMode = input<boolean>(false);
   readonly nodeRename = output<ChecklistTreeNode>();
   readonly nodeDelete = output<ChecklistTreeNode>();
   readonly dragHandle = viewChild(CdkDragHandle);

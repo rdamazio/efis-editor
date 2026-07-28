@@ -255,4 +255,30 @@ describe('ChecklistItemComponent', () => {
     expect(itemChange).toHaveBeenCalledTimes(8);
     expect(item.indent).toEqual(0);
   });
+
+  it('should hide action buttons in checkMode', async () => {
+    await render(ChecklistItemComponent, {
+      inputs: { item: item, checkMode: true },
+    });
+
+    expect(screen.queryByRole('button', { name: /Edit.*/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Delete.*/ })).not.toBeInTheDocument();
+  });
+
+  it('should emit itemCheckedToggle when clicking checkbox in checkMode', async () => {
+    item.type = ChecklistItem_Type.ITEM_CHALLENGE;
+    const itemCheckedToggle = vi.fn<() => undefined>();
+    await render(ChecklistItemComponent, {
+      inputs: { item: item, checkMode: true, checked: false },
+      on: { itemCheckedToggle },
+    });
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Check My prompt' });
+
+    expect(checkbox).toBeInTheDocument();
+
+    await user.click(checkbox);
+
+    expect(itemCheckedToggle).toHaveBeenCalled();
+  });
 });

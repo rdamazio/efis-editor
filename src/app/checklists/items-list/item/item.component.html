@@ -3,76 +3,80 @@
 <div
   #container
   class="item-container"
+  [class.item-checked]="checked()"
+  [class.check-mode]="checkMode()"
   tabindex="0"
   (focus)="itemFocused.emit(true)"
   (blur)="itemBlurred.emit(true)"
   (click)="onItemClick($event)"
 >
-  <div class="actions">
-    <mat-icon cdkDragHandle class="mat-icon-rtl-mirror action-icon drag-icon" matTooltip="Drag to reorder">
-      drag_pan
-    </mat-icon>
-    <button
-      mat-icon-button
-      mat-medium-icon-button
-      class="action-icon"
-      matTooltip="Edit this line"
-      [attr.aria-label]="`Edit ${it.prompt}`"
-      [disabled]="it.type === itemType.ITEM_SPACE"
-      (click)="onEdit($event)"
-    >
-      <mat-icon>edit</mat-icon>
-    </button>
-    <button
-      mat-icon-button
-      mat-medium-icon-button
-      class="action-icon"
-      matTooltip="Delete this line"
-      [attr.aria-label]="`Delete ${it.prompt || 'blank row'}`"
-      (click)="onDelete()"
-    >
-      <mat-icon>delete</mat-icon>
-    </button>
-    <button
-      mat-icon-button
-      mat-medium-icon-button
-      class="action-icon"
-      matTooltip="Indent left"
-      [attr.aria-label]="`Indent ${it.prompt || 'blank row'} left`"
-      [disabled]="it.indent === 0 || it.centered"
-      (click)="onIndent(-1)"
-    >
-      <mat-icon>format_indent_decrease</mat-icon>
-    </button>
-    <button
-      mat-icon-button
-      mat-medium-icon-button
-      class="action-icon"
-      matTooltip="Indent right"
-      [attr.aria-label]="`Indent ${it.prompt || 'blank row'} right`"
-      [disabled]="it.indent === 4 || it.centered"
-      (click)="onIndent(1)"
-    >
-      <mat-icon>format_indent_increase</mat-icon>
-    </button>
-    <button
-      mat-icon-button
-      mat-medium-icon-button
-      class="action-icon"
-      [matTooltip]="`${it.centered ? 'Left-justify' : 'Center'}  this line`"
-      [attr.aria-label]="`Center ${it.prompt}`"
-      [disabled]="it.type === itemType.ITEM_SPACE || it.type === itemType.ITEM_CHALLENGE_RESPONSE"
-      (click)="onCenterToggle()"
-    >
-      <mat-icon>
-        @if (it.centered) {
-          format_align_left
-        } @else {
-          format_align_center
-        }
+  @if (!checkMode()) {
+    <div class="actions">
+      <mat-icon cdkDragHandle class="mat-icon-rtl-mirror action-icon drag-icon" matTooltip="Drag to reorder">
+        drag_pan
       </mat-icon>
-    </button>
-  </div>
+      <button
+        mat-icon-button
+        mat-medium-icon-button
+        class="action-icon"
+        matTooltip="Edit this line"
+        [attr.aria-label]="`Edit ${it.prompt}`"
+        [disabled]="it.type === itemType.ITEM_SPACE"
+        (click)="onEdit($event)"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        mat-medium-icon-button
+        class="action-icon"
+        matTooltip="Delete this line"
+        [attr.aria-label]="`Delete ${it.prompt || 'blank row'}`"
+        (click)="onDelete()"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        mat-medium-icon-button
+        class="action-icon"
+        matTooltip="Indent left"
+        [attr.aria-label]="`Indent ${it.prompt || 'blank row'} left`"
+        [disabled]="it.indent === 0 || it.centered"
+        (click)="onIndent(-1)"
+      >
+        <mat-icon>format_indent_decrease</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        mat-medium-icon-button
+        class="action-icon"
+        matTooltip="Indent right"
+        [attr.aria-label]="`Indent ${it.prompt || 'blank row'} right`"
+        [disabled]="it.indent === 4 || it.centered"
+        (click)="onIndent(1)"
+      >
+        <mat-icon>format_indent_increase</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        mat-medium-icon-button
+        class="action-icon"
+        [matTooltip]="`${it.centered ? 'Left-justify' : 'Center'}  this line`"
+        [attr.aria-label]="`Center ${it.prompt}`"
+        [disabled]="it.type === itemType.ITEM_SPACE || it.type === itemType.ITEM_CHALLENGE_RESPONSE"
+        (click)="onCenterToggle()"
+      >
+        <mat-icon>
+          @if (it.centered) {
+            format_align_left
+          } @else {
+            format_align_center
+          }
+        </mat-icon>
+      </button>
+    </div>
+  }
   <div
     class="item"
     [class.item-centered]="it.centered"
@@ -89,6 +93,18 @@
       <span class="prompt-tabulator"></span>
     }
     <span class="indentable-container">
+      @if (isCheckable()) {
+        <span
+          class="checkbox-click-target"
+          [class.checkbox-checked]="checked()"
+          [class.clickable]="checkMode()"
+          role="checkbox"
+          tabindex="0"
+          [attr.aria-checked]="checked()"
+          [attr.aria-label]="`Check ${it.prompt || 'item'}`"
+          (click)="onCheckboxClick($event)"
+        ></span>
+      }
       <span class="prompt">
         <!-- TODO: Find a better solution than to save/cancel independent fields together -->
         <editable-label

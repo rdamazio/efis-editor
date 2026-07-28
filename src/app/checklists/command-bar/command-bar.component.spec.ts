@@ -176,4 +176,32 @@ describe('ChecklistCommandBarComponent', () => {
 
     expect(deleteFile).toHaveBeenCalledExactlyOnceWith(true);
   });
+
+  it('should toggle checklist mode when mode button is clicked', async () => {
+    const toggleCheckMode = vi.fn<() => undefined>();
+    await render(ChecklistCommandBarComponent, {
+      inputs: { hasFiles: true, fileIsOpen: true, checkMode: false },
+      on: { toggleCheckMode },
+    });
+
+    const modeBtn = screen.getByRole('button', { name: 'Switch to checklist mode' });
+
+    expect(modeBtn).toBeVisible();
+
+    await user.click(modeBtn);
+
+    expect(toggleCheckMode).toHaveBeenCalledWith(true);
+  });
+
+  it('should hide editing buttons when checkMode is true', async () => {
+    await render(ChecklistCommandBarComponent, {
+      inputs: { hasFiles: true, fileIsOpen: true, checkMode: true },
+    });
+
+    expect(screen.getByRole('button', { name: 'Switch to edit mode' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'New file' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Upload file' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Delete file' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Open file' })).toBeVisible();
+  });
 });

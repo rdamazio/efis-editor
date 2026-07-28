@@ -4,7 +4,7 @@
   #scrollContainer
   class="container"
   data-testid="items-list"
-  [style.scroll-padding-bottom.px]="dynamicPadding()"
+  [style.scroll-padding-bottom.px]="checkMode() ? 0 : dynamicPadding()"
   (scroll)="updateScrollShadow()"
   (onResize)="updateScrollShadow()"
 >
@@ -14,15 +14,26 @@
       cdkDropList
       class="list"
       role="list"
+      [cdkDropListDisabled]="checkMode()"
       [cdkDropListData]="chklist.items"
       [cdkDropListConnectedTo]="groupDropListIds()"
       (cdkDropListDropped)="onDrop($event)"
     >
       @for (item of chklist.items; track _trackChecklistItem(item)) {
-        <div class="list-item" cdkDrag [cdkDragData]="item" role="listitem" [attr.aria-label]="itemLabel(item)">
+        <div
+          class="list-item"
+          cdkDrag
+          [cdkDragDisabled]="checkMode()"
+          [cdkDragData]="item"
+          role="listitem"
+          [attr.aria-label]="itemLabel(item)"
+        >
           <checklist-item
             #item
             [item]="item"
+            [checkMode]="checkMode()"
+            [checked]="checkedItemIndices().has($index)"
+            (itemCheckedToggle)="onItemCheckedToggle($index)"
             (itemChange)="onItemsUpdated()"
             (itemDeleted)="onItemDeleted($index)"
             (itemFocused)="onItemFocused($index)"
@@ -32,23 +43,25 @@
         </div>
       }
     </div>
-    <div #addBar class="list-item add-bar" [class.at-bottom]="isAtBottom()" (onResize)="updateAddBarHeight()">
-      @for (item_type of itemTypes; track item_type.type) {
-        <div class="action-button">
-          <button
-            mat-fab
-            extended
-            class="action-button"
-            aria-label="Add a new checklist {{ item_type.label | lowercase }}"
-            (mousedown)="$event.preventDefault()"
-            (click)="onNewItem(item_type.type)"
-          >
-            <mat-icon class="action-icon">add</mat-icon>
-            <span class="action-label">{{ item_type.label }}</span>
-          </button>
-        </div>
-      }
-    </div>
+    @if (!checkMode()) {
+      <div #addBar class="list-item add-bar" [class.at-bottom]="isAtBottom()" (onResize)="updateAddBarHeight()">
+        @for (item_type of itemTypes; track item_type.type) {
+          <div class="action-button">
+            <button
+              mat-fab
+              extended
+              class="action-button"
+              aria-label="Add a new checklist {{ item_type.label | lowercase }}"
+              (mousedown)="$event.preventDefault()"
+              (click)="onNewItem(item_type.type)"
+            >
+              <mat-icon class="action-icon">add</mat-icon>
+              <span class="action-label">{{ item_type.label }}</span>
+            </button>
+          </div>
+        }
+      </div>
+    }
   } @else {
     <div>Select or create a checklist from the left-side bar.</div>
   }

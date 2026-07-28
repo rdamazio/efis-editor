@@ -8,13 +8,13 @@
   (focus)="hideButtons = false"
   (mouseleave)="hideButtons = true"
 >
-  @if (n.isAddNew) {
+  @if (n.isAddNew && !checkMode()) {
     <button mat-icon-button mat-medium-icon-button class="checklist-tree-node-add" [attr.aria-label]="n.title">
       <mat-icon>add</mat-icon>
     </button>
   }
 
-  @if (n.checklist) {
+  @if (n.checklist && !checkMode()) {
     <mat-icon
       cdkDragHandle
       class="mat-icon-rtl-mirror checklist-tree-drag-icon"
@@ -27,18 +27,20 @@
 
   <div class="checklist-tree-node-title">
     @if (n.group && !n.checklist && !n.isAddNew) {
-      <mat-select
-        [(value)]="checklistGroupCategory"
-        [class]="`checklist-tree-node-title-category checklist-tree-node-title-category-${checklistGroupCategory}`"
-        matTooltip="Checklist group category"
-        panelWidth="12em"
-      >
-        @for (category of _groupCategories; track category[0]) {
-          <mat-option [value]="category[0]"
-            ><span [class]="`checklist-tree-node-title-category-${category[0]}`">{{ category[1] }}</span>
-          </mat-option>
-        }
-      </mat-select>
+      @if (!checkMode()) {
+        <mat-select
+          [(value)]="checklistGroupCategory"
+          [class]="`checklist-tree-node-title-category checklist-tree-node-title-category-${checklistGroupCategory}`"
+          matTooltip="Checklist group category"
+          panelWidth="12em"
+        >
+          @for (category of _groupCategories; track category[0]) {
+            <mat-option [value]="category[0]"
+              ><span [class]="`checklist-tree-node-title-category-${category[0]}`">{{ category[1] }}</span>
+            </mat-option>
+          }
+        </mat-select>
+      }
     }
     <div class="checklist-tree-node-title">
       {{ n.title }}
@@ -47,7 +49,7 @@
 
   <span class="checklist-tree-node-spacer"></span>
 
-  @if (!n.isAddNew) {
+  @if (!n.isAddNew && !checkMode()) {
     <div
       class="checklist-tree-node-buttons"
       [style.visibility]="hideButtons || disableButtonHover() ? 'hidden' : 'visible'"

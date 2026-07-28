@@ -69,6 +69,7 @@ export class ChecklistTreeComponent implements OnInit, AfterViewInit {
   readonly selectedChecklist = model<Checklist>();
   readonly selectedChecklistGroup = model<ChecklistGroup>();
   readonly groupDropListIds = model<string[]>([]);
+  readonly checkMode = input<boolean>(false);
   readonly beforeSelectionChange = input<() => Promise<boolean>>();
   readonly tree = viewChild.required(MatTree);
   readonly allDropLists = viewChildren(CdkDropList<ChecklistTreeNode>);

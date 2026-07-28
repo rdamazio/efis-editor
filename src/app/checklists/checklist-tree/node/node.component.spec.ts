@@ -148,4 +148,15 @@ describe('NodeComponent', () => {
     // Verify that model was changed.
     expect(node.group.category).toEqual(ChecklistGroup_Category.normal);
   });
+
+  it('should hide action buttons and drag handles when checkMode is true', async () => {
+    await render(ChecklistTreeNodeComponent, {
+      inputs: { node: node, disableButtonHover: false, checkMode: true },
+    });
+
+    expect(screen.getByText(node.title)).toBeInTheDocument();
+    expect(screen.queryByText('drag_handle')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('rename-button')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('delete-button')).not.toBeInTheDocument();
+  });
 });
