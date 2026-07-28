@@ -222,7 +222,20 @@ export class ChecklistItemsComponent {
     this.onItemsUpdated();
   }
 
+  private _isCheckable(item: ChecklistItem): boolean {
+    return item.type === ChecklistItem_Type.ITEM_CHALLENGE || item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE;
+  }
+
   onItemCheckedToggle(idx: number) {
+    const chk = this.checklist();
+    if (!chk || idx < 0 || idx >= chk.items.length) {
+      return;
+    }
+    const item = chk.items[idx];
+    if (!this._isCheckable(item)) {
+      return;
+    }
+
     const current = new Set(this.checkedItemIndices());
     const isNowChecked = !current.has(idx);
     if (isNowChecked) {
@@ -246,12 +259,15 @@ export class ChecklistItemsComponent {
     this._selectedIdx ??= 0;
 
     const currentIdx = this._selectedIdx;
-    const currentSet = new Set(this.checkedItemIndices());
+    const item = chk.items[currentIdx];
 
-    if (!currentSet.has(currentIdx)) {
-      currentSet.add(currentIdx);
-      this.checkedItemIndices.set(currentSet);
-      this._scrollDownIfNeeded(currentIdx);
+    if (this._isCheckable(item)) {
+      const currentSet = new Set(this.checkedItemIndices());
+      if (!currentSet.has(currentIdx)) {
+        currentSet.add(currentIdx);
+        this.checkedItemIndices.set(currentSet);
+        this._scrollDownIfNeeded(currentIdx);
+      }
     }
 
     if (currentIdx < chk.items.length - 1) {

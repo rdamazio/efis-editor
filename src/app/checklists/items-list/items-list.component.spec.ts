@@ -354,4 +354,24 @@ describe('ChecklistItemsComponent', () => {
 
     expect(fixture.componentInstance.checkedItemIndices().size).toBe(0);
   });
+
+  it('should skip non-checkable items when Check item button is clicked', async () => {
+    fixture.componentRef.setInput('checkMode', true);
+    fixture.detectChanges();
+
+    const checkBtn = screen.getByRole('button', { name: 'Check current item' });
+
+    // Item 0 is challenge (checkable), item 1 is challenge-response (checkable), item 2 is plaintext (not checkable)
+    await user.click(checkBtn); // Checks 0, advances to 1
+    await user.click(checkBtn); // Checks 1, advances to 2 (plaintext)
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.checkedItemIndices().has(0)).toBe(true);
+    expect(fixture.componentInstance.checkedItemIndices().has(1)).toBe(true);
+
+    await user.click(checkBtn); // On plaintext (not checkable), skips checking 2, advances to 3 (note, not checkable)
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.checkedItemIndices().has(2)).toBe(false);
+  });
 });
