@@ -21,6 +21,7 @@ const NON_DEFAULT_OPTS: PdfWriterOptions = {
   checklistStart: 'page',
   columns: 2,
   fontSizePercent: 75,
+  columnFillPercent: 60,
 };
 
 describe('PreferenceStorage', () => {

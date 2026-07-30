@@ -46,6 +46,7 @@ describe('PrintDialogComponent', () => {
   let okButton: HTMLButtonElement;
   let cancelButton: HTMLButtonElement;
   let fontSize: HTMLInputElement;
+  let columnFill: HTMLInputElement;
 
   let paperSize: HTMLElement;
   let landscape: HTMLElement;
@@ -85,6 +86,7 @@ describe('PrintDialogComponent', () => {
     pageNumbers = await screen.findByRole('checkbox', { name: 'Output page numbers' });
     completionActions = await screen.findByRole('checkbox', { name: 'Output completion actions' });
     fontSize = await screen.findByRole('spinbutton', { name: 'Font size' });
+    columnFill = await screen.findByRole('spinbutton', { name: 'Column fill percentage' });
   }
 
   it('should open and cancel the dialog', async () => {
@@ -146,6 +148,9 @@ describe('PrintDialogComponent', () => {
     await user.click(pageNumbers);
     await user.click(completionActions);
 
+    await user.clear(columnFill);
+    await user.type(columnFill, '70');
+
     const checklistStartPage = await screen.findByRole('radio', { name: 'New page' });
     await user.click(checklistStartPage);
 
@@ -163,6 +168,7 @@ describe('PrintDialogComponent', () => {
       outputCompletionActions: false,
       checklistStart: 'page',
       fontSizePercent: 90,
+      columnFillPercent: 70,
     };
 
     expect(dataOut).toHaveBeenCalledExactlyOnceWith(expectedOpts);
@@ -179,6 +185,7 @@ describe('PrintDialogComponent', () => {
       orientation: 'landscape',
       checklistStart: 'page',
       fontSizePercent: 150,
+      columnFillPercent: 80,
     };
     await prefs.setPrintOptions(expectedOpts);
 
@@ -241,5 +248,21 @@ describe('PrintDialogComponent', () => {
         checklistStart: 'page',
       }),
     );
+  });
+
+  it('should disable column fill input unless "Below the previous checklist" is selected', async () => {
+    await openDialog();
+
+    expect(columnFill).toBeEnabled();
+
+    const checklistStartPage = await screen.findByRole('radio', { name: 'New page' });
+    await user.click(checklistStartPage);
+
+    expect(columnFill).toBeDisabled();
+
+    const checklistStartBelow = await screen.findByRole('radio', { name: /Below the previous checklist/ });
+    await user.click(checklistStartBelow);
+
+    expect(columnFill).toBeEnabled();
   });
 });

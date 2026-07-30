@@ -19,6 +19,21 @@
   }
 }
 
+.column-fill-field {
+  width: 75px;
+  margin-right: 10px;
+  text-align: right;
+}
+
+.column-fill-input {
+  display: inline;
+}
+
+.column-fill-input::-webkit-outer-spin-button,
+.column-fill-input::-webkit-inner-spin-button {
+  display: none;
+}
+
 .font-size-input {
   width: 110px;
 }
@@ -76,4 +91,13 @@ mat-form-field:not(.columns-input) input[type='number'] {
 [matTextSuffix],
 [matSuffix] {
   color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 80);
+}
+
+.top-aligned-radio ::ng-deep .mdc-form-field {
+  align-items: flex-start !important;
+}
+
+.top-aligned-radio ::ng-deep .mdc-radio,
+.top-aligned-radio ::ng-deep .mdc-label {
+  padding-top: 10px !important;
 }

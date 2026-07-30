@@ -180,6 +180,19 @@ describe('PdfWriter', () => {
     expect(rightItems.length).toBeGreaterThan(0);
   });
 
+  it('respects columnFillPercent threshold before starting a new column', async () => {
+    const pdfLowThreshold = await writeAndParsePdf({
+      checklistStart: 'below',
+      columnFillPercent: 0,
+    });
+    const pdfHighThreshold = await writeAndParsePdf({
+      checklistStart: 'below',
+      columnFillPercent: 100,
+    });
+
+    expect(pdfLowThreshold.numPages).toBeGreaterThan(pdfHighThreshold.numPages);
+  });
+
   async function writeAndParsePdf(options: PdfWriterOptions): Promise<pdfjs.PDFDocumentProxy> {
     const writtenFile = await serializeChecklistFile(EXPECTED_CONTENTS_WITH_COMPLETION_ACTION, FormatId.PDF, options);
     const writtenData = await writtenFile.arrayBuffer();

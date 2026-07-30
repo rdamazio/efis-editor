@@ -69,6 +69,9 @@ export interface PdfWriterOptions extends ExportOptions {
   // Percentage multiplier for checklist content and group headers font sizes.
   // E.g., 100 is normal size, 150 is 50% larger.
   fontSizePercent?: number;
+
+  // Maximum percentage of column height filled before starting a new column.
+  columnFillPercent?: number;
 }
 
 export const DEFAULT_OPTIONS: PdfWriterOptions = {
@@ -89,6 +92,7 @@ export const DEFAULT_OPTIONS: PdfWriterOptions = {
   checklistStart: 'below',
   columns: 1,
   fontSizePercent: 100,
+  columnFillPercent: 50,
 };
 
 // Precalculated, option-dependent dimensions used for drawing the PDF.
@@ -549,8 +553,11 @@ export class PdfWriter {
       } else if (this._options.checklistStart === 'column') {
         // User requested a new column for each checklist.
         this._newPage(false);
-      } else if (this._doc.lastAutoTable.finalY - this._dims.tableMargin.top > this._dims.innerPageHeight / 2) {
-        // More than half the page is already used, start on the next column.
+      } else if (
+        this._doc.lastAutoTable.finalY - this._dims.tableMargin.top >
+        (this._dims.innerPageHeight * (this._options.columnFillPercent ?? 50)) / 100
+      ) {
+        // More than columnFillPercent of the column is already used, start on the next column.
         this._newPage(false);
       } else {
         // Start on the same column, after the previous checklist.

@@ -172,6 +172,7 @@
           (ngModelChange)="onColumnsChange()"
         />
       </mat-form-field>
+
       <mat-form-field class="font-size-input">
         <mat-label id="font-size-label">Font size</mat-label>
         <input
@@ -203,7 +204,27 @@
         <mat-radio-button value="column" [disabled]="options.columns !== undefined && options.columns <= 1"
           >New column</mat-radio-button
         ><br />
-        <mat-radio-button value="below">Below the previous checklist</mat-radio-button>
+        <mat-radio-button class="top-aligned-radio" value="below"
+          >Below the previous checklist<br />
+          (unless {{ options.columns === 1 ? 'page' : 'column' }} is more<br />
+          than
+          <mat-form-field class="column-fill-field">
+            <input
+              matInput
+              required
+              type="number"
+              min="0"
+              max="100"
+              placeholder="50"
+              class="column-fill-input"
+              aria-label="Column fill percentage"
+              [disabled]="options.checklistStart !== 'below'"
+              [(ngModel)]="options.columnFillPercent"
+            />
+            <span matTextSuffix>%</span>
+          </mat-form-field>
+          full)
+        </mat-radio-button>
       </mat-radio-group>
     </div>
   </div>
