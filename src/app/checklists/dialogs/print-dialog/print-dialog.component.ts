@@ -63,6 +63,7 @@ export class PrintDialogComponent implements OnInit {
       closeOnNavigation: true,
       enterAnimationDuration: 200,
       exitAnimationDuration: 200,
+      maxWidth: '1000px',
       role: 'dialog',
       ariaModal: true,
     });

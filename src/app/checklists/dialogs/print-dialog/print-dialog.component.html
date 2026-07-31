@@ -1,195 +1,212 @@
 <h2 mat-dialog-title>PDF export options</h2>
-<mat-dialog-content>
+<mat-dialog-content class="print-dialog-content">
   <div>
-    <mat-label class="section-header">Page options</mat-label><br />
+    <div>
+      <mat-label class="section-header">Page options</mat-label><br /><br />
 
-    <mat-form-field>
-      <mat-label>Paper size</mat-label>
-      <mat-select required [(value)]="options.pageSize" aria-label="Select the paper size">
-        <mat-optgroup label="Imperial">
-          <mat-option value="letter">Letter (8.5 x 11)</mat-option>
-          <mat-option value="government-letter">Government letter (8 x 10.5)</mat-option>
-          <mat-option value="legal">Legal (8.5 x 14)</mat-option>
-          <mat-option value="junior-legal">Junior legal (5 x 8)</mat-option>
-          <mat-option value="tabloid">Tabloid (17 x 11)</mat-option>
-        </mat-optgroup>
-        <mat-optgroup label="Metric">
-          <mat-option value="a6">A6</mat-option>
-          <mat-option value="a5">A5</mat-option>
-          <mat-option value="a4">A4</mat-option>
-          <mat-option value="a3">A3</mat-option>
-          <mat-option value="a2">A2</mat-option>
-          <mat-option value="a1">A1</mat-option>
-          <mat-option value="a0">A0</mat-option>
-        </mat-optgroup>
-        <mat-option value="custom">Custom...</mat-option>
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field class="paper-size-input">
+        <mat-label>Paper size</mat-label>
+        <mat-select required [(value)]="options.pageSize" aria-label="Select the paper size">
+          <mat-optgroup label="Imperial">
+            <mat-option value="letter">Letter (8.5 x 11)</mat-option>
+            <mat-option value="government-letter">Government letter (8 x 10.5)</mat-option>
+            <mat-option value="legal">Legal (8.5 x 14)</mat-option>
+            <mat-option value="junior-legal">Junior legal (5 x 8)</mat-option>
+            <mat-option value="tabloid">Tabloid (17 x 11)</mat-option>
+          </mat-optgroup>
+          <mat-optgroup label="Metric">
+            <mat-option value="a6">A6</mat-option>
+            <mat-option value="a5">A5</mat-option>
+            <mat-option value="a4">A4</mat-option>
+            <mat-option value="a3">A3</mat-option>
+            <mat-option value="a2">A2</mat-option>
+            <mat-option value="a1">A1</mat-option>
+            <mat-option value="a0">A0</mat-option>
+          </mat-optgroup>
+          <mat-option value="custom">Custom...</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-    <mat-form-field class="columns-input">
-      <mat-label id="columns-label">Columns</mat-label>
-      <input
-        matInput
-        type="number"
-        min="1"
-        max="10"
-        required
-        aria-labelledby="columns-label"
-        placeholder="1"
-        [(ngModel)]="options.columns"
-        (ngModelChange)="onColumnsChange()"
-      />
-    </mat-form-field>
+    @if (options.pageSize === 'custom') {
+      <div>
+        <mat-label>Custom page size:</mat-label><br />
+        <mat-form-field class="pagesize-input">
+          <mat-label id="width-label">Width (in)</mat-label>
+          <input
+            matInput
+            cdkFocusInitial
+            required
+            aria-labelledby="width-label"
+            placeholder="8.5"
+            [(ngModel)]="options.customPageWidth"
+          />
+        </mat-form-field>
 
-    <mat-form-field class="font-size-input">
-      <mat-label id="font-size-label">Font size (%)</mat-label>
-      <input
-        matInput
-        required
-        type="number"
-        min="10"
-        max="500"
-        placeholder="100"
-        aria-labelledby="font-size-label"
-        [(ngModel)]="options.fontSizePercent"
-      />
-    </mat-form-field>
+        <mat-form-field class="pagesize-input">
+          <mat-label id="height-label">Height (in)</mat-label>
+          <input
+            matInput
+            cdkFocusInitial
+            required
+            aria-labelledby="height-label"
+            placeholder="11"
+            [(ngModel)]="options.customPageHeight"
+          />
+        </mat-form-field>
+      </div>
+    } @else {
+      <div>
+        <mat-label>Orientation:</mat-label><br />
+        <mat-radio-group required [(ngModel)]="options.orientation" aria-label="Select the paper orientation">
+          <mat-radio-button value="portrait">Portrait</mat-radio-button>
+          <mat-radio-button value="landscape">Landscape</mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <br />
+    }
+
+    <div>
+      <mat-label>Margins:</mat-label><br />
+      <mat-grid-list cols="3" rowHeight="60px" class="margin-grid">
+        <mat-grid-tile />
+        <mat-grid-tile>
+          <mat-form-field class="margin-input">
+            <mat-label id="top-margin-label">Top</mat-label>
+            <input
+              matInput
+              cdkFocusInitial
+              required
+              aria-labelledby="top-margin-label"
+              placeholder="5"
+              [(ngModel)]="options.marginTop"
+            />
+          </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile />
+
+        <mat-grid-tile>
+          <mat-form-field class="margin-input">
+            <mat-label id="left-margin-label">Left</mat-label>
+            <input
+              matInput
+              cdkFocusInitial
+              required
+              aria-labelledby="left-margin-label"
+              placeholder="5"
+              [(ngModel)]="options.marginLeft"
+            />
+          </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile>
+          <mat-form-field class="margin-input">
+            <mat-label>Unit</mat-label>
+            <mat-select required [(value)]="options.marginUnits" aria-label="Select the margin units">
+              <mat-option value="percent">%</mat-option>
+              <mat-option value="in">in</mat-option>
+              <mat-option value="mm">mm</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile>
+          <mat-form-field class="margin-input">
+            <mat-label id="right-margin-label">Right</mat-label>
+            <input
+              matInput
+              cdkFocusInitial
+              required
+              aria-labelledby="right-margin-label"
+              placeholder="5"
+              [(ngModel)]="options.marginRight"
+            />
+          </mat-form-field>
+        </mat-grid-tile>
+
+        <mat-grid-tile />
+        <mat-grid-tile>
+          <mat-form-field class="margin-input">
+            <mat-label id="bottom-margin-label">Bottom</mat-label>
+            <input
+              matInput
+              cdkFocusInitial
+              required
+              aria-labelledby="bottom-margin-label"
+              placeholder="5"
+              [(ngModel)]="options.marginBottom"
+            />
+          </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile />
+      </mat-grid-list>
+    </div>
   </div>
 
-  @if (options.pageSize === 'custom') {
+  <mat-divider [vertical]="true" class="divider" />
+
+  <div>
+    <mat-label class="section-header">Layout options</mat-label>
+
     <div>
-      <mat-label>Custom page size:</mat-label><br />
-      <mat-form-field class="pagesize-input">
-        <mat-label id="width-label">Width (in)</mat-label>
+      <mat-form-field class="columns-input">
+        <mat-label id="columns-label">Columns</mat-label>
         <input
           matInput
-          cdkFocusInitial
+          type="number"
+          min="1"
+          max="10"
           required
-          aria-labelledby="width-label"
-          placeholder="8.5"
-          [(ngModel)]="options.customPageWidth"
+          aria-labelledby="columns-label"
+          placeholder="1"
+          [(ngModel)]="options.columns"
+          (ngModelChange)="onColumnsChange()"
         />
       </mat-form-field>
-
-      <mat-form-field class="pagesize-input">
-        <mat-label id="height-label">Height (in)</mat-label>
+      <mat-form-field class="font-size-input">
+        <mat-label id="font-size-label">Font size (%)</mat-label>
         <input
           matInput
-          cdkFocusInitial
           required
-          aria-labelledby="height-label"
-          placeholder="11"
-          [(ngModel)]="options.customPageHeight"
+          type="number"
+          min="10"
+          max="500"
+          placeholder="100"
+          aria-labelledby="font-size-label"
+          [(ngModel)]="options.fontSizePercent"
         />
       </mat-form-field>
     </div>
-  } @else {
-    <div>
-      <mat-label>Orientation:</mat-label>
-      <mat-radio-group required [(ngModel)]="options.orientation" aria-label="Select the paper orientation">
-        <mat-radio-button value="portrait">Portrait</mat-radio-button>
-        <mat-radio-button value="landscape">Landscape</mat-radio-button>
+
+    <div class="options-group">
+      <mat-checkbox [(ngModel)]="options.marginOffsetsGroupTitle"
+        >Offset group title by top margin<br />
+        (for top spiral binding)</mat-checkbox
+      >
+    </div>
+    <br />
+
+    <div class="options-group">
+      <mat-label>Checklist start position:</mat-label>
+      <mat-radio-group required [(ngModel)]="options.checklistStart" aria-label="Select where new checklists start">
+        <mat-radio-button value="page">New page</mat-radio-button><br />
+        <mat-radio-button value="column" [disabled]="options.columns !== undefined && options.columns <= 1"
+          >New column</mat-radio-button
+        ><br />
+        <mat-radio-button value="below">Below the previous checklist</mat-radio-button>
       </mat-radio-group>
     </div>
-  }
+  </div>
+
+  <mat-divider [vertical]="true" class="divider" />
 
   <div>
-    <mat-label>Margins:</mat-label>
-    <mat-grid-list cols="3" rowHeight="60px">
-      <mat-grid-tile />
-      <mat-grid-tile>
-        <mat-form-field class="margin-input">
-          <mat-label id="top-margin-label">Top</mat-label>
-          <input
-            matInput
-            cdkFocusInitial
-            required
-            aria-labelledby="top-margin-label"
-            placeholder="5"
-            [(ngModel)]="options.marginTop"
-          />
-        </mat-form-field>
-      </mat-grid-tile>
-      <mat-grid-tile />
+    <mat-label class="section-header">Content options</mat-label>
 
-      <mat-grid-tile>
-        <mat-form-field class="margin-input">
-          <mat-label id="left-margin-label">Left</mat-label>
-          <input
-            matInput
-            cdkFocusInitial
-            required
-            aria-labelledby="left-margin-label"
-            placeholder="5"
-            [(ngModel)]="options.marginLeft"
-          />
-        </mat-form-field>
-      </mat-grid-tile>
-      <mat-grid-tile>
-        <mat-form-field class="margin-input">
-          <mat-label>Units</mat-label>
-          <mat-select required [(value)]="options.marginUnits" aria-label="Select the margin units">
-            <mat-option value="percent">%</mat-option>
-            <mat-option value="in">in</mat-option>
-            <mat-option value="mm">mm</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </mat-grid-tile>
-      <mat-grid-tile>
-        <mat-form-field class="margin-input">
-          <mat-label id="right-margin-label">Right</mat-label>
-          <input
-            matInput
-            cdkFocusInitial
-            required
-            aria-labelledby="right-margin-label"
-            placeholder="5"
-            [(ngModel)]="options.marginRight"
-          />
-        </mat-form-field>
-      </mat-grid-tile>
-
-      <mat-grid-tile />
-      <mat-grid-tile>
-        <mat-form-field class="margin-input">
-          <mat-label id="bottom-margin-label">Bottom</mat-label>
-          <input
-            matInput
-            cdkFocusInitial
-            required
-            aria-labelledby="bottom-margin-label"
-            placeholder="5"
-            [(ngModel)]="options.marginBottom"
-          />
-        </mat-form-field>
-      </mat-grid-tile>
-      <mat-grid-tile />
-    </mat-grid-list>
-  </div>
-
-  <mat-divider class="divider" />
-  <mat-label class="section-header">Document layout</mat-label>
-
-  <div class="options-group">
-    <mat-checkbox [(ngModel)]="options.outputPageNumbers">Output page numbers</mat-checkbox>
-    <mat-checkbox [(ngModel)]="options.outputCoverPage">Output cover page</mat-checkbox>
-    <mat-checkbox [(ngModel)]="options.outputGroupCoverPages">Output group cover pages</mat-checkbox>
-    <mat-checkbox [(ngModel)]="options.marginOffsetsGroupTitle"
-      >Offset group title by top margin<br />
-      (for top spiral binding)</mat-checkbox
-    >
-    <mat-checkbox [(ngModel)]="options.outputCompletionActions">Output completion actions</mat-checkbox>
-  </div>
-
-  <div class="options-group">
-    <mat-label>Checklist start position:</mat-label>
-    <mat-radio-group required [(ngModel)]="options.checklistStart" aria-label="Select where new checklists start">
-      <mat-radio-button value="page">New page</mat-radio-button><br />
-      <mat-radio-button value="column" [disabled]="options.columns !== undefined && options.columns <= 1"
-        >New column</mat-radio-button
-      ><br />
-      <mat-radio-button value="below">Below the previous checklist</mat-radio-button>
-    </mat-radio-group>
+    <div class="options-group">
+      <mat-checkbox [(ngModel)]="options.outputPageNumbers">Output page numbers</mat-checkbox>
+      <mat-checkbox [(ngModel)]="options.outputCoverPage">Output cover page</mat-checkbox>
+      <mat-checkbox [(ngModel)]="options.outputGroupCoverPages">Output group cover pages</mat-checkbox>
+      <mat-checkbox [(ngModel)]="options.outputCompletionActions">Output completion actions</mat-checkbox>
+    </div>
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
