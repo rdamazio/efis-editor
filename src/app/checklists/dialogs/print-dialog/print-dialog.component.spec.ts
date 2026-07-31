@@ -84,7 +84,7 @@ describe('PrintDialogComponent', () => {
     landscape = await screen.findByRole('radio', { name: 'Landscape' });
     pageNumbers = await screen.findByRole('checkbox', { name: 'Output page numbers' });
     completionActions = await screen.findByRole('checkbox', { name: 'Output completion actions' });
-    fontSize = await screen.findByRole('spinbutton', { name: 'Font size (%)' });
+    fontSize = await screen.findByRole('spinbutton', { name: 'Font size' });
   }
 
   it('should open and cancel the dialog', async () => {

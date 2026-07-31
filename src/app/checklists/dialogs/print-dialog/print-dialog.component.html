@@ -37,6 +37,7 @@
             matInput
             cdkFocusInitial
             required
+            type="number"
             aria-labelledby="width-label"
             placeholder="8.5"
             [(ngModel)]="options.customPageWidth"
@@ -49,6 +50,7 @@
             matInput
             cdkFocusInitial
             required
+            type="number"
             aria-labelledby="height-label"
             placeholder="11"
             [(ngModel)]="options.customPageHeight"
@@ -67,6 +69,7 @@
     }
 
     <div>
+      @let unitName = unit.value === 'percent' ? '%' : unit.value === 'in' ? '"' : '㎜';
       <mat-label>Margins:</mat-label><br />
       <mat-grid-list cols="3" rowHeight="60px" class="margin-grid">
         <mat-grid-tile />
@@ -77,10 +80,12 @@
               matInput
               cdkFocusInitial
               required
+              type="number"
               aria-labelledby="top-margin-label"
               placeholder="5"
               [(ngModel)]="options.marginTop"
             />
+            <span matTextSuffix>{{ unitName }}</span>
           </mat-form-field>
         </mat-grid-tile>
         <mat-grid-tile />
@@ -92,16 +97,18 @@
               matInput
               cdkFocusInitial
               required
+              type="number"
               aria-labelledby="left-margin-label"
               placeholder="5"
               [(ngModel)]="options.marginLeft"
             />
+            <span matTextSuffix>{{ unitName }}</span>
           </mat-form-field>
         </mat-grid-tile>
         <mat-grid-tile>
           <mat-form-field class="margin-input">
             <mat-label>Unit</mat-label>
-            <mat-select required [(value)]="options.marginUnits" aria-label="Select the margin units">
+            <mat-select #unit required [(value)]="options.marginUnits" aria-label="Select the margin units">
               <mat-option value="percent">%</mat-option>
               <mat-option value="in">in</mat-option>
               <mat-option value="mm">mm</mat-option>
@@ -115,10 +122,12 @@
               matInput
               cdkFocusInitial
               required
+              type="number"
               aria-labelledby="right-margin-label"
               placeholder="5"
               [(ngModel)]="options.marginRight"
             />
+            <span matTextSuffix>{{ unitName }}</span>
           </mat-form-field>
         </mat-grid-tile>
 
@@ -130,10 +139,12 @@
               matInput
               cdkFocusInitial
               required
+              type="number"
               aria-labelledby="bottom-margin-label"
               placeholder="5"
               [(ngModel)]="options.marginBottom"
             />
+            <span matTextSuffix>{{ unitName }}</span>
           </mat-form-field>
         </mat-grid-tile>
         <mat-grid-tile />
@@ -162,7 +173,7 @@
         />
       </mat-form-field>
       <mat-form-field class="font-size-input">
-        <mat-label id="font-size-label">Font size (%)</mat-label>
+        <mat-label id="font-size-label">Font size</mat-label>
         <input
           matInput
           required
@@ -173,6 +184,7 @@
           aria-labelledby="font-size-label"
           [(ngModel)]="options.fontSizePercent"
         />
+        <span matTextSuffix>%</span>
       </mat-form-field>
     </div>
 

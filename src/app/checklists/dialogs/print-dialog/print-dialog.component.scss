@@ -1,3 +1,6 @@
+@use '@angular/material' as mat;
+@use '../../../../theme' as theme;
+
 .print-dialog-content {
   display: flex;
   flex-direction: row;
@@ -9,6 +12,11 @@
   width: 90px;
   margin-right: 10px;
   margin-top: 20px;
+
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    margin-left: 5px;
+  }
 }
 
 .font-size-input {
@@ -52,4 +60,20 @@
 
   /* Creates space for the checkbox touch targets so they don't overflow the dialog boundary and cause scrollbars */
   padding: 8px 4px;
+}
+
+input[type='number'] {
+  text-align: right;
+}
+
+mat-form-field:not(.columns-input) input[type='number'] {
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    display: none;
+  }
+}
+
+[matTextSuffix],
+[matSuffix] {
+  color: mat.get-theme-color(theme.$efis-editor-theme, neutral, 80);
 }
