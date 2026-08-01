@@ -1,6 +1,5 @@
 import { parse } from 'csv-parse/sync';
 import {
-  Checklist,
   Checklist_CompletionAction,
   ChecklistFile,
   ChecklistFileMetadata,
@@ -9,272 +8,186 @@ import {
   ChecklistItem,
   ChecklistItem_Type,
 } from '../../../gen/ts/checklist';
-import { CsvFormatError } from './csv-format';
+import { CsvColumn, CsvColumnIndexes, CsvFormatError, CsvItemRow, CsvUtils } from './csv-utils';
+import { FormatId } from './format-id';
 
-interface ItemFields {
-  typeStr: string;
-  text: string;
-  response: string;
-  indentStr: string;
-  centerStr: string;
-}
+type CellReader = (column: CsvColumn) => string;
+type CellError = (column: CsvColumn, message: string) => CsvFormatError;
 
-function colIndexToLetters(colIndex: number): string {
-  let temp = colIndex;
-  let letter = '';
-  while (temp >= 0) {
-    letter = String.fromCharCode((temp % 26) + 65) + letter;
-    temp = Math.floor(temp / 26) - 1;
-  }
-  return letter;
-}
-
-function cellId(colIndex: number, rowIndex: number): string {
-  return `${colIndexToLetters(colIndex)}${rowIndex + 1}`;
-}
+const DEFAULT_LABELS = new Set(
+  [CsvUtils.DEFAULT_GROUP_LABEL, CsvUtils.DEFAULT_CHECKLIST_LABEL].map(CsvUtils.normalizeLabel),
+);
 
 export class CsvReader {
   public static async read(file: File): Promise<ChecklistFile> {
-    const csvText = await file.text();
-    const rows = parse(csvText, {
-      /* eslint-disable @typescript-eslint/naming-convention */
-      relax_column_count: true,
-      relax_quotes: true,
-      /* eslint-enable @typescript-eslint/naming-convention */
-    });
+    const [rows, itemsHeaderIndex] = CsvReader._parseRows(await file.text());
 
-    const minCols = ['group', 'checklist', 'type', 'text'];
-    let tableHeaderIndex = -1;
-    const colIndexMap = new Map<string, number>();
+    const itemRows = [...rows.entries()]
+      .slice(itemsHeaderIndex + 1)
+      // Blank rows may be used to visually separate checklists
+      .filter(([, cells]) => cells.some((cell) => cell.trim()));
+    const groups = CsvReader._checklistGroupsToEFIS(
+      CsvReader._readItemRows(itemRows, CsvUtils.columnIndexes(rows[itemsHeaderIndex])),
+    );
 
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      if (row.length >= minCols.length) {
-        const isHeader = minCols.every((col, idx) => row[idx]?.trim().toLowerCase() === col);
-        if (isHeader) {
-          tableHeaderIndex = i;
-          row.forEach((cell: string, idx: number) => {
-            colIndexMap.set(cell.trim().toLowerCase(), idx);
-          });
-          break;
-        }
-      }
-    }
-
-    if (tableHeaderIndex === -1) {
-      throw new CsvFormatError('Did not find table header row with columns "Group", "Checklist", "Type", "Text"');
-    }
-
-    const metadata = ChecklistFileMetadata.create();
-    let defaultGroupTitle: string | undefined;
-    let defaultChecklistTitle: string | undefined;
-
-    for (let i = 0; i < tableHeaderIndex; i++) {
-      const row = rows[i];
-      for (let j = 0; j < row.length - 1; j += 2) {
-        const rawKey = row[j]?.trim();
-        const val = row[j + 1]?.trim();
-        if (!rawKey || !val) {
-          continue;
-        }
-
-        let key = rawKey;
-        if (key.endsWith(':')) {
-          key = key.slice(0, -1).trim();
-        }
-        const normalizedKey = key.toLowerCase();
-
-        if (normalizedKey === 'name') {
-          metadata.name = val;
-        } else if (normalizedKey === 'make & model' || normalizedKey === 'make and model') {
-          metadata.makeAndModel = val;
-        } else if (normalizedKey === 'aircraft' || normalizedKey === 'aircraft info') {
-          metadata.aircraftInfo = val;
-        } else if (normalizedKey === 'manufacturer info' || normalizedKey === 'manufacturer') {
-          metadata.manufacturerInfo = val;
-        } else if (normalizedKey === 'copyright info' || normalizedKey === 'copyright') {
-          metadata.copyrightInfo = val;
-        } else if (normalizedKey === 'default group') {
-          defaultGroupTitle = val;
-        } else if (normalizedKey === 'default checklist') {
-          defaultChecklistTitle = val;
-        } else {
-          console.warn(`cell ${cellId(j, i)}: Ignoring unsupported metadata key: ${rawKey}`);
-        }
-      }
-    }
-
-    if (!metadata.name) {
-      metadata.name = file.name.replace(/\.csv$/i, '');
-    }
-
-    const checklistFile = ChecklistFile.create({
-      metadata,
-      groups: [],
-    });
-
-    let currentGroup: ChecklistGroup | undefined;
-    let currentChecklist: Checklist | undefined;
-
-    for (let i = tableHeaderIndex + 1; i < rows.length; i++) {
-      const row = rows[i];
-      if (row.length === 0 || row.every((c: string) => c.trim() === '')) {
-        continue;
-      }
-
-      const getCell = (name: string): string => {
-        const idx = colIndexMap.get(name);
-        return idx !== undefined && idx < row.length ? (row[idx] ?? '') : '';
-      };
-
-      let groupTitle = getCell('group').trim();
-      let checklistTitle = getCell('checklist').trim();
-      const typeStr = getCell('type').trim();
-      const text = getCell('text');
-      const response = getCell('response');
-      const indentStr = getCell('indent').trim();
-      const centerStr = getCell('center').trim();
-
-      if (!groupTitle) {
-        if (currentGroup) {
-          groupTitle = currentGroup.title;
-        } else {
-          const groupCol = colIndexMap.get('group') ?? 0;
-          throw new CsvFormatError(`cell ${cellId(groupCol, i)}: invalid/missing "Group" column value`);
-        }
-      }
-
-      if (!checklistTitle) {
-        if (currentChecklist && currentGroup?.title === groupTitle) {
-          checklistTitle = currentChecklist.title;
-        } else {
-          const checklistCol = colIndexMap.get('checklist') ?? 1;
-          throw new CsvFormatError(`cell ${cellId(checklistCol, i)}: invalid/missing "Checklist" column value`);
-        }
-      }
-
-      if (currentGroup?.title !== groupTitle) {
-        let existingGroup = checklistFile.groups.find((g) => g.title === groupTitle);
-        if (!existingGroup) {
-          existingGroup = ChecklistGroup.create({
-            title: groupTitle,
-            category: ChecklistGroup_Category.normal,
-            checklists: [],
-          });
-          checklistFile.groups.push(existingGroup);
-        }
-        currentGroup = existingGroup;
-        currentChecklist = undefined;
-      }
-
-      if (currentChecklist?.title !== checklistTitle) {
-        let existingChecklist = currentGroup.checklists.find((c) => c.title === checklistTitle);
-        if (!existingChecklist) {
-          existingChecklist = Checklist.create({
-            title: checklistTitle,
-            completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
-            items: [],
-          });
-          currentGroup.checklists.push(existingChecklist);
-        }
-        currentChecklist = existingChecklist;
-      }
-
-      const item = CsvReader._parseItem(
-        {
-          typeStr,
-          text,
-          response,
-          indentStr,
-          centerStr,
-        },
-        i,
-        colIndexMap,
-      );
-      currentChecklist.items.push(item);
-    }
-
-    if (defaultGroupTitle && defaultChecklistTitle) {
-      let found = false;
-      for (let i = 0; i < checklistFile.groups.length; i++) {
-        const group = checklistFile.groups[i];
-        if (group.title === defaultGroupTitle) {
-          for (let j = 0; j < group.checklists.length; j++) {
-            const checklist = group.checklists[j];
-            if (checklist.title === defaultChecklistTitle) {
-              checklistFile.metadata!.defaultGroupIndex = i;
-              checklistFile.metadata!.defaultChecklistIndex = j;
-              found = true;
-              break;
-            }
-          }
-        }
-        if (found) break;
-      }
-      if (!found) {
-        throw new CsvFormatError(
-          `Default checklist "${defaultChecklistTitle}" in group "${defaultGroupTitle}" not found`,
-        );
-      }
-    }
-
-    return checklistFile;
+    return {
+      groups: groups,
+      metadata: CsvReader._checklistMetadataToEFIS(rows.slice(0, itemsHeaderIndex), file, groups),
+    };
   }
 
-  private static _parseItem(fields: ItemFields, rowIdx: number, colIndexMap: Map<string, number>): ChecklistItem {
-    const { typeStr, text, response, indentStr, centerStr } = fields;
-    const item = ChecklistItem.create();
-    const normalizedType = typeStr.toLowerCase();
-
-    if (normalizedType === 'title bar' || normalizedType === 'title') {
-      item.type = ChecklistItem_Type.ITEM_TITLE;
-      item.prompt = text;
-    } else if (normalizedType === 'challenge') {
-      if (response.length > 0) {
-        item.type = ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE;
-        item.prompt = text;
-        item.expectation = response;
+  /**
+   * Spreadsheets in locales where the comma is the decimal separator write semicolon-delimited files instead,
+   * so the file is imported with whichever delimiter makes its item table header show up.
+   */
+  private static _parseRows(text: string): [string[][], number] {
+    for (const delimiter of [',', ';']) {
+      const rows: string[][] = parse(text, {
+        delimiter: delimiter,
+        /* eslint-disable @typescript-eslint/naming-convention */
+        relax_column_count: true, // metadata rows are shorter than the rows of the checklist item table
+        relax_quotes: true, // tolerate quotes within unquoted fields
+        /* eslint-enable @typescript-eslint/naming-convention */
+      });
+      const itemsHeaderIndex = rows.findIndex(CsvReader._isItemsHeader);
+      if (itemsHeaderIndex !== -1) {
+        return [rows, itemsHeaderIndex];
       } else {
-        item.type = ChecklistItem_Type.ITEM_CHALLENGE;
-        item.prompt = text;
-      }
-    } else if (normalizedType === 'information' || normalizedType === 'plain text' || normalizedType === 'text') {
-      item.type = ChecklistItem_Type.ITEM_PLAINTEXT;
-      item.prompt = text;
-    } else if (normalizedType === 'warning') {
-      item.type = ChecklistItem_Type.ITEM_WARNING;
-      item.prompt = text;
-    } else if (normalizedType === 'caution') {
-      item.type = ChecklistItem_Type.ITEM_CAUTION;
-      item.prompt = text;
-    } else if (normalizedType === 'note') {
-      item.type = ChecklistItem_Type.ITEM_NOTE;
-      item.prompt = text;
-    } else if (normalizedType === 'space' || normalizedType === 'blank') {
-      item.type = ChecklistItem_Type.ITEM_SPACE;
-    } else {
-      const typeCol = colIndexMap.get('type') ?? 2;
-      throw new CsvFormatError(`cell ${cellId(typeCol, rowIdx)}: unknown type "${typeStr}"`);
-    }
-
-    if (indentStr.length > 0) {
-      const indent = Number(indentStr);
-      if (isNaN(indent) || indent < 0 || !Number.isInteger(indent)) {
-        const indentCol = colIndexMap.get('indent') ?? 5;
-        throw new CsvFormatError(`cell ${cellId(indentCol, rowIdx)}: invalid indent value "${indentStr}"`);
-      }
-      if (indent > 0) {
-        item.indent = indent;
+        console.warn(`CSV: continuing after failed parse attempt using delimiter "${delimiter}"`);
       }
     }
 
-    if (centerStr.length > 0) {
-      const c = centerStr.toLowerCase();
-      if (c === 'true' || c === '1' || c === 'yes') {
-        item.centered = true;
+    const columns = CsvUtils.REQUIRED_COLUMNS.map((column) => `"${column}"`).join(', ');
+    throw new CsvFormatError(`did not find table header row with columns ${columns}`);
+  }
+
+  private static _isItemsHeader(cells: string[]): boolean {
+    const columns = CsvUtils.columnIndexes(cells);
+    return CsvUtils.REQUIRED_COLUMNS.every((column) => columns.has(column));
+  }
+
+  private static _readItemRows(rows: [number, string[]][], columns: CsvColumnIndexes): CsvItemRow[] {
+    const itemRows: CsvItemRow[] = [];
+
+    for (const [rowIndex, cells] of rows) {
+      const cellReader: CellReader = (column) => CsvUtils.cell(cells, columns, column);
+      const cellError: CellError = (column, message) =>
+        new CsvFormatError(`cell ${CsvUtils.cellId(columns.get(column) ?? -1, rowIndex)}: ${message}`);
+
+      // Titles omitted on a row are carried over, but a checklist only continues within its own group
+      const previous = itemRows.at(-1);
+      const group = cellReader('Group').trim() || previous?.group;
+      if (!group) {
+        throw cellError('Group', 'invalid/missing "Group" column value');
+      }
+      const checklist = cellReader('Checklist').trim() || (previous?.group === group ? previous.checklist : undefined);
+      if (!checklist) {
+        throw cellError('Checklist', 'invalid/missing "Checklist" column value');
+      }
+
+      itemRows.push({ group: group, checklist: checklist, item: CsvReader._readItem(cellReader, cellError) });
+    }
+
+    return itemRows;
+  }
+
+  private static _readItem(cellReader: CellReader, cellError: CellError): ChecklistItem {
+    const label = cellReader('Type').trim();
+    const type = CsvUtils.itemType(label);
+    if (type === undefined) {
+      throw cellError('Type', `unknown type "${label}"`);
+    }
+
+    // A response promotes a challenge to a challenge/response item, and is meaningless for any other type
+    const response = cellReader('Response');
+    const isChallengeResponse = type === ChecklistItem_Type.ITEM_CHALLENGE && Boolean(response);
+
+    return ChecklistItem.create({
+      type: isChallengeResponse ? ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE : type,
+      prompt: cellReader('Text'),
+      expectation: isChallengeResponse ? response : '',
+      indent: CsvReader._readIndent(cellReader('Indent').trim(), cellError),
+      centered: CsvUtils.CENTERED_VALUES.has(cellReader('Center').trim().toLowerCase()),
+    });
+  }
+
+  private static _readIndent(value: string, cellError: CellError): number {
+    const indent = value ? Number(value) : 0;
+    if (!Number.isInteger(indent) || indent < 0) {
+      throw cellError('Indent', `invalid indent value "${value}"`);
+    }
+    return indent;
+  }
+
+  private static _checklistGroupsToEFIS(itemRows: CsvItemRow[]): ChecklistGroup[] {
+    // Rows of one group or checklist don't have to be adjacent, so they are gathered by title
+    return [...CsvUtils.groupBy(itemRows, (row) => row.group)].map(([title, groupRows]) => ({
+      category: ChecklistGroup_Category.normal,
+      title: title,
+      checklists: [...CsvUtils.groupBy(groupRows, (row) => row.checklist)].map(([checklistTitle, checklistRows]) => ({
+        title: checklistTitle,
+        completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
+        items: checklistRows.map((row) => row.item),
+      })),
+    }));
+  }
+
+  private static _checklistMetadataToEFIS(
+    rows: string[][],
+    file: File,
+    groups: ChecklistGroup[],
+  ): ChecklistFileMetadata {
+    const values = CsvReader._readMetadataValues(rows);
+    const [defaultGroupIndex, defaultChecklistIndex] = CsvReader._defaultIndexes(values, groups);
+
+    const metadata = ChecklistFileMetadata.create({
+      name: file.name.replace(new RegExp(`\\.${FormatId.CSV}$`, 'i'), ''),
+      defaultGroupIndex: defaultGroupIndex,
+      defaultChecklistIndex: defaultChecklistIndex,
+    });
+
+    for (const [label, value] of values) {
+      const field = CsvUtils.METADATA_FIELD_BY_LABEL.get(label);
+      if (field) {
+        metadata[field] = value;
+      } else if (!DEFAULT_LABELS.has(label)) {
+        console.warn(`CSV: ignoring unsupported metadata key "${label}"`);
       }
     }
 
-    return item;
+    return metadata;
+  }
+
+  private static _readMetadataValues(rows: string[][]): ReadonlyMap<string, string> {
+    const values = new Map<string, string>();
+
+    for (const [labelCell = '', valueCell = ''] of rows) {
+      const label = CsvUtils.normalizeLabel(labelCell);
+      const value = valueCell.trim();
+      if (label && value) {
+        values.set(label, value);
+      }
+    }
+
+    return values;
+  }
+
+  private static _defaultIndexes(values: ReadonlyMap<string, string>, groups: ChecklistGroup[]): [number, number] {
+    const groupTitle = values.get(CsvUtils.normalizeLabel(CsvUtils.DEFAULT_GROUP_LABEL));
+    const checklistTitle = values.get(CsvUtils.normalizeLabel(CsvUtils.DEFAULT_CHECKLIST_LABEL));
+    if (groupTitle === undefined || checklistTitle === undefined) {
+      return [0, 0];
+    }
+
+    const groupIndex = groups.findIndex((group) => group.title === groupTitle);
+    const checklistIndex =
+      groupIndex === -1
+        ? -1
+        : groups[groupIndex].checklists.findIndex((checklist) => checklist.title === checklistTitle);
+    if (checklistIndex === -1) {
+      throw new CsvFormatError(`default checklist "${checklistTitle}" in group "${groupTitle}" not found`);
+    }
+
+    return [groupIndex, checklistIndex];
   }
 }
