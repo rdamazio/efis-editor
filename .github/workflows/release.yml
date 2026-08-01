@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Prepare build
-        uses: ./.github/actions/build-prep
+        uses: $/.github/actions/build-prep
         with:
           browsers: chromium firefox
           github-token: '${{ secrets.GITHUB_TOKEN }}'
