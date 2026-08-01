@@ -141,11 +141,11 @@ metadata is added to the end of the file.
 
 CSV spreadsheet files (.csv) allow importing and exporting checklist data to edit easily using spreadsheet applications like Google Sheets or Microsoft Excel.
 
-The CSV file can contain 3 parts, in this order: metadata (optional), table header, and then checklist items.
+The CSV file can contain 3 parts, in this order: metadata (optional), table header, and then checklist items. Fields are separated by commas on export, but files separated by semicolons are imported as well.
 
 To be imported successfully, the CSV file must contain a **table header row** identifying the data columns:
 
-- **Metadata** (Optional): Metadata key-value pairs can be placed in rows prior to the table header row (e.g. `Name:,My Airplane Checklists` or `Make & Model:,Cessna 172`). Supported metadata keys:
+- **Metadata** (Optional): Metadata key-value pairs can be placed in the first two columns of the rows prior to the table header row (e.g. `Name:,My Airplane Checklists` or `Make & Model:,Cessna 172`). Supported metadata keys:
   - `Name:` (File title)
   - `Make & Model:` (Aircraft make & model)
   - `Aircraft:` (Aircraft info / tail number)
@@ -153,7 +153,7 @@ To be imported successfully, the CSV file must contain a **table header row** id
   - `Copyright Info:` (Copyright info)
   - `Default Group:` (Title of the default group)
   - `Default Checklist:` (Title of the default checklist)
-- **Table Header Row**: Must contain at minimum the columns `Group`, `Checklist`, `Type`, `Text` (case-insensitive). The columns `Response`, `Indent`, and `Center` are optional.
+- **Table Header Row**: Must contain at minimum the columns `Group`, `Checklist`, `Type`, `Text` (case- and order-insensitive). The columns `Response`, `Indent`, and `Center` are optional, and any other column is ignored.
 - **Item Rows**:
   - `Group`: Name of the checklist group. If omitted on subsequent rows, items belong to the previous group.
   - `Checklist`: Name of the checklist within the group. If omitted on subsequent rows, items belong to the previous checklist.
@@ -162,6 +162,8 @@ To be imported successfully, the CSV file must contain a **table header row** id
   - `Response`: Expected response for challenge items. If provided, the item is created as a Challenge/Response item.
   - `Indent`: Indentation level (numeric integer `0`, `1`, etc., optional).
   - `Center`: Centering flag (`true` / `1` / `yes`, optional).
+
+This format has no representation for group categories and completion actions, so all imported groups are normal ones, and all imported checklists go to the next checklist upon completion. Groups and checklists are identified by their titles, so same-titled ones are merged on import, and ones holding no items at all are dropped on export.
 
 ### GRT
 
