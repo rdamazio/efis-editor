@@ -10,6 +10,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - uses: actions/checkout@v7
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:

@@ -18,7 +18,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
       - name: Prepare build
         uses: $/.github/actions/build-prep
         with:
@@ -31,7 +30,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
       - name: Prepare build
         uses: $/.github/actions/build-prep
         with:
@@ -62,7 +60,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
       - name: Prepare build
         uses: $/.github/actions/build-prep
         with:
@@ -85,7 +82,6 @@ jobs:
     name: Linters
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
       - name: Prepare build
         uses: $/.github/actions/build-prep
         with:
