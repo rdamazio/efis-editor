@@ -95,7 +95,7 @@
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-rxjs-x": "^1.0.4",
     "eslint-plugin-testing-library": "^7.16.2",
-    "globals": "^17.10.0",
+    "globals": "^17.11.0",
     "pdfjs-dist": "^6.2.108",
     "playwright": "^1.62.1",
     "prettier": "^3.9.6",
