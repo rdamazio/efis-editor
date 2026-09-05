@@ -16,7 +16,6 @@ export class ChecklistStorage {
     this._browserStorage.storage
       .then((store: Storage) => {
         this._publishList(store);
-        return void {};
       })
       .catch((error: unknown) => {
         console.error(error);
