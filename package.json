@@ -60,7 +60,7 @@
     "ngx-spinner": "^21.1.0",
     "rxjs": "~7.8.2",
     "scroll-into-view-if-needed": "^3.1.0",
-    "svg2pdf.js": "^2.7.0",
+    "svg2pdf.js": "^2.8.1",
     "tslib": "^2.8.1",
     "zone.js": "^0.16.2"
   },
@@ -96,7 +96,7 @@
     "eslint-plugin-rxjs-x": "^1.0.6",
     "eslint-plugin-testing-library": "^7.16.2",
     "globals": "^17.11.0",
-    "pdfjs-dist": "^6.2.108",
+    "pdfjs-dist": "^6.3.289",
     "playwright": "^1.62.1",
     "prettier": "^3.9.6",
     "prettier-plugin-organize-imports": "^4.3.0",
