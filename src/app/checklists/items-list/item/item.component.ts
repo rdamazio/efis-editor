@@ -1,5 +1,5 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, ElementRef, input, output, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, model, output, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -22,8 +22,7 @@ import { EditableLabelComponent } from '../../../shared/editable-label/editable-
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ChecklistItemComponent {
-  readonly item = input.required<ChecklistItem>();
-  readonly itemChange = output<ChecklistItem>();
+  readonly item = model.required<ChecklistItem>();
   readonly itemDeleted = output<boolean>();
   readonly itemFocused = output<boolean>();
   readonly itemBlurred = output<boolean>();
@@ -31,6 +30,8 @@ export class ChecklistItemComponent {
   readonly promptInput = viewChild.required<EditableLabelComponent>('promptInput');
   readonly expectationInput = viewChild.required<EditableLabelComponent>('expectationInput');
   private _shouldRestoreFocus = false;
+  private _newPrompt?: string;
+  private _newExpectation?: string;
 
   readonly itemType = ChecklistItem_Type;
 
@@ -49,45 +50,63 @@ export class ChecklistItemComponent {
   }
 
   onIndent(delta: number) {
-    const item = this.item();
-    const indent = item.indent + delta;
+    const indent = this.item().indent + delta;
     if (indent >= 0 && indent <= 4) {
-      item.indent = indent;
-      this.onItemUpdated();
+      this.item.update((i) => ({
+        ...i,
+        indent,
+      }));
     }
   }
 
   onCenterToggle() {
-    const item = this.item();
-    if (item.type === ChecklistItem_Type.ITEM_SPACE || item.type === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
+    const itemType = this.item().type;
+    if (itemType === ChecklistItem_Type.ITEM_SPACE || itemType === ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE) {
       return;
     }
 
-    item.indent = 0;
-    item.centered = !item.centered;
-    this.onItemUpdated();
+    this.item.update((i) => ({
+      ...i,
+      indent: 0,
+      centered: !i.centered,
+    }));
   }
 
   onSavePrompt(prompt: string) {
-    this.item().prompt = prompt;
+    this._newPrompt = prompt;
+
     if (this.expectationInput().editing()) {
       // Let the expectation input propagate the change.
       this.expectationInput().save();
     } else {
-      this.onItemUpdated();
+      this._updateItem();
       this._restoreFocus();
     }
   }
 
   onSaveExpectation(expectation: string) {
-    this.item().expectation = expectation;
+    this._newExpectation = expectation;
+
     if (this.promptInput().editing()) {
       // Let the prompt input propagate the change.
       this.promptInput().save();
     } else {
-      this.onItemUpdated();
+      this._updateItem();
       this._restoreFocus();
     }
+  }
+
+  private _updateItem() {
+    const prompt = this._newPrompt ?? this.item().prompt;
+    const expectation = this._newExpectation ?? this.item().expectation;
+    this._newPrompt = undefined;
+    this._newExpectation = undefined;
+
+    this.item.set({
+      ...this.item(),
+      prompt,
+      expectation,
+    });
   }
 
   onCancelEdit() {
@@ -101,10 +120,6 @@ export class ChecklistItemComponent {
       this.focus();
     }
     this._shouldRestoreFocus = false;
-  }
-
-  onItemUpdated() {
-    this.itemChange.emit(this.item());
   }
 
   onDelete() {

@@ -113,6 +113,14 @@ export class ChecklistItemsComponent {
     this.onItemsUpdated();
   }
 
+  onItemChange(idx: number, item: ChecklistItem) {
+    const checklist = this.checklist();
+    if (checklist) {
+      checklist.items[idx] = item;
+    }
+    this.onItemsUpdated();
+  }
+
   onItemsUpdated(selectedIdx?: number, editSelectedItem = false) {
     this.checklistModified.emit(this.checklist());
     afterNextRender(
@@ -391,7 +399,4 @@ export class ChecklistItemsComponent {
     }
     return `Item: ${item.prompt}`;
   }
-
-  // Opt-out of NG0956 warning regarding tracking by identity (non-static collection)
-  protected readonly _trackChecklistItem = (item: ChecklistItem) => item;
 }

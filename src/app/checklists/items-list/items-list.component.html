@@ -18,12 +18,12 @@
       [cdkDropListConnectedTo]="groupDropListIds()"
       (cdkDropListDropped)="onDrop($event)"
     >
-      @for (item of chklist.items; track _trackChecklistItem(item)) {
+      @for (item of chklist.items; track $index) {
         <div class="list-item" cdkDrag [cdkDragData]="item" role="listitem" [attr.aria-label]="itemLabel(item)">
           <checklist-item
             #item
             [item]="item"
-            (itemChange)="onItemsUpdated()"
+            (itemChange)="onItemChange($index, $event)"
             (itemDeleted)="onItemDeleted($index)"
             (itemFocused)="onItemFocused($index)"
             (itemBlurred)="onItemBlurred()"

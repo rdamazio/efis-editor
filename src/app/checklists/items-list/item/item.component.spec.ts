@@ -1,3 +1,4 @@
+import { outputBinding, signal, twoWayBinding, WritableSignal } from '@angular/core';
 import { render, screen } from '@testing-library/angular';
 import userEvent, { UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -6,27 +7,24 @@ import { ChecklistItemComponent } from './item.component';
 
 describe('ChecklistItemComponent', () => {
   let user: UserEvent;
-  let itemChange: Mock<(value: ChecklistItem) => undefined>;
   let itemDeleted: Mock<(value: boolean) => undefined>;
   let editButton: HTMLButtonElement;
   let deleteButton: HTMLButtonElement;
   let indentLeftButton: HTMLButtonElement;
   let indentRightButton: HTMLButtonElement;
   let centerButton: HTMLButtonElement;
-  let item: ChecklistItem;
+  let item: WritableSignal<ChecklistItem>;
 
   beforeEach(() => {
     user = userEvent.setup({ delay: null });
-    itemChange = vi.fn().mockName('ChecklistItemComponent.itemChange');
     itemDeleted = vi.fn().mockName('ChecklistItemComponent.itemDeleted');
 
-    item = ChecklistItem.create({ prompt: 'My prompt', type: ChecklistItem_Type.ITEM_PLAINTEXT });
+    item = signal(ChecklistItem.create({ prompt: 'My prompt', type: ChecklistItem_Type.ITEM_PLAINTEXT }));
   });
 
   async function renderComponent() {
     await render(ChecklistItemComponent, {
-      inputs: { item: item },
-      on: { itemChange, itemDeleted },
+      bindings: [twoWayBinding('item', item), outputBinding('itemDeleted', itemDeleted)],
     });
 
     editButton = screen.queryByRole('button', { name: /Edit.*/ })!;
@@ -62,9 +60,7 @@ describe('ChecklistItemComponent', () => {
 
     await user.type(editBox, '[Enter]');
 
-    expect(itemChange).toHaveBeenCalledExactlyOnceWith(item);
-
-    expect(item.prompt).toEqual('My prompt was modified');
+    expect(item().prompt).toEqual('My prompt was modified');
   });
 
   it('should not be able to enter forbidden characters when editing', async () => {
@@ -82,14 +78,15 @@ describe('ChecklistItemComponent', () => {
 
     await user.type(editBox, '[Enter]');
 
-    expect(itemChange).toHaveBeenCalledExactlyOnceWith(item);
-
-    expect(item.prompt).toEqual('My prompt had  as an invalid character');
+    expect(item().prompt).toEqual('My prompt had  as an invalid character');
   });
 
   it('should edit a challenge/response item', async () => {
-    item.type = ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE;
-    item.expectation = 'My expectation';
+    item.update((i) => ({
+      ...i,
+      type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+      expectation: 'My expectation',
+    }));
     await renderComponent();
 
     expect(editButton).toBeVisible();
@@ -115,14 +112,16 @@ describe('ChecklistItemComponent', () => {
 
     await user.type(expectationBox, '[Enter]');
 
-    expect(itemChange).toHaveBeenCalledWith(item);
-    expect(item.prompt).toEqual('My prompt was modified');
-    expect(item.expectation).toEqual('My expectation was modified too');
+    expect(item().prompt).toEqual('My prompt was modified');
+    expect(item().expectation).toEqual('My expectation was modified too');
   });
 
-  it('should not emit when an edit is cancelled', async () => {
-    item.type = ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE;
-    item.expectation = 'My expectation';
+  it('should not update when an edit is cancelled', async () => {
+    item.update((i) => ({
+      ...i,
+      type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE,
+      expectation: 'My expectation',
+    }));
     await renderComponent();
 
     expect(editButton).toBeVisible();
@@ -148,14 +147,16 @@ describe('ChecklistItemComponent', () => {
 
     await user.type(expectationBox, '[Escape]');
 
-    expect(itemChange).not.toHaveBeenCalled();
-    expect(item.prompt).toEqual('My prompt');
-    expect(item.expectation).toEqual('My expectation');
+    expect(item().prompt).toEqual('My prompt');
+    expect(item().expectation).toEqual('My expectation');
   });
 
   it('should not be able to edit but able to indent a blank item', async () => {
-    item.type = ChecklistItem_Type.ITEM_SPACE;
-    item.prompt = '';
+    item.update((i) => ({
+      ...i,
+      type: ChecklistItem_Type.ITEM_SPACE,
+      prompt: '',
+    }));
     await renderComponent();
 
     expect(editButton).toBeVisible();
@@ -177,7 +178,10 @@ describe('ChecklistItemComponent', () => {
   });
 
   it('should toggle centered', async () => {
-    item.indent = 1;
+    item.update((i) => ({
+      ...i,
+      indent: 1,
+    }));
     await renderComponent();
 
     expect(centerButton).toBeEnabled();
@@ -192,10 +196,8 @@ describe('ChecklistItemComponent', () => {
     expect(indentLeftButton).toBeDisabled();
     expect(indentRightButton).toBeDisabled();
 
-    expect(itemChange).toHaveBeenCalledExactlyOnceWith(item);
-
-    expect(item.centered).toBe(true);
-    expect(item.indent).toEqual(0);
+    expect(item().centered).toBe(true);
+    expect(item().indent).toEqual(0);
 
     await user.click(centerButton);
 
@@ -204,12 +206,14 @@ describe('ChecklistItemComponent', () => {
     expect(indentLeftButton).toBeDisabled();
     expect(indentRightButton).toBeEnabled();
 
-    expect(itemChange).toHaveBeenCalledTimes(2);
-    expect(item.centered).toBe(false);
+    expect(item().centered).toBe(false);
   });
 
   it('should indent left/right', async () => {
-    item.indent = 0;
+    item.update((i) => ({
+      ...i,
+      indent: 0,
+    }));
     await renderComponent();
 
     expect(indentLeftButton).toBeDisabled();
@@ -222,8 +226,7 @@ describe('ChecklistItemComponent', () => {
       expect(indentLeftButton).toBeEnabled();
       expect(indentRightButton).toBeEnabled();
 
-      expect(itemChange).toHaveBeenCalledTimes(i);
-      expect(item.indent).toEqual(i);
+      expect(item().indent).toEqual(i);
     }
 
     // 4th time reaches the limit, so button gets disabled.
@@ -232,8 +235,7 @@ describe('ChecklistItemComponent', () => {
     expect(indentLeftButton).toBeEnabled();
     expect(indentRightButton).toBeDisabled();
 
-    expect(itemChange).toHaveBeenCalledTimes(4);
-    expect(item.indent).toEqual(4);
+    expect(item().indent).toEqual(4);
 
     // Indent left 3 times.
     for (let i = 1; i < 4; i++) {
@@ -242,8 +244,7 @@ describe('ChecklistItemComponent', () => {
       expect(indentLeftButton).toBeEnabled();
       expect(indentRightButton).toBeEnabled();
 
-      expect(itemChange).toHaveBeenCalledTimes(4 + i);
-      expect(item.indent).toEqual(4 - i);
+      expect(item().indent).toEqual(4 - i);
     }
 
     // 4th time reaches the limit, so button gets disabled.
@@ -252,7 +253,6 @@ describe('ChecklistItemComponent', () => {
     expect(indentLeftButton).toBeDisabled();
     expect(indentRightButton).toBeEnabled();
 
-    expect(itemChange).toHaveBeenCalledTimes(8);
-    expect(item.indent).toEqual(0);
+    expect(item().indent).toEqual(0);
   });
 });
