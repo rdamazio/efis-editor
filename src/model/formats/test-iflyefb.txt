@@ -1,0 +1,269 @@
+> PREFLIGHT INSPECTION
+>> COCKPIT
+Parking Brake - Set
+Hobbs/Tach - Check
+Battery - On
+Fuel Quantity - Check
+Lights/Stall Warning - Check
+Electrical Equipment - Off
+Battery - Off
+Flaps - Check/Up
+Trim - Check
+Pitot/Static Drains - Drain/Close
+Acft Documents - On Board
+>> RIGHT WING
+Flap Hinges - Check
+Aileron - Check Hinges
+Wingtip/Lights - Check
+Leading Edge - Clean
+Fuel Quantity - Check
+Fuel Vent - Clear
+Fuel Strainer - Sample
+Landing Gear/Tire - Check
+Air Inlet - Clear
+>> NOSE
+Engine Condition - Check
+Oil Quantity - Check
+Propeller & Spinner - Check
+Alternator Belt - Check
+Air Inlets - Clear
+Landing Light - Check
+Nose Gear & Tire - Check
+Engine Condition (L) - Check
+Fuel Strainer - Sample
+>> LEFT WING
+Left Wing - Same as Right (In reverse)
+Pitot/Static Mast - Check
+Stall Warning Horn - Check
+>> FUSELAGE AND EMPENNAGE
+Antennas - Check
+Air Inlet - Check
+Stabilator & Trim - Check
+Rudder - Check
+
+> BEFORE START
+Seat Belts - Fastened
+Battery - On
+Alternator - On
+Anti-Collision Lights - On
+Nav Lights - On
+Fuel Selector - Lowest Tank
+
+> ENGINE START
+Pilot In Command - Establish
+Parking Brake - Set
+Electric Fuel Pump - On
+Mixture - Full Rich
+Throttle - 1/4" Open
+Prime - As Required
+Prop Area - Clear!
+Starter - Engage
+Throttle - 1000 RPM
+Engine Instruments - Check
+Annunciators - Out
+Electric Fuel Pump - Off
+
+> AFTER START
+Avionics - On
+Radios - Set
+Transponder - Standby
+Circuit Breakers - In
+Mixture - Leaned for Taxi
+Fuel Selector - Opposite Tank
+
+> BEFORE TAXI
+Toe Brakes - Check
+Fuel Pump - Off for Taxi
+
+> RUN UP
+Brakes - Set
+Mixture - Full Rich
+Throttle - 2000 RPM
+Engine Instruments - In Limits
+Magnetos - Check
+Annunciators - Test
+Carb Heat - Check
+Gyro Suction - In Limits
+Throttle - Idle
+RPM & Oil Pressure - In Limits
+Throttle - 1000 RPM
+
+> BEFORE TAKEOFF
+Flight Controls - Check
+Flight Instruments - Set
+Radios - Set
+Flaps - Set
+Trim - Set
+Takeoff Briefing - Complete
+Door & Window - Secured
+Parking Brake - Released
+Electric Fuel Pump - On
+Landing Light - On
+Transponder - Altitude
+Time Off - Noted
+
+> AFTER TAKEOFF
+Flaps - Up
+Electric Fuel Pump - Off
+
+> CRUISE
+Throttle - RPM
+Mixture - Leaned
+Landing Light - Off
+
+> PRE-MANEUVER CHECK
+Mixture - Rich
+Min Safe Altitude - Verify
+Area - Clear
+
+> POST-MANEUVER CHECK
+Mixture - Lean
+Engine Instruments - Check
+Fuel Selector - Fullest Tank
+
+> APPROACH
+Flight Instrument - Ckd & Set
+Radios - Set
+Landing Light - On
+Electric Fuel Pump - On
+Mixture - Full Rich
+Fuel Selector - Fullest Tank
+Approach Briefing - Complete
+Seat Belts - Fastened
+
+> AFTER LANDING
+Transponder - Standby
+Electric Fuel Pump - Off
+Landing Light - Off
+Mixture - Leaned
+Flaps - Up
+
+> PARKING
+Avionics - Off
+Mixture - Cut-Off
+Electrical Equipment - Off
+Battery & Alternator - Off
+Magnetos - Off
+
+> SECURING THE AIRCRAFT
+Hobbs/Tach - Record
+Flight Controls - Secure
+Door & Window - Secure
+Tie-Downs - Secure
+
+> V-SPEEDS (KIAS)
+Vr - 40-50
+Vx - 63
+Vy - 79
+Climb - 87
+Vs - 50
+Vso - 44
+Va - 88-111
+Vfe - 103
+Vno - 126
+Vne - 160
+Glide - 73
+Max dem XW - 17
+Vref Flaps 0-10 - 68+1/2 Gust
+Vref Flaps 25-40 - 63+1/2 Gust
+
+> EMERGENCY
+>> ENGINE FAILURE - NO RESTART
+Glide - Establish
+Landing Site - Select
+Mixture - Cut-Off
+Battery/Alternator - Off
+Magnetos - Off
+Fuel Selector - Off
+>> ENGINE FAILURE - RESTART
+Glide - Establish
+Landing Site - Select
+Electric Fuel Pump - On
+Mixture - Full Rich
+Fuel Selector - Opposite Tank
+Carb Heat - On
+Throttle - Set
+Primer - Locked
+Magnetos - Check
+If Restarts - Fuel Present Tank/Land
+If No Restart - Mayday/Cut-Off/Off
+>> LOSS OF FUEL PRESSURE
+Electric Fuel Pump - On
+Fuel Selector - Opposite Tank
+>> FLOODED ENGINE START
+Throttle - Full Forward
+Battery/Alternator - On
+Electric Fuel Pump - Off
+Mixture - Cut-Off
+Starter - Engage
+Mixture (When Fires) - Full Rich
+Throttle - 1000 RPM
+Oil Pressure - Check
+>> HOT ENGINE START
+Throttle - 1/2" Open
+Battery/Alternator - On
+Electric Fuel Pump - On
+Mixture - Full Rich
+Starter - Engage
+Throttle - 1000 RPM
+Oil Pressure - Check
+>> ENGINE ROUGHNESS
+Carb Heat - On
+Carb Heat (After 1 Min) - Cut-Off
+Mixture - Adjust
+Electric Fuel Pump - On
+Fuel Selector - Opposite Tank
+Engine Instruments - Check
+Magnetos - Check
+>> ENGINE FIRE DURING START
+Starter - Engage
+Mixture - Cut-Off
+Throttle - Open
+Electric Fuel Pump - Off
+Fuel Selector - Off
+Fire Continues - Evacuate
+>> ENGINE FIRE DURING TAXI
+Airplane - Stop
+Mixture - Cut-Off
+Fuel Selector - Off
+Battery/Alternator - Off
+Aircraft - Evacuate
+>> ENGINE FIRE IN FLIGHT
+Mixture - Cut-Off
+Fuel Selector - Off
+Glide - Establish
+Landing Site - Select
+Mayday - Transmit
+Magnetos - Off
+Battery/Alternator - Off
+>> CABIN FIRE IN FLIGHT
+Battery/Alternator - Off
+Electrical Equipment - Off
+Vents - Open
+>> CARBURETOR ICING
+Carb Heat - On
+Mixture - Adjust
+>> SPIN RECOVERY
+Throttle - Idle
+Ailerons - Neutral
+Rudder - Full Opposite Rotation
+Control Wheel - Full Forward
+Neutral - When Rotation Stops
+Pitch - Level
+>> OIL PRESSURE / TEMP
+Land - As Soon as Practical
+Engine Failure - Prepare Imminent
+>> ELECTRICAL FAILURE
+Load Meter - Verify Inop
+Alternator - Off
+Elec Load - Reduce to Min
+Alternator Fld - Check
+Circuit Breaker - Check & Reset
+Alternator - On
+If No Power - Alternator Off/Land
+>> ELECTRICAL OVERLOAD
+Alternator - Off
+Battery - On
+Reduce Loads - Land ASAP
+Alt - Alternator Off
+Battery - As Required
