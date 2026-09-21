@@ -238,19 +238,25 @@ function cleanField(field: string): string {
 
 /** Converts Miracheck Goose comments, which may be HTML, into indented notes - one per line or paragraph. */
 function notesForComments(comments: string): ChecklistItem[] {
-  const text = comments
-    .replaceAll(/<br\s*\/?>|<\/p>/gi, '\n')
-    // Only strip actual tags, so that text like "<50 RPM" is preserved.
-    .replaceAll(/<\/?[a-z][^>]*>/gi, '')
-    .replaceAll('&nbsp;', ' ')
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&amp;', '&');
-  return cleanField(text)
+  return cleanField(htmlToText(comments))
     .split('\n')
     .filter((line) => line.length > 0)
     .map((line) => ChecklistItem.create({ prompt: line, type: ChecklistItem_Type.ITEM_NOTE, indent: 1 }));
+}
+
+/**
+ * Extracts the text from an HTML fragment, with line breaks for `<br>` and after paragraphs. This uses the browser's
+ * parser (which never runs scripts) rather than stripping tags, and preserves plain text such as "<50 RPM".
+ */
+function htmlToText(html: string): string {
+  const body = new DOMParser().parseFromString(html, 'text/html').body;
+  body.querySelectorAll('br').forEach((br) => {
+    br.replaceWith('\n');
+  });
+  body.querySelectorAll('p, div, li').forEach((block) => {
+    block.append('\n');
+  });
+  return body.textContent.replaceAll('\u00A0', ' ');
 }
 
 function categoryForGroup(title: string): ChecklistGroup_Category {
