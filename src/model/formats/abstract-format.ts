@@ -12,9 +12,14 @@ export function getFileExtension(fileName: string): FileExtension {
   return `.${toLowerCase(fileName.slice(fileName.lastIndexOf('.') + 1))}`;
 }
 
+export const enum FormatSupport {
+  IMPORT_EXPORT = 'import-export',
+  IMPORT_ONLY = 'import-only',
+  EXPORT_ONLY = 'export-only',
+}
+
 export interface FormatOptions {
-  supportsImport?: boolean;
-  supportsExport?: boolean;
+  support?: FormatSupport;
   extension?: FileExtension;
 }
 
@@ -27,8 +32,7 @@ export type FormatConstructor<T extends FormatOptions> = new (
 export abstract class ExportOptions {}
 
 export abstract class AbstractChecklistFormat<T extends FormatOptions = FormatOptions> {
-  public readonly supportsImport: boolean;
-  public readonly supportsExport: boolean;
+  public readonly support: FormatSupport;
   protected readonly _extension?: FileExtension;
 
   constructor(
@@ -36,9 +40,16 @@ export abstract class AbstractChecklistFormat<T extends FormatOptions = FormatOp
     public readonly name: string,
     args?: T,
   ) {
-    this.supportsImport = args?.supportsImport ?? true;
-    this.supportsExport = args?.supportsExport ?? true;
+    this.support = args?.support ?? FormatSupport.IMPORT_EXPORT;
     this._extension = args?.extension;
+  }
+
+  public get supportsImport(): boolean {
+    return this.support !== FormatSupport.EXPORT_ONLY;
+  }
+
+  public get supportsExport(): boolean {
+    return this.support !== FormatSupport.IMPORT_ONLY;
   }
 
   public get extension(): FileExtension {
@@ -53,7 +64,6 @@ export abstract class AbstractChecklistFormat<T extends FormatOptions = FormatOp
 export interface OutputFormat {
   id: FormatId;
   name: string;
-  supportsImport: boolean;
-  supportsExport: boolean;
+  support: FormatSupport;
   extension: FileExtension;
 }

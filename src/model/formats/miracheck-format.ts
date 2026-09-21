@@ -13,6 +13,16 @@ export const MIRACHECK_EXTENSION: FileExtension = '.csv';
 
 const MIRACHECK_HEADER = 'list,section,label1,label2,labelOnly,labelOnlyBackgroundColor,mandatory';
 
+/** A double-quoted CSV field (with `""` escaping a quote), captured as `name`. */
+function quotedField(name: string): string {
+  return `"(?<${name}>(?:[^"]|"")*)"`;
+}
+
+/** A field matching `pattern` that may or may not be quoted, captured as `name`. */
+function optionallyQuotedField(name: string, pattern: string): string {
+  return `"?(?<${name}>${pattern})"?`;
+}
+
 /**
  * Matches a single record of a Miracheck Goose CSV export.
  *
@@ -22,10 +32,32 @@ const MIRACHECK_HEADER = 'list,section,label1,label2,labelOnly,labelOnlyBackgrou
  * fields is skipped.
  */
 const MIRACHECK_RECORD_REGEX = new RegExp(
-  String.raw`^"((?:[^"]|"")*)","((?:[^"]|"")*)","((?:[^"]|"")*)","((?:[^"]|"")*)",` +
-    String.raw`(?:.*?,)??"?(true|false)"?,"?(#?[0-9A-Fa-f]*)"?,"?(true|false)"?[ \t]*\r?$`,
+  [
+    '^',
+    `${quotedField('list')},${quotedField('section')},${quotedField('label1')},${quotedField('label2')},`,
+    // The unquoted copy of label2, if present. This is lazy and optional, so that it's skipped only when needed and
+    // never swallows the following record of a well-formed file.
+    '(?:.*?,)??',
+    optionallyQuotedField('labelOnly', 'true|false'),
+    ',',
+    optionallyQuotedField('color', '#?[0-9A-Fa-f]*'),
+    ',',
+    optionallyQuotedField('mandatory', 'true|false'),
+    String.raw`[ \t]*\r?$`,
+  ].join(''),
   'gms',
 );
+
+const GROUP_CATEGORY_PATTERNS: readonly (readonly [RegExp, ChecklistGroup_Category])[] = [
+  [/emergenc/i, ChecklistGroup_Category.emergency],
+  [/abnormal/i, ChecklistGroup_Category.abnormal],
+];
+
+interface MiracheckRow {
+  list: string;
+  section: string;
+  items: ChecklistItem[];
+}
 
 /**
  * Import-only reader for CSV files exported by the Miracheck Goose checklist app (formerly just Miracheck).
@@ -46,29 +78,23 @@ export class MiracheckFormat extends AbstractChecklistFormat {
       throw new FormatError('Not a Miracheck Goose CSV file: unexpected header row.');
     }
 
-    const groups: ChecklistGroup[] = [];
-    for (const match of contents.slice(newline + 1).matchAll(MIRACHECK_RECORD_REGEX)) {
-      const [groupTitle, checklistTitle, label1, label2] = match.slice(1, 5).map(cleanField);
-      const labelOnly = match[5] === 'true';
-
-      let group = groups.at(-1);
-      if (group?.title !== groupTitle) {
-        group = ChecklistGroup.create({ title: groupTitle, category: categoryForGroup(groupTitle) });
-        groups.push(group);
-      }
-
-      let checklist = group.checklists.at(-1);
-      if (checklist?.title !== checklistTitle) {
-        checklist = Checklist.create({ title: checklistTitle });
-        group.checklists.push(checklist);
-      }
-
-      checklist.items.push(...itemsForRow(label1, label2, labelOnly));
-    }
-
-    if (!groups.length) {
+    const rows = [...contents.slice(newline + 1).matchAll(MIRACHECK_RECORD_REGEX)].map(parseRecord);
+    if (!rows.length) {
       throw new FormatError('No checklist items found in Miracheck Goose CSV file.');
     }
+
+    const groups = groupConsecutive(rows, (row) => row.list).map((listRows) =>
+      ChecklistGroup.create({
+        title: listRows[0].list,
+        category: categoryForGroup(listRows[0].list),
+        checklists: groupConsecutive(listRows, (row) => row.section).map((sectionRows) =>
+          Checklist.create({
+            title: sectionRows[0].section,
+            items: sectionRows.flatMap((row) => row.items),
+          }),
+        ),
+      }),
+    );
 
     return ChecklistFile.create({
       metadata: { name: file.name.replace(/\.csv$/i, '') },
@@ -79,6 +105,21 @@ export class MiracheckFormat extends AbstractChecklistFormat {
   public async fromProto(): Promise<File> {
     return Promise.reject(new FormatError('Exporting to Miracheck Goose CSV is not supported.'));
   }
+}
+
+function parseRecord(match: RegExpMatchArray): MiracheckRow {
+  const fields = match.groups!;
+  return {
+    list: cleanField(fields['list']),
+    section: cleanField(fields['section']),
+    items: itemsForRow(cleanField(fields['label1']), cleanField(fields['label2']), fields['labelOnly'] === 'true'),
+  };
+}
+
+/** Splits values into runs of consecutive values that have the same key, preserving their order. */
+function groupConsecutive<T>(values: readonly T[], key: (value: T) => string): T[][] {
+  const runStarts = values.flatMap((value, i) => (i === 0 || key(values[i - 1]) !== key(value) ? [i] : []));
+  return runStarts.map((start, run) => values.slice(start, runStarts.at(run + 1)));
 }
 
 function cleanField(field: string): string {
@@ -93,14 +134,7 @@ function cleanField(field: string): string {
 }
 
 function categoryForGroup(title: string): ChecklistGroup_Category {
-  const lowerTitle = title.toLowerCase();
-  if (lowerTitle.includes('emergenc')) {
-    return ChecklistGroup_Category.emergency;
-  }
-  if (lowerTitle.includes('abnormal')) {
-    return ChecklistGroup_Category.abnormal;
-  }
-  return ChecklistGroup_Category.normal;
+  return GROUP_CATEGORY_PATTERNS.find(([pattern]) => pattern.test(title))?.[1] ?? ChecklistGroup_Category.normal;
 }
 
 function itemsForRow(label1: string, label2: string, labelOnly: boolean): ChecklistItem[] {

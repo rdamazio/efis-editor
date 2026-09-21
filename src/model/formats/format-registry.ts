@@ -5,6 +5,7 @@ import {
   FileExtension,
   FormatConstructor,
   FormatOptions,
+  FormatSupport,
   getFileExtension,
   OutputFormat,
 } from './abstract-format';
@@ -68,13 +69,12 @@ class FormatRegistry {
       id: formatId,
       name: format.name,
       extension: format.extension,
-      supportsImport: format.supportsImport,
-      supportsExport: format.supportsExport,
+      support: format.support,
     }));
   }
 
   public getSupportedOutputFormats(): OutputFormat[] {
-    return this.getSupportedFormats().filter((format) => format.supportsExport);
+    return this.getSupportedFormats().filter((format) => format.support !== FormatSupport.IMPORT_ONLY);
   }
 }
 
@@ -97,12 +97,13 @@ FORMAT_REGISTRY.register<DynonFormatOptions>(DynonFormat, FormatId.DYNON40, 'Dyn
 FORMAT_REGISTRY.register(ForeFlightFormat, FormatId.FOREFLIGHT, 'Jeppesen ForeFlight');
 FORMAT_REGISTRY.register(GarminPilotFormat, FormatId.GARMIN_PILOT, 'Garmin Pilot™');
 FORMAT_REGISTRY.register(GrtFormat, FormatId.GRT, 'Grand Rapids Technologies', {
-  supportsImport: true,
   extension: TXT_EXTENSION,
 });
 FORMAT_REGISTRY.register(JsonFormat, FormatId.JSON, 'Raw data');
-FORMAT_REGISTRY.register(MiracheckFormat, FormatId.MIRACHECK, 'Miracheck Goose CSV', { supportsExport: false });
-FORMAT_REGISTRY.register(PdfFormat, FormatId.PDF, 'Printable PDF', { supportsImport: false });
+FORMAT_REGISTRY.register(MiracheckFormat, FormatId.MIRACHECK, 'Miracheck Goose CSV', {
+  support: FormatSupport.IMPORT_ONLY,
+});
+FORMAT_REGISTRY.register(PdfFormat, FormatId.PDF, 'Printable PDF', { support: FormatSupport.EXPORT_ONLY });
 
 export async function serializeChecklistFile(
   checklistFile: ChecklistFile,
