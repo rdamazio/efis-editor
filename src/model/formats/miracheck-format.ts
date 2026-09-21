@@ -11,7 +11,15 @@ import { FormatError } from './error';
 
 export const MIRACHECK_EXTENSION: FileExtension = '.csv';
 
-const MIRACHECK_HEADER = 'list,section,label1,label2,labelOnly,labelOnlyBackgroundColor,mandatory';
+/**
+ * Header of the files Miracheck Goose exports. Despite the header, each row actually has an extra field after label2
+ * (see MIRACHECK_EXPORT_RECORD_REGEX).
+ */
+const MIRACHECK_EXPORT_HEADER = 'list,section,label1,label2,labelOnly,labelOnlyBackgroundColor,mandatory';
+
+/** Header of the (well-formed) CSV files Miracheck Goose imports, as in its downloadable template. */
+const MIRACHECK_IMPORT_HEADER = 'list,section,label1,label2,comments,labelOnly,labelOnlyBackgroundColor,mandatory';
+const MIRACHECK_IMPORT_COLUMN_COUNT = MIRACHECK_IMPORT_HEADER.split(',').length;
 
 /** A double-quoted CSV field (with `""` escaping a quote), captured as `name`. */
 function quotedField(name: string): string {
@@ -26,12 +34,13 @@ function optionallyQuotedField(name: string, pattern: string): string {
 /**
  * Matches a single record of a Miracheck Goose CSV export.
  *
- * The first four fields (list, section, label1, label2) are always quoted. Some Miracheck Goose exports then include an
- * extra, *unquoted* copy of label2, which breaks naive CSV parsing whenever label2 contains commas or newlines. To
+ * The first four fields (list, section, label1, label2) are always quoted. Miracheck Goose exports then include an
+ * extra field that's missing from the header - in the position of the import format's comments column, but actually
+ * containing an *unquoted* copy of label2 - which breaks CSV parsing whenever label2 contains commas or newlines. To
  * handle both that and well-formed files, anything between label2 and the trailing labelOnly, color and mandatory
  * fields is skipped.
  */
-const MIRACHECK_RECORD_REGEX = new RegExp(
+const MIRACHECK_EXPORT_RECORD_REGEX = new RegExp(
   [
     '^',
     `${quotedField('list')},${quotedField('section')},${quotedField('label1')},${quotedField('label2')},`,
@@ -53,6 +62,16 @@ const GROUP_CATEGORY_PATTERNS: readonly (readonly [RegExp, ChecklistGroup_Catego
   [/abnormal/i, ChecklistGroup_Category.abnormal],
 ];
 
+/** The fields of a single row, from either file layout. */
+interface MiracheckRecord {
+  list: string;
+  section: string;
+  label1: string;
+  label2: string;
+  comments: string;
+  labelOnly: boolean;
+}
+
 interface MiracheckRow {
   list: string;
   section: string;
@@ -60,10 +79,11 @@ interface MiracheckRow {
 }
 
 /**
- * Import-only reader for CSV files exported by the Miracheck Goose checklist app (formerly just Miracheck).
+ * Import-only reader for Miracheck Goose checklist app (formerly just Miracheck) CSV files - both the files it exports,
+ * and the files it imports (e.g. made from its template).
  *
- * Each "list" becomes a checklist group, each "section" a checklist and each row an item, with label1 as the challenge
- * and label2 as the response.
+ * Each "list" becomes a checklist group, each "section" a checklist and each row an item, with label1 as the challenge,
+ * label2 as the response and any comments as notes below it.
  */
 export class MiracheckFormat extends AbstractChecklistFormat {
   public override get extension(): FileExtension {
@@ -73,12 +93,10 @@ export class MiracheckFormat extends AbstractChecklistFormat {
   public async toProto(file: File): Promise<ChecklistFile> {
     const contents = (await file.text()).replace(/^\uFEFF/, '');
     const newline = contents.indexOf('\n');
-    const header = (newline < 0 ? contents : contents.slice(0, newline)).trim();
-    if (header !== MIRACHECK_HEADER) {
-      throw new FormatError('Not a Miracheck Goose CSV file: unexpected header row.');
-    }
+    const header = (newline < 0 ? contents : contents.slice(0, newline)).trim().toLowerCase();
+    const body = newline < 0 ? '' : contents.slice(newline + 1);
 
-    const rows = [...contents.slice(newline + 1).matchAll(MIRACHECK_RECORD_REGEX)].map(parseRecord);
+    const rows = parseRecords(header, body).map(rowForRecord);
     if (!rows.length) {
       throw new FormatError('No checklist items found in Miracheck Goose CSV file.');
     }
@@ -107,12 +125,98 @@ export class MiracheckFormat extends AbstractChecklistFormat {
   }
 }
 
-function parseRecord(match: RegExpMatchArray): MiracheckRow {
+function parseRecords(header: string, body: string): MiracheckRecord[] {
+  if (header === MIRACHECK_EXPORT_HEADER.toLowerCase()) {
+    return [...body.matchAll(MIRACHECK_EXPORT_RECORD_REGEX)].map(parseExportRecord);
+  }
+  if (header === MIRACHECK_IMPORT_HEADER.toLowerCase()) {
+    return parseImportRecords(body);
+  }
+  throw new FormatError('Not a Miracheck Goose CSV file: unexpected header row.');
+}
+
+function parseExportRecord(match: RegExpMatchArray): MiracheckRecord {
   const fields = match.groups!;
+  const unescape = (field: string) => field.replaceAll('""', '"');
   return {
-    list: cleanField(fields['list']),
-    section: cleanField(fields['section']),
-    items: itemsForRow(cleanField(fields['label1']), cleanField(fields['label2']), fields['labelOnly'] === 'true'),
+    list: unescape(fields['list']),
+    section: unescape(fields['section']),
+    label1: unescape(fields['label1']),
+    label2: unescape(fields['label2']),
+    // The export has no real comments column (see MIRACHECK_EXPORT_RECORD_REGEX).
+    comments: '',
+    labelOnly: fields['labelOnly'] === 'true',
+  };
+}
+
+function parseImportRecords(body: string): MiracheckRecord[] {
+  return parseCsv(body).flatMap((fields, index): MiracheckRecord[] => {
+    if (fields.every((field) => !field.trim())) {
+      return [];
+    }
+    if (fields.length !== MIRACHECK_IMPORT_COLUMN_COUNT) {
+      // Row numbers as shown in a spreadsheet, where the header is row 1.
+      throw new FormatError(
+        `Row ${index + 2}: expected ${MIRACHECK_IMPORT_COLUMN_COUNT} columns, found ${fields.length}.`,
+      );
+    }
+    const [list, section, label1, label2, comments, labelOnly] = fields;
+    return [{ list, section, label1, label2, comments, labelOnly: /^\s*true\s*$/i.test(labelOnly) }];
+  });
+}
+
+/**
+ * Parses RFC 4180 CSV into records of fields. Quoted fields may contain commas, newlines and quotes (escaped as `""`).
+ */
+function parseCsv(text: string): string[][] {
+  const records: string[][] = [];
+  let record: string[] = [];
+  let field = '';
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (inQuotes) {
+      if (char !== '"') {
+        field += char;
+      } else if (text[i + 1] === '"') {
+        field += '"';
+        i++;
+      } else {
+        inQuotes = false;
+      }
+    } else if (char === '"') {
+      inQuotes = true;
+    } else if (char === ',') {
+      record.push(field);
+      field = '';
+    } else if (char === '\n' || char === '\r') {
+      if (char === '\r' && text[i + 1] === '\n') {
+        i++;
+      }
+      records.push([...record, field]);
+      record = [];
+      field = '';
+    } else {
+      field += char;
+    }
+  }
+  if (inQuotes) {
+    throw new FormatError('Unterminated quoted field in CSV file.');
+  }
+  if (field || record.length) {
+    records.push([...record, field]);
+  }
+  return records;
+}
+
+function rowForRecord(record: MiracheckRecord): MiracheckRow {
+  return {
+    list: cleanField(record.list),
+    section: cleanField(record.section),
+    items: [
+      ...itemsForRow(cleanField(record.label1), cleanField(record.label2), record.labelOnly),
+      ...notesForComments(record.comments),
+    ],
   };
 }
 
@@ -124,13 +228,29 @@ function groupConsecutive<T>(values: readonly T[], key: (value: T) => string): T
 
 function cleanField(field: string): string {
   return field
-    .replaceAll('""', '"')
     .replaceAll('\u200B', '')
-    .replaceAll('\r', '')
+    .replaceAll(/\r\n?/g, '\n')
     .split('\n')
     .map((line) => line.replaceAll(/[ \t]+/g, ' ').trim())
     .join('\n')
     .trim();
+}
+
+/** Converts Miracheck Goose comments, which may be HTML, into indented notes - one per line or paragraph. */
+function notesForComments(comments: string): ChecklistItem[] {
+  const text = comments
+    .replaceAll(/<br\s*\/?>|<\/p>/gi, '\n')
+    // Only strip actual tags, so that text like "<50 RPM" is preserved.
+    .replaceAll(/<\/?[a-z][^>]*>/gi, '')
+    .replaceAll('&nbsp;', ' ')
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&amp;', '&');
+  return cleanField(text)
+    .split('\n')
+    .filter((line) => line.length > 0)
+    .map((line) => ChecklistItem.create({ prompt: line, type: ChecklistItem_Type.ITEM_NOTE, indent: 1 }));
 }
 
 function categoryForGroup(title: string): ChecklistGroup_Category {

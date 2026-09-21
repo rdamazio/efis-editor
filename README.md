@@ -48,17 +48,19 @@ You can try it out directly in the link above, but here's what it currently look
 
 Different checklist file formats support different subsets of all the features in the editor:
 
-| **Feature**                | AFS/Dynon          | ForeFlight         | Garmin (G3X/GTN)   | Garmin Pilot       | GRT                | PDF                |
-| -------------------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| Checklist groups           | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Checklist group categories | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: |
-| Item types                 | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Indentation                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
-| Centering                  | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
-| Default checklist/group    | :x:                | :x:                | :white_check_mark: | :x:                | :x:                | :x:                |
-| Checklist metadata         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: | :white_check_mark: |
-| Live data                  | :x:                | :x:                | :x:                | :white_check_mark: | :white_check_mark: | :x:                |
-| Completion actions         | :x:                | :x:                | :x:                | :white_check_mark: | :x:                | :white_check_mark: |
+| **Feature**                | AFS/Dynon          | ForeFlight         | Garmin (G3X/GTN)   | Garmin Pilot       | GRT                | Miracheck Goose<sup>‡</sup> | PDF                |
+| -------------------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | --------------------------- | ------------------ |
+| Checklist groups           | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark:          | :white_check_mark: |
+| Checklist group categories | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :warning:                   | :white_check_mark: |
+| Item types                 | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :warning:                   | :white_check_mark: |
+| Indentation                | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :x:                         | :white_check_mark: |
+| Centering                  | :white_check_mark: | :x:                | :white_check_mark: | :x:                | :white_check_mark: | :x:                         | :white_check_mark: |
+| Default checklist/group    | :x:                | :x:                | :white_check_mark: | :x:                | :x:                | :x:                         | :x:                |
+| Checklist metadata         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :x:                | :white_check_mark: | :x:                         | :white_check_mark: |
+| Live data                  | :x:                | :x:                | :x:                | :white_check_mark: | :white_check_mark: | :x:                         | :x:                |
+| Completion actions         | :x:                | :x:                | :x:                | :white_check_mark: | :x:                | :x:                         | :white_check_mark: |
+
+<sup>‡</sup> Import only - :warning: means partial support, see [Miracheck Goose](#miracheck-goose-import-only) below.
 
 > [!NOTE]
 > See sections below on format-specific details to understand how data from the editor gets translated to those formats.
@@ -192,14 +194,20 @@ Supported tokens are `%LOCAL_ALTIMETER%`, `%OPEN_NEAREST%`, `%OPEN_ATIS_SCRATCHP
 
 ### Miracheck Goose (import only)
 
-CSV files exported from the [Miracheck Goose](https://miracheck.com/) web app can be imported, so that
-existing checklists can be moved into the editor and then exported to any of the other formats. Each
+CSV files from the [Miracheck Goose](https://miracheck.com/) web app can be imported, so that existing
+checklists can be moved into the editor and then exported to any of the other formats. Both the CSV files
+Goose exports and the CSV files it imports (e.g. made from its downloadable template) are supported. Each
 Miracheck list becomes a checklist group (lists with "Emergency" or "Abnormal" in their name get that
 category), each section becomes a checklist, and each item becomes a challenge/response item. Items
-marked as "label only" become titles, and the mandatory flag and background colors are not imported.
+marked as "label only" become titles, and comments become indented notes below their item. The mandatory
+flag and background colors are not imported.
 
 If a response has multiple lines, each line is imported as an indented plain text item below the
 challenge, unless the extra lines are a continuation of the same sentence.
+
+> [!NOTE]
+> Goose's CSV export doesn't include item comments, and leaves out some items (such as Yes/No items),
+> so review the imported checklists carefully.
 
 ### PDF (printing)
 

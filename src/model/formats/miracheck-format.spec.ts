@@ -4,10 +4,15 @@ import { FormatId } from './format-id';
 import { FORMAT_REGISTRY, parseChecklistFile, serializeChecklistFile } from './format-registry';
 import { loadFile } from './test-utils';
 
-const HEADER = 'list,section,label1,label2,labelOnly,labelOnlyBackgroundColor,mandatory';
+const EXPORT_HEADER = 'list,section,label1,label2,labelOnly,labelOnlyBackgroundColor,mandatory';
+const IMPORT_HEADER = 'list,section,label1,label2,comments,labelOnly,labelOnlyBackgroundColor,mandatory';
 
 function challengeResponse(prompt: string, expectation: string): ChecklistItem {
   return ChecklistItem.create({ prompt, expectation, type: ChecklistItem_Type.ITEM_CHALLENGE_RESPONSE });
+}
+
+function note(prompt: string): ChecklistItem {
+  return ChecklistItem.create({ prompt, type: ChecklistItem_Type.ITEM_NOTE, indent: 1 });
 }
 
 const EXPECTED_MIRACHECK_CONTENTS = ChecklistFile.create({
@@ -64,7 +69,7 @@ const EXPECTED_MIRACHECK_CONTENTS = ChecklistFile.create({
 });
 
 describe('MiracheckFormat', () => {
-  it('reads test file', async () => {
+  it('reads exported file', async () => {
     const f = await loadFile('/src/model/formats/test-miracheck.csv', 'N12345.csv');
     const readFile = await parseChecklistFile(f);
 
@@ -73,7 +78,7 @@ describe('MiracheckFormat', () => {
 
   it('reads well-formed CSV with CRLF line endings', async () => {
     const contents = [
-      HEADER,
+      EXPORT_HEADER,
       '"Abnormal","Alternator Failure","Master","Off",false,#FFF8C6,true',
       '"Abnormal","Alternator Failure","Loads","Shed, then land",false,#FFF8C6,false',
       '',
@@ -99,6 +104,64 @@ describe('MiracheckFormat', () => {
     );
   });
 
+  it('reads file in the import (template) layout', async () => {
+    const f = await loadFile('/src/model/formats/test-miracheck-import.csv', 'Template.csv');
+    const readFile = await parseChecklistFile(f);
+
+    expect(readFile).toEqual(
+      ChecklistFile.create({
+        metadata: { name: 'Template' },
+        groups: [
+          {
+            title: 'Preflight',
+            category: ChecklistGroup_Category.normal,
+            checklists: [
+              {
+                title: 'Before Start',
+                items: [
+                  challengeResponse('Fuel Selector', 'BOTH'),
+                  challengeResponse('Oil Pressure, Temperature', 'CHECK'),
+                  ChecklistItem.create({ prompt: 'Run-up', type: ChecklistItem_Type.ITEM_TITLE }),
+                  challengeResponse('Magnetos', 'CHECK'),
+                  note('<175 RPM drop on each,'),
+                  note('<50 RPM drop between'),
+                ],
+              },
+            ],
+          },
+          {
+            title: 'Emergency',
+            category: ChecklistGroup_Category.emergency,
+            checklists: [
+              {
+                title: 'Engine Fire',
+                items: [
+                  challengeResponse('Radio', 'Declare "MAYDAY"'),
+                  note('Squawk 7700 & state position'),
+                  note('Souls on board'),
+                ],
+              },
+            ],
+          },
+        ],
+      }),
+    );
+  });
+
+  it('reports the row with the wrong number of columns in the import layout', async () => {
+    const f = new File([`${IMPORT_HEADER}\nA,B,C,D,,,,\nA,B,"C, D",E\n`], 'bad.csv');
+
+    await expect(FORMAT_REGISTRY.getFormat(FormatId.MIRACHECK).toProto(f)).rejects.toThrow(
+      /Row 3: expected 8 columns, found 4/,
+    );
+  });
+
+  it('rejects unterminated quoted fields in the import layout', async () => {
+    const f = new File([`${IMPORT_HEADER}\nA,B,"C,D,,,,\n`], 'bad.csv');
+
+    await expect(FORMAT_REGISTRY.getFormat(FormatId.MIRACHECK).toProto(f)).rejects.toThrow(/Unterminated/);
+  });
+
   it('rejects CSV files with a different header', async () => {
     const f = new File(['a,b,c\n1,2,3\n'], 'other.csv');
 
@@ -106,7 +169,7 @@ describe('MiracheckFormat', () => {
   });
 
   it('rejects CSV files without any items', async () => {
-    const f = new File([`${HEADER}\n`], 'empty.csv');
+    const f = new File([`${EXPORT_HEADER}\n`], 'empty.csv');
 
     await expect(FORMAT_REGISTRY.getFormat(FormatId.MIRACHECK).toProto(f)).rejects.toThrow(/No checklist items/);
   });
