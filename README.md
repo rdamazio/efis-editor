@@ -40,6 +40,7 @@ You can try it out directly in the link above, but here's what it currently look
   - Garmin Pilot (.gplt file format) <sup>†</sup>
   - Garmin G3X / G3X Touch / GTN (.ace file format)
   - Grand Rapids (GRT)
+  - Miracheck Goose (.csv export) - import only
   - Printable (PDF) - export only, selectable page size
   - Raw (JSON) - the editor's internal format (for lossless backup purposes)
 
@@ -188,6 +189,17 @@ Supported tokens are `%LOCAL_ALTIMETER%`, `%OPEN_NEAREST%`, `%OPEN_ATIS_SCRATCHP
 `%OPEN_CRAFT_SCRATCHPAD%`, `%WEATHER_FREQUENCY%`, `%CLEARANCE_FREQUENCY%`,
 `%GROUND_CTAF_FREQUENCY%`, `%TOWER_CTAF_FREQUENCY%`, `%APPROACH_FREQUENCY%`, and
 `%CENTER_FREQUENCY%`.
+
+### Miracheck Goose (import only)
+
+CSV files exported from the [Miracheck Goose](https://miracheck.com/) web app can be imported, so that
+existing checklists can be moved into the editor and then exported to any of the other formats. Each
+Miracheck list becomes a checklist group (lists with "Emergency" or "Abnormal" in their name get that
+category), each section becomes a checklist, and each item becomes a challenge/response item. Items
+marked as "label only" become titles, and the mandatory flag and background colors are not imported.
+
+If a response has multiple lines, each line is imported as an indented plain text item below the
+challenge, unless the extra lines are a continuation of the same sentence.
 
 ### PDF (printing)
 

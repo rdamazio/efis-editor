@@ -40,6 +40,16 @@ describe('WelcomeComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should list supported formats with their import/export limitations', () => {
+    const formats = [...(fixture.nativeElement as HTMLElement).querySelectorAll('.filetype-card li')].map((li) =>
+      li.textContent.replaceAll(/\s+/g, ' ').trim(),
+    );
+
+    expect(formats).toContain('Raw data (.json)');
+    expect(formats).toContain('Printable PDF (.pdf) - export only');
+    expect(formats).toContain('Miracheck Goose CSV (.csv) - import only');
+  });
+
   describe('showStorageWarning', () => {
     it('should show warning when Google Drive is disconnected', async () => {
       state$.next(DriveSyncState.DISCONNECTED);

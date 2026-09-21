@@ -26,11 +26,13 @@
         </p>
         <p>Currently supported import/export formats:</p>
         <ul>
-          @for (format of _formatRegistry.getSupportedOutputFormats(); track format.id) {
+          @for (format of _formatRegistry.getSupportedFormats(); track format.id) {
             <li>
               {{ format.name }} ({{ format.extension }})
               @if (!format.supportsImport) {
                 - export only
+              } @else if (!format.supportsExport) {
+                - import only
               }
             </li>
           }

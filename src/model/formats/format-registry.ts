@@ -16,6 +16,7 @@ import { FormatId } from './format-id';
 import { GarminPilotFormat } from './garmin-pilot-format';
 import { GrtFormat } from './grt-format';
 import { JsonFormat } from './json-format';
+import { MiracheckFormat } from './miracheck-format';
 import { PdfFormat } from './pdf-format';
 import { TXT_EXTENSION } from './text-format-options';
 
@@ -62,13 +63,18 @@ class FormatRegistry {
     return [...this._inputFormats.keys()].sort().join(', ');
   }
 
-  public getSupportedOutputFormats(): OutputFormat[] {
+  public getSupportedFormats(): OutputFormat[] {
     return [...this._outputFormats.entries()].map(([formatId, format]): OutputFormat => ({
       id: formatId,
       name: format.name,
       extension: format.extension,
       supportsImport: format.supportsImport,
+      supportsExport: format.supportsExport,
     }));
+  }
+
+  public getSupportedOutputFormats(): OutputFormat[] {
+    return this.getSupportedFormats().filter((format) => format.supportsExport);
   }
 }
 
@@ -95,6 +101,7 @@ FORMAT_REGISTRY.register(GrtFormat, FormatId.GRT, 'Grand Rapids Technologies', {
   extension: TXT_EXTENSION,
 });
 FORMAT_REGISTRY.register(JsonFormat, FormatId.JSON, 'Raw data');
+FORMAT_REGISTRY.register(MiracheckFormat, FormatId.MIRACHECK, 'Miracheck Goose CSV', { supportsExport: false });
 FORMAT_REGISTRY.register(PdfFormat, FormatId.PDF, 'Printable PDF', { supportsImport: false });
 
 export async function serializeChecklistFile(

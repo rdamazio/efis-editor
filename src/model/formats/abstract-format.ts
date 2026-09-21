@@ -14,6 +14,7 @@ export function getFileExtension(fileName: string): FileExtension {
 
 export interface FormatOptions {
   supportsImport?: boolean;
+  supportsExport?: boolean;
   extension?: FileExtension;
 }
 
@@ -27,6 +28,7 @@ export abstract class ExportOptions {}
 
 export abstract class AbstractChecklistFormat<T extends FormatOptions = FormatOptions> {
   public readonly supportsImport: boolean;
+  public readonly supportsExport: boolean;
   protected readonly _extension?: FileExtension;
 
   constructor(
@@ -35,6 +37,7 @@ export abstract class AbstractChecklistFormat<T extends FormatOptions = FormatOp
     args?: T,
   ) {
     this.supportsImport = args?.supportsImport ?? true;
+    this.supportsExport = args?.supportsExport ?? true;
     this._extension = args?.extension;
   }
 
@@ -51,5 +54,6 @@ export interface OutputFormat {
   id: FormatId;
   name: string;
   supportsImport: boolean;
+  supportsExport: boolean;
   extension: FileExtension;
 }
