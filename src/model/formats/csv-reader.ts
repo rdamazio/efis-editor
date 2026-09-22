@@ -70,7 +70,7 @@ export class CsvReader {
     const itemRows: CsvItemRow[] = [];
 
     for (const [rowIndex, cells] of rows) {
-      const cellReader: CellReader = (column) => CsvUtils.cell(cells, columns, column);
+      const cellReader: CellReader = (column) => CsvUtils.getCell(cells, columns, column);
       const cellError: CellError = (column, message) =>
         new CsvFormatError(`cell ${CsvUtils.cellId(columns.get(column) ?? -1, rowIndex)}: ${message}`);
 
@@ -121,10 +121,10 @@ export class CsvReader {
 
   private static _checklistGroupsToEFIS(itemRows: CsvItemRow[]): ChecklistGroup[] {
     // Rows of one group or checklist don't have to be adjacent, so they are gathered by title
-    return [...CsvUtils.groupBy(itemRows, (row) => row.group)].map(([title, groupRows]) => ({
+    return [...Map.groupBy(itemRows, (row) => row.group)].map(([title, groupRows]) => ({
       category: ChecklistGroup_Category.normal,
       title: title,
-      checklists: [...CsvUtils.groupBy(groupRows, (row) => row.checklist)].map(([checklistTitle, checklistRows]) => ({
+      checklists: [...Map.groupBy(groupRows, (row) => row.checklist)].map(([checklistTitle, checklistRows]) => ({
         title: checklistTitle,
         completionAction: Checklist_CompletionAction.ACTION_GO_TO_NEXT_CHECKLIST,
         items: checklistRows.map((row) => row.item),

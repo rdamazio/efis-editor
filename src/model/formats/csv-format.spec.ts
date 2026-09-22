@@ -73,6 +73,7 @@ describe('CsvFormat', () => {
     );
     expect(checklistFile.groups).toHaveLength(1);
     expect(checklistFile.groups[0].title).toBe('Group 1');
+    expect(checklistFile.groups[0].checklists).toHaveLength(1);
     expect(checklistFile.groups[0].checklists[0].items).toEqual([
       ChecklistItem.create({ type: ChecklistItem_Type.ITEM_TITLE, prompt: 'BEFORE START', centered: true }),
       ChecklistItem.create({

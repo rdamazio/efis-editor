@@ -2,8 +2,11 @@ import { ChecklistFile, ChecklistFileMetadata } from '../../../gen/ts/checklist'
 import { CsvItemRow, CsvUtils } from './csv-utils';
 
 export class CsvWriter {
+  // Fields containing quotes, commas or line breaks have to be quoted (RFC 4180)
+  private static readonly QUOTABLE = /["\r\n,]/;
+
   public static write(file: ChecklistFile): Blob {
-    return new Blob([CsvUtils.BOM, ...CsvWriter._rows(file).map(CsvUtils.formatRow)], {
+    return new Blob([CsvUtils.BOM, ...CsvWriter._rows(file).map(CsvWriter._formatRow)], {
       type: 'text/csv;charset=utf-8',
     });
   }
@@ -44,5 +47,13 @@ export class CsvWriter {
         checklist.items.map((item): CsvItemRow => ({ group: group.title, checklist: checklist.title, item: item })),
       ),
     );
+  }
+
+  private static _formatRow(cells: readonly string[]): string {
+    return `${cells.map(CsvWriter._formatCell).join(',')}\r\n`;
+  }
+
+  private static _formatCell(cell: string): string {
+    return CsvWriter.QUOTABLE.test(cell) ? `"${cell.replaceAll('"', '""')}"` : cell;
   }
 }
