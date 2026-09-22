@@ -66,10 +66,7 @@ export class CsvUtils {
   public static readonly CENTERED_VALUE = 'true';
   public static readonly CENTERED_VALUES: ReadonlySet<string> = new Set([CsvUtils.CENTERED_VALUE, '1', 'yes']);
 
-  // Fields containing quotes, commas or line breaks have to be quoted (RFC 4180)
-  private static readonly QUOTABLE = /["\r\n,]/;
-
-  private static readonly COLUMN_BY_LABEL = new Map<string, CsvColumn>(
+  public static readonly COLUMN_BY_LABEL = new Map<string, CsvColumn>(
     CsvUtils.COLUMNS.map(([column]): [string, CsvColumn] => [CsvUtils.normalizeLabel(column), column]),
   );
 
@@ -104,7 +101,7 @@ export class CsvUtils {
     return columns;
   }
 
-  public static cell(cells: string[], columns: CsvColumnIndexes, column: CsvColumn): string {
+  public static getCell(cells: string[], columns: CsvColumnIndexes, column: CsvColumn): string {
     const index = columns.get(column);
     return index === undefined ? '' : (cells.at(index) ?? '');
   }
@@ -133,25 +130,5 @@ export class CsvUtils {
     return columnIndex < 0
       ? ''
       : CsvUtils._columnLetters(Math.floor(columnIndex / 26) - 1) + String.fromCharCode(0x41 + (columnIndex % 26));
-  }
-
-  public static formatRow(cells: readonly string[]): string {
-    return `${cells.map(CsvUtils._formatCell).join(',')}\r\n`;
-  }
-
-  private static _formatCell(cell: string): string {
-    return CsvUtils.QUOTABLE.test(cell) ? `"${cell.replaceAll('"', '""')}"` : cell;
-  }
-
-  /** Polyfill for Map.groupBy for all currently supported browsers */
-  public static groupBy(rows: CsvItemRow[], key: (row: CsvItemRow) => string): Map<string, CsvItemRow[]> {
-    const groups = new Map<string, CsvItemRow[]>();
-    for (const row of rows) {
-      const rowKey = key(row);
-      const group = groups.get(rowKey) ?? [];
-      group.push(row);
-      groups.set(rowKey, group);
-    }
-    return groups;
   }
 }
