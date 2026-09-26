@@ -86,6 +86,8 @@ jobs:
         uses: $/.github/actions/build-prep
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Validate NPM dependencies
+        run: npm i --dry-run
       - run: npm run lint
       - run: npm run lint:actions
       - run: npm run format

@@ -25,7 +25,7 @@
     "spell:fix": "codespell -w -i 3 src/",
     "lint:dependabot": "npx -y @bugron/validate-dependabot-yaml@latest",
     "lint:actions": "for f in .github/workflows/*.yml; do echo Validating $f && npx @action-validator/cli $f; done",
-    "prepush": "npm clean-install && npm run genproto && npm run lint && npm run format && npm run spell && npm run lint:dependabot && npm run lint:actions && npm run test:coverage",
+    "prepush": "npm clean-install && npm i --dry-run && npm run genproto && npm run lint && npm run format && npm run spell && npm run lint:dependabot && npm run lint:actions && npm run test:coverage",
     "prepush:fix": "npm run format:fix && npm run spell:fix",
     "push": "jj bookmark move main --to @- && jj git push -b main"
   },
