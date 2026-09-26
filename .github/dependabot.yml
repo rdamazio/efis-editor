@@ -28,7 +28,7 @@ updates:
     groups:
       infra:
         applies-to: version-updates
-        patterns:
+        patterns: &infra-patterns
           - '@angular*'
           - '@testing-library/*'
           - '@types/node'
@@ -36,16 +36,22 @@ updates:
           - '*playwright*'
           - '*protobuf*'
           - 'rxjs'
-          - '*vitest*'
-          - 'zone.js'
-        exclude-patterns:
-          - '*eslint*'
-          - '*prettier*'
-      typescript:
-        applies-to: version-updates
-        patterns:
           - 'tslib'
           - 'typescript'
+          - '*vitest*'
+          - 'zone.js'
+        exclude-patterns: &infra-exclude-patterns
+          - '*eslint*'
+          - '*prettier*'
+        update-types:
+          - 'minor'
+          - 'patch'
+      infra-major:
+        applies-to: version-updates
+        patterns: *infra-patterns
+        exclude-patterns: *infra-exclude-patterns
+        update-types:
+          - 'major'
       lint:
         applies-to: version-updates
         patterns:
