@@ -36,16 +36,36 @@ updates:
           - '*playwright*'
           - '*protobuf*'
           - 'rxjs'
+          - 'tslib'
+          - 'typescript'
           - '*vitest*'
           - 'zone.js'
         exclude-patterns:
           - '*eslint*'
           - '*prettier*'
-      typescript:
+        update-types:
+          - 'minor'
+          - 'patch'
+      infra-major:
         applies-to: version-updates
+        # TODO: Reduce duplication with alises if https://github.com/dependabot/dependabot-core/issues/1582 is addressed.
         patterns:
+          - '@angular*'
+          - '@testing-library/*'
+          - '@types/node'
+          - '*express*'
+          - '*playwright*'
+          - '*protobuf*'
+          - 'rxjs'
           - 'tslib'
           - 'typescript'
+          - '*vitest*'
+          - 'zone.js'
+        exclude-patterns:
+          - '*eslint*'
+          - '*prettier*'
+        update-types:
+          - 'major'
       lint:
         applies-to: version-updates
         patterns:
