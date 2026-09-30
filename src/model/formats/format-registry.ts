@@ -9,6 +9,7 @@ import {
   OutputFormat,
 } from './abstract-format';
 import { AceFormat } from './ace-format';
+import { CsvFormat } from './csv-format';
 import { DynonFormat, DynonFormatOptions } from './dynon-format';
 import { FormatError } from './error';
 import { ForeFlightFormat } from './foreflight-format';
@@ -75,6 +76,7 @@ class FormatRegistry {
 export const FORMAT_REGISTRY = new FormatRegistry();
 
 FORMAT_REGISTRY.register(AceFormat, FormatId.ACE, 'Garmin G3X™/GTN™');
+FORMAT_REGISTRY.register(CsvFormat, FormatId.CSV, 'CSV spreadsheet');
 FORMAT_REGISTRY.register<DynonFormatOptions>(DynonFormat, FormatId.AFD, 'Advanced Flight Systems', {
   extension: `.${FormatId.AFD}`,
   fileName: 'CHKLST.AFD',

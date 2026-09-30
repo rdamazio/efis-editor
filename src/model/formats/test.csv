@@ -1,0 +1,30 @@
+Name:,Test checklist name
+Make & Model:,Test make and model
+Aircraft:,Test aircraft
+Manufacturer Info:,Test manufacturer
+Copyright Info:,Test copyright
+Default Group:,Test group 2 (default)
+Default Checklist:,Test group 2 checklist 3 (default)
+
+Group,Checklist,Type,Text,Response,Indent,Center
+Test group 1,Test group 1 checklist 1,Challenge,Challenge item,,,
+Test group 1,Test group 1 checklist 1,Challenge,Challenge item 2,Item response,,
+Test group 1,Test group 1 checklist 1,Information,Plain text item,,,
+Test group 1,Test group 1 checklist 1,Note,Note item,,,
+Test group 1,Test group 1 checklist 1,Title Bar,Subtitle item,,,
+Test group 1,Test group 1 checklist 1,Warning,Warning item,,,
+Test group 1,Test group 1 checklist 1,Caution,Caution item,,,
+Test group 1,Test group 1 checklist 1,Information,Item with 1 blank line,,,
+Test group 1,Test group 1 checklist 1,Space,,,,
+Test group 1,Test group 1 checklist 1,Challenge,Item with 2 blank lines,,,
+Test group 1,Test group 1 checklist 1,Space,,,,
+Test group 1,Test group 1 checklist 1,Space,,,,
+Test group 1,Test group 1 checklist 1,Challenge,Item with a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long text,Response with a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long text,,
+Test group 1,Test group 1 checklist 1,Information,Item with indent 1,,1,
+Test group 1,Test group 1 checklist 1,Note,Item with indent 2,,2,
+Test group 1,Test group 1 checklist 1,Caution,Item with indent 3,,3,
+Test group 1,Test group 1 checklist 1,Warning,Item with indent 4,,4,
+Test group 1,Test group 1 checklist 1,Title Bar,Centered item,,,true
+Test group 2 (default),Test group 2 checklist 1,Information,Test group 2 checklist 1 item 1,,,
+Test group 2 (default),Test group 2 checklist 2,Title Bar,Test group 2 checklist 2 item 1,,,
+Test group 2 (default),Test group 2 checklist 3 (default),Note,Test group 2 checklist 3 item 1,,,

@@ -1,6 +1,7 @@
 export const enum FormatId {
   ACE = 'ace',
   AFD = 'afd',
+  CSV = 'csv',
   DYNON = 'dynon',
   DYNON31 = 'dynon31',
   DYNON40 = 'dynon40',
