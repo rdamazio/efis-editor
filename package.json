@@ -39,7 +39,7 @@
     "@angular/material": "^22.1.7",
     "@angular/platform-browser": "^22.1.7",
     "@angular/platform-server": "^22.1.7",
-    "@angular/router": "^22.1.7",
+    "@angular/router": "^22.2.0",
     "@angular/service-worker": "^22.1.7",
     "@angular/ssr": "^22.1.8",
     "@ngneat/hotkeys": "^4.1.0",
