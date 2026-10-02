@@ -21,42 +21,28 @@ updates:
         applies-to: version-updates
         patterns:
           - '@angular*'
-          - '@testing-library/*'
           - '@types/node'
           - '*express*'
-          - '*playwright*'
           - '*protobuf*'
           - 'rxjs'
           - 'tslib'
           - 'typescript'
-          - '*vitest*'
           - 'zone.js'
         exclude-patterns:
           - '*eslint*'
-          - '*prettier*'
-        update-types:
-          - 'minor'
-          - 'patch'
-      infra-major:
+      testing:
         applies-to: version-updates
-        # TODO: Reduce duplication with alises if https://github.com/dependabot/dependabot-core/issues/1582 is addressed.
+        patterns:
+          - '@testing-library/*'
+          - '*playwright*'
+          - '*vitest*'
+        exclude-patterns:
+          - '*eslint*'
+      angular-security:
+        # Angular packages must always be updated together, even for security reasons.
+        applies-to: security-updates
         patterns:
           - '@angular*'
-          - '@testing-library/*'
-          - '@types/node'
-          - '*express*'
-          - '*playwright*'
-          - '*protobuf*'
-          - 'rxjs'
-          - 'tslib'
-          - 'typescript'
-          - '*vitest*'
-          - 'zone.js'
-        exclude-patterns:
-          - '*eslint*'
-          - '*prettier*'
-        update-types:
-          - 'major'
       lint:
         applies-to: version-updates
         patterns:
