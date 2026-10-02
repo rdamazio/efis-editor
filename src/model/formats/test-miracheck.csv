@@ -1,0 +1,19 @@
+﻿list,section,label1,label2,labelOnly,labelOnlyBackgroundColor,mandatory
+"Preflight","Before Start","Fuel Selector","Both",Both,false,#FFF8C6,false
+"Preflight","Before Start","Master
+","On
+",On
+,false,#FFF8C6,false
+"Preflight","Before Start","Throttle","1,000 RPM",1,000 RPM,false,#FFF8C6,false
+"Preflight","Before Start","Engine Run-up","",,true,#FFF8C6,false
+"Preflight","Before Start","Mixture","​
+",​
+,false,#FFF8C6,true
+"Preflight","Before Takeoff","Doors","Closed, latched",Closed, latched,false,#FFF8C6,false
+"Emergency","Engine Fire","Radio","Declare ""MAYDAY""",Declare ""MAYDAY"",false,#FFF8C6,false
+"Emergency","Engine Fire","Land","As soon as possible and if the fire
+does not go out, evacuate",As soon as possible and if the fire
+does not go out, evacuate,false,#FFF8C6,false
+"Reference","Speeds","V-Speeds","Vx - 60 kts
+Vy - 75 kts",Vx - 60 kts
+Vy - 75 kts,false,#FFF8C6,false

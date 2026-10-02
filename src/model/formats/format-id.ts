@@ -8,5 +8,6 @@ export const enum FormatId {
   GARMIN_PILOT = 'gplt',
   GRT = 'grt',
   JSON = 'json',
+  MIRACHECK = 'miracheck',
   PDF = 'pdf',
 }
