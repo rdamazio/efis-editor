@@ -11,7 +11,7 @@ describe('FormatRegistry', () => {
 
   it('should reject getting an unknown format', () => {
     expect(() => {
-      FORMAT_REGISTRY.getFormat('foobar' as FormatId);
+      FORMAT_REGISTRY.getFormat('foobar' as unknown as FormatId);
     }).toThrow(/not registered/);
   });
 
