@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { RouterLink } from '@angular/router';
 import { BROWSERS, DeviceDetectorService, DeviceType, OS } from 'ngx-device-detector';
+import { FormatSupport } from '../../model/formats/abstract-format';
 import { FORMAT_REGISTRY } from '../../model/formats/format-registry';
 import { DriveSyncState, GoogleDriveStorage } from '../../model/storage/gdrive';
 
@@ -19,6 +20,8 @@ export class WelcomeComponent {
   private readonly _deviceService = inject(DeviceDetectorService);
   private readonly _gdriveState = toSignal(this._gdrive.getState());
   protected readonly _formatRegistry = FORMAT_REGISTRY;
+  protected readonly _importOnly = FormatSupport.IMPORT_ONLY;
+  protected readonly _exportOnly = FormatSupport.EXPORT_ONLY;
 
   public readonly installUrl = computed(() => this._getInstallUrl());
   public readonly showStorageWarning = computed(() => this._gdriveState() === DriveSyncState.DISCONNECTED);

@@ -1,0 +1,8 @@
+list,section,label1,label2,comments,labelOnly,labelOnlyBackgroundColor,mandatory
+Preflight,Before Start,Fuel Selector,BOTH,,,,TRUE
+Preflight,Before Start,"Oil Pressure, Temperature",CHECK,,FALSE,lightyellow,FALSE
+Preflight,Before Start,Run-up,,,TRUE,,
+Preflight,Before Start,Magnetos,CHECK,"<175 RPM drop on each,<50 RPM drop between",,,
+,,,,,,,
+Emergency,Engine Fire,Radio,"Declare ""MAYDAY""","<p>Squawk 7700 &amp; state position</p>
+<p>Souls&nbsp;on board</p>",false,,true
