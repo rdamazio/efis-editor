@@ -1,7 +1,18 @@
-import '@testing-library/jest-dom/vitest';
-import { afterEach, beforeEach, vi } from 'vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
+import { afterEach, beforeEach, expect, vi } from 'vitest';
 import 'zone.js';
 import 'zone.js/testing';
+
+// TODO: Switch back to `import '@testing-library/jest-dom/vitest'` and remove this once
+// https://github.com/testing-library/jest-dom/pull/742 is fixed.
+declare module 'vitest' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface Assertion<R, T> extends matchers.TestingLibraryMatchers<T, R> {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface AsymmetricMatchersContaining extends matchers.TestingLibraryMatchers<unknown, unknown> {}
+}
+
+expect.extend(matchers);
 
 vi.setConfig({ testTimeout: 60000 });
 

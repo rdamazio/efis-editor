@@ -39,6 +39,7 @@ yarn-error.log
 /test-results
 __screenshots__/
 .vitest-attachments/
+.vitest/
 
 # Miscellaneous
 /.angular/cache

@@ -107,12 +107,12 @@
     "vitest-mock-extended": "^5.1.1"
   },
   "allowScripts": {
-    "@parcel/watcher@2.5.6": true,
     "core-js@3.49.0": true,
     "fsevents@2.3.2": true,
     "fsevents@2.3.3": true,
     "msgpackr-extract@3.0.4": true,
     "esbuild@0.28.2": true,
-    "lmdb@3.5.6": true
+    "lmdb@3.5.6": true,
+    "@parcel/watcher@2.6.0": true
   }
 }
